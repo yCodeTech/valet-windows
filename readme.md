@@ -26,7 +26,7 @@ wget https://github.com/cretueusebiu/valet-windows/raw/master/bin/php-installer.
 ``` 
 > This script will download and install PHP 7.1 for you and it to your environment Path variable. PowerShell is only required for installing PHP this way.
 
-- Configue Network by following this [guide](http://mayakron.altervista.org/wikibase/show.php?id=AcrylicWindows10Configuration).
+- Configure your Network by following this [guide](http://mayakron.altervista.org/wikibase/show.php?id=AcrylicWindows10Configuration).
 
 - If you don't have Composer installed, make sure to [install](https://getcomposer.org/Composer-Setup.exe) it.
 
