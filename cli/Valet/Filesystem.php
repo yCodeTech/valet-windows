@@ -262,7 +262,7 @@ class Filesystem
             if (is_dir($path)) {
                 exec("cd \"{$dir}\" && rmdir {$link}");
             } else {
-                exec("cd \"{$dir}\" && del {$link}");
+                @unlink($path);
             }
         } elseif (file_exists($path)) {
             @unlink($path);
