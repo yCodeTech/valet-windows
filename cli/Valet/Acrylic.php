@@ -69,7 +69,7 @@ class Acrylic
     {
         $this->stop();
 
-        $this->cli->quietly('cmd "/C '.$this->path().'/AcrylicController UninstallAcrylicService"');
+        $this->cli->run('cmd "/C '.$this->path().'/AcrylicController UninstallAcrylicService"');
     }
 
     public function start()
