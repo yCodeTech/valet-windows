@@ -23,7 +23,6 @@ class PhpFpmTest extends PHPUnit_Framework_TestCase
 
     public function test_fpm_is_configured()
     {
-
     }
 }
 
