@@ -2,8 +2,6 @@
 
 namespace Valet;
 
-use CommandLine as CommandLineFacade;
-
 class Filesystem
 {
     /**
@@ -246,8 +244,6 @@ class Filesystem
         $mode = is_dir($target) ? 'J' : 'H';
 
         exec("mklink /{$mode} \"{$link}\" \"{$target}\"");
-
-        // CommandLineFacade::runAsUser('ln -s '.escapeshellarg($target).' '.escapeshellarg($link));
     }
 
     /**
@@ -263,7 +259,11 @@ class Filesystem
             $dir = pathinfo($path, PATHINFO_DIRNAME);
             $link = pathinfo($path, PATHINFO_BASENAME);
 
-            exec("cd \"{$dir}\" && rmdir {$link}");
+            if (is_dir($path)) {
+                exec("cd \"{$dir}\" && rmdir {$link}");
+            } else {
+                exec("cd \"{$dir}\" && del {$link}");
+            }
         } elseif (file_exists($path)) {
             @unlink($path);
         }
@@ -358,7 +358,7 @@ class Filesystem
      */
     public function isBrokenLink($path)
     {
-        return is_link($path) && !file_exists($path);
+        return is_link($path) || @readlink($path) === false;
     }
 
     /**

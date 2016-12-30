@@ -1,9 +1,10 @@
 <p align="center"><img src="https://laravel.com/assets/img/components/logo-valet.svg"></p>
 
 <p align="center">
-<a href="https://packagist.org/packages/cretueusebiu/valet"><img src="https://poser.pugx.org/cretueusebiu/valet/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/cretueusebiu/valet"><img src="https://poser.pugx.org/cretueusebiu/valet/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/cretueusebiu/valet"><img src="https://poser.pugx.org/cretueusebiu/valet/license.svg" alt="License"></a>
+<a href="https://travis-ci.org/cretueusebiu/valet-windows"><img src="https://travis-ci.org/cretueusebiu/valet-windows.svg" alt="Build Status"></a>
+<a href="https://packagist.org/packages/cretueusebiu/valet-windows"><img src="https://poser.pugx.org/cretueusebiu/valet-windows/d/total.svg" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/cretueusebiu/valet-windows"><img src="https://poser.pugx.org/cretueusebiu/valet-windows/v/stable.svg" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/cretueusebiu/valet-windows"><img src="https://poser.pugx.org/cretueusebiu/valet-windows/license.svg" alt="License"></a>
 </p>
 
 <p align="center">Windows port of the popular development environment <a href="https://github.com/laravel/valet">Laravel Valet</a>.</p>

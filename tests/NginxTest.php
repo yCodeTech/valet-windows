@@ -25,7 +25,7 @@ class NginxTest extends PHPUnit_Framework_TestCase
         $files = Mockery::mock(Filesystem::class.'[putAsUser]');
 
         $files->shouldReceive('putAsUser')->andReturnUsing(function ($path, $contents) {
-            $this->assertSame('/usr/local/etc/nginx/nginx.conf', $path);
+            $this->assertSame(realpath(__DIR__.'/../bin/nginx').'/conf/nginx.conf', $path);
             $this->assertTrue(strpos($contents, 'include '.VALET_HOME_PATH.'/Nginx/*') !== false);
         })->once();
 
@@ -35,7 +35,7 @@ class NginxTest extends PHPUnit_Framework_TestCase
         $nginx->installConfiguration();
     }
 
-    public function test_install_caddy_directories_creates_location_for_site_specific_configuration()
+    public function test_install_nginx_directories_creates_location_for_site_specific_configuration()
     {
         $files = Mockery::mock(Filesystem::class);
         $files->shouldReceive('isDir')->with(VALET_HOME_PATH.'/Nginx')->andReturn(false);
