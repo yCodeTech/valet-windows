@@ -32,6 +32,12 @@ class Acrylic
         $this->restart();
     }
 
+    /**
+     * Create the AcrylicHosts file.
+     *
+     * @param  string $domain
+     * @return void
+     */
     public function createConfigFile($domain)
     {
         $contents = $this->files->get(__DIR__.'/../stubs/AcrylicHosts.txt');
@@ -65,6 +71,11 @@ class Acrylic
         $this->restart();
     }
 
+    /**
+     * Uninstall the Acrylic DNS service.
+     *
+     * @return void
+     */
     public function uninstall()
     {
         $this->stop();
@@ -72,6 +83,11 @@ class Acrylic
         $this->cli->run('cmd "/C '.$this->path().'/AcrylicController UninstallAcrylicService"');
     }
 
+    /**
+     * Start the Acrylic DNS service.
+     *
+     * @return void
+     */
     public function start()
     {
         $this->cli->runOrDie('cmd "/C '.$this->path().'/AcrylicController StartAcrylicServiceSilently"', function ($code, $output) {
@@ -81,6 +97,11 @@ class Acrylic
         $this->flushdns();
     }
 
+    /**
+     * Stop the Acrylic DNS service.
+     *
+     * @return void
+     */
     public function stop()
     {
         $this->cli->run('cmd "/C '.$this->path().'/AcrylicController StopAcrylicServiceSilently"');
@@ -88,6 +109,11 @@ class Acrylic
         $this->flushdns();
     }
 
+    /**
+     * Restart the Acrylic DNS service.
+     *
+     * @return void
+     */
     public function restart()
     {
         $this->stop();
@@ -95,6 +121,11 @@ class Acrylic
         $this->start();
     }
 
+    /**
+     * Flush Windows DNS.
+     *
+     * @return void
+     */
     public function flushdns()
     {
         $this->cli->run('cmd "/C ipconfig /flushdns"');
