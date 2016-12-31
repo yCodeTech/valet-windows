@@ -43,8 +43,9 @@ class WinSW
     /**
      * Create the service XML configuration file.
      *
-     * @param  string $service
-     * @param  array  $args
+     * @param string $service
+     * @param array  $args
+     *
      * @return void
      */
     protected function createConfiguration($service, $args = [])

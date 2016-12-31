@@ -24,7 +24,8 @@ class Acrylic
     /**
      * Install the Acrylic DNS service.
      *
-     * @param  string $domain
+     * @param string $domain
+     *
      * @return void
      */
     public function install($domain = 'dev')
@@ -41,7 +42,8 @@ class Acrylic
     /**
      * Create the AcrylicHosts file.
      *
-     * @param  string $domain
+     * @param string $domain
+     *
      * @return void
      */
     public function createHostsFile($domain)

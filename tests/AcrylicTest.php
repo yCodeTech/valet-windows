@@ -1,10 +1,9 @@
 <?php
 
 use Illuminate\Container\Container;
-use Valet\Configuration;
-use Valet\Filesystem;
-use Valet\CommandLine;
 use Valet\Acrylic;
+use Valet\CommandLine;
+use Valet\Filesystem;
 
 class AcrylicTest extends PHPUnit_Framework_TestCase
 {
@@ -54,7 +53,7 @@ class AcrylicTest extends PHPUnit_Framework_TestCase
 
     public function test_update_domain()
     {
-        $acrylic = Mockery::mock(Acrylic::class.'[stop,createHostsFile,restart]',[resolve(CommandLine::class), resolve(Filesystem::class)]);
+        $acrylic = Mockery::mock(Acrylic::class.'[stop,createHostsFile,restart]', [resolve(CommandLine::class), resolve(Filesystem::class)]);
         $acrylic->shouldReceive('stop')->once();
         $acrylic->shouldReceive('createHostsFile')->with('app')->once();
         $acrylic->shouldReceive('restart')->once();
