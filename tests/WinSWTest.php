@@ -1,9 +1,8 @@
 <?php
 
 use Illuminate\Container\Container;
-use Valet\Configuration;
-use Valet\Filesystem;
 use Valet\CommandLine;
+use Valet\Filesystem;
 use Valet\WinSW;
 
 class WinSWTest extends PHPUnit_Framework_TestCase
@@ -34,7 +33,7 @@ class WinSWTest extends PHPUnit_Framework_TestCase
 
         $files->shouldReceive('copy')->andReturnUsing(function ($from, $to) {
             $this->assertSame(realpath(__DIR__.'/../bin').'/winsw.exe', $from);
-            $this->assertSame(VALET_HOME_PATH."/Services/testservice.exe", $to);
+            $this->assertSame(VALET_HOME_PATH.'/Services/testservice.exe', $to);
         })->once();
 
         $cli = Mockery::mock(CommandLine::class);
