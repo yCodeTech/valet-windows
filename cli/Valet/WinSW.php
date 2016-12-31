@@ -4,8 +4,8 @@ namespace Valet;
 
 class WinSW
 {
-    public $cli;
-    public $files;
+    protected $cli;
+    protected $files;
 
     /**
      * Create a new WinSW instance.
@@ -29,6 +29,26 @@ class WinSW
      */
     public function install($service, $args = [])
     {
+        $this->createConfiguration($service, $args);
+
+        $bin = realpath(__DIR__.'/../../bin');
+        $this->files->copy("$bin/winsw.exe", VALET_HOME_PATH."/Services/$service.exe");
+
+        $command = 'cmd "/C cd '.VALET_HOME_PATH.'\Services && '.$service.' install"';
+        $this->cli->runOrDie($command, function () use ($service) {
+            warning("Could not install the $service service. Check ~/.valet/Log for errors.");
+        });
+    }
+
+    /**
+     * Create the service XML configuration file.
+     *
+     * @param  string $service
+     * @param  array  $args
+     * @return void
+     */
+    protected function createConfiguration($service, $args = [])
+    {
         $args['VALET_HOME_PATH'] = VALET_HOME_PATH;
 
         $contents = $this->files->get(__DIR__."/../stubs/$service.xml");
@@ -37,16 +57,6 @@ class WinSW
             VALET_HOME_PATH."/Services/$service.xml",
             str_replace(array_keys($args), array_values($args), $contents)
         );
-
-        $binPath = realpath(__DIR__.'/../../bin');
-
-        $this->files->copy("$binPath/winsw.exe", VALET_HOME_PATH."/Services/$service.exe");
-
-        $command = 'cmd "/C cd '.VALET_HOME_PATH.'\Services && '.$service.' install"';
-
-        $this->cli->runOrDie($command, function () use ($service) {
-            warning("Could not install the $service service. Check ~/.valet/Log for errors.");
-        });
     }
 
     /**

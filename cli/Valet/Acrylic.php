@@ -4,8 +4,8 @@ namespace Valet;
 
 class Acrylic
 {
-    public $cli;
-    public $files;
+    protected $cli;
+    protected $files;
 
     /**
      * Create a new Acrylic instance.
@@ -21,13 +21,19 @@ class Acrylic
         $this->files = $files;
     }
 
+    /**
+     * Install the Acrylic DNS service.
+     *
+     * @param  string $domain
+     * @return void
+     */
     public function install($domain = 'dev')
     {
+        $this->createHostsFile($domain);
+
         $this->cli->runOrDie('cmd "/C '.$this->path().'/AcrylicController InstallAcrylicService"', function ($code, $output) {
             warning($output);
         });
-
-        $this->createConfigFile($domain);
 
         $this->restart();
     }
@@ -38,7 +44,7 @@ class Acrylic
      * @param  string $domain
      * @return void
      */
-    public function createConfigFile($domain)
+    public function createHostsFile($domain)
     {
         $contents = $this->files->get(__DIR__.'/../stubs/AcrylicHosts.txt');
 
@@ -57,16 +63,15 @@ class Acrylic
     /**
      * Update the domain used by Acrylic DNS.
      *
-     * @param string $oldDomain
      * @param string $newDomain
      *
      * @return void
      */
-    public function updateDomain($oldDomain, $newDomain)
+    public function updateDomain($domain)
     {
         $this->stop();
 
-        $this->createConfigFile($newDomain);
+        $this->createHostsFile($domain);
 
         $this->restart();
     }

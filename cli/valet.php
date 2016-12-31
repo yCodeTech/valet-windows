@@ -60,7 +60,7 @@ $app->command('domain [domain]', function ($domain = null) {
     $oldDomain = Configuration::read()['domain'];
     $domain = trim($domain, '.');
 
-    Acrylic::updateDomain($oldDomain, $domain);
+    Acrylic::updateDomain($domain);
 
     Configuration::updateKey('domain', $domain);
 
