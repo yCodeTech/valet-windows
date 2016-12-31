@@ -7,8 +7,6 @@ class Valet
     public $cli;
     public $files;
 
-    public $valetBin = '/usr/local/bin/valet';
-
     /**
      * Create a new Valet instance.
      *
@@ -19,31 +17,6 @@ class Valet
     {
         $this->cli = $cli;
         $this->files = $files;
-    }
-
-    /**
-     * Symlink the Valet Bash script into the user's local bin.
-     *
-     * @return void
-     */
-    public function symlinkToUsersBin()
-    {
-        $this->cli->quietlyAsUser('rm '.$this->valetBin);
-
-        $this->cli->runAsUser('ln -s '.realpath(__DIR__.'/../../valet').' '.$this->valetBin);
-    }
-
-    /**
-     * Create the "sudoers.d" entry for running Valet.
-     *
-     * @return void
-     */
-    public function createSudoersEntry()
-    {
-        $this->files->ensureDirExists('/etc/sudoers.d');
-
-        $this->files->put('/etc/sudoers.d/valet', 'Cmnd_Alias VALET = /usr/local/bin/valet *
-%admin ALL=(root) NOPASSWD: VALET'.PHP_EOL);
     }
 
     /**
