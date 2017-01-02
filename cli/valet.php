@@ -93,9 +93,7 @@ $app->command('forget [path]', function ($path = null) {
  * Register a symbolic link with Valet.
  */
 $app->command('link [name]', function ($name) {
-    $target = getcwd().($name ? '/'.$name : '');
-
-    $linkPath = Site::link($target, $name = $name ?: basename(getcwd()));
+    $linkPath = Site::link(getcwd(), $name = $name ?: basename(getcwd()));
 
     info('A ['.$name.'] symbolic link has been created in ['.$linkPath.'].');
 })->descriptions('Link the current working directory to Valet');
