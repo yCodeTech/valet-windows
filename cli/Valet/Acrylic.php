@@ -32,6 +32,8 @@ class Acrylic
     {
         $this->createHostsFile($domain);
 
+        $this->configureNetworkDNS();
+
         $this->cli->runOrDie('cmd "/C '.$this->path().'/AcrylicController InstallAcrylicService"', function ($code, $output) {
             warning($output);
         });
@@ -60,6 +62,18 @@ class Acrylic
         if (!$this->files->exists($customConfigPath)) {
             $this->files->putAsUser($customConfigPath, PHP_EOL);
         }
+    }
+
+    /**
+     * Configure the Network DNS.
+     *
+     * @return void
+     */
+    public function configureNetworkDNS()
+    {
+        $bin = realpath(__DIR__.'/../../bin');
+
+        $this->cli->run('cmd "/C cd '.$bin.' && configuredns"');
     }
 
     /**

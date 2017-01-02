@@ -26,8 +26,6 @@ wget https://github.com/cretueusebiu/valet-windows/raw/master/bin/php-installer.
 ``` 
 > This script will download and install PHP 7.1 for you and it to your environment Path variable. PowerShell is only required for installing PHP this way.
 
-- Configure your Network by following this [guide](http://mayakron.altervista.org/wikibase/show.php?id=AcrylicWindows10Configuration).
-
 - If you don't have Composer installed, make sure to [install](https://getcomposer.org/Composer-Setup.exe) it.
 
 - Install Valet with Composer via `composer global require cretueusebiu/valet-windows`.
@@ -42,6 +40,10 @@ For more please refer to the official documentation on the [Laravel website](htt
 
 - HTTP/2 does not work with secured sites.
 - When sharing sites the url will not be copied to the clipboard.
+
+## Change log
+
+Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
 
 ## License
 

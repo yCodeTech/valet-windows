@@ -42,8 +42,9 @@ class AcrylicTest extends PHPUnit_Framework_TestCase
             $this->assertSame('cmd "/C '.$this->path().'/AcrylicController InstallAcrylicService"', $command);
         })->once();
 
-        $acrylic = Mockery::mock(Acrylic::class.'[restart]', [$cli, $files]);
+        $acrylic = Mockery::mock(Acrylic::class.'[restart,configureNetworkDNS]', [$cli, $files]);
         $acrylic->shouldReceive('restart')->once();
+        $acrylic->shouldReceive('configureNetworkDNS')->once();
 
         swap(Acrylic::class, $acrylic);
         swap(CommandLine::class, $cli);
