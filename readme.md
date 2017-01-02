@@ -19,10 +19,10 @@ Laravel Valet configures your Windows to always run Nginx in the background when
 
 Before installation, make sure that no other programs such as Apache or Nginx are binding to your local machine's port 80. <br> Also make sure to open your preferred terminal (CMD, Git Bash, PowerShell, etc.) as Administrator. 
 
-- If you don't have PHP installed, open PowerShell as Administrator and run: 
+- If you don't have PHP installed, open PowerShell (3.0+) as Administrator and run: 
 
 ```bash
-wget https://github.com/cretueusebiu/valet-windows/raw/master/bin/php-installer.ps1 -OutFile $env:temp\php-installer.ps1; ."$env:temp\php-installer.ps1"
+Invoke-WebRequest -Uri "https://github.com/cretueusebiu/valet-windows/raw/master/bin/php-installer.ps1" -OutFile $env:temp\php-installer.ps1; ."$env:temp\php-installer.ps1"
 ``` 
 > This script will download and install PHP 7.1 for you and it to your environment Path variable. PowerShell is only required for installing PHP this way.
 
