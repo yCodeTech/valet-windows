@@ -22,7 +22,7 @@ Before installation, make sure that no other programs such as Apache or Nginx ar
 - If you don't have PHP installed, open PowerShell (3.0+) as Administrator and run: 
 
 ```bash
-Invoke-WebRequest -Uri "https://github.com/cretueusebiu/valet-windows/raw/master/bin/php-installer.ps1" -OutFile $env:temp\php-installer.ps1; ."$env:temp\php-installer.ps1"
+Set-ExecutionPolicy RemoteSigned; Invoke-WebRequest -Uri "https://github.com/cretueusebiu/valet-windows/raw/master/bin/php-installer.ps1" -OutFile $env:temp\php-installer.ps1; ."$env:temp\php-installer.ps1"
 ``` 
 > This script will download and install PHP 7.1 for you and it to your environment Path variable. PowerShell is only required for installing PHP this way.
 
