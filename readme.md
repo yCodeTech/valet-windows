@@ -24,7 +24,7 @@ Before installation, make sure that no other programs such as Apache or Nginx ar
 ```bash
 Set-ExecutionPolicy RemoteSigned; Invoke-WebRequest -Uri "https://github.com/cretueusebiu/valet-windows/raw/master/bin/php-installer.ps1" -OutFile $env:temp\php-installer.ps1; ."$env:temp\php-installer.ps1"
 ``` 
-> This script will download and install PHP 7.1 for you and it to your environment Path variable. PowerShell is only required for installing PHP this way.
+> This script will download and install PHP 7.1 for you and add it to your environment Path variable. PowerShell is only required for installing PHP this way.
 
 - If you don't have Composer installed, make sure to [install](https://getcomposer.org/Composer-Setup.exe) it.
 
