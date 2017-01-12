@@ -17,7 +17,7 @@ use Silly\Application;
  */
 Container::setInstance(new Container());
 
-$version = '2.0.4';
+$version = '2.0.5';
 
 $app = new Application('Laravel Valet for Windows', $version);
 
