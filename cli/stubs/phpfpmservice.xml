@@ -6,4 +6,5 @@
   <arguments>-b 127.0.0.1:9000</arguments>
   <logpath>VALET_HOME_PATH\Log\</logpath>
   <logmode>reset</logmode>
+  <onfailure action="restart"/>
 </service>
