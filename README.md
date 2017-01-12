@@ -41,10 +41,10 @@ For more please refer to the official documentation on the [Laravel website](htt
 - HTTP/2 does not work with secured sites.
 - When sharing sites the url will not be copied to the clipboard.
 
-## Change log
+## Changelog
 
 Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
 
 ## License
 
-Laravel Valet is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT)
+Laravel Valet is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT).
