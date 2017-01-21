@@ -42,7 +42,9 @@ $app->command('install', function () {
 
     Nginx::install();
     PhpFpm::install();
-    Acrylic::install();
+
+    $domain = Configuration::read()['domain'];
+    Acrylic::install($domain);
 
     Nginx::restart();
 
