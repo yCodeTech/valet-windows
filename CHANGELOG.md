@@ -1,8 +1,9 @@
 # Changelog
 
-## 2.0.6 - 2017-01-21
+## 2.0.7 - 2017-01-21
 
 - Fix Nginx when parking a directory from other drives than `C:`.
+- Read the domain set in config when reinstalling.
 
 ## 2.0.5 - 2017-01-12
 
