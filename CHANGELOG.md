@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.6 - 2017-01-21
+
+- Fix Nginx when parking a directory from other drives than `C:`.
+
 ## 2.0.5 - 2017-01-12
 
 - Restart PHP-FPM service on failure.
