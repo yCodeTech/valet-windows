@@ -169,10 +169,7 @@ abstract class ValetDriver
         header('Content-Type: text/html');
         header_remove('Content-Type');
 
-        // Remove drive letter.
-        $staticFilePath = explode(':', $staticFilePath, 2)[1];
-
-        header('X-Accel-Redirect: /'.VALET_STATIC_PREFIX.$staticFilePath);
+        header('X-Accel-Redirect: /'.VALET_STATIC_PREFIX.'/'.$staticFilePath);
     }
 
     /**
