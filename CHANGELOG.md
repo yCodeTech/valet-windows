@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.8 - 2017-01-25
+
+- Fix Nginx configuration for secured sites. Make sure to resecure your sites.
+
 ## 2.0.7 - 2017-01-21
 
 - Fix Nginx when parking a directory from other drives than `C:`.
