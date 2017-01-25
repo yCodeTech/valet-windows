@@ -2,7 +2,7 @@
 
 ## 2.0.8 - 2017-01-25
 
-- Fix Nginx configuration for secured sites. Make sure to resecure your sites.
+- Fixed Nginx configuration for secured sites.
 
 ## 2.0.7 - 2017-01-21
 
