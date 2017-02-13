@@ -1,5 +1,6 @@
-$phpUrl = "http://windows.php.net/downloads/releases/php-7.1.0-nts-Win32-VC14-x86.zip"
+$phpUrl = "http://windows.php.net/downloads/releases/php-7.1.1-nts-Win32-VC14-x86.zip"
 $phpIniUrl = "https://raw.githubusercontent.com/cretueusebiu/valet-windows/master/cli/stubs/php.ini"
+$caCertUrl = "https://curl.haxx.se/ca/cacert.pem"
 $zipfile = "$PSScriptRoot\php.zip"
 $outpath = "C:\php"
 
@@ -21,6 +22,9 @@ Remove-Item $zipfile
 
 # Download php.ini
 Start-BitsTransfer -Source $phpIniUrl -Destination $outpath\php.ini -Description " " -DisplayName "Installing php.ini..."
+
+# Download CA certificate
+Start-BitsTransfer -Source $caCertUrl -Destination $outpath\cacert.pem -Description " " -DisplayName "Installing CA certificate..."
 
 # Add PHP to the environment variable
 $env:Path += ";" + $outpath
