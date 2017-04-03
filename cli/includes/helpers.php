@@ -6,7 +6,6 @@ if (!isset($_SERVER['HOME'])) {
     $_SERVER['HOME'] = $_SERVER['USERPROFILE'];
 }
 
-
 $_SERVER['HOME'] = str_replace('\\', '/', $_SERVER['HOME']);
 
 /*
