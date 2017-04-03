@@ -34,7 +34,7 @@ class Acrylic
 
         $this->configureNetworkDNS();
 
-        $this->cli->runOrDie('cmd "/C '.$this->path().'/AcrylicController InstallAcrylicService"', function ($code, $output) {
+        $this->cli->runOrDie('cmd /C "'.$this->path().'/AcrylicController" InstallAcrylicService', function ($code, $output) {
             warning($output);
         });
 
@@ -73,7 +73,7 @@ class Acrylic
     {
         $bin = realpath(__DIR__.'/../../bin');
 
-        $this->cli->run('cmd "/C cd '.$bin.' && configuredns"');
+        $this->cli->run('cmd /C cd "'.$bin.'" && configuredns');
     }
 
     /**
@@ -101,7 +101,7 @@ class Acrylic
     {
         $this->stop();
 
-        $this->cli->run('cmd "/C '.$this->path().'/AcrylicController UninstallAcrylicService"');
+        $this->cli->run('cmd /C "'.$this->path().'/AcrylicController" UninstallAcrylicService');
     }
 
     /**
@@ -111,7 +111,7 @@ class Acrylic
      */
     public function start()
     {
-        $this->cli->runOrDie('cmd "/C '.$this->path().'/AcrylicController StartAcrylicServiceSilently"', function ($code, $output) {
+        $this->cli->runOrDie('cmd /C "'.$this->path().'/AcrylicController" StartAcrylicServiceSilently', function ($code, $output) {
             warning($output);
         });
 
@@ -125,7 +125,7 @@ class Acrylic
      */
     public function stop()
     {
-        $this->cli->run('cmd "/C '.$this->path().'/AcrylicController StopAcrylicServiceSilently"');
+        $this->cli->run('cmd /C "'.$this->path().'/AcrylicController" StopAcrylicServiceSilently');
 
         $this->flushdns();
     }
@@ -159,6 +159,6 @@ class Acrylic
      */
     public function path()
     {
-        return realpath(__DIR__.'/../../bin/Acrylic/');
+        return str_replace(DIRECTORY_SEPARATOR, '/', realpath(__DIR__.'/../../bin/Acrylic/'));
     }
 }
