@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.9 - 2017-04-03
+
+- Fixed issues ([#10](https://github.com/cretueusebiu/valet-windows/issues/10) and [#18](https://github.com/cretueusebiu/valet-windows/issues/18)) related to paths.
+
 ## 2.0.8 - 2017-01-25
 
 - Fixed Nginx configuration for secured sites.
