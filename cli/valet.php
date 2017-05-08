@@ -189,8 +189,9 @@ $app->command('paths', function () {
 $app->command('share', function () {
     $host = basename(getcwd());
     $domain = Configuration::read()['domain'];
+    $ngrok = realpath(__DIR__.'/../bin/ngrok.exe');
 
-    passthru('start '.__DIR__."/../bin/ngrok http $host.$domain:80 -host-header=rewrite");
+    passthru("start \"$host.$domain\" \"$ngrok\" http $host.$domain:80 -host-header=rewrite");
 })->descriptions('Generate a publicly accessible URL for your project');
 
 /*
