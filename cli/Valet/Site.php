@@ -211,6 +211,13 @@ class Site
         $x509 = new X509();
         $x509->setPrivateKey($privKey);
         $x509->setDNProp('commonname', $url);
+        
+        $x509->loadCSR($x509->saveCSR($x509->signCSR()));
+
+        // Set extension request. Fix for issue #29.
+        $x509->setExtension("id-ce-subjectAltName", [
+            ['dNSName' => $url]
+        ]);
 
         $csr = $x509->saveCSR($x509->signCSR());
 
