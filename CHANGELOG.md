@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.10 - 2017-05-23
+
+- Fixed SSL certificate ([#29](https://github.com/cretueusebiu/valet-windows/pull/30)).
+
 ## 2.0.9 - 2017-04-03
 
 - Fixed issues ([#10](https://github.com/cretueusebiu/valet-windows/issues/10) and [#18](https://github.com/cretueusebiu/valet-windows/issues/18)) related to paths.
