@@ -99,7 +99,7 @@ class Site
      * @param string $path
      * @return \Illuminate\Support\Collection
      */
-    protected function getCertificates(string $path)
+    protected function getCertificates($path)
     {
         return collect($this->files->scanDir($path))->filter(function ($value, $key) {
             return ends_with($value, '.crt');
@@ -115,7 +115,7 @@ class Site
      * @param \Illuminate\Support\Collection $certs
      * @return \Illuminate\Support\Collection
      */
-    protected function getLinks(string $path, \Illuminate\Support\Collection $certs)
+    protected function getLinks($path, $certs)
     {
         $config = $this->config->read();
 
