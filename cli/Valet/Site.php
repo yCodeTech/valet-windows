@@ -83,7 +83,8 @@ class Site
      *
      * @return \Illuminate\Support\Collection
      */
-    public function links() {
+    public function links()
+    {
         $certsPath = VALET_HOME_PATH.'/Certificates';
 
         $this->files->ensureDirExists($certsPath, user());
@@ -97,6 +98,7 @@ class Site
      * Get all certificates from config folder.
      *
      * @param string $path
+     *
      * @return \Illuminate\Support\Collection
      */
     protected function getCertificates($path)
@@ -111,21 +113,22 @@ class Site
     /**
      * Get list of links and present them formatted.
      *
-     * @param string $path
+     * @param string                         $path
      * @param \Illuminate\Support\Collection $certs
+     *
      * @return \Illuminate\Support\Collection
      */
     protected function getLinks($path, $certs)
     {
         $config = $this->config->read();
 
-        return collect($this->files->scanDir($path))->mapWithKeys(function ($site) use($path) {
+        return collect($this->files->scanDir($path))->mapWithKeys(function ($site) use ($path) {
             return [$site => $this->files->readLink($path.'/'.$site)];
-        })->map(function ($path, $site) use($certs, $config) {
+        })->map(function ($path, $site) use ($certs, $config) {
             $secured = $certs->has($site);
-            $url = ($secured ? 'https': 'http').'://'.$site.'.'.$config['domain'];
+            $url = ($secured ? 'https' : 'http').'://'.$site.'.'.$config['domain'];
 
-            return [$site, $secured ? ' X': '', $url, $path];
+            return [$site, $secured ? ' X' : '', $url, $path];
         });
     }
 
