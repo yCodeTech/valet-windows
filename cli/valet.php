@@ -175,13 +175,13 @@ $app->command('paths', function () {
 })->descriptions('Get all of the paths registered with Valet');
 
 /*
- * Open the current directory in the browser.
+ * Open the current or given directory in the browser.
  */
- $app->command('open', function () {
-     $url = 'http://'.Site::host(getcwd()).'.'.Configuration::read()['domain'].'/';
+ $app->command('open [domain]', function ($domain = null) {
+    $url = "http://".($domain ?: Site::host(getcwd())).'.'.Configuration::read()['domain'];
 
-     passthru("start $url");
- })->descriptions('Open the site for the current directory in your browser');
+    passthru("start $url");
+ })->descriptions('Open the site for the current (or specified) directory in your browser');
 
 /*
  * Generate a publicly accessible URL for your project.
