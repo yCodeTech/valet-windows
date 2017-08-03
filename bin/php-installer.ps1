@@ -1,4 +1,4 @@
-$phpUrl = "http://windows.php.net/downloads/releases/php-7.1.7-nts-Win32-VC14-x86.zip"
+$phpUrl = "http://windows.php.net/downloads/releases/php-7.1.8-nts-Win32-VC14-x86.zip"
 $phpIniUrl = "https://raw.githubusercontent.com/cretueusebiu/valet-windows/master/cli/stubs/php.ini"
 $caCertUrl = "https://curl.haxx.se/ca/cacert.pem"
 $zipfile = "$PSScriptRoot\php.zip"
