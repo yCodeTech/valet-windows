@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.0.11 - 2017-08-04
+
+- Pretty print sites
+- Update some drivers
+- Added wildcard certificates
+- Fixed Nginx upload max size
+- Added `--secure` option for `valet link`
+- Added ability to pass directory to `valet open`
+- Other minor fixes
+
 ## 2.0.10 - 2017-05-23
 
 - Fixed SSL certificate ([#29](https://github.com/cretueusebiu/valet-windows/pull/30)).
