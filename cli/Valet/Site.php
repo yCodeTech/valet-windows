@@ -214,9 +214,9 @@ class Site
 
         $x509->loadCSR($x509->saveCSR($x509->signCSR()));
 
-        // Set extension request. Fix for issue #29.
         $x509->setExtension('id-ce-subjectAltName', [
             ['dNSName' => $url],
+            ['dNSName' => "*.$url"],
         ]);
 
         $csr = $x509->saveCSR($x509->signCSR());
