@@ -104,7 +104,9 @@ $app->command('link [name]', function ($name) {
  * Display all of the registered symbolic links.
  */
 $app->command('links', function () {
-    Site::links();
+    $links = Site::links();
+
+    table(['Site', 'SSL', 'URL', 'Path'], $links->all());
 })->descriptions('Display all of the registered Valet links');
 
 /*

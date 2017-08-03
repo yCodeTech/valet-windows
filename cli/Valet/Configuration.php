@@ -28,6 +28,7 @@ class Configuration
         $this->createSitesDirectory();
         $this->createExtensionsDirectory();
         $this->createLogDirectory();
+        $this->createCertificatesDirectory();
         $this->createServicesDirectory();
         $this->writeBaseConfiguration();
 
@@ -93,6 +94,16 @@ class Configuration
         $this->files->ensureDirExists(VALET_HOME_PATH.'/Log', user());
 
         $this->files->touch(VALET_HOME_PATH.'/Log/nginx-error.log');
+    }
+
+    /**
+     * Create the directory for SSL certificates.
+     *
+     * @return void
+     */
+    public function createCertificatesDirectory()
+    {
+        $this->files->ensureDirExists(VALET_HOME_PATH.'/Certificates', user());
     }
 
     /**
