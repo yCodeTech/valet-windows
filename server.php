@@ -95,7 +95,7 @@ if (!$valetDriver) {
     show_valet_404();
 }
 
-/**
+/*
  * Ngrok uses the X-Original-Host to store the forwarded hostname.
  */
 if (isset($_SERVER['HTTP_X_ORIGINAL_HOST']) && !isset($_SERVER['HTTP_X_FORWARDED_HOST'])) {
