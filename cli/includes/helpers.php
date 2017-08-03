@@ -46,11 +46,12 @@ function warning($output)
  *
  * @param array $headers
  * @param array $rows
+ *
  * @return void
  */
 function table(array $headers = [], array $rows = [])
 {
-    $table = new Table(new ConsoleOutput);
+    $table = new Table(new ConsoleOutput());
 
     $table->setHeaders($headers)->setRows($rows);
 
@@ -70,7 +71,7 @@ function output($output)
         return;
     }
 
-    (new ConsoleOutput)->writeln($output);
+    (new ConsoleOutput())->writeln($output);
 }
 
 if (!function_exists('resolve')) {
@@ -160,15 +161,17 @@ if (!function_exists('tap')) {
     }
 }
 
-if (! function_exists('ends_with')) {
+if (!function_exists('ends_with')) {
     /**
      * Determine if a given string ends with a given substring.
      *
-     * @param  string  $haystack
-     * @param  string|array  $needles
+     * @param string       $haystack
+     * @param string|array $needles
+     *
      * @return bool
      */
-    function ends_with($haystack, $needles) {
+    function ends_with($haystack, $needles)
+    {
         foreach ((array) $needles as $needle) {
             if (substr($haystack, -strlen($needle)) === (string) $needle) {
                 return true;

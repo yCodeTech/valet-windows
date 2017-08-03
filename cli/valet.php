@@ -180,9 +180,9 @@ $app->command('paths', function () {
  * Open the current or given directory in the browser.
  */
  $app->command('open [domain]', function ($domain = null) {
-    $url = "http://".($domain ?: Site::host(getcwd())).'.'.Configuration::read()['domain'];
+     $url = 'http://'.($domain ?: Site::host(getcwd())).'.'.Configuration::read()['domain'];
 
-    passthru("start $url");
+     passthru("start $url");
  })->descriptions('Open the site for the current (or specified) directory in your browser');
 
 /*
