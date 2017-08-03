@@ -53,6 +53,8 @@ class Nginx
      */
     public function installConfiguration()
     {
+        info('Installing nginx configuration...');
+
         $contents = $this->files->get(__DIR__.'/../stubs/nginx.conf');
 
         $this->files->putAsUser(
@@ -94,6 +96,8 @@ class Nginx
      */
     public function installNginxDirectory()
     {
+        info('Installing nginx directory...');
+
         if (!$this->files->isDir($nginxDirectory = VALET_HOME_PATH.'/Nginx')) {
             $this->files->mkdirAsUser($nginxDirectory);
         }
@@ -148,6 +152,8 @@ class Nginx
      */
     public function stop()
     {
+        info('Stopping nginx....');
+
         $this->winsw->stop(static::SERVICE);
 
         $this->cli->run('cmd "/C taskkill /IM nginx.exe /F"');
