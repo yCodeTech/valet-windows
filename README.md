@@ -32,11 +32,11 @@ Set-ExecutionPolicy RemoteSigned; Invoke-WebRequest -Uri "https://github.com/cre
 
 - Run the `valet install` command. This will configure and install Valet and register Valet's daemon to launch when your system starts.
 
-- If you're installing on Windows 10, you may need to [manually configure](http://mayakron.altervista.org/wikibase/show.php?id=AcrylicWindows10Configuration) Windows to use the Acrylic DNS proxy
+- If you're installing on Windows 10, you may need to [manually configure](http://mayakron.altervista.org/wikibase/show.php?id=AcrylicWindows10Configuration) Windows to use the Acrylic DNS proxy.
 
 Valet will automatically start its daemon each time your machine boots. There is no need to run `valet start` or `valet install` ever again once the initial Valet installation is complete.
 
-For more please refer to the official documentation on the [Laravel website](https://laravel.com/docs/5.3/valet#serving-sites).
+For more please refer to the official documentation on the [Laravel website](https://laravel.com/docs/5.5/valet#serving-sites).
 
 ## Known Issues
 
