@@ -17,10 +17,10 @@ class DrupalValetDriver extends ValetDriver
        * /misc/drupal.js = Drupal 7
        * /core/lib/Drupal.php = Drupal 8
        */
-      if (file_exists($sitePath.'/misc/drupal.js') ||
+        if (file_exists($sitePath.'/misc/drupal.js') ||
           file_exists($sitePath.'/core/lib/Drupal.php')) {
-          return true;
-      }
+            return true;
+        }
     }
 
     /**
