@@ -9,6 +9,10 @@ if (file_exists(__DIR__.'/../vendor/autoload.php')) {
     require __DIR__.'/../../../autoload.php';
 }
 
+require __DIR__.'/includes/compatibility.php';
+require __DIR__.'/includes/facades.php';
+require __DIR__.'/includes/helpers.php';
+
 use Illuminate\Container\Container;
 use Silly\Application;
 
@@ -17,7 +21,7 @@ use Silly\Application;
  */
 Container::setInstance(new Container());
 
-$version = '2.0.11';
+$version = '2.0.12';
 
 $app = new Application('Laravel Valet for Windows', $version);
 

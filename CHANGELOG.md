@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.12 - 2017-09-27
+
+- Fixed global composer files ([#49](https://github.com/cretueusebiu/valet-windows/issues/49)).
+
 ## 2.0.11 - 2017-08-04
 
 - Pretty print sites
