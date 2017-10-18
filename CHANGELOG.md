@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Changed default tld from `.dev` to `.test`
+- Fixed `valet share` for linked sites
+- Other minor fixes ported from [laravel/valet](https://github.com/laravel/valet)
+
 ## 2.0.12 - 2017-09-27
 
 - Fixed global composer files ([#49](https://github.com/cretueusebiu/valet-windows/issues/49)).
