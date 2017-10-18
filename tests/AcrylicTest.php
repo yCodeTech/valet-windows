@@ -25,7 +25,7 @@ class AcrylicTest extends PHPUnit_Framework_TestCase
 
         $files->shouldReceive('put')->andReturnUsing(function ($path, $contents) {
             $this->assertSame($this->path().'/AcrylicHosts.txt', $path);
-            $this->assertTrue(strpos($contents, 'dev') !== false);
+            $this->assertTrue(strpos($contents, 'test') !== false);
             $this->assertTrue(strpos($contents, VALET_HOME_PATH) !== false);
         })->once();
 

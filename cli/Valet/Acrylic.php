@@ -28,7 +28,7 @@ class Acrylic
      *
      * @return void
      */
-    public function install($domain = 'dev')
+    public function install($domain = 'test')
     {
         $this->createHostsFile($domain);
 
