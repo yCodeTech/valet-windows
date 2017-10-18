@@ -4,6 +4,7 @@ php:
   - 5.6
   - 7.0
   - 7.1
+  - nightly
 
 env:
   global:
@@ -26,5 +27,5 @@ install:
 
 script: vendor/bin/phpunit
 
-notifications: 
+notifications:
   email: false
