@@ -197,7 +197,7 @@ $app->command('paths', function () {
  * Generate a publicly accessible URL for your project.
  */
 $app->command('share', function () {
-    $host = basename(getcwd());
+    $host = Site::host(getcwd());
     $domain = Configuration::read()['domain'];
     $ngrok = realpath(__DIR__.'/../bin/ngrok.exe');
 
