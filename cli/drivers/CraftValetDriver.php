@@ -39,9 +39,9 @@ class CraftValetDriver extends ValetDriver
      */
     public function isStaticFile($sitePath, $siteName, $uri)
     {
-        $frontControllerDir = $this->frontControllerDirectory($sitePath);
+        $frontControllerDirectory = $this->frontControllerDirectory($sitePath);
 
-        if ($this->isActualFile($staticFilePath = $sitePath.'/'.$frontControllerDir.$uri)) {
+        if ($this->isActualFile($staticFilePath = $sitePath.'/'.$frontControllerDirectory.$uri)) {
             return $staticFilePath;
         }
 
@@ -187,7 +187,7 @@ class CraftValetDriver extends ValetDriver
         $parts = explode('/', $uri);
 
         if (count($parts) > 1 && in_array($parts[1], $locales)) {
-            $indexPath = $sitePath.'/public/'.$parts[1].'/index.php';
+            $indexPath = $sitePath.'/'.$frontControllerDirectory.'/'.$parts[1].'/index.php';
             $scriptName = '/'.$parts[1].'/index.php';
         }
 
