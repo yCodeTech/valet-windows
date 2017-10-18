@@ -152,7 +152,7 @@ class Nginx
      */
     public function stop()
     {
-        info('Stopping nginx....');
+        info('Stopping nginx...');
 
         $this->winsw->stop(static::SERVICE);
 
