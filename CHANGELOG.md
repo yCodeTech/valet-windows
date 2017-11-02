@@ -4,6 +4,7 @@
 
 - Changed default tld from `.dev` to `.test`
 - Fixed `valet share` for linked sites
+- Change FPM port to 9001 ([#51](https://github.com/cretueusebiu/valet-windows/pull/51))
 - Other minor fixes ported from [laravel/valet](https://github.com/laravel/valet)
 
 ## 2.0.12 - 2017-09-27
