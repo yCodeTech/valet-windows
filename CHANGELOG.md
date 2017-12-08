@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 2.0.13 - 2017-12-08
 
 - Changed default tld from `.dev` to `.test`
 - Fixed `valet share` for linked sites
