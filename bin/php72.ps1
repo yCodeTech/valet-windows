@@ -4,12 +4,12 @@ $phpResponse = Invoke-WebRequest $phpPage
 $phpUrl = ""
 ForEach ($Link in $phpResponse.Links)
 {
-  If( $Link.href -match "/downloads/releases/php-7\.1\.\d+?-nts-Win32-VC14-x86\.zip" ){
+  If( $Link.href -match "/downloads/releases/php-7\.2\.\d+?-nts-Win32-VC14-x86\.zip" ){
     $phpUrl = (-join($phpBase, $Matches[0]))
   }
 }
 
-$phpIniUrl = "https://raw.githubusercontent.com/cretueusebiu/valet-windows/master/cli/stubs/php.ini"
+$phpIniUrl = "https://raw.githubusercontent.com/cretueusebiu/valet-windows/master/cli/stubs/php72.ini"
 $caCertUrl = "https://curl.haxx.se/ca/cacert.pem"
 $zipfile = "$PSScriptRoot\php.zip"
 $outpath = "C:\php"
