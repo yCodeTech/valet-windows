@@ -38,6 +38,10 @@ function info($output)
  */
 function warning($output)
 {
+    if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'testing') {
+        throw new RuntimeException($output);
+    }
+
     output('<fg=red>'.$output.'</>');
 }
 
