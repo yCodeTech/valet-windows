@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Container\Container;
-use Valet\PhpFpm;
 use Valet\CommandLine;
+use Valet\PhpFpm;
 
 class PhpFpmTest extends PHPUnit_Framework_TestCase
 {
@@ -46,7 +46,7 @@ class PhpFpmTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('C:\php', $phpfpm->findPhpPath());
     }
 
-    function test_throws_exception_if_can_not_find_php_path()
+    public function test_throws_exception_if_can_not_find_php_path()
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Could not find PHP. Make sure it\'s added to the environment variables.');
