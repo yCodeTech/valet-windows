@@ -83,6 +83,6 @@ class PhpFpm
             warning('Could not find PHP. Make sure it\'s added to the environment variables.');
         });
 
-        return pathinfo($php, PATHINFO_DIRNAME);
+        return pathinfo(explode("\n", $php)[0], PATHINFO_DIRNAME);
     }
 }
