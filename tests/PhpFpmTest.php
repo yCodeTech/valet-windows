@@ -25,25 +25,25 @@ class PhpFpmTest extends PHPUnit_Framework_TestCase
     public function test_can_find_php_path()
     {
         $cli = Mockery::mock(CommandLine::class);
-        $cli->shouldReceive('runOrDie')->once()->with('where php', Mockery::type('callable'))->andReturn('C:\php\php.exe');
+        $cli->shouldReceive('runOrDie')->once()->with('where php', Mockery::type('callable'))->andReturn('C:/php/php.exe');
 
         swap(CommandLine::class, $cli);
 
         $phpfpm = resolve(PhpFpm::class);
-        $this->assertEquals('C:\php', $phpfpm->findPhpPath());
+        $this->assertEquals('C:/php', $phpfpm->findPhpPath());
     }
 
     public function test_can_find_first_php_path()
     {
         $cli = Mockery::mock(CommandLine::class);
         $cli->shouldReceive('runOrDie')->once()->with('where php', Mockery::type('callable'))->andReturn(
-            "C:\php\php.exe\nC:\php71\php.exe"
+            "C:/php/php.exe\nC:/php71/php.exe"
         );
 
         swap(CommandLine::class, $cli);
 
         $phpfpm = resolve(PhpFpm::class);
-        $this->assertEquals('C:\php', $phpfpm->findPhpPath());
+        $this->assertEquals('C:/php', $phpfpm->findPhpPath());
     }
 
     public function test_throws_exception_if_can_not_find_php_path()
