@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.14 - 2018-01-06
+
+- Fixed PHP path detection
+
 ## 2.0.13 - 2017-12-08
 
 - Changed default tld from `.dev` to `.test`
