@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.15 - 2018-01-10
+
+- Add compatibility with symfony/process v4
+
 ## 2.0.14 - 2018-01-06
 
 - Fixed PHP path detection
