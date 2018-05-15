@@ -23,10 +23,10 @@ Before installation, make sure that no other programs such as Apache or Nginx ar
 
 ```bash
 # PHP 7.1
-Set-ExecutionPolicy RemoteSigned; Invoke-WebRequest -Uri "https://github.com/cretueusebiu/valet-windows/raw/master/bin/php71.ps1" -OutFile $env:temp\php71.ps1; ."$env:temp\php71.ps1"
+Set-ExecutionPolicy RemoteSigned; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri "https://github.com/cretueusebiu/valet-windows/raw/master/bin/php71.ps1" -OutFile $env:temp\php71.ps1; ."$env:temp\php71.ps1"
 
 # PHP 7.2
-Set-ExecutionPolicy RemoteSigned; Invoke-WebRequest -Uri "https://github.com/cretueusebiu/valet-windows/raw/master/bin/php72.ps1" -OutFile $env:temp\php72.ps1; ."$env:temp\php72.ps1"
+Set-ExecutionPolicy RemoteSigned; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri "https://github.com/cretueusebiu/valet-windows/raw/master/bin/php72.ps1" -OutFile $env:temp\php72.ps1; ."$env:temp\php72.ps1"
 ```
 
 > This script will download and install PHP for you and add it to your environment path variable. PowerShell is only required for this step.
