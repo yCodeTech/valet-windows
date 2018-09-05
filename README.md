@@ -50,6 +50,10 @@ For more please refer to the official documentation on the [Laravel website](htt
 - You must run the `valet` commands from the drive where Valet is installed, except for park and link. See [#12](https://github.com/cretueusebiu/valet-windows/issues/12#issuecomment-283111834).
 - If your machine is not connected to the internet you'll have to manually add the domains in your `hosts` file.
 
+## Useful Links
+
+- [Install ImageMagick](https://mlocati.github.io/articles/php-windows-imagick.html)
+
 ## Changelog
 
 Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
