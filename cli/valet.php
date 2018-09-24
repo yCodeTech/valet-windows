@@ -134,8 +134,6 @@ $app->command('secure [domain]', function ($domain = null) {
 
     Site::secure($url);
 
-    PhpFpm::restart();
-
     Nginx::restart();
 
     info('The ['.$url.'] site has been secured with a fresh TLS certificate.');
@@ -148,8 +146,6 @@ $app->command('unsecure [domain]', function ($domain = null) {
     $url = ($domain ?: Site::host(getcwd())).'.'.Configuration::read()['domain'];
 
     Site::unsecure($url);
-
-    PhpFpm::restart();
 
     Nginx::restart();
 
