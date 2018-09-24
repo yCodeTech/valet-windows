@@ -1,4 +1,4 @@
-127.0.0.1 *.DOMAIN
-::1 *.DOMAIN
+127.0.0.1 *.VALET_TLD
+::1 *.VALET_TLD
 
 @VALET_HOME_PATH/AcrylicHosts.txt

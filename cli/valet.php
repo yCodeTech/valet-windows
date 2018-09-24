@@ -47,8 +47,8 @@ $app->command('install', function () {
     Nginx::install();
     PhpFpm::install();
 
-    $domain = Configuration::read()['domain'];
-    Acrylic::install($domain);
+    $tld = Configuration::read()['tld'];
+    Acrylic::install($tld);
 
     Nginx::restart();
 
@@ -56,26 +56,26 @@ $app->command('install', function () {
 })->descriptions('Install the Valet services');
 
 /*
- * Get or set the domain currently being used by Valet.
+ * Get or set the tld currently being used by Valet.
  */
-$app->command('domain [domain]', function ($domain = null) {
-    if ($domain === null) {
-        return info(Configuration::read()['domain']);
+$app->command('tld [tld]', function ($tld = null) {
+    if ($tld === null) {
+        return info('Valet is configured to serve for TLD: .'.Configuration::read()['tld']);
     }
 
-    $oldDomain = Configuration::read()['domain'];
-    $domain = trim($domain, '.');
+    $oldTld = Configuration::read()['tld'];
+    $tld = trim($tld, '.');
 
-    Acrylic::updateDomain($domain);
+    Acrylic::updateTld($tld);
 
-    Configuration::updateKey('domain', $domain);
+    Configuration::updateKey('tld', $tld);
 
-    Site::resecureForNewDomain($oldDomain, $domain);
+    Site::resecureForNewTld($oldTld, $tld);
     PhpFpm::restart();
     Nginx::restart();
 
-    info('Your Valet domain has been updated to ['.$domain.'].');
-})->descriptions('Get or set the domain used for Valet sites');
+    info('Your Valet tld has been updated to ['.$tld.'].');
+}, ['domain'])->descriptions('Get or set the TLD used for Valet sites. (Currently: .'.Configuration::read()['tld'].')');
 
 /*
  * Add the current working directory to the paths configuration.
@@ -130,7 +130,7 @@ $app->command('unlink [name]', function ($name) {
  * Secure the given domain with a trusted TLS certificate.
  */
 $app->command('secure [domain]', function ($domain = null) {
-    $url = ($domain ?: Site::host(getcwd())).'.'.Configuration::read()['domain'];
+    $url = ($domain ?: Site::host(getcwd())).'.'.Configuration::read()['tld'];
 
     Site::secure($url);
 
@@ -143,7 +143,7 @@ $app->command('secure [domain]', function ($domain = null) {
  * Stop serving the given domain over HTTPS and remove the trusted TLS certificate.
  */
 $app->command('unsecure [domain]', function ($domain = null) {
-    $url = ($domain ?: Site::host(getcwd())).'.'.Configuration::read()['domain'];
+    $url = ($domain ?: Site::host(getcwd())).'.'.Configuration::read()['tld'];
 
     Site::unsecure($url);
 

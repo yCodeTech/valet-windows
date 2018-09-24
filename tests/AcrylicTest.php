@@ -53,7 +53,7 @@ class AcrylicTest extends PHPUnit_Framework_TestCase
         resolve(Acrylic::class)->install();
     }
 
-    public function test_update_domain()
+    public function test_update_tld()
     {
         $acrylic = Mockery::mock(Acrylic::class.'[stop,createHostsFile,restart]', [resolve(CommandLine::class), resolve(Filesystem::class)]);
         $acrylic->shouldReceive('stop')->once();
@@ -62,7 +62,7 @@ class AcrylicTest extends PHPUnit_Framework_TestCase
 
         swap(Acrylic::class, $acrylic);
 
-        resolve(Acrylic::class)->updateDomain('app');
+        resolve(Acrylic::class)->updateTld('app');
     }
 
     public function test_uninstall_service()

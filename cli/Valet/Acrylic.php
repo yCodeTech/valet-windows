@@ -24,13 +24,13 @@ class Acrylic
     /**
      * Install the Acrylic DNS service.
      *
-     * @param string $domain
+     * @param string $tld
      *
      * @return void
      */
-    public function install($domain = 'test')
+    public function install($tld = 'test')
     {
-        $this->createHostsFile($domain);
+        $this->createHostsFile($tld);
 
         $this->configureNetworkDNS();
 
@@ -44,17 +44,17 @@ class Acrylic
     /**
      * Create the AcrylicHosts file.
      *
-     * @param string $domain
+     * @param string $tld
      *
      * @return void
      */
-    public function createHostsFile($domain)
+    public function createHostsFile($tld)
     {
         $contents = $this->files->get(__DIR__.'/../stubs/AcrylicHosts.txt');
 
         $this->files->put(
             $this->path().'/AcrylicHosts.txt',
-            str_replace(['DOMAIN', 'VALET_HOME_PATH'], [$domain, VALET_HOME_PATH], $contents)
+            str_replace(['VALET_TLD', 'VALET_HOME_PATH'], [$tld, VALET_HOME_PATH], $contents)
         );
 
         $customConfigPath = VALET_HOME_PATH.'/AcrylicHosts.txt';
@@ -77,17 +77,16 @@ class Acrylic
     }
 
     /**
-     * Update the domain used by Acrylic DNS.
+     * Update the tld used by Acrylic DNS.
      *
-     * @param string $newDomain
-     *
+     * @param  string $tld
      * @return void
      */
-    public function updateDomain($domain)
+    public function updateTld($tld)
     {
         $this->stop();
 
-        $this->createHostsFile($domain);
+        $this->createHostsFile($tld);
 
         $this->restart();
     }
