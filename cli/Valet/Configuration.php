@@ -125,10 +125,13 @@ class Configuration
             $this->write(['tld' => 'test', 'paths' => []]);
         }
 
+        // Migrate old configurations from 'domain' to 'tld'
         $config = $this->read();
-        if (isset($config['domain']) && !isset($config['tld'])) {
-            $this->updateKey('tld', $config['domain']);
+        if (isset($config['tld'])) {
+            return;
         }
+
+       $this->updateKey('tld', ! empty($config['domain']) ? $config['domain'] : 'test');
     }
 
     /**

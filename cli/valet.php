@@ -60,6 +60,10 @@ $app->command('install', function () {
  * Get or set the tld currently being used by Valet.
  */
 $app->command('tld [tld]', function ($tld = null) {
+    if (empty(Configuration::read()['tld'])) {
+        Configuration::writeBaseConfiguration();
+    }
+
     if ($tld === null) {
         return info('Valet is configured to serve for TLD: .'.Configuration::read()['tld']);
     }
@@ -76,7 +80,7 @@ $app->command('tld [tld]', function ($tld = null) {
     Nginx::restart();
 
     info('Your Valet tld has been updated to ['.$tld.'].');
-}, ['domain'])->descriptions('Get or set the TLD used for Valet sites. (Currently: .'.Configuration::read()['tld'].')');
+}, ['domain'])->descriptions('Get or set the TLD used for Valet sites.');
 
 /*
  * Add the current working directory to the paths configuration.
