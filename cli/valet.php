@@ -15,6 +15,7 @@ require __DIR__.'/includes/helpers.php';
 
 use Silly\Application;
 use Illuminate\Container\Container;
+use function Valet\{info, output, table, warning};
 
 /*
  * Create the application.
