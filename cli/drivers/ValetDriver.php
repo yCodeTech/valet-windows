@@ -93,7 +93,7 @@ abstract class ValetDriver
      */
     public static function customSiteDriver($sitePath)
     {
-        if (!file_exists($sitePath.'/LocalValetDriver.php')) {
+        if (! file_exists($sitePath.'/LocalValetDriver.php')) {
             return;
         }
 
@@ -111,7 +111,7 @@ abstract class ValetDriver
      */
     public static function driversIn($path)
     {
-        if (!is_dir($path)) {
+        if (! is_dir($path)) {
             return [];
         }
 
@@ -182,6 +182,6 @@ abstract class ValetDriver
      */
     protected function isActualFile($path)
     {
-        return !is_dir($path) && file_exists($path);
+        return ! is_dir($path) && file_exists($path);
     }
 }

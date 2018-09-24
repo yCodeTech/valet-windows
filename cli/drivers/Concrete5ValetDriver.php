@@ -25,7 +25,7 @@ class Concrete5ValetDriver extends BasicValetDriver
      */
     public function frontControllerPath($sitePath, $siteName, $uri)
     {
-        if (!getenv('CONCRETE5_ENV')) {
+        if (! getenv('CONCRETE5_ENV')) {
             putenv('CONCRETE5_ENV=valet');
         }
 
@@ -33,7 +33,7 @@ class Concrete5ValetDriver extends BasicValetDriver
         if (preg_match('/^\/(.*?)\.php/', $uri, $matches)) {
             $filename = $matches[0];
 
-            if (file_exists($sitePath.$filename) && !is_dir($sitePath.$filename)) {
+            if (file_exists($sitePath.$filename) && ! is_dir($sitePath.$filename)) {
                 $_SERVER['SCRIPT_FILENAME'] = $sitePath.$filename;
                 $_SERVER['SCRIPT_NAME'] = $filename;
 

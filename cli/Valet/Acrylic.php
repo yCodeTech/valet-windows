@@ -59,7 +59,7 @@ class Acrylic
 
         $customConfigPath = VALET_HOME_PATH.'/AcrylicHosts.txt';
 
-        if (!$this->files->exists($customConfigPath)) {
+        if (! $this->files->exists($customConfigPath)) {
             $this->files->putAsUser($customConfigPath, PHP_EOL);
         }
     }

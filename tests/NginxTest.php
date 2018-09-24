@@ -1,10 +1,10 @@
 <?php
 
-use Illuminate\Container\Container;
-use Valet\Configuration;
-use Valet\Filesystem;
-use Valet\Nginx;
 use Valet\Site;
+use Valet\Nginx;
+use Valet\Filesystem;
+use Valet\Configuration;
+use Illuminate\Container\Container;
 
 class NginxTest extends PHPUnit_Framework_TestCase
 {

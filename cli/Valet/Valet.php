@@ -26,7 +26,7 @@ class Valet
      */
     public function extensions()
     {
-        if (!$this->files->isDir(VALET_HOME_PATH.'/Extensions')) {
+        if (! $this->files->isDir(VALET_HOME_PATH.'/Extensions')) {
             return [];
         }
 

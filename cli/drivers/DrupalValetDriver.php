@@ -35,7 +35,7 @@ class DrupalValetDriver extends ValetDriver
     public function isStaticFile($sitePath, $siteName, $uri)
     {
         if (file_exists($sitePath.$uri) &&
-            !is_dir($sitePath.$uri) &&
+            ! is_dir($sitePath.$uri) &&
             pathinfo($sitePath.$uri)['extension'] != 'php') {
             return $sitePath.$uri;
         }
@@ -54,14 +54,14 @@ class DrupalValetDriver extends ValetDriver
      */
     public function frontControllerPath($sitePath, $siteName, $uri)
     {
-        if (!empty($uri) && $uri !== '/') {
+        if (! empty($uri) && $uri !== '/') {
             $_GET['q'] = $uri;
         }
 
         $matches = [];
         if (preg_match('/^\/(.*?)\.php/', $uri, $matches)) {
             $filename = $matches[0];
-            if (file_exists($sitePath.$filename) && !is_dir($sitePath.$filename)) {
+            if (file_exists($sitePath.$filename) && ! is_dir($sitePath.$filename)) {
                 $_SERVER['SCRIPT_FILENAME'] = $sitePath.$filename;
                 $_SERVER['SCRIPT_NAME'] = $filename;
 

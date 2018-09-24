@@ -121,7 +121,7 @@ class Configuration
      */
     public function writeBaseConfiguration()
     {
-        if (!$this->files->exists($this->path())) {
+        if (! $this->files->exists($this->path())) {
             $this->write(['domain' => 'test', 'paths' => []]);
         }
     }
@@ -178,7 +178,7 @@ class Configuration
      */
     public function prune()
     {
-        if (!$this->files->exists($this->path())) {
+        if (! $this->files->exists($this->path())) {
             return;
         }
 

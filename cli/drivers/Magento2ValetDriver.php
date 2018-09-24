@@ -44,7 +44,7 @@ class Magento2ValetDriver extends ValetDriver
             $pub = 'pub/';
         }
 
-        if (!$this->isPubDirectory($sitePath, $route, $pub)) {
+        if (! $this->isPubDirectory($sitePath, $route, $pub)) {
             return false;
         }
 
@@ -96,7 +96,7 @@ class Magento2ValetDriver extends ValetDriver
             // We have already figure out mode, no need to check it again
             return;
         }
-        if (!file_exists($sitePath.'/index.php')) {
+        if (! file_exists($sitePath.'/index.php')) {
             $this->mageMode = 'production'; // Can't use developer mode without index.php in project root
             return;
         }
