@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Define the user's "~/.valet" path.
+ * Define the user's "~/.config/valet" path.
  */
-define('VALET_HOME_PATH', str_replace('\\', '/', $_SERVER['HOME'].'/.valet'));
+define('VALET_HOME_PATH', str_replace('\\', '/', $_SERVER['HOME'].'/.config/valet'));
 define('VALET_STATIC_PREFIX', '41c270e4-5535-4daa-b23e-c269744c2f45');
 
 /**

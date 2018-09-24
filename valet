@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-if (!isset($_SERVER['HOME'])) {
+if (! isset($_SERVER['HOME'])) {
     $_SERVER['HOME'] = $_SERVER['USERPROFILE'];
 }
 

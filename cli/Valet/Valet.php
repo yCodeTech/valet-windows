@@ -2,6 +2,8 @@
 
 namespace Valet;
 
+use Httpful\Request;
+
 class Valet
 {
     public $cli;
@@ -49,7 +51,7 @@ class Valet
      */
     public function onLatestVersion($currentVersion)
     {
-        $response = \Httpful\Request::get('https://api.github.com/repos/cretueusebiu/valet-windows/releases/latest')->send();
+        $response = Request::get('https://api.github.com/repos/cretueusebiu/valet-windows/releases/latest')->send();
 
         return version_compare($currentVersion, trim($response->body->tag_name, 'v'), '>=');
     }
