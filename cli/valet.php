@@ -13,8 +13,8 @@ require __DIR__.'/includes/compatibility.php';
 require __DIR__.'/includes/facades.php';
 require __DIR__.'/includes/helpers.php';
 
-use Illuminate\Container\Container;
 use Silly\Application;
+use Illuminate\Container\Container;
 
 /*
  * Create the application.

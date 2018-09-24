@@ -4,7 +4,7 @@ use Illuminate\Container\Container;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
-if (!isset($_SERVER['HOME'])) {
+if (! isset($_SERVER['HOME'])) {
     $_SERVER['HOME'] = $_SERVER['USERPROFILE'];
 }
 
@@ -78,7 +78,7 @@ function output($output)
     (new ConsoleOutput())->writeln($output);
 }
 
-if (!function_exists('resolve')) {
+if (! function_exists('resolve')) {
     /**
      * Resolve the given class from the container.
      *
@@ -105,7 +105,7 @@ function swap($class, $instance)
     Container::getInstance()->instance($class, $instance);
 }
 
-if (!function_exists('retry')) {
+if (! function_exists('retry')) {
     /**
      * Retry the given function N times.
      *
@@ -121,7 +121,7 @@ if (!function_exists('retry')) {
         try {
             return $fn();
         } catch (Exception $e) {
-            if (!$retries) {
+            if (! $retries) {
                 throw $e;
             }
 
@@ -143,12 +143,12 @@ if (!function_exists('retry')) {
  */
 function should_be_sudo()
 {
-    if (!isset($_SERVER['SUDO_USER'])) {
+    if (! isset($_SERVER['SUDO_USER'])) {
         throw new Exception('This command must be run with sudo.');
     }
 }
 
-if (!function_exists('tap')) {
+if (! function_exists('tap')) {
     /**
      * Tap the given value.
      *
@@ -165,7 +165,7 @@ if (!function_exists('tap')) {
     }
 }
 
-if (!function_exists('ends_with')) {
+if (! function_exists('ends_with')) {
     /**
      * Determine if a given string ends with a given substring.
      *
@@ -191,8 +191,8 @@ if (!function_exists('ends_with')) {
  */
 function user()
 {
-    if (!isset($_SERVER['SUDO_USER'])) {
-        if (!isset($_SERVER['USER'])) {
+    if (! isset($_SERVER['SUDO_USER'])) {
+        if (! isset($_SERVER['USER'])) {
             return $_SERVER['USERNAME'];
         }
 

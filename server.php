@@ -91,14 +91,14 @@ require __DIR__.'/cli/drivers/require.php';
 
 $valetDriver = ValetDriver::assign($valetSitePath, $siteName, $uri);
 
-if (!$valetDriver) {
+if (! $valetDriver) {
     show_valet_404();
 }
 
 /*
  * Ngrok uses the X-Original-Host to store the forwarded hostname.
  */
-if (isset($_SERVER['HTTP_X_ORIGINAL_HOST']) && !isset($_SERVER['HTTP_X_FORWARDED_HOST'])) {
+if (isset($_SERVER['HTTP_X_ORIGINAL_HOST']) && ! isset($_SERVER['HTTP_X_FORWARDED_HOST'])) {
     $_SERVER['HTTP_X_FORWARDED_HOST'] = $_SERVER['HTTP_X_ORIGINAL_HOST'];
 }
 
@@ -112,7 +112,7 @@ $uri = $valetDriver->mutateUri($uri);
  */
 $isPhpFile = pathinfo($uri, PATHINFO_EXTENSION) === 'php';
 
-if ($uri !== '/' && !$isPhpFile && $staticFilePath = $valetDriver->isStaticFile($valetSitePath, $siteName, $uri)) {
+if ($uri !== '/' && ! $isPhpFile && $staticFilePath = $valetDriver->isStaticFile($valetSitePath, $siteName, $uri)) {
     return $valetDriver->serveStaticFile($staticFilePath, $valetSitePath, $siteName, $uri);
 }
 
@@ -123,7 +123,7 @@ $frontControllerPath = $valetDriver->frontControllerPath(
     $valetSitePath, $siteName, $uri
 );
 
-if (!$frontControllerPath) {
+if (! $frontControllerPath) {
     show_valet_404();
 }
 

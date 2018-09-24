@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Container\Container;
-use Valet\Configuration;
 use Valet\Filesystem;
+use Valet\Configuration;
+use Illuminate\Container\Container;
 
 class ConfigurationTest extends PHPUnit_Framework_TestCase
 {

@@ -1,9 +1,9 @@
 <?php
 
-use Illuminate\Container\Container;
 use Valet\Acrylic;
-use Valet\CommandLine;
 use Valet\Filesystem;
+use Valet\CommandLine;
+use Illuminate\Container\Container;
 
 class AcrylicTest extends PHPUnit_Framework_TestCase
 {

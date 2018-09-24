@@ -102,7 +102,7 @@ class StatamicValetDriver extends ValetDriver
         $parts = explode('/', $uri);
         $locale = $parts[1];
 
-        if (count($parts) < 2 || !in_array($locale, $this->getLocales())) {
+        if (count($parts) < 2 || ! in_array($locale, $this->getLocales())) {
             return;
         }
 

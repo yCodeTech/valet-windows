@@ -45,7 +45,7 @@ class Filesystem
      */
     public function ensureDirExists($path, $owner = null, $mode = 0755)
     {
-        if (!$this->isDir($path)) {
+        if (! $this->isDir($path)) {
             $this->mkdir($path, $owner, $mode);
         }
     }

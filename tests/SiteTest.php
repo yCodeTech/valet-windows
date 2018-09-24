@@ -1,9 +1,9 @@
 <?php
 
-use Illuminate\Container\Container;
-use Valet\Configuration;
-use Valet\Filesystem;
 use Valet\Site;
+use Valet\Filesystem;
+use Valet\Configuration;
+use Illuminate\Container\Container;
 
 class SiteTest extends PHPUnit_Framework_TestCase
 {

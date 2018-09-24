@@ -1,9 +1,9 @@
 <?php
 
-use Illuminate\Container\Container;
-use Valet\CommandLine;
-use Valet\Filesystem;
 use Valet\WinSW;
+use Valet\Filesystem;
+use Valet\CommandLine;
+use Illuminate\Container\Container;
 
 class WinSWTest extends PHPUnit_Framework_TestCase
 {

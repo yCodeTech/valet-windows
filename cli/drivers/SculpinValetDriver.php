@@ -31,7 +31,7 @@ class SculpinValetDriver extends BasicValetDriver
 
     private function composerRequiresSculpin($sitePath)
     {
-        if (!file_exists($sitePath.'/composer.json')) {
+        if (! file_exists($sitePath.'/composer.json')) {
             return false;
         }
 

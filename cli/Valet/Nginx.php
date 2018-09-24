@@ -98,7 +98,7 @@ class Nginx
     {
         info('Installing nginx directory...');
 
-        if (!$this->files->isDir($nginxDirectory = VALET_HOME_PATH.'/Nginx')) {
+        if (! $this->files->isDir($nginxDirectory = VALET_HOME_PATH.'/Nginx')) {
             $this->files->mkdirAsUser($nginxDirectory);
         }
 
