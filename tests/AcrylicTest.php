@@ -4,6 +4,7 @@ use Valet\Acrylic;
 use Valet\Filesystem;
 use Valet\CommandLine;
 use Illuminate\Container\Container;
+use function Valet\{user, resolve, swap};
 
 class AcrylicTest extends PHPUnit_Framework_TestCase
 {

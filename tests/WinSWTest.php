@@ -4,6 +4,7 @@ use Valet\WinSW;
 use Valet\Filesystem;
 use Valet\CommandLine;
 use Illuminate\Container\Container;
+use function Valet\{user, resolve, swap};
 
 class WinSWTest extends PHPUnit_Framework_TestCase
 {

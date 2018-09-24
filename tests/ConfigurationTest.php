@@ -3,6 +3,7 @@
 use Valet\Filesystem;
 use Valet\Configuration;
 use Illuminate\Container\Container;
+use function Valet\{user, resolve, swap};
 
 class ConfigurationTest extends PHPUnit_Framework_TestCase
 {

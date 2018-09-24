@@ -5,6 +5,7 @@ use Valet\Nginx;
 use Valet\Filesystem;
 use Valet\Configuration;
 use Illuminate\Container\Container;
+use function Valet\{user, resolve, swap};
 
 class NginxTest extends PHPUnit_Framework_TestCase
 {
