@@ -42,12 +42,14 @@ class Configuration
      */
     public function createConfigurationDirectory()
     {
-        $this->files->ensureDirExists(VALET_HOME_PATH, user());
+        $oldPath = $_SERVER['HOME'].'/.valet';
 
-        if ($this->files->isDir($oldPath = $_SERVER['HOME'].'/.valet')) {
-            $this->prependPath(VALET_HOME_PATH.'/Sites');
+        if ($this->files->isDir($oldPath)) {
             rename($oldPath, VALET_HOME_PATH);
+            $this->prependPath(VALET_HOME_PATH.'/Sites');
         }
+
+        $this->files->ensureDirExists(VALET_HOME_PATH, user());
     }
 
     /**
