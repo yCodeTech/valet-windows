@@ -65,7 +65,7 @@ $app->command('tld [tld]', function ($tld = null) {
     }
 
     if ($tld === null) {
-        return info('Valet is configured to serve for TLD: .'.Configuration::read()['tld']);
+        return info(Configuration::read()['tld']);
     }
 
     $oldTld = Configuration::read()['tld'];
