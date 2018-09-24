@@ -101,7 +101,7 @@ class Site
      *
      * @return \Illuminate\Support\Collection
      */
-    protected function getCertificates($path)
+    public function getCertificates($path)
     {
         return collect($this->files->scanDir($path))->filter(function ($value, $key) {
             return ends_with($value, '.crt');
