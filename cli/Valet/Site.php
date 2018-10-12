@@ -107,6 +107,7 @@ class Site
             return ends_with($value, '.crt');
         })->map(function ($cert) {
             $certWithoutSuffix = substr($cert, 0, -4);
+
             return substr($certWithoutSuffix, 0, strrpos($certWithoutSuffix, '.'));
         })->flip();
     }

@@ -3,9 +3,11 @@
 use Valet\Site;
 use Valet\Nginx;
 use Valet\Filesystem;
+use function Valet\swap;
+use function Valet\user;
 use Valet\Configuration;
+use function Valet\resolve;
 use Illuminate\Container\Container;
-use function Valet\{user, resolve, swap};
 
 class NginxTest extends PHPUnit_Framework_TestCase
 {

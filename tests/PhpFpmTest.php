@@ -2,8 +2,10 @@
 
 use Valet\PhpFpm;
 use Valet\CommandLine;
+use function Valet\swap;
+use function Valet\user;
+use function Valet\resolve;
 use Illuminate\Container\Container;
-use function Valet\{user, resolve, swap};
 
 class PhpFpmTest extends PHPUnit_Framework_TestCase
 {
