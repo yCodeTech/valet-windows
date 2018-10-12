@@ -48,7 +48,7 @@ For more please refer to the official documentation on the [Laravel website](htt
 - HTTP/2 does not work with secured sites.
 - When sharing sites the url will not be copied to the clipboard.
 - You must run the `valet` commands from the drive where Valet is installed, except for park and link. See [#12](https://github.com/cretueusebiu/valet-windows/issues/12#issuecomment-283111834).
-- If your machine is not connected to the internet you'll have to manually add the domains in your `hosts` file OR you can install the "Microsoft Loopback Adapter" as this simulates an active local network interface that valet can bind too.
+- If your machine is not connected to the internet you'll have to manually add the domains in your `hosts` file or you can install the "Microsoft Loopback Adapter" as this simulates an active local network interface that Valet can bind too.
 
 ## Useful Links
 
