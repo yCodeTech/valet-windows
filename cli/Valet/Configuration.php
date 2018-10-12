@@ -138,7 +138,7 @@ class Configuration
             return;
         }
 
-       $this->updateKey('tld', ! empty($config['domain']) ? $config['domain'] : 'test');
+        $this->updateKey('tld', ! empty($config['domain']) ? $config['domain'] : 'test');
     }
 
     /**

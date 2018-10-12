@@ -14,8 +14,11 @@ require __DIR__.'/includes/facades.php';
 require __DIR__.'/includes/helpers.php';
 
 use Silly\Application;
+use function Valet\info;
+use function Valet\table;
+use function Valet\output;
+use function Valet\warning;
 use Illuminate\Container\Container;
-use function Valet\{info, output, table, warning};
 
 /*
  * Create the application.

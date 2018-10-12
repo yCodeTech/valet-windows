@@ -48,7 +48,7 @@ class KirbyValetDriver extends ValetDriver
         // Needed to force Kirby to use *.dev to generate its URLs...
         $_SERVER['SERVER_NAME'] = $_SERVER['HTTP_HOST'];
 
-        if (preg_match('/^\/panel/', $uri) && file_exists($sitePath . '/panel/index.php')) {
+        if (preg_match('/^\/panel/', $uri) && file_exists($sitePath.'/panel/index.php')) {
             $_SERVER['SCRIPT_NAME'] = '/panel/index.php';
 
             return $sitePath.'/panel/index.php';
