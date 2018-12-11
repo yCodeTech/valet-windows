@@ -20,6 +20,13 @@ use function Valet\output;
 use function Valet\warning;
 use Illuminate\Container\Container;
 
+/**
+ * Relocate config dir to ~/.config/valet/ if found in old location.
+ */
+if (is_dir(VALET_LEGACY_HOME_PATH) && !is_dir(VALET_HOME_PATH)) {
+    Configuration::createConfigurationDirectory();
+}
+
 /*
  * Create the application.
  */
