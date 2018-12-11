@@ -13,10 +13,12 @@ class DrupalValetDriver extends ValetDriver
      */
     public function serves($sitePath, $siteName, $uri)
     {
-        /*
-       * /misc/drupal.js = Drupal 7
-       * /core/lib/Drupal.php = Drupal 8
-       */
+        $sitePath = $this->addSubdirectory($sitePath);
+
+        /**
+         * /misc/drupal.js = Drupal 7
+         * /core/lib/Drupal.php = Drupal 8
+         */
         if (file_exists($sitePath.'/misc/drupal.js') ||
           file_exists($sitePath.'/core/lib/Drupal.php')) {
             return true;
@@ -34,6 +36,8 @@ class DrupalValetDriver extends ValetDriver
      */
     public function isStaticFile($sitePath, $siteName, $uri)
     {
+        $sitePath = $this->addSubdirectory($sitePath);
+
         if (file_exists($sitePath.$uri) &&
             ! is_dir($sitePath.$uri) &&
             pathinfo($sitePath.$uri)['extension'] != 'php') {
@@ -54,6 +58,8 @@ class DrupalValetDriver extends ValetDriver
      */
     public function frontControllerPath($sitePath, $siteName, $uri)
     {
+        $sitePath = $this->addSubdirectory($sitePath);
+
         if (! isset($_GET['q']) && ! empty($uri) && $uri !== '/') {
             $_GET['q'] = $uri;
         }
@@ -74,5 +80,37 @@ class DrupalValetDriver extends ValetDriver
         $_SERVER['SCRIPT_NAME'] = '/index.php';
 
         return $sitePath.'/index.php';
+    }
+
+    /**
+     * Add any matching subdirectory to the site path.
+     */
+    public function addSubdirectory($sitePath)
+    {
+        $paths = array_map(function ($subDir) use ($sitePath) {
+            return "$sitePath/$subDir";
+        }, $this->possibleSubdirectories());
+
+        $foundPaths = array_filter($paths, function ($path) {
+            return file_exists($path);
+        });
+
+        // If paths are found, return the first one.
+        if (!empty($foundPaths)) {
+            return array_shift($foundPaths);
+        }
+
+        // If there are no matches, return the original path.
+        return $sitePath;
+    }
+
+    /**
+     * Return an array of possible subdirectories.
+     *
+     * @return array
+     */
+    protected function possibleSubdirectories()
+    {
+        return ['docroot', 'public', 'web'];
     }
 }
