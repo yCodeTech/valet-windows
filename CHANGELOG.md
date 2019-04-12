@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.1.0 - Unreleased
+
+- Moved the helper functions into the Valet namespace
+- Renamed `valet domain` command to `valet tld`
+- Moved `~/.valet` to `~/.config/valet`
+- Unlink renamed links
+- Fixed warning on newer `symfony/process` versions
+- Added PHP 7.3 install script
 ## 2.0.15 - 2018-01-10
 
 - Add compatibility with symfony/process v4
