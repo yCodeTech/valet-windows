@@ -187,6 +187,7 @@ abstract class ValetDriver
 
     /**
      * Load server environment variables if available.
+     * Processes any '*' entries first, and then adds site-specific entries
      *
      * @param  string  $sitePath
      * @param  string  $siteName
@@ -200,12 +201,18 @@ abstract class ValetDriver
         }
 
         $variables = include $varFilePath;
-        if (! isset($variables[$siteName])) {
-            return;
+
+        $variablesToSet = isset($variables['*']) ? $variables['*'] : [];
+
+        if (isset($variables[$siteName])) {
+            $variablesToSet = array_merge($variablesToSet, $variables[$siteName]);
         }
 
-        foreach ($variables[$siteName] as $key => $value) {
+        foreach ($variablesToSet as $key => $value) {
+            if (! is_string($key)) continue;
             $_SERVER[$key] = $value;
+            $_ENV[$key] = $value;
+            putenv($key . '=' . $value);
         }
     }
 }
