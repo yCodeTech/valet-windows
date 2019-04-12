@@ -40,6 +40,13 @@ $app = new Application('Laravel Valet for Windows', $version);
  * Prune missing directories and symbolic links on every command.
  */
 if (is_dir(VALET_HOME_PATH)) {
+    /**
+     * Upgrade helper: ensure the tld config exists
+     */
+    if (empty(Configuration::read()['tld'])) {
+        Configuration::writeBaseConfiguration();
+    }
+
     Configuration::prune();
 
     Site::pruneLinks();
@@ -70,10 +77,6 @@ $app->command('install', function () {
  * Get or set the tld currently being used by Valet.
  */
 $app->command('tld [tld]', function ($tld = null) {
-    if (empty(Configuration::read()['tld'])) {
-        Configuration::writeBaseConfiguration();
-    }
-
     if ($tld === null) {
         return info(Configuration::read()['tld']);
     }
