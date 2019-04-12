@@ -15,7 +15,7 @@ class DrupalValetDriver extends ValetDriver
     {
         $sitePath = $this->addSubdirectory($sitePath);
 
-        /**
+        /*
          * /misc/drupal.js = Drupal 7
          * /core/lib/Drupal.php = Drupal 8
          */
@@ -96,7 +96,7 @@ class DrupalValetDriver extends ValetDriver
         });
 
         // If paths are found, return the first one.
-        if (!empty($foundPaths)) {
+        if (! empty($foundPaths)) {
             return array_shift($foundPaths);
         }
 

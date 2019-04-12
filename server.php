@@ -120,7 +120,7 @@ if ($uri !== '/' && ! $isPhpFile && $staticFilePath = $valetDriver->isStaticFile
     return $valetDriver->serveStaticFile($staticFilePath, $valetSitePath, $siteName, $uri);
 }
 
-/**
+/*
  * Attempt to load server environment variables.
  */
 $valetDriver->loadServerEnvironmentVariables(

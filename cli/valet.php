@@ -20,10 +20,10 @@ use function Valet\output;
 use function Valet\warning;
 use Illuminate\Container\Container;
 
-/**
+/*
  * Relocate config dir to ~/.config/valet/ if found in old location.
  */
-if (is_dir(VALET_LEGACY_HOME_PATH) && !is_dir(VALET_HOME_PATH)) {
+if (is_dir(VALET_LEGACY_HOME_PATH) && ! is_dir(VALET_HOME_PATH)) {
     Configuration::createConfigurationDirectory();
 }
 
@@ -40,7 +40,7 @@ $app = new Application('Laravel Valet for Windows', $version);
  * Prune missing directories and symbolic links on every command.
  */
 if (is_dir(VALET_HOME_PATH)) {
-    /**
+    /*
      * Upgrade helper: ensure the tld config exists
      */
     if (empty(Configuration::read()['tld'])) {
