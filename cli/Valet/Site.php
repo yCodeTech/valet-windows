@@ -174,7 +174,7 @@ class Site
 
             return [
                 'site' => $site,
-                'secured' => $secured ? ' X': '',
+                'secured' => $secured ? ' X' : '',
                 'url' => $url,
                 'path' => $path,
             ];
