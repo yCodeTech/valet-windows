@@ -42,6 +42,8 @@ class Configuration
      */
     public function createConfigurationDirectory()
     {
+        $this->files->ensureDirExists(preg_replace('~/valet$~', '', VALET_HOME_PATH), user());
+
         $oldPath = $_SERVER['HOME'].'/.valet';
 
         if ($this->files->isDir($oldPath)) {
