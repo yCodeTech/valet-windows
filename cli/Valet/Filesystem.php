@@ -60,7 +60,7 @@ class Filesystem
      */
     public function mkdirAsUser($path, $mode = 0755)
     {
-        return $this->mkdir($path, user(), $mode);
+        $this->mkdir($path, user(), $mode);
     }
 
     /**
@@ -125,7 +125,7 @@ class Filesystem
      * @param string      $contents
      * @param string|null $owner
      *
-     * @return string
+     * @return void
      */
     public function put($path, $contents, $owner = null)
     {
@@ -142,11 +142,11 @@ class Filesystem
      * @param string $path
      * @param string $contents
      *
-     * @return string
+     * @return void
      */
     public function putAsUser($path, $contents)
     {
-        return $this->put($path, $contents, user());
+        $this->put($path, $contents, user());
     }
 
     /**
