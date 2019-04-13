@@ -7,7 +7,11 @@
 - Moved `~/.valet` to `~/.config/valet`
 - Unlink renamed links
 - Fixed warning on newer `symfony/process` versions
+- Share command now works with secured sites
 - Added PHP 7.3 install script
+- Updated `nginx`, `ngrok`, `winsw` and `Acrylic DNS` 
+- Other various fixes ported from [laravel/valet](https://github.com/laravel/valet)
+
 ## 2.0.15 - 2018-01-10
 
 - Add compatibility with symfony/process v4
