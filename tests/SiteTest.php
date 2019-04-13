@@ -80,6 +80,44 @@ class SiteTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('threeletters', $certs->first());
         $this->assertEquals('fiveletters', $certs->last());
     }
+
+    public function test_get_site_port()
+    {
+        $path = VALET_HOME_PATH."/Nginx/example.test.conf";
+        $files = Mockery::mock(Filesystem::class);
+        $files->shouldReceive('exists')
+            ->once()
+            ->with($path)
+            ->andReturn(false)
+            ->shouldReceive('get')
+            ->never();
+
+        swap(Filesystem::class, $files);
+
+        $site = resolve(Site::class);
+
+        $this->assertEquals(80, $site->port('example.test'));
+    }
+
+    public function test_get_site_port_when_secured()
+    {
+        $path = VALET_HOME_PATH."/Nginx/example.test.conf";
+        $files = Mockery::mock(Filesystem::class);
+        $files->shouldReceive('exists')
+            ->once()
+            ->with($path)
+            ->andReturn(true)
+            ->shouldReceive('get')
+            ->once()
+            ->with($path)
+            ->andReturn(file_get_contents(__DIR__.'/../cli/stubs/secure.valet.conf'));
+
+        swap(Filesystem::class, $files);
+
+        $site = resolve(Site::class);
+
+        $this->assertEquals(443, $site->port('example.test'));
+    }
 }
 
 class StubForRemovingLinks extends Site

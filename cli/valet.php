@@ -210,10 +210,12 @@ $app->command('paths', function () {
  */
 $app->command('share', function () {
     $host = Site::host(getcwd());
-    $domain = Configuration::read()['domain'];
+    $tld = Configuration::read()['tld'];
+    $port = Site::port("$host.$tld");
+    $port = $port === 443 ? 60 : $port;
     $ngrok = realpath(__DIR__.'/../bin/ngrok.exe');
 
-    passthru("start \"$host.$domain\" \"$ngrok\" http $host.$domain:80 -host-header=rewrite");
+    passthru("start \"$host.$tld\" \"$ngrok\" http $host.$tld:$port -host-header=rewrite");
 })->descriptions('Generate a publicly accessible URL for your project');
 
 /*
