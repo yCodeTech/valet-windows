@@ -5,7 +5,6 @@ namespace Valet;
 use DomainException;
 use phpseclib\Crypt\RSA;
 use phpseclib\File\X509;
-use Illuminate\Support\Str;
 
 class Site
 {
@@ -262,7 +261,7 @@ class Site
     public function port($url)
     {
         if ($this->files->exists($path = VALET_HOME_PATH."/Nginx/$url.conf")) {
-            if (Str::contains($this->files->get($path), '443')) {
+            if (strpos($this->files->get($path), '443') !== false) {
                 return 443;
             }
         }
