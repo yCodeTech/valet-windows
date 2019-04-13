@@ -41,7 +41,7 @@ Set-ExecutionPolicy RemoteSigned; [System.Net.ServicePointManager]::SecurityProt
 
 Valet will automatically start its daemon each time your machine boots. There is no need to run `valet start` or `valet install` ever again once the initial Valet installation is complete.
 
-For more please refer to the official documentation on the [Laravel website](https://laravel.com/docs/5.5/valet#serving-sites).
+For more please refer to the official documentation on the [Laravel website](https://laravel.com/docs/5.8/valet#serving-sites).
 
 ## Known Issues
 
