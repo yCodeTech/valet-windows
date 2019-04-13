@@ -93,7 +93,7 @@ $app->command('tld [tld]', function ($tld = null) {
     Nginx::restart();
 
     info('Your Valet tld has been updated to ['.$tld.'].');
-}, ['domain'])->descriptions('Get or set the TLD used for Valet sites.');
+}, ['tld'])->descriptions('Get or set the TLD used for Valet sites.');
 
 /*
  * Add the current working directory to the paths configuration.
@@ -200,7 +200,7 @@ $app->command('paths', function () {
  * Open the current or given directory in the browser.
  */
  $app->command('open [domain]', function ($domain = null) {
-     $url = 'http://'.($domain ?: Site::host(getcwd())).'.'.Configuration::read()['domain'];
+     $url = 'http://'.($domain ?: Site::host(getcwd())).'.'.Configuration::read()['tld'];
 
      passthru("start $url");
  })->descriptions('Open the site for the current (or specified) directory in your browser');
