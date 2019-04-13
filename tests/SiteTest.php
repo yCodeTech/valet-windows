@@ -83,7 +83,7 @@ class SiteTest extends PHPUnit_Framework_TestCase
 
     public function test_get_site_port()
     {
-        $path = VALET_HOME_PATH."/Nginx/example.test.conf";
+        $path = VALET_HOME_PATH.'/Nginx/example.test.conf';
         $files = Mockery::mock(Filesystem::class);
         $files->shouldReceive('exists')
             ->once()
@@ -101,7 +101,7 @@ class SiteTest extends PHPUnit_Framework_TestCase
 
     public function test_get_site_port_when_secured()
     {
-        $path = VALET_HOME_PATH."/Nginx/example.test.conf";
+        $path = VALET_HOME_PATH.'/Nginx/example.test.conf';
         $files = Mockery::mock(Filesystem::class);
         $files->shouldReceive('exists')
             ->once()
