@@ -34,7 +34,7 @@ class Acrylic
 
         $this->configureNetworkDNS();
 
-        $this->cli->runOrDie('cmd /C "'.$this->path().'/AcrylicController" InstallAcrylicService', function ($code, $output) {
+        $this->cli->runOrDie('cmd /C "'.$this->path().'/AcrylicUI.exe" InstallAcrylicService', function ($code, $output) {
             warning($output);
         });
 
@@ -100,7 +100,7 @@ class Acrylic
     {
         $this->stop();
 
-        $this->cli->run('cmd /C "'.$this->path().'/AcrylicController" UninstallAcrylicService');
+        $this->cli->run('cmd /C "'.$this->path().'/AcrylicUI.exe" UninstallAcrylicService');
     }
 
     /**
@@ -110,7 +110,7 @@ class Acrylic
      */
     public function start()
     {
-        $this->cli->runOrDie('cmd /C "'.$this->path().'/AcrylicController" StartAcrylicServiceSilently', function ($code, $output) {
+        $this->cli->runOrDie('cmd /C "'.$this->path().'/AcrylicUI.exe" StartAcrylicService', function ($code, $output) {
             warning($output);
         });
 
@@ -124,7 +124,7 @@ class Acrylic
      */
     public function stop()
     {
-        $this->cli->run('cmd /C "'.$this->path().'/AcrylicController" StopAcrylicServiceSilently');
+        $this->cli->run('cmd /C "'.$this->path().'/AcrylicUI.exe" StopAcrylicService');
 
         $this->flushdns();
     }
