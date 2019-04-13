@@ -42,7 +42,7 @@ class AcrylicTest extends PHPUnit_Framework_TestCase
         $cli = Mockery::mock(CommandLine::class);
 
         $cli->shouldReceive('runOrDie')->andReturnUsing(function ($command) {
-            $this->assertSame('cmd /C "'.$this->path().'/AcrylicController" InstallAcrylicService', $command);
+            $this->assertSame('cmd /C "'.$this->path().'/AcrylicUI.exe" InstallAcrylicService', $command);
         })->once();
 
         $acrylic = Mockery::mock(Acrylic::class.'[restart,configureNetworkDNS]', [$cli, $files]);
@@ -72,7 +72,7 @@ class AcrylicTest extends PHPUnit_Framework_TestCase
         $cli = Mockery::mock(CommandLine::class);
 
         $cli->shouldReceive('run')->andReturnUsing(function ($command) {
-            $this->assertSame('cmd /C "'.$this->path().'/AcrylicController" UninstallAcrylicService', $command);
+            $this->assertSame('cmd /C "'.$this->path().'/AcrylicUI.exe" UninstallAcrylicService', $command);
         })->once();
 
         $acrylic = Mockery::mock(Acrylic::class.'[stop]', [$cli, resolve(Filesystem::class)]);
