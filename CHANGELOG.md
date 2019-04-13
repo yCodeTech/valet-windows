@@ -9,6 +9,7 @@
 - Fixed warning on newer `symfony/process` versions
 - Share command now works with secured sites
 - Added PHP 7.3 install script
+- HTTP/2 works now with secured sites
 - Updated `nginx`, `ngrok`, `winsw` and `Acrylic DNS` 
 - Other various fixes ported from [laravel/valet](https://github.com/laravel/valet)
 
