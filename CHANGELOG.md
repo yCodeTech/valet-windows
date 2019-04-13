@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.1.0 - Unreleased
+## 2.1.0 - 2019-04-13
 
 - Moved the helper functions into the Valet namespace
 - Renamed `valet domain` command to `valet tld`
