@@ -286,6 +286,15 @@ $app->command('on-latest-version', function () use ($version) {
     }
 })->descriptions('Determine if this is the latest version of Valet');
 
+/**
+ * Allow the user to change the version of php valet uses
+ */
+$app->command('use phpVersion', function ($phpVersion) {
+    info('Not implemented yet!');
+})->descriptions('Change the version of php used by valet', [
+    'phpVersion' => 'The PHP version you want to use, e.g php@7.2',
+]);
+
 /*
  * Load all of the Valet extensions.
  */
