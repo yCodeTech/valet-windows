@@ -354,6 +354,7 @@ class Site
 
         $x509 = new X509();
         $x509->makeCA();
+        $x509->setStartDate('-1 day');
 
         $result = $x509->sign($issuer, $subject, 'sha256WithRSAEncryption');
         $certificate = $x509->saveX509($result);
