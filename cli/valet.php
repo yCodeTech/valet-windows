@@ -4,14 +4,14 @@
  * Load correct autoloader depending on install location.
  */
 if (file_exists(__DIR__.'/../vendor/autoload.php')) {
-    require __DIR__.'/../vendor/autoload.php';
+    require_once __DIR__.'/../vendor/autoload.php';
 } else {
-    require __DIR__.'/../../../autoload.php';
+    require_once __DIR__.'/../../../autoload.php';
 }
 
-require __DIR__.'/includes/compatibility.php';
-require __DIR__.'/includes/facades.php';
-require __DIR__.'/includes/helpers.php';
+require_once __DIR__.'/includes/compatibility.php';
+require_once __DIR__.'/includes/facades.php';
+require_once __DIR__.'/includes/helpers.php';
 
 use Silly\Application;
 use function Valet\info;
