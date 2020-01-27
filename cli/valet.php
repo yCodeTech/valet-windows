@@ -13,12 +13,12 @@ require_once __DIR__.'/includes/compatibility.php';
 require_once __DIR__.'/includes/facades.php';
 require_once __DIR__.'/includes/helpers.php';
 
+use Illuminate\Container\Container;
 use Silly\Application;
 use function Valet\info;
-use function Valet\table;
 use function Valet\output;
+use function Valet\table;
 use function Valet\warning;
-use Illuminate\Container\Container;
 
 /*
  * Relocate config dir to ~/.config/valet/ if found in old location.

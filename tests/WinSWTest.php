@@ -1,12 +1,12 @@
 <?php
 
-use Valet\WinSW;
-use Valet\Filesystem;
+use Illuminate\Container\Container;
 use Valet\CommandLine;
+use Valet\Filesystem;
+use function Valet\resolve;
 use function Valet\swap;
 use function Valet\user;
-use function Valet\resolve;
-use Illuminate\Container\Container;
+use Valet\WinSW;
 
 class WinSWTest extends PHPUnit_Framework_TestCase
 {

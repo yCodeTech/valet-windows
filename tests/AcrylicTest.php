@@ -1,12 +1,12 @@
 <?php
 
+use Illuminate\Container\Container;
 use Valet\Acrylic;
-use Valet\Filesystem;
 use Valet\CommandLine;
+use Valet\Filesystem;
+use function Valet\resolve;
 use function Valet\swap;
 use function Valet\user;
-use function Valet\resolve;
-use Illuminate\Container\Container;
 
 class AcrylicTest extends PHPUnit_Framework_TestCase
 {

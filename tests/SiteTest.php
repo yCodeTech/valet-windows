@@ -1,12 +1,12 @@
 <?php
 
-use Valet\Site;
+use Illuminate\Container\Container;
+use Valet\Configuration;
 use Valet\Filesystem;
+use function Valet\resolve;
+use Valet\Site;
 use function Valet\swap;
 use function Valet\user;
-use Valet\Configuration;
-use function Valet\resolve;
-use Illuminate\Container\Container;
 
 class SiteTest extends PHPUnit_Framework_TestCase
 {

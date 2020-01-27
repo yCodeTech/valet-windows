@@ -2,8 +2,8 @@
 
 namespace Valet;
 
-use RuntimeException;
 use Illuminate\Container\Container;
+use RuntimeException;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
