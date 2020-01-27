@@ -23,7 +23,7 @@ Before installation, make sure that no other programs such as Apache or Nginx ar
 
 ```bash
 # PHP 7.4
-Set-ExecutionPolicy RemoteSigned; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri "https://github.com/cretueusebiu/valet-windows/raw/master/bin/php73.ps1" -OutFile $env:temp\php74.ps1; .$env:temp\php74.ps1
+Set-ExecutionPolicy RemoteSigned; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri "https://github.com/cretueusebiu/valet-windows/raw/master/bin/php74.ps1" -OutFile $env:temp\php74.ps1; .$env:temp\php74.ps1
 
 # PHP 7.3
 Set-ExecutionPolicy RemoteSigned; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri "https://github.com/cretueusebiu/valet-windows/raw/master/bin/php73.ps1" -OutFile $env:temp\php73.ps1; .$env:temp\php73.ps1
