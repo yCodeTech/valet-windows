@@ -1,13 +1,13 @@
 <?php
 
-use Valet\Site;
-use Valet\Nginx;
+use Illuminate\Container\Container;
+use Valet\Configuration;
 use Valet\Filesystem;
+use Valet\Nginx;
+use function Valet\resolve;
+use Valet\Site;
 use function Valet\swap;
 use function Valet\user;
-use Valet\Configuration;
-use function Valet\resolve;
-use Illuminate\Container\Container;
 
 class NginxTest extends PHPUnit_Framework_TestCase
 {
