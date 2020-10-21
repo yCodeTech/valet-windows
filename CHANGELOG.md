@@ -2,6 +2,7 @@
 
 ## 2.1.3 - 2020-10-21
 
+- Update Acrylic DNS Proxy
 - Added `PHP_FCGI_CHILDREN=10` [#148](https://github.com/cretueusebiu/valet-windows/issues/148)
 - Fixed illuminate/container conflict [#147](https://github.com/cretueusebiu/valet-windows/issues/147)
 
