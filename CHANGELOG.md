@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.3 - 2020-10-21
+
+- Added `PHP_FCGI_CHILDREN=10` [#148](https://github.com/cretueusebiu/valet-windows/issues/148)
+
 ## 2.1.1 - 2019-07-26
 
 - Fixed certificates in non-UTC timezones [#121](https://github.com/cretueusebiu/valet-windows/pull/121) 
