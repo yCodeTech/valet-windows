@@ -93,7 +93,7 @@ class WinSW
         $this->cli->run($command, function () use ($service, $command) {
             sleep(2);
 
-            $this->cli->runOrDie($command, function () use ($service, $command) {
+            $this->cli->runOrDie($command, function () use ($service) {
                 warning("Could not start the $service service. Check ~/.valet/Log for errors.");
             });
         });
