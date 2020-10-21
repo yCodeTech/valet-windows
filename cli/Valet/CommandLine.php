@@ -70,7 +70,7 @@ class CommandLine
                 $onError($code, $output);
             }
 
-            die;
+            exit;
         });
     }
 
