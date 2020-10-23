@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.4 - 2020-10-23
+
+- Lowered the number of php processes
+
 ## 2.1.3 - 2020-10-21
 
 - Update Acrylic DNS Proxy
