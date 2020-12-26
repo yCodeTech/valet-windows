@@ -46,9 +46,9 @@ if (is_dir(VALET_HOME_PATH)) {
  * Install Valet and any required services.
  */
 $app->command('install', function () {
-    Nginx::stop();
-    PhpCgi::stop();
-    Acrylic::stop();
+    // Nginx::stop();
+    // PhpCgi::stop();
+    // Acrylic::stop();
 
     Configuration::install();
     Nginx::install();

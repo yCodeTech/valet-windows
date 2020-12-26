@@ -7,9 +7,18 @@ use Valet\Filesystem;
 use function Valet\resolve;
 use Valet\Valet;
 use Valet\WinSW;
+use Valet\WinSwFactory;
 
 class WinSWTest extends TestCase
 {
+    /** @test */
+    public function make_winsw()
+    {
+        $winsw = resolve(WinSwFactory::class)->make('testservice');
+
+        $this->assertInstanceOf(WinSW::class, $winsw);
+    }
+
     /** @test */
     public function install_service()
     {
@@ -30,7 +39,7 @@ class WinSWTest extends TestCase
                 $this->assertSame('cmd "/C cd '.Valet::homePath('Services').' && testservice install"', $command);
             })->once();
 
-        resolve(WinSW::class)->install('testservice');
+        $this->winsw('testservice')->install();
     }
 
     /** @test */
@@ -41,19 +50,18 @@ class WinSWTest extends TestCase
                 $this->assertSame('cmd "/C cd '.Valet::homePath('Services').' && testservice stop"', $command);
             })->once();
 
-        resolve(WinSW::class)->stop('testservice');
+        $this->winsw('testservice')->stop();
     }
 
     /** @test */
     public function restart_service()
     {
         $this->mock(CommandLine::class)
-            ->shouldReceive('run')->once()
             ->shouldReceive('run')->andReturnUsing(function ($command) {
-                $this->assertSame('cmd "/C cd '.Valet::homePath('Services').' && testservice start"', $command);
+                $this->assertSame('cmd "/C cd '.Valet::homePath('Services').' && testservice restart"', $command);
             })->once();
 
-        resolve(WinSW::class)->restart('testservice');
+        $this->winsw('testservice')->restart();
     }
 
     /** @test */
@@ -65,6 +73,15 @@ class WinSWTest extends TestCase
                 $this->assertSame('cmd "/C cd '.Valet::homePath('Services').' && testservice uninstall"', $command);
             })->once();
 
-        resolve(WinSW::class)->uninstall('testservice');
+        $this->winsw('testservice')->uninstall();
+    }
+
+    /**
+     * @param  string $service
+     * @return \Valet\WinSW
+     */
+    protected function winsw(string $service): WinSW
+    {
+        return resolve(WinSwFactory::class)->make($service);
     }
 }

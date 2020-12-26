@@ -34,15 +34,15 @@ class PhpCgi
      *
      * @param  CommandLine   $cli
      * @param  Filesystem    $files
-     * @param  WinSW         $winsw
+     * @param  WinSwFactory  $winsw
      * @param  Configuration $configuration
      * @return void
      */
-    public function __construct(CommandLine $cli, Filesystem $files, WinSW $winsw, Configuration $configuration)
+    public function __construct(CommandLine $cli, Filesystem $files, WinSwFactory $winsw, Configuration $configuration)
     {
         $this->cli = $cli;
         $this->files = $files;
-        $this->winsw = $winsw;
+        $this->winsw = $winsw->make(static::SERVICE);
         $this->configuration = $configuration;
     }
 
@@ -55,12 +55,24 @@ class PhpCgi
     {
         info('Installing PHP-CGI service...');
 
-        $this->winsw->install(static::SERVICE, [
-            'PHP_PATH' => $this->findPhpPath(),
-            'PHP_PORT' => $this->configuration->read()['php_port'] ?? PhpCgi::PORT,
-        ]);
+        $this->installService();
+    }
 
-        $this->restart();
+    /**
+     * Install the Windows service.
+     *
+     * @return void
+     */
+    public function installService()
+    {
+        if (! $this->winsw->installed()) {
+            $this->winsw->install([
+                'PHP_PATH' => $this->findPhpPath(),
+                'PHP_PORT' => $this->configuration->read()['php_port'] ?? PhpCgi::PORT,
+            ]);
+        }
+
+        $this->winsw->restart();
     }
 
     /**
@@ -70,7 +82,7 @@ class PhpCgi
      */
     public function uninstall()
     {
-        $this->winsw->uninstall(static::SERVICE);
+        $this->winsw->uninstall();
     }
 
     /**
@@ -80,7 +92,7 @@ class PhpCgi
      */
     public function restart()
     {
-        $this->winsw->restart(static::SERVICE);
+        $this->winsw->restart();
     }
 
     /**
@@ -90,7 +102,7 @@ class PhpCgi
      */
     public function stop()
     {
-        $this->winsw->stop(static::SERVICE);
+        $this->winsw->stop();
     }
 
     /**

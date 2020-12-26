@@ -44,7 +44,7 @@ class CommandLine
      *
      * @param  string   $command
      * @param  callable $onError
-     * @return string
+     * @return ProcessOutput
      */
     public function run($command, callable $onError = null)
     {
@@ -56,11 +56,23 @@ class CommandLine
      *
      * @param  string  $command
      * @param  callable $onError
-     * @return string
+     * @return ProcessOutput
      */
     public function runAsUser($command, callable $onError = null)
     {
         return $this->runCommand($command, $onError);
+    }
+
+    /**
+     * Run the given command with PowerShell.
+     *
+     * @param  string  $command
+     * @param  callable|null $onError
+     * @return ProcessOutput
+     */
+    public function powershell(string $command, callable $onError = null)
+    {
+        return $this->runCommand("powershell -command \"$command\"", $onError);
     }
 
     /**
@@ -76,7 +88,7 @@ class CommandLine
      *
      * @param  string   $command
      * @param  callable $onError (int $code, string $output)
-     * @return string
+     * @return ProcessOutput
      */
     public function runOrExit($command, callable $onError = null)
     {
@@ -94,7 +106,7 @@ class CommandLine
      *
      * @param  string  $command
      * @param  callable $onError
-     * @return string
+     * @return ProcessOutput
      */
     public function runCommand($command, callable $onError = null)
     {
@@ -120,6 +132,6 @@ class CommandLine
             $onError($process->getExitCode(), $processOutput);
         }
 
-        return $processOutput;
+        return new ProcessOutput($process);
     }
 }

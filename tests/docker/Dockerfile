@@ -32,4 +32,4 @@ RUN powershell -Command valet install
 CMD [ "powershell" ]
 
 # docker build -t cretueusebiu/valet-windows -f ./tests/docker/Dockerfile .
-# docker run -it --rm --name cretueusebiu-valet-windows cretueusebiu/valet-windows
+# docker run -it --rm --name cretueusebiu-valet-windows -v "C:\Users\Eusebiu\Code\valet-windows:C:\valet" cretueusebiu/valet-windows

@@ -41,9 +41,13 @@ class Acrylic
 
         $this->configureNetworkDNS();
 
-        $this->cli->runOrExit('cmd /C "'.$this->path('AcrylicUI.exe').'" InstallAcrylicService', function ($code, $output) {
-            error("Failed to start Acrylic DNS: $output");
-        });
+        if (! $this->installed()) {
+            $this->cli->runOrExit('cmd /C "'.$this->path('AcrylicUI.exe').'" InstallAcrylicService', function ($code, $output) {
+                error("Failed to install Acrylic DNS: $output");
+            });
+        }
+
+        $this->flushdns();
     }
 
     /**
@@ -100,6 +104,10 @@ class Acrylic
      */
     public function uninstall()
     {
+        if (! $this->installed()) {
+            return;
+        }
+
         $this->stop();
 
         $this->cli->run('cmd /C "'.$this->path('AcrylicUI.exe').'" UninstallAcrylicService', function ($code, $output) {
@@ -107,6 +115,16 @@ class Acrylic
         });
 
         $this->flushdns();
+    }
+
+    /**
+     * Determine if the Acrylic DNS is installed.
+     *
+     * @return boolean
+     */
+    protected function installed(): bool
+    {
+        return $this->cli->powershell('Get-Service -Name "AcrylicDNSProxySvc"')->isSuccessful();
     }
 
     /**

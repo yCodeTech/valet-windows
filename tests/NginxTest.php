@@ -10,6 +10,8 @@ use function Valet\resolve;
 use Valet\Site;
 use Valet\Valet;
 use Valet\WinSW;
+use Mockery as m;
+use Valet\WinSwFactory;
 
 class NginxTest extends TestCase
 {
@@ -82,11 +84,23 @@ class NginxTest extends TestCase
     /** @test */
     public function install_nginx_service()
     {
-        $this->mock(WinSW::class)
-            ->shouldReceive('uninstall')->once()->with(Nginx::SERVICE)
-            ->shouldReceive('install')->once()->with(Nginx::SERVICE, [
-                'NGINX_PATH' => realpath(__DIR__.'/../bin/nginx'),
-            ]);
+        ($winsw = m::mock(WinSW::class))
+            ->shouldReceive('installed')
+                ->once()
+                ->andReturn(false)
+            ->shouldReceive('install')
+                ->once()
+                ->with([
+                    'NGINX_PATH' => realpath(__DIR__.'/../bin/nginx'),
+                ])
+            ->shouldReceive('restart')
+                ->once();
+
+        $this->mock(WinSwFactory::class)
+            ->shouldReceive('make')
+                ->once()
+                ->with(Nginx::SERVICE)
+                ->andReturn($winsw);
 
         resolve(Nginx::class)->installService();
     }
@@ -94,12 +108,16 @@ class NginxTest extends TestCase
     /** @test */
     public function restart_nginx_service()
     {
-        $this->mock(CommandLine::class)
-            ->shouldReceive('run')->once()->with('cmd "/C taskkill /IM nginx.exe /F"');
+        // $this->mock(CommandLine::class)
+        //     ->shouldReceive('run')->once()->with('cmd "/C taskkill /IM nginx.exe /F"');
 
-        $this->mock(WinSW::class)
-            ->shouldReceive('stop')->once()->with(Nginx::SERVICE)
-            ->shouldReceive('restart')->once()->with(Nginx::SERVICE);
+        ($winsw = m::mock(WinSW::class))
+            ->shouldReceive('restart')
+                ->once();
+
+        $this->mock(WinSwFactory::class)
+            ->shouldReceive('make')
+                ->andReturn($winsw);
 
         resolve(Nginx::class)->restart();
     }
@@ -107,11 +125,16 @@ class NginxTest extends TestCase
     /** @test */
     public function stop_nginx_service()
     {
-        $this->mock(CommandLine::class)
-            ->shouldReceive('run')->once()->with('cmd "/C taskkill /IM nginx.exe /F"');
+        // $this->mock(CommandLine::class)
+        //     ->shouldReceive('run')->once()->with('cmd "/C taskkill /IM nginx.exe /F"');
 
-        $this->mock(WinSW::class)
-            ->shouldReceive('stop')->once()->with(Nginx::SERVICE);
+        ($winsw = m::mock(WinSW::class))
+            ->shouldReceive('stop')
+                ->once();
+
+        $this->mock(WinSwFactory::class)
+            ->shouldReceive('make')
+                ->andReturn($winsw);
 
         resolve(Nginx::class)->stop();
     }
@@ -119,8 +142,13 @@ class NginxTest extends TestCase
     /** @test */
     public function uninstall_nginx_service()
     {
-        $this->mock(WinSW::class)
-            ->shouldReceive('uninstall')->once()->with(Nginx::SERVICE);
+        ($winsw = m::mock(WinSW::class))
+            ->shouldReceive('uninstall')
+                ->once();
+
+        $this->mock(WinSwFactory::class)
+            ->shouldReceive('make')
+                ->andReturn($winsw);
 
         resolve(Nginx::class)->uninstall();
     }

@@ -2,11 +2,13 @@
 
 namespace Tests;
 
+use Mockery as m;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Valet\Configuration;
 use Valet\PhpCgi;
 use function Valet\resolve;
 use Valet\WinSW;
+use Valet\WinSwFactory;
 
 class PhpCgiTest extends TestCase
 {
@@ -17,12 +19,24 @@ class PhpCgiTest extends TestCase
             ->shouldReceive('read')
             ->andReturn(['php_port' => 1234]);
 
-        $this->mock(WinSW::class)
-            ->shouldReceive('install')->once()->with(PhpCgi::SERVICE, [
-                'PHP_PATH' => $this->findPhpPath(),
-                'PHP_PORT' => 1234,
-            ])
-            ->shouldReceive('restart')->once()->with(PhpCgi::SERVICE);
+        ($winsw = m::mock(WinSW::class))
+            ->shouldReceive('installed')
+                ->once()
+                ->andReturn(false)
+            ->shouldReceive('install')
+                ->once()
+                ->with([
+                    'PHP_PATH' => $this->findPhpPath(),
+                    'PHP_PORT' => 1234,
+                ])
+            ->shouldReceive('restart')
+                ->once();
+
+        $this->mock(WinSwFactory::class)
+            ->shouldReceive('make')
+                ->once()
+                ->with(PhpCgi::SERVICE)
+                ->andReturn($winsw);
 
         resolve(PhpCgi::class)->install();
     }
@@ -30,8 +44,13 @@ class PhpCgiTest extends TestCase
     /** @test */
     public function uninstall_php_cgi_service()
     {
-        $this->mock(WinSW::class)
-            ->shouldReceive('uninstall')->once()->with(PhpCgi::SERVICE);
+        ($winsw = m::mock(WinSW::class))
+            ->shouldReceive('uninstall')
+            ->once();
+
+        $this->mock(WinSwFactory::class)
+            ->shouldReceive('make')
+            ->andReturn($winsw);
 
         resolve(PhpCgi::class)->uninstall();
     }
@@ -39,8 +58,13 @@ class PhpCgiTest extends TestCase
     /** @test */
     public function restart_php_cgi_service()
     {
-        $this->mock(WinSW::class)
-            ->shouldReceive('restart')->once()->with(PhpCgi::SERVICE);
+        ($winsw = m::mock(WinSW::class))
+            ->shouldReceive('restart')
+            ->once();
+
+        $this->mock(WinSwFactory::class)
+            ->shouldReceive('make')
+            ->andReturn($winsw);
 
         resolve(PhpCgi::class)->restart();
     }
@@ -48,8 +72,13 @@ class PhpCgiTest extends TestCase
     /** @test */
     public function stop_php_cgi_service()
     {
-        $this->mock(WinSW::class)
-            ->shouldReceive('stop')->once()->with(PhpCgi::SERVICE);
+        ($winsw = m::mock(WinSW::class))
+            ->shouldReceive('stop')
+            ->once();
+
+        $this->mock(WinSwFactory::class)
+            ->shouldReceive('make')
+            ->andReturn($winsw);
 
         resolve(PhpCgi::class)->stop();
     }

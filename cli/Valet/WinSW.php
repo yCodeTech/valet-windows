@@ -5,6 +5,11 @@ namespace Valet;
 class WinSW
 {
     /**
+     * @var string
+     */
+    protected $service;
+
+    /**
      * @var CommandLine
      */
     protected $cli;
@@ -21,104 +26,128 @@ class WinSW
      * @param  Filesystem  $files
      * @return void
      */
-    public function __construct(CommandLine $cli, Filesystem $files)
+    public function __construct(string $service, CommandLine $cli, Filesystem $files)
     {
         $this->cli = $cli;
         $this->files = $files;
+        $this->service = $service;
     }
 
     /**
-     * Install a Windows service.
+     * Install the service.
      *
-     * @param  string $service
      * @param  array  $args
      * @return void
      */
-    public function install(string $service, array $args = [])
+    public function install(array $args = [])
     {
-        $this->createConfiguration($service, $args);
+        $this->createConfiguration($args);
 
-        $command = 'cmd "/C cd '.$this->servicesPath().' && '.$service.' install"';
+        $command = 'cmd "/C cd '.$this->servicesPath().' && '.$this->service.' install"';
 
-        $this->cli->runOrExit($command, function ($code, $output) use ($service) {
-            error("Failed to install service [$service]. Check ~/.config/valet/Log for errors.\n$output");
+        $this->cli->runOrExit($command, function ($code, $output) {
+            error("Failed to install service [$this->service]. Check ~/.config/valet/Log for errors.\n$output");
         });
     }
 
     /**
      * Create the .exe and .xml files.
      *
-     * @param  string $service
      * @param  array  $args
      * @return void
      */
-    protected function createConfiguration(string $service, array $args = [])
+    protected function createConfiguration(array $args = [])
     {
         $args['VALET_HOME_PATH'] = Valet::homePath();
 
         $this->files->copy(
             realpath(__DIR__.'/../../bin/winsw/WinSW.NET4.exe'),
-            $this->servicesPath("$service.exe")
+            $this->binaryPath()
         );
 
-        $config = $this->files->get(__DIR__."/../stubs/$service.xml");
+        $config = $this->files->get(__DIR__."/../stubs/$this->service.xml");
 
         $this->files->put(
-            $this->servicesPath("$service.xml"),
+            $this->configPath(),
             str_replace(array_keys($args), array_values($args), $config)
         );
     }
 
     /**
-     * Uninstall a Windows service.
+     * Uninstall the service.
      *
-     * @param  string $service
      * @return void
      */
-    public function uninstall(string $service)
+    public function uninstall()
     {
-        $this->stop($service);
+        $this->stop($this->service);
 
-        $this->cli->run('cmd "/C cd '.$this->servicesPath().' && '.$service.' uninstall"');
+        $this->cli->run('cmd "/C cd '.$this->servicesPath().' && '.$this->service.' uninstall"');
 
-        $this->files->unlink($this->servicesPath("$service.exe"));
-        $this->files->unlink($this->servicesPath("$service.xml"));
+        $this->files->unlink($this->binaryPath());
+        $this->files->unlink($this->configPath());
     }
 
     /**
-     * Restart a Windows service.
+     * Determine if the service is installed.
      *
-     * @param  string $service
+     * @return boolean
+     */
+    public function installed(): bool
+    {
+        return $this->cli->powershell("Get-Service -Name \"$this->service\"")->isSuccessful();
+    }
+
+    /**
+     * Restart the service.
+     *
      * @return void
      */
-    public function restart(string $service)
+    public function restart()
     {
-        $this->stop($service);
+        $command = 'cmd "/C cd '.$this->servicesPath().' && '.$this->service.' restart"';
 
-        $command = 'cmd "/C cd '.$this->servicesPath().' && '.$service.' start"';
-
-        $this->cli->run($command, function () use ($service, $command) {
+        $this->cli->run($command, function () use ($command) {
             sleep(2);
 
-            $this->cli->runOrExit($command, function ($code, $output) use ($service) {
-                error("Failed to start service [$service]. Check ~/.config/valet/Log for errors.\n$output");
+            $this->cli->runOrExit($command, function ($code, $output) {
+                error("Failed to restart service [$this->service]. Check ~/.config/valet/Log for errors.\n$output");
             });
         });
     }
 
     /**
-     * Stop a Windows service.
+     * Stop the service.
      *
-     * @param  string $service
      * @return void
      */
-    public function stop(string $service)
+    public function stop()
     {
-        $command = 'cmd "/C cd '.$this->servicesPath().' && '.$service.' stop"';
+        $command = 'cmd "/C cd '.$this->servicesPath().' && '.$this->service.' stop"';
 
-        $this->cli->run($command, function ($code, $output) use ($service) {
-            warning("Failed to stop service [$service].\n$output");
+        $this->cli->run($command, function ($code, $output) {
+            warning("Failed to stop service [$this->service].\n$output");
         });
+    }
+
+    /**
+     * Get the config path.
+     *
+     * @return string
+     */
+    protected function configPath(): string
+    {
+        return $this->servicesPath("$this->service.xml");
+    }
+
+    /**
+     * Get the binary path.
+     *
+     * @return string
+     */
+    protected function binaryPath(): string
+    {
+        return $this->servicesPath("$this->service.exe");
     }
 
     /**

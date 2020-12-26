@@ -2,10 +2,12 @@
 
 namespace Tests;
 
+use Tests\Support\FakeProcessOutput;
 use Valet;
 use Valet\Acrylic;
 use Valet\CommandLine;
 use Valet\Filesystem;
+
 use function Valet\resolve;
 
 class AcrylicTest extends TestCase
@@ -26,12 +28,14 @@ class AcrylicTest extends TestCase
             });
 
         $this->mock(CommandLine::class)
+            ->shouldReceive('powershell')->andReturn(FakeProcessOutput::unsuccessfull())
             ->shouldReceive('run')->once()->andReturnUsing(function ($command) {
                 $this->assertSame('cmd /C cd "'.realpath(__DIR__.'/../bin').'" && configuredns', $command);
             })
             ->shouldReceive('runOrExit')->once()->andReturnUsing(function ($command) {
                 $this->assertSame('cmd /C "'.$this->path('AcrylicUI.exe').'" InstallAcrylicService', $command);
-            });
+            })
+            ->shouldReceive('run')->once()->with('cmd "/C ipconfig /flushdns"');
 
         resolve(Acrylic::class)->install();
     }
@@ -58,9 +62,7 @@ class AcrylicTest extends TestCase
             ->shouldReceive('runOrExit')->once()->andReturnUsing(function ($command) {
                 $this->assertSame('cmd /C "'.$this->path('AcrylicUI.exe').'" StartAcrylicService', $command);
             })
-            ->shouldReceive('run')->once()->andReturnUsing(function ($command) {
-                $this->assertSame('cmd "/C ipconfig /flushdns"', $command);
-            });
+            ->shouldReceive('run')->once()->with('cmd "/C ipconfig /flushdns"');
 
         resolve(Acrylic::class)->start();
     }
@@ -72,9 +74,7 @@ class AcrylicTest extends TestCase
             ->shouldReceive('run')->once()->andReturnUsing(function ($command) {
                 $this->assertSame('cmd /C "'.$this->path('AcrylicUI.exe').'" RestartAcrylicService', $command);
             })
-            ->shouldReceive('run')->once()->andReturnUsing(function ($command) {
-                $this->assertSame('cmd "/C ipconfig /flushdns"', $command);
-            });
+            ->shouldReceive('run')->once()->with('cmd "/C ipconfig /flushdns"');
 
         resolve(Acrylic::class)->restart();
     }
@@ -83,6 +83,7 @@ class AcrylicTest extends TestCase
     public function uninstall_acrylic_service()
     {
         $this->mock(CommandLine::class)
+            ->shouldReceive('powershell')->andReturn(FakeProcessOutput::successfull())
             ->shouldReceive('run')->twice()
             ->shouldReceive('run')->once()->andReturnUsing(function ($command) {
                 $this->assertSame('cmd /C "'.$this->path('AcrylicUI.exe').'" UninstallAcrylicService', $command);

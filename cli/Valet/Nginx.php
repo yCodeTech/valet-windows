@@ -8,10 +8,29 @@ class Nginx
 {
     const SERVICE = 'nginxservice';
 
+    /**
+     * @var CommandLine
+     */
     protected $cli;
+
+    /**
+     * @var Filesystem
+     */
     protected $files;
+
+    /**
+     * @var Configuration
+     */
     protected $configuration;
+
+    /**
+     * @var Site
+     */
     protected $site;
+
+    /**
+     * @var WinSW
+     */
     protected $winsw;
 
     /**
@@ -26,12 +45,12 @@ class Nginx
      * @return void
      */
     public function __construct(CommandLine $cli, Filesystem $files,
-                         Configuration $configuration, Site $site, WinSW $winsw)
+                         Configuration $configuration, Site $site, WinSwFactory $winsw)
     {
         $this->cli = $cli;
         $this->site = $site;
         $this->files = $files;
-        $this->winsw = $winsw;
+        $this->winsw = $winsw->make(static::SERVICE);
         $this->configuration = $configuration;
     }
 
@@ -48,8 +67,6 @@ class Nginx
         $this->installServer();
         $this->installNginxDirectory();
         $this->installService();
-
-        $this->restart();
     }
 
     /**
@@ -142,11 +159,13 @@ class Nginx
      */
     public function installService()
     {
-        $this->uninstall();
+        if (! $this->winsw->installed()) {
+            $this->winsw->install([
+                'NGINX_PATH' => $this->path(),
+            ]);
+        }
 
-        $this->winsw->install(static::SERVICE, [
-            'NGINX_PATH' => $this->path(),
-        ]);
+        $this->winsw->restart();
     }
 
     /**
@@ -156,9 +175,9 @@ class Nginx
      */
     public function restart()
     {
-        $this->stop();
+        // $this->stop();
 
-        $this->winsw->restart(static::SERVICE);
+        $this->winsw->restart();
     }
 
     /**
@@ -168,9 +187,9 @@ class Nginx
      */
     public function stop()
     {
-        $this->winsw->stop(static::SERVICE);
+        $this->winsw->stop();
 
-        $this->cli->run('cmd "/C taskkill /IM nginx.exe /F"');
+        // $this->cli->run('cmd "/C taskkill /IM nginx.exe /F"');
     }
 
     /**
@@ -180,7 +199,7 @@ class Nginx
      */
     public function uninstall()
     {
-        $this->winsw->uninstall(static::SERVICE);
+        $this->winsw->uninstall();
     }
 
     /**
