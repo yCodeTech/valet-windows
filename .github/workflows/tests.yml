@@ -48,13 +48,8 @@ jobs:
       - name: Run unit tests
         run: composer test-unit
 
-      - name: Add Valet to system path
-        run: |
-          $env:Path += (Get-Item .).FullName
-          $env:Path
-
       - name: Run integration tests
         run: |
-          $env:Path += (Get-Item .).FullName
+          $env:Path += ';' + (Get-Item .).FullName
           $env:Path
           composer test-integration-windows
