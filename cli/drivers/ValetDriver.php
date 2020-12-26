@@ -182,7 +182,7 @@ abstract class ValetDriver
 
     /**
      * Load server environment variables if available.
-     * Processes any '*' entries first, and then adds site-specific entries
+     * Processes any '*' entries first, and then adds site-specific entries.
      *
      * @param  string  $sitePath
      * @param  string  $siteName

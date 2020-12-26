@@ -15,11 +15,11 @@ class Magento2ValetDriver extends ValetDriver
      * @param  string  $sitePath
      * @param  string  $siteName
      * @param  string  $uri
-     * @return boolean
+     * @return bool
      */
     public function serves($sitePath, $siteName, $uri)
     {
-        return file_exists($sitePath.'/bin/magento') && file_exists($sitePath . '/pub/index.php');
+        return file_exists($sitePath.'/bin/magento') && file_exists($sitePath.'/pub/index.php');
     }
 
     /**
@@ -51,21 +51,21 @@ class Magento2ValetDriver extends ValetDriver
             $magentoPackagePubDir .= '/pub';
         }
 
-        $file = $magentoPackagePubDir . '/' . $route;
+        $file = $magentoPackagePubDir.'/'.$route;
 
         if (file_exists($file)) {
-            return $magentoPackagePubDir . $uri;
+            return $magentoPackagePubDir.$uri;
         }
 
-        if (strpos($route, $pub . 'static/') === 0) {
-            $route = preg_replace('#' . $pub . 'static/#', '', $route, 1);
+        if (strpos($route, $pub.'static/') === 0) {
+            $route = preg_replace('#'.$pub.'static/#', '', $route, 1);
             $_GET['resource'] = $route;
-            include $magentoPackagePubDir . '/' . $pub . 'static.php';
+            include $magentoPackagePubDir.'/'.$pub.'static.php';
             exit;
         }
 
-        if (strpos($route, $pub . 'media/') === 0) {
-            include $magentoPackagePubDir . '/' . $pub . 'get.php';
+        if (strpos($route, $pub.'media/') === 0) {
+            include $magentoPackagePubDir.'/'.$pub.'get.php';
             exit;
         }
 
@@ -152,11 +152,11 @@ class Magento2ValetDriver extends ValetDriver
         if ('developer' === $this->mageMode) {
             $_SERVER['DOCUMENT_ROOT'] = $sitePath;
 
-            return $sitePath . '/index.php';
+            return $sitePath.'/index.php';
         }
 
-        $_SERVER['DOCUMENT_ROOT'] = $sitePath . '/pub';
+        $_SERVER['DOCUMENT_ROOT'] = $sitePath.'/pub';
 
-        return $sitePath . '/pub/index.php';
+        return $sitePath.'/pub/index.php';
     }
 }

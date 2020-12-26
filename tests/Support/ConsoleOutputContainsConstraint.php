@@ -18,7 +18,7 @@ class ConsoleOutputContainsConstraint extends Constraint
 
     public function __construct(string $string, bool $ignoreCase = false)
     {
-        $this->string     = $string;
+        $this->string = $string;
         $this->ignoreCase = $ignoreCase;
     }
 
@@ -75,6 +75,6 @@ class ConsoleOutputContainsConstraint extends Constraint
      */
     protected function failureDescription($other): string
     {
-        return "Output: \n--- begin output ---\n" . $other . "\n--- end output ---\n" . $this->toString();
+        return "Output: \n--- begin output ---\n".$other."\n--- end output ---\n".$this->toString();
     }
 }

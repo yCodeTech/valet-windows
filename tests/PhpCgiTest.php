@@ -5,9 +5,8 @@ namespace Tests;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Valet\Configuration;
 use Valet\PhpCgi;
-use Valet\WinSW;
-
 use function Valet\resolve;
+use Valet\WinSW;
 
 class PhpCgiTest extends TestCase
 {

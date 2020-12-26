@@ -2,12 +2,11 @@
 
 namespace Tests;
 
-use Valet\WinSW;
-use Valet\Filesystem;
 use Valet\CommandLine;
-use Valet\Valet;
-
+use Valet\Filesystem;
 use function Valet\resolve;
+use Valet\Valet;
+use Valet\WinSW;
 
 class WinSWTest extends TestCase
 {

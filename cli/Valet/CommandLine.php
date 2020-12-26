@@ -98,7 +98,8 @@ class CommandLine
      */
     public function runCommand($command, callable $onError = null)
     {
-        $onError = $onError ?: function () {};
+        $onError = $onError ?: function () {
+        };
 
         // Symfony's 4.x Process component has deprecated passing a command string
         // to the constructor, but older versions (which Valet's Composer

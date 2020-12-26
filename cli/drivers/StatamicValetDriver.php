@@ -88,7 +88,7 @@ class StatamicValetDriver extends ValetDriver
     }
 
     /**
-     * Get the locale from this URI
+     * Get the locale from this URI.
      *
      * @param  string  $uri
      * @return string|null
@@ -131,7 +131,7 @@ class StatamicValetDriver extends ValetDriver
     }
 
     /**
-     * Get the path to a statically cached page
+     * Get the path to a statically cached page.
      *
      * @param  string  $sitePath
      * @return string

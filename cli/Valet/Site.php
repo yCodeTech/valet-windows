@@ -106,7 +106,7 @@ class Site
      *
      * @return \Illuminate\Support\Collection
      */
-    function links()
+    public function links()
     {
         $certsPath = $this->certificatesPath();
 
@@ -118,7 +118,7 @@ class Site
     }
 
     /**
-     * Pretty print out all parked links in Valet
+     * Pretty print out all parked links in Valet.
      *
      * @return \Illuminate\Support\Collection
      */
@@ -137,7 +137,7 @@ class Site
 
             // Only merge on the parked sites that don't interfere with the linked sites
             $sites = $this->getSites($path, $certs)->filter(function ($site, $key) use ($links) {
-                return !$links->has($key);
+                return ! $links->has($key);
             });
 
             $parkedLinks = $parkedLinks->merge($sites);
@@ -147,7 +147,7 @@ class Site
     }
 
     /**
-     * Get all sites which are proxies (not Links, and contain proxy_pass directive)
+     * Get all sites which are proxies (not Links, and contain proxy_pass directive).
      *
      * @return \Illuminate\Support\Collection
      */
@@ -173,17 +173,18 @@ class Site
             return $links->has($site);
         })->mapWithKeys(function ($site) {
             $host = $this->getProxyHostForSite($site) ?: '(other)';
+
             return [$site => $host];
         })->reject(function ($host, $site) {
             // If proxy host is null, it may be just a normal SSL stub, or something else; either way we exclude it from the list
             return $host === '(other)';
         })->map(function ($host, $site) use ($certs, $tld) {
             $secured = $certs->has($site);
-            $url = ($secured ? 'https': 'http').'://'.$site.'.'.$tld;
+            $url = ($secured ? 'https' : 'http').'://'.$site.'.'.$tld;
 
             return [
                 'site' => $site,
-                'secured' => $secured ? ' X': '',
+                'secured' => $secured ? ' X' : '',
                 'url' => $url,
                 'path' => $host,
             ];
@@ -211,6 +212,7 @@ class Site
         if (preg_match('~proxy_pass\s+(?<host>https?://.*)\s*;~', $siteConf, $patterns)) {
             $host = trim($patterns['host']);
         }
+
         return $host;
     }
 
@@ -218,7 +220,8 @@ class Site
     {
         $config = $this->config->read();
         $suffix = $suffix ?: '.'.$config['tld'];
-        $file = str_replace($suffix,'',$site).$suffix;
+        $file = str_replace($suffix, '', $site).$suffix;
+
         return $this->files->exists($this->nginxPath($file)) ? $this->files->get($this->nginxPath($file)) : null;
     }
 
@@ -266,7 +269,7 @@ class Site
 
     /**
      * Get list of sites and return them formatted
-     * Will work for symlink and normal site paths
+     * Will work for symlink and normal site paths.
      *
      * @param  string $path
      * @param  \Illuminate\Support\Collection $certs
@@ -286,16 +289,17 @@ class Site
             } else {
                 $realPath = $this->files->realpath($sitePath);
             }
+
             return [$site => $realPath];
         })->filter(function ($path) {
             return $this->files->isDir($path);
         })->map(function ($path, $site) use ($certs, $config) {
             $secured = $certs->has($site);
-            $url = ($secured ? 'https': 'http').'://'.$site.'.'.$config['tld'];
+            $url = ($secured ? 'https' : 'http').'://'.$site.'.'.$config['tld'];
 
             return [
                 'site' => $site,
-                'secured' => $secured ? ' X': '',
+                'secured' => $secured ? ' X' : '',
                 'url' => $url,
                 'path' => $path,
             ];
@@ -350,7 +354,7 @@ class Site
             $newUrl = str_replace('.'.$oldTld, '.'.$tld, $url);
             $siteConf = $this->getSiteConfigFileContents($url, '.'.$oldTld);
 
-            if (!empty($siteConf) && strpos($siteConf, '# valet stub: proxy.valet.conf') === 0) {
+            if (! empty($siteConf) && strpos($siteConf, '# valet stub: proxy.valet.conf') === 0) {
                 // proxy config
                 $this->unsecure($url);
                 $this->secure($newUrl, $this->replaceOldDomainWithNew($siteConf, $url, $newUrl));
@@ -385,6 +389,7 @@ class Site
                 $siteConf = str_replace($match, $replaced, $siteConf);
             }
         }
+
         return $siteConf;
     }
 
@@ -555,7 +560,7 @@ class Site
      * @param  string  $siteConf  (optional) Nginx site config file content
      * @return string
      */
-    function buildSecureNginxServer($url, $siteConf = null)
+    public function buildSecureNginxServer($url, $siteConf = null)
     {
         if ($siteConf === null) {
             $siteConf = $this->files->get(__DIR__.'/../stubs/secure.valet.conf');
@@ -614,7 +619,7 @@ class Site
         table(['Site', 'SSL', 'URL', 'Path'], $secured->toArray());
 
         foreach ($secured->pluck('site') as $url) {
-            $this->unsecure($url . '.' . $tld);
+            $this->unsecure($url.'.'.$tld);
         }
 
         $remaining = $this->parked()
@@ -629,7 +634,7 @@ class Site
     }
 
     /**
-     * Build the Nginx proxy config for the specified domain
+     * Build the Nginx proxy config for the specified domain.
      *
      * @param  string  $url The domain name to serve
      * @param  string  $host The URL to proxy to, eg: http://127.0.0.1:8080

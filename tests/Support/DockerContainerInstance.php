@@ -2,8 +2,8 @@
 
 namespace Tests\Support;
 
-use Symfony\Component\Process\Process;
 use Spatie\Docker\DockerContainerInstance as SpatieDockerContainerInstance;
+use Symfony\Component\Process\Process;
 
 class DockerContainerInstance extends SpatieDockerContainerInstance
 {

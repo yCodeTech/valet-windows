@@ -3,8 +3,8 @@
 namespace Valet;
 
 use Exception;
-use RuntimeException;
 use Illuminate\Container\Container;
+use RuntimeException;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
@@ -186,12 +186,14 @@ if (! function_exists('ends_with')) {
      * @param  string|array  $needles
      * @return bool
      */
-    function ends_with($haystack, $needles) {
+    function ends_with($haystack, $needles)
+    {
         foreach ((array) $needles as $needle) {
             if (substr($haystack, -strlen($needle)) === (string) $needle) {
                 return true;
             }
         }
+
         return false;
     }
 }

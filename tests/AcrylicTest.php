@@ -76,7 +76,6 @@ class AcrylicTest extends TestCase
                 $this->assertSame('cmd "/C ipconfig /flushdns"', $command);
             });
 
-
         resolve(Acrylic::class)->restart();
     }
 

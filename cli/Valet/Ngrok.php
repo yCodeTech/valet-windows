@@ -2,9 +2,9 @@
 
 namespace Valet;
 
-use ZipArchive;
-use Httpful\Request;
 use DomainException;
+use Httpful\Request;
+use ZipArchive;
 
 class Ngrok
 {
@@ -34,7 +34,7 @@ class Ngrok
 
     /**
      * @param  string  $domain
-     * @param  integer $port
+     * @param  int $port
      * @return void
      */
     public function start(string $domain, int $port)
@@ -63,12 +63,12 @@ class Ngrok
                 }
             }, 250);
 
-            if (!empty($response)) {
+            if (! empty($response)) {
                 return $response;
             }
         }
 
-        throw new DomainException("Tunnel not established.");
+        throw new DomainException('Tunnel not established.');
     }
 
     /**
@@ -84,7 +84,7 @@ class Ngrok
         // find the one responding on HTTP. Each tunnel has an HTTP and a HTTPS address
         // but for local dev purposes we just desire the plain HTTP URL endpoint.
         foreach ($tunnels as $tunnel) {
-            if ($tunnel->proto === 'http' && strpos($tunnel->config->addr, $domain) ) {
+            if ($tunnel->proto === 'http' && strpos($tunnel->config->addr, $domain)) {
                 return $tunnel->public_url;
             }
         }

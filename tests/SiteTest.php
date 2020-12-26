@@ -4,12 +4,12 @@ namespace Tests;
 
 use Mockery;
 use Valet\CommandLine;
-use Valet\Site;
-use Valet\Filesystem;
 use Valet\Configuration;
-use function Valet\user;
+use Valet\Filesystem;
 use function Valet\resolve;
+use Valet\Site;
 use function Valet\swap;
+use function Valet\user;
 
 class SiteTest extends TestCase
 {
@@ -58,7 +58,7 @@ class SiteTest extends TestCase
             ->andReturn(false);
         $files->shouldReceive('realpath')
             ->twice()
-            ->andReturn($dirPath . '/sitetwo', $dirPath . '/sitethree');
+            ->andReturn($dirPath.'/sitetwo', $dirPath.'/sitethree');
         $files->shouldReceive('isDir')->andReturn(true);
         $files->shouldReceive('ensureDirExists')
             ->once()
@@ -90,13 +90,13 @@ class SiteTest extends TestCase
             'site' => 'sitetwo',
             'secured' => '',
             'url' => 'http://sitetwo.local',
-            'path' => $dirPath . '/sitetwo',
+            'path' => $dirPath.'/sitetwo',
         ], $sites->first());
         $this->assertSame([
             'site' => 'sitethree',
             'secured' => ' X',
             'url' => 'https://sitethree.local',
-            'path' => $dirPath . '/sitethree',
+            'path' => $dirPath.'/sitethree',
         ], $sites->last());
     }
 
@@ -110,13 +110,13 @@ class SiteTest extends TestCase
             ->andReturn(['sitetwo']);
         $files->shouldReceive('isLink')
             ->once()
-            ->with($dirPath . '/sitetwo')
+            ->with($dirPath.'/sitetwo')
             ->andReturn(false);
         $files->shouldReceive('realpath')
             ->once()
-            ->with($dirPath . '/sitetwo')
-            ->andReturn($dirPath . '/sitetwo');
-        $files->shouldReceive('isDir')->once()->with($dirPath . '/sitetwo')->andReturn(true);
+            ->with($dirPath.'/sitetwo')
+            ->andReturn($dirPath.'/sitetwo');
+        $files->shouldReceive('isDir')->once()->with($dirPath.'/sitetwo')->andReturn(true);
         $files->shouldReceive('ensureDirExists')
             ->once()
             ->with($dirPath, user());
@@ -138,7 +138,7 @@ class SiteTest extends TestCase
             'site' => 'sitetwo',
             'secured' => '',
             'url' => 'http://sitetwo.local',
-            'path' => $dirPath . '/sitetwo',
+            'path' => $dirPath.'/sitetwo',
         ], $sites->first());
     }
 
@@ -151,7 +151,7 @@ class SiteTest extends TestCase
             ->with($dirPath)
             ->andReturn(['sitetwo', 'siteone']);
         $files->shouldReceive('isLink')->andReturn(false);
-        $files->shouldReceive('realpath')->andReturn($dirPath . '/sitetwo', $dirPath . '/siteone');
+        $files->shouldReceive('realpath')->andReturn($dirPath.'/sitetwo', $dirPath.'/siteone');
         $files->shouldReceive('isDir')->twice()
             ->andReturn(false, true);
         $files->shouldReceive('ensureDirExists')
@@ -175,7 +175,7 @@ class SiteTest extends TestCase
             'site' => 'siteone',
             'secured' => '',
             'url' => 'http://siteone.local',
-            'path' => $dirPath . '/siteone',
+            'path' => $dirPath.'/siteone',
         ], $sites->first());
     }
 
@@ -189,11 +189,11 @@ class SiteTest extends TestCase
             ->andReturn(['siteone']);
         $files->shouldReceive('isLink')
             ->once()
-            ->with($dirPath . '/siteone')
+            ->with($dirPath.'/siteone')
             ->andReturn(true);
         $files->shouldReceive('readLink')
             ->once()
-            ->with($dirPath . '/siteone')
+            ->with($dirPath.'/siteone')
             ->andReturn($linkedPath = '/Users/usertest/linkedpath/siteone');
         $files->shouldReceive('isDir')->andReturn(true);
         $files->shouldReceive('ensureDirExists')
@@ -490,7 +490,6 @@ class SiteTest extends TestCase
     }
 }
 
-
 class CommandLineFake extends CommandLine
 {
     public function runCommand($command, callable $onError = null)
@@ -504,7 +503,6 @@ class CommandLineFake extends CommandLine
         // commands for real.
     }
 }
-
 
 class FixturesSiteFake extends Site
 {
@@ -611,7 +609,6 @@ class FixturesSiteFake extends Site
         SiteTest::assertEquals('key:'.$urlWithTld.':'.$counter, file_get_contents($keyPath));
     }
 }
-
 
 class StubForRemovingLinks extends Site
 {

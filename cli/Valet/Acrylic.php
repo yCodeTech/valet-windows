@@ -132,7 +132,7 @@ class Acrylic
     {
         $this->cli->run('cmd /C "'.$this->path('AcrylicUI.exe').'" StopAcrylicService', function ($code, $output) {
             warning("Failed to stop Acrylic DNS: $output");
-        });;
+        });
 
         $this->flushdns();
     }
@@ -146,7 +146,7 @@ class Acrylic
     {
         $this->cli->run('cmd /C "'.$this->path('AcrylicUI.exe').'" RestartAcrylicService', function ($code, $output) {
             warning("Failed to restart Acrylic DNS: $output");
-        });;
+        });
 
         $this->flushdns();
     }
