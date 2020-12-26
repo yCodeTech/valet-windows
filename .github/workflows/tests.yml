@@ -48,5 +48,8 @@ jobs:
       - name: Run unit tests
         run: composer test-unit
 
+      - name: Add Valet to system path
+        run: echo $GITHUB_WORKSPACE >> $GITHUB_PATH
+
       - name: Run integration tests
         run: composer test-integration-windows
