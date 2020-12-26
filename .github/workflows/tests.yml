@@ -47,3 +47,6 @@ jobs:
 
       - name: Run unit tests
         run: composer test-unit
+
+      - name: Run integration tests
+        run: composer test-integration-windows

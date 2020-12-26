@@ -56,6 +56,10 @@
             "Composer\\Config::disableProcessTimeout",
             "vendor\\bin\\phpunit --filter=DockerIntegrationTest"
         ],
+        "test-integration-windows": [
+            "Composer\\Config::disableProcessTimeout",
+            "vendor\\bin\\phpunit --filter=WindowsIntegrationTest"
+        ],
         "build-docker": "docker build -t cretueusebiu/valet-windows -f ./tests/docker/Dockerfile ."
     },
     "extra": {
