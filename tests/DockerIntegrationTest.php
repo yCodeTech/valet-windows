@@ -8,7 +8,7 @@ use Tests\Support\DockerContainer;
 /**
  * @group integration
  */
-class IntegrationTest extends TestCase
+class DockerIntegrationTest extends TestCase
 {
     /**
      * @var \Tests\Support\DockerContainerInstance

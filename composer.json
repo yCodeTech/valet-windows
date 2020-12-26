@@ -54,7 +54,7 @@
         "test-unit": "vendor\\bin\\phpunit --exclude-group=integration",
         "test-integration": [
             "Composer\\Config::disableProcessTimeout",
-            "vendor\\bin\\phpunit --group=integration"
+            "vendor\\bin\\phpunit --filter=DockerIntegrationTest"
         ],
         "build-docker": "docker build -t cretueusebiu/valet-windows -f ./tests/docker/Dockerfile ."
     },
