@@ -11,8 +11,8 @@ if (PHP_OS !== 'WINNT' && ! $inTestingEnvironment) {
     exit(1);
 }
 
-if (version_compare(PHP_VERSION, '5.6.0', '<')) {
-    echo 'Valet requires PHP 5.6.0 or later.';
+if (version_compare(PHP_VERSION, '7.3.0', '<')) {
+    echo 'Valet requires PHP 7.3 or later.';
 
     exit(1);
 }

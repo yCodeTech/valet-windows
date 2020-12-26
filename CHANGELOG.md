@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Sync with [laravel/valet](https://github.com/laravel/valet)
+- Added support for PHP 8.0
+- Update Acrylic DNS Proxy, Nginx, WinSW
+- Added integration tests with Docker
+
 ## 2.1.4 - 2020-10-23
 
 - Lowered the number of php processes

@@ -22,11 +22,11 @@ Before installation, make sure that no other programs such as Apache or Nginx ar
 - If you don't have PHP installed, open PowerShell (3.0+) as Administrator and run: 
 
 ```bash
-# PHP 7.4
-Set-ExecutionPolicy RemoteSigned; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri "https://github.com/cretueusebiu/valet-windows/raw/master/bin/php74.ps1" -OutFile $env:temp\php74.ps1; .$env:temp\php74.ps1
+# PHP 8.0
+Set-ExecutionPolicy RemoteSigned; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri "https://github.com/cretueusebiu/valet-windows/raw/master/bin/php.ps1" -OutFile $env:temp\php.ps1; .$env:temp\php.ps1 8.0
 
-# PHP 7.3
-Set-ExecutionPolicy RemoteSigned; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri "https://github.com/cretueusebiu/valet-windows/raw/master/bin/php73.ps1" -OutFile $env:temp\php73.ps1; .$env:temp\php73.ps1
+# PHP 7.4
+Set-ExecutionPolicy RemoteSigned; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri "https://github.com/cretueusebiu/valet-windows/raw/master/bin/php.ps1" -OutFile $env:temp\php.ps1; .$env:temp\php.ps1 7.4
 ```
 
 > This script will download and install PHP for you and add it to your environment path variable. PowerShell is only required for this step.
@@ -49,9 +49,25 @@ For more please refer to the official documentation on the [Laravel website](htt
 - You must run the `valet` commands from the drive where Valet is installed, except for park and link. See [#12](https://github.com/cretueusebiu/valet-windows/issues/12#issuecomment-283111834).
 - If your machine is not connected to the internet you'll have to manually add the domains in your `hosts` file or you can install the "Microsoft Loopback Adapter" as this simulates an active local network interface that Valet can bind too.
 
-## Useful Links
+## Testing
 
-- [Install ImageMagick](https://mlocati.github.io/articles/php-windows-imagick.html)
+Run the unit tests with:
+
+```bash
+composer test-unit
+```
+
+Before running the integration tests for the first time, you must build the Docker container with:
+
+```bash
+composer build-docker
+```
+
+Next, you can run the integration tests with:
+
+```bash
+composer test-integration
+```
 
 ## Changelog
 

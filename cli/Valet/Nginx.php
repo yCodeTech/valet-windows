@@ -2,15 +2,17 @@
 
 namespace Valet;
 
+use DomainException;
+
 class Nginx
 {
-    public $cli;
-    public $files;
-    public $configuration;
-    public $site;
-    public $winsw;
-
     const SERVICE = 'nginxservice';
+
+    protected $cli;
+    protected $files;
+    protected $configuration;
+    protected $site;
+    protected $winsw;
 
     /**
      * Create a new Nginx instance.
@@ -40,10 +42,14 @@ class Nginx
      */
     public function install()
     {
+        info('Installing Nginx...');
+
         $this->installConfiguration();
         $this->installServer();
         $this->installNginxDirectory();
         $this->installService();
+
+        $this->restart();
     }
 
     /**
@@ -53,12 +59,10 @@ class Nginx
      */
     public function installConfiguration()
     {
-        info('Installing nginx configuration...');
-
         $contents = $this->files->get(__DIR__.'/../stubs/nginx.conf');
 
         $this->files->putAsUser(
-            $this->path().'/conf/nginx.conf',
+            $this->path('conf/nginx.conf'),
             str_replace(['VALET_USER', 'VALET_HOME_PATH'], [user(), VALET_HOME_PATH], $contents)
         );
     }
@@ -70,13 +74,13 @@ class Nginx
      */
     public function installServer()
     {
-        $this->files->ensureDirExists($this->path().'/valet');
+        $this->files->ensureDirExists($this->path('valet'));
 
         $this->files->putAsUser(
-            $this->path().'/valet/valet.conf',
+            $this->path('valet/valet.conf'),
             str_replace(
-                ['VALET_HOME_PATH', 'VALET_SERVER_PATH', 'VALET_STATIC_PREFIX', 'HOME_PATH'],
-                [VALET_HOME_PATH, VALET_SERVER_PATH, VALET_STATIC_PREFIX, $_SERVER['HOME']],
+                ['VALET_HOME_PATH', 'VALET_SERVER_PATH', 'VALET_STATIC_PREFIX', 'HOME_PATH', 'PHP_PORT'],
+                [VALET_HOME_PATH, VALET_SERVER_PATH, VALET_STATIC_PREFIX, $_SERVER['HOME'], $this->configuration->read()['php_port'] ?? PhpCgi::PORT],
                 $this->files->get(__DIR__.'/../stubs/valet.conf')
             )
         );
@@ -96,15 +100,27 @@ class Nginx
      */
     public function installNginxDirectory()
     {
-        info('Installing nginx directory...');
-
-        if (! $this->files->isDir($nginxDirectory = VALET_HOME_PATH.'/Nginx')) {
+        if (! $this->files->isDir($nginxDirectory = Valet::homePath('Nginx'))) {
             $this->files->mkdirAsUser($nginxDirectory);
         }
 
-        $this->files->putAsUser($nginxDirectory.'/.keep', "\n");
+        $this->files->putAsUser($nginxDirectory.DIRECTORY_SEPARATOR.'.keep', "\n");
 
         $this->rewriteSecureNginxFiles();
+    }
+
+    /**
+     * Check nginx.conf for errors.
+     */
+    private function lint()
+    {
+        // TODO
+        // $this->cli->run(
+        //     'sudo nginx -c '.$this->path('conf/nginx.conf').' -t',
+        //     function ($exitCode, $outputMessage) {
+        //         throw new DomainException("Nginx cannot start; please check your nginx.conf [$exitCode: $outputMessage].");
+        //     }
+        // );
     }
 
     /**
@@ -129,7 +145,7 @@ class Nginx
         $this->uninstall();
 
         $this->winsw->install(static::SERVICE, [
-            'NGINX_PATH' => realpath(__DIR__.'/../../bin/nginx'),
+            'NGINX_PATH' => $this->path(),
         ]);
     }
 
@@ -152,8 +168,6 @@ class Nginx
      */
     public function stop()
     {
-        info('Stopping nginx...');
-
         $this->winsw->stop(static::SERVICE);
 
         $this->cli->run('cmd "/C taskkill /IM nginx.exe /F"');
@@ -172,10 +186,11 @@ class Nginx
     /**
      * Get the Nginx path.
      *
+     * @param  string $path
      * @return string
      */
-    public function path()
+    public function path(string $path = ''): string
     {
-        return realpath(__DIR__.'/../../bin/nginx');
+        return realpath(__DIR__.'/../../bin/nginx').($path ? DIRECTORY_SEPARATOR.$path : $path);
     }
 }

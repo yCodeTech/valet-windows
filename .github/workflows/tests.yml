@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: [7.3, 7.4]
+        php: [7.3, 7.4, 8.0]
 
     name: PHP ${{ matrix.php }}
 
@@ -45,5 +45,5 @@ jobs:
           max_attempts: 2
           command: composer install --prefer-dist --no-interaction --no-progress
 
-      - name: Run tests
-        run: vendor/bin/phpunit
+      - name: Run unit tests
+        run: composer test-unit

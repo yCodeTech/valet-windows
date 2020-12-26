@@ -4,12 +4,16 @@ namespace Valet;
 
 class Configuration
 {
-    public $files;
+    /**
+     * @var Filesystem
+     */
+    protected $files;
 
     /**
      * Create a new Valet configuration class instance.
      *
-     * @param Filesystem $filesystem
+     * @param  Filesystem $filesystem
+     * @return void
      */
     public function __construct(Filesystem $files)
     {
@@ -23,6 +27,8 @@ class Configuration
      */
     public function install()
     {
+        info('Installing Configuration...');
+
         $this->createConfigurationDirectory();
         $this->createDriversDirectory();
         $this->createSitesDirectory();
@@ -42,16 +48,16 @@ class Configuration
      */
     public function createConfigurationDirectory()
     {
-        $this->files->ensureDirExists(preg_replace('~/valet$~', '', VALET_HOME_PATH), user());
+        $this->files->ensureDirExists(preg_replace('~/valet$~', '', $this->valetHomePath()), user());
 
         $oldPath = $_SERVER['HOME'].'/.valet';
 
         if ($this->files->isDir($oldPath)) {
-            rename($oldPath, VALET_HOME_PATH);
-            $this->prependPath(VALET_HOME_PATH.'/Sites');
+            rename($oldPath, $this->valetHomePath());
+            $this->prependPath($this->valetHomePath('Sites'));
         }
 
-        $this->files->ensureDirExists(VALET_HOME_PATH, user());
+        $this->files->ensureDirExists($this->valetHomePath(), user());
     }
 
     /**
@@ -61,14 +67,16 @@ class Configuration
      */
     public function createDriversDirectory()
     {
-        if ($this->files->isDir($driversDirectory = VALET_HOME_PATH.'/Drivers')) {
+        $driversPath = $this->valetHomePath('Drivers');
+
+        if ($this->files->isDir($driversPath)) {
             return;
         }
 
-        $this->files->mkdirAsUser($driversDirectory);
+        $this->files->mkdirAsUser($driversPath);
 
         $this->files->putAsUser(
-            $driversDirectory.'/SampleValetDriver.php',
+            $driversPath.'/SampleValetDriver.php',
             $this->files->get(__DIR__.'/../stubs/SampleValetDriver.php')
         );
     }
@@ -80,7 +88,7 @@ class Configuration
      */
     public function createSitesDirectory()
     {
-        $this->files->ensureDirExists(VALET_HOME_PATH.'/Sites', user());
+        $this->files->ensureDirExists($this->valetHomePath('Sites'), user());
     }
 
     /**
@@ -90,7 +98,7 @@ class Configuration
      */
     public function createExtensionsDirectory()
     {
-        $this->files->ensureDirExists(VALET_HOME_PATH.'/Extensions', user());
+        $this->files->ensureDirExists(Valet::homePath('Extensions'), user());
     }
 
     /**
@@ -100,9 +108,9 @@ class Configuration
      */
     public function createLogDirectory()
     {
-        $this->files->ensureDirExists(VALET_HOME_PATH.'/Log', user());
+        $this->files->ensureDirExists($path = $this->valetHomePath('Log'), user());
 
-        $this->files->touch(VALET_HOME_PATH.'/Log/nginx-error.log');
+        $this->files->touch($path.DIRECTORY_SEPARATOR.'nginx-error.log');
     }
 
     /**
@@ -112,7 +120,7 @@ class Configuration
      */
     public function createCertificatesDirectory()
     {
-        $this->files->ensureDirExists(VALET_HOME_PATH.'/Certificates', user());
+        $this->files->ensureDirExists($this->valetHomePath('Certificates'), user());
     }
 
     /**
@@ -122,36 +130,49 @@ class Configuration
      */
     public function createServicesDirectory()
     {
-        $this->files->ensureDirExists(VALET_HOME_PATH.'/Services', user());
+        $this->files->ensureDirExists($this->valetHomePath('Services'), user());
     }
 
     /**
      * Write the base, initial configuration for Valet.
+     *
+     * @return void
      */
     public function writeBaseConfiguration()
     {
         if (! $this->files->exists($this->path())) {
-            $this->write(['tld' => 'test', 'paths' => []]);
+            $this->write(['tld' => 'test', 'paths' => [], 'php_port' => PhpCgi::PORT]);
         }
 
-        // Migrate old configurations from 'domain' to 'tld'
         $config = $this->read();
-        if (isset($config['tld'])) {
-            return;
+
+        // Migrate old configurations from 'domain' to 'tld'.
+        if (! isset($config['tld'])) {
+            $this->updateKey('tld', ! empty($config['domain']) ? $config['domain'] : 'test');
         }
 
-        $this->updateKey('tld', ! empty($config['domain']) ? $config['domain'] : 'test');
+        // Add php_port if missing.
+        $this->updateKey('php_port', $config['php_port'] ?? PhpCgi::PORT);
+    }
+
+    /**
+     * Forcefully delete the Valet home configuration directory and contents.
+     *
+     * @return void
+     */
+    public function uninstall()
+    {
+        $this->files->unlink(VALET_HOME_PATH);
     }
 
     /**
      * Add the given path to the configuration.
      *
-     * @param string $path
-     * @param bool   $prepend
-     *
+     * @param  string  $path
+     * @param  bool    $prepend
      * @return void
      */
-    public function addPath($path, $prepend = false)
+    public function addPath(string $path, bool $prepend = false)
     {
         $this->write(tap($this->read(), function (&$config) use ($path, $prepend) {
             $method = $prepend ? 'prepend' : 'push';
@@ -163,11 +184,10 @@ class Configuration
     /**
      * Prepend the given path to the configuration.
      *
-     * @param string $path
-     *
+     * @param  string  $path
      * @return void
      */
-    public function prependPath($path)
+    public function prependPath(string $path)
     {
         $this->addPath($path, true);
     }
@@ -175,12 +195,16 @@ class Configuration
     /**
      * Remove the given path from the configuration.
      *
-     * @param string $path
-     *
+     * @param  string  $path
      * @return void
      */
-    public function removePath($path)
+    public function removePath(string $path)
     {
+        if ($path == VALET_HOME_PATH.'/Sites') {
+            info("Cannot remove this directory because this is where Valet stores its site definitions.\nRun [valet paths] for a list of parked paths.");
+            die();
+        }
+
         $this->write(tap($this->read(), function (&$config) use ($path) {
             $config['paths'] = collect($config['paths'])->reject(function ($value) use ($path) {
                 return $value === $path;
@@ -211,7 +235,7 @@ class Configuration
      *
      * @return array
      */
-    public function read()
+    public function read(): array
     {
         return json_decode($this->files->get($this->path()), true);
     }
@@ -219,12 +243,11 @@ class Configuration
     /**
      * Update a specific key in the configuration file.
      *
-     * @param string $key
-     * @param mixed  $value
-     *
+     * @param  string  $key
+     * @param  mixed   $value
      * @return array
      */
-    public function updateKey($key, $value)
+    public function updateKey(string $key, $value): array
     {
         return tap($this->read(), function (&$config) use ($key, $value) {
             $config[$key] = $value;
@@ -236,11 +259,10 @@ class Configuration
     /**
      * Write the given configuration to disk.
      *
-     * @param array $config
-     *
+     * @param  array  $config
      * @return void
      */
-    public function write($config)
+    public function write(array $config)
     {
         $this->files->putAsUser($this->path(), json_encode(
             $config, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
@@ -252,8 +274,19 @@ class Configuration
      *
      * @return string
      */
-    public function path()
+    protected function path(): string
     {
-        return VALET_HOME_PATH.'/config.json';
+        return $this->valetHomePath('config.json');
+    }
+
+    /**
+     * Get the Valet home path.
+     *
+     * @param  string $path
+     * @return string
+     */
+    protected function valetHomePath(string $path = ''): string
+    {
+        return Valet::homePath($path);
     }
 }

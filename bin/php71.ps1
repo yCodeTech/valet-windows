@@ -1,3 +1,5 @@
+Write-Output "DEPRECATED!"
+
 $phpBase = "http://windows.php.net"
 $phpPage = "http://windows.php.net/downloads/releases/"
 $phpResponse = Invoke-WebRequest $phpPage

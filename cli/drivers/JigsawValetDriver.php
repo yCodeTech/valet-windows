@@ -5,8 +5,7 @@ class JigsawValetDriver extends BasicValetDriver
     /**
      * Mutate the incoming URI.
      *
-     * @param string $uri
-     *
+     * @param  string  $uri
      * @return string
      */
     public function mutateUri($uri)
@@ -17,10 +16,9 @@ class JigsawValetDriver extends BasicValetDriver
     /**
      * Determine if the driver serves the request.
      *
-     * @param string $sitePath
-     * @param string $siteName
-     * @param string $uri
-     *
+     * @param  string  $sitePath
+     * @param  string  $siteName
+     * @param  string  $uri
      * @return void
      */
     public function serves($sitePath, $siteName, $uri)

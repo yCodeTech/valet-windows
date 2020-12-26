@@ -1,90 +1,104 @@
 <?php
 
-use Illuminate\Container\Container;
+namespace Tests;
+
+use Valet;
 use Valet\Acrylic;
 use Valet\CommandLine;
 use Valet\Filesystem;
 use function Valet\resolve;
-use function Valet\swap;
-use function Valet\user;
 
-class AcrylicTest extends PHPUnit_Framework_TestCase
+class AcrylicTest extends TestCase
 {
-    public function setUp()
+    /** @test */
+    public function install_acrylic_service()
     {
-        $_SERVER['SUDO_USER'] = user();
+        $this->partialMock(Filesystem::class)
+            ->shouldReceive('put')->once()->andReturnUsing(function ($path, $contents) {
+                $this->assertSame($this->path('AcrylicHosts.txt'), $path);
+                $this->assertTrue(strpos($contents, 'test') !== false);
+                $this->assertTrue(strpos($contents, Valet::homePath()) !== false);
+            })
+            ->shouldReceive('exists')->with(Valet::homePath('AcrylicHosts.txt'))->once()->andReturn(false)
+            ->shouldReceive('putAsUser')->once()->andReturnUsing(function ($path, $contents) {
+                $this->assertSame(Valet::homePath('AcrylicHosts.txt'), $path);
+                $this->assertSame(PHP_EOL, $contents);
+            });
 
-        Container::setInstance(new Container());
-    }
-
-    public function tearDown()
-    {
-        Mockery::close();
-    }
-
-    public function test_install_service()
-    {
-        $files = Mockery::mock(Filesystem::class.'[put,exists,putAsUser]');
-
-        $files->shouldReceive('put')->andReturnUsing(function ($path, $contents) {
-            $this->assertSame($this->path().'/AcrylicHosts.txt', $path);
-            $this->assertTrue(strpos($contents, 'test') !== false);
-            $this->assertTrue(strpos($contents, VALET_HOME_PATH) !== false);
-        })->once();
-
-        $files->shouldReceive('exists')->with(VALET_HOME_PATH.'/AcrylicHosts.txt')->andReturn(false)->once();
-
-        $files->shouldReceive('putAsUser')->andReturnUsing(function ($path, $contents) {
-            $this->assertSame(VALET_HOME_PATH.'/AcrylicHosts.txt', $path);
-            $this->assertSame(PHP_EOL, $contents);
-        });
-
-        $cli = Mockery::mock(CommandLine::class);
-
-        $cli->shouldReceive('runOrDie')->andReturnUsing(function ($command) {
-            $this->assertSame('cmd /C "'.$this->path().'/AcrylicUI.exe" InstallAcrylicService', $command);
-        })->once();
-
-        $acrylic = Mockery::mock(Acrylic::class.'[restart,configureNetworkDNS]', [$cli, $files]);
-        $acrylic->shouldReceive('restart')->once();
-        $acrylic->shouldReceive('configureNetworkDNS')->once();
-
-        swap(Acrylic::class, $acrylic);
-        swap(CommandLine::class, $cli);
+        $this->mock(CommandLine::class)
+            ->shouldReceive('run')->once()->andReturnUsing(function ($command) {
+                $this->assertSame('cmd /C cd "'.realpath(__DIR__.'/../bin').'" && configuredns', $command);
+            })
+            ->shouldReceive('runOrExit')->once()->andReturnUsing(function ($command) {
+                $this->assertSame('cmd /C "'.$this->path('AcrylicUI.exe').'" InstallAcrylicService', $command);
+            });
 
         resolve(Acrylic::class)->install();
     }
 
-    public function test_update_tld()
+    /** @test */
+    public function update_acrylic_tld()
     {
-        $acrylic = Mockery::mock(Acrylic::class.'[stop,createHostsFile,restart]', [resolve(CommandLine::class), resolve(Filesystem::class)]);
-        $acrylic->shouldReceive('stop')->once();
-        $acrylic->shouldReceive('createHostsFile')->with('app')->once();
-        $acrylic->shouldReceive('restart')->once();
+        $this->mock(CommandLine::class)
+            ->shouldReceive('run');
 
-        swap(Acrylic::class, $acrylic);
+        $this->partialMock(Filesystem::class)
+            ->shouldReceive('put')->once()->andReturnUsing(function ($path, $contents) {
+                $this->assertTrue(strpos($contents, 'app') !== false);
+            })
+            ->shouldReceive('exists')->andReturn(true);
 
         resolve(Acrylic::class)->updateTld('app');
     }
 
-    public function test_uninstall_service()
+    /** @test */
+    public function start_acrylic_service()
     {
-        $cli = Mockery::mock(CommandLine::class);
+        $this->mock(CommandLine::class)
+            ->shouldReceive('runOrExit')->once()->andReturnUsing(function ($command) {
+                $this->assertSame('cmd /C "'.$this->path('AcrylicUI.exe').'" StartAcrylicService', $command);
+            })
+            ->shouldReceive('run')->once()->andReturnUsing(function ($command) {
+                $this->assertSame('cmd "/C ipconfig /flushdns"', $command);
+            });
 
-        $cli->shouldReceive('run')->andReturnUsing(function ($command) {
-            $this->assertSame('cmd /C "'.$this->path().'/AcrylicUI.exe" UninstallAcrylicService', $command);
-        })->once();
+        resolve(Acrylic::class)->start();
+    }
 
-        $acrylic = Mockery::mock(Acrylic::class.'[stop]', [$cli, resolve(Filesystem::class)]);
-        $acrylic->shouldReceive('stop')->once();
+    /** @test */
+    public function restart_acrylic_service()
+    {
+        $this->mock(CommandLine::class)
+            ->shouldReceive('run')->once()->andReturnUsing(function ($command) {
+                $this->assertSame('cmd /C "'.$this->path('AcrylicUI.exe').'" RestartAcrylicService', $command);
+            })
+            ->shouldReceive('run')->once()->andReturnUsing(function ($command) {
+                $this->assertSame('cmd "/C ipconfig /flushdns"', $command);
+            });
 
-        swap(Acrylic::class, $acrylic);
+
+        resolve(Acrylic::class)->restart();
+    }
+
+    /** @test */
+    public function uninstall_acrylic_service()
+    {
+        $this->mock(CommandLine::class)
+            ->shouldReceive('run')->twice()
+            ->shouldReceive('run')->once()->andReturnUsing(function ($command) {
+                $this->assertSame('cmd /C "'.$this->path('AcrylicUI.exe').'" UninstallAcrylicService', $command);
+            })
+            ->shouldReceive('run')->once();
 
         resolve(Acrylic::class)->uninstall();
     }
 
-    protected function path()
+    /**
+     * @param  string $path
+     * @return string
+     */
+    protected function path(string $path = ''): string
     {
-        return str_replace(DIRECTORY_SEPARATOR, '/', realpath(__DIR__.'/../bin/Acrylic/'));
+        return resolve(Acrylic::class)->path($path);
     }
 }

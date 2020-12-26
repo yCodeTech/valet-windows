@@ -5,10 +5,9 @@ class Concrete5ValetDriver extends BasicValetDriver
     /**
      * If a concrete directory exists, it's probably c5.
      *
-     * @param string $sitePath
-     * @param string $siteName
-     * @param string $uri
-     *
+     * @param  string  $sitePath
+     * @param  string  $siteName
+     * @param  string  $uri
      * @return bool
      */
     public function serves($sitePath, $siteName, $uri)
@@ -17,10 +16,9 @@ class Concrete5ValetDriver extends BasicValetDriver
     }
 
     /**
-     * @param string $sitePath
-     * @param string $siteName
-     * @param string $uri
-     *
+     * @param  string  $sitePath
+     * @param  string  $siteName
+     * @param  string  $uri
      * @return string
      */
     public function frontControllerPath($sitePath, $siteName, $uri)

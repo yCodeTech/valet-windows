@@ -5,10 +5,9 @@ class StatamicValetDriver extends ValetDriver
     /**
      * Determine if the driver serves the request.
      *
-     * @param string $sitePath
-     * @param string $siteName
-     * @param string $uri
-     *
+     * @param  string  $sitePath
+     * @param  string  $siteName
+     * @param  string  $uri
      * @return bool
      */
     public function serves($sitePath, $siteName, $uri)
@@ -19,10 +18,9 @@ class StatamicValetDriver extends ValetDriver
     /**
      * Determine if the incoming request is for a static file.
      *
-     * @param string $sitePath
-     * @param string $siteName
-     * @param string $uri
-     *
+     * @param  string  $sitePath
+     * @param  string  $siteName
+     * @param  string  $uri
      * @return string|false
      */
     public function isStaticFile($sitePath, $siteName, $uri)
@@ -43,10 +41,9 @@ class StatamicValetDriver extends ValetDriver
     /**
      * Get the fully resolved path to the application's front controller.
      *
-     * @param string $sitePath
-     * @param string $siteName
-     * @param string $uri
-     *
+     * @param  string  $sitePath
+     * @param  string  $siteName
+     * @param  string  $uri
      * @return string
      */
     public function frontControllerPath($sitePath, $siteName, $uri)
@@ -91,10 +88,9 @@ class StatamicValetDriver extends ValetDriver
     }
 
     /**
-     * Get the locale from this URI.
+     * Get the locale from this URI
      *
-     * @param string $uri
-     *
+     * @param  string  $uri
      * @return string|null
      */
     public function getUriLocale($uri)
@@ -130,15 +126,14 @@ class StatamicValetDriver extends ValetDriver
             're', 'ro', 'ru', 'rw', 'bl', 'sh', 'kn', 'lc', 'mf', 'pm', 'vc', 'ws', 'sm', 'st', 'sa', 'sn', 'rs', 'sc',
             'sl', 'sg', 'sx', 'sk', 'si', 'sb', 'so', 'za', 'gs', 'ss', 'es', 'lk', 'sd', 'sr', 'sj', 'sz', 'se', 'ch',
             'sy', 'tw', 'tj', 'tz', 'th', 'tl', 'tg', 'tk', 'to', 'tt', 'tn', 'tr', 'tm', 'tc', 'tv', 'ug', 'ua', 'ae',
-            'gb', 'us', 'um', 'uy', 'uz', 'vu', 've', 'vn', 'vg', 'vi', 'wf', 'eh', 'ye', 'zm', 'zw', 'en',
+            'gb', 'us', 'um', 'uy', 'uz', 'vu', 've', 'vn', 'vg', 'vi', 'wf', 'eh', 'ye', 'zm', 'zw', 'en', 'zh',
         ];
     }
 
     /**
-     * Get the path to a statically cached page.
+     * Get the path to a statically cached page
      *
-     * @param string $sitePath
-     *
+     * @param  string  $sitePath
      * @return string
      */
     protected function getStaticPath($sitePath)

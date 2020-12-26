@@ -17,9 +17,8 @@ class Facade
     /**
      * Call a non-static method on the facade.
      *
-     * @param string $method
-     * @param array  $parameters
-     *
+     * @param  string  $method
+     * @param  array  $parameters
      * @return mixed
      */
     public static function __callStatic($method, $parameters)
@@ -39,13 +38,16 @@ class CommandLine extends Facade
 class Configuration extends Facade
 {
 }
+class Diagnose extends Facade
+{
+}
 class Filesystem extends Facade
 {
 }
 class Ngrok extends Facade
 {
 }
-class PhpFpm extends Facade
+class PhpCgi extends Facade
 {
 }
 class Site extends Facade

@@ -4,15 +4,21 @@ namespace Valet;
 
 class Acrylic
 {
+    /**
+     * @var CommandLine
+     */
     protected $cli;
+
+    /**
+     * @var Filesystem
+     */
     protected $files;
 
     /**
      * Create a new Acrylic instance.
      *
-     * @param CommandLine $cli
-     * @param Filesystem  $files
-     *
+     * @param  CommandLine $cli
+     * @param  Filesystem  $files
      * @return void
      */
     public function __construct(CommandLine $cli, Filesystem $files)
@@ -22,45 +28,41 @@ class Acrylic
     }
 
     /**
-     * Install the Acrylic DNS service.
+     * Install the Acrylic DNS Proxy service.
      *
-     * @param string $tld
-     *
+     * @param  string $tld
      * @return void
      */
-    public function install($tld = 'test')
+    public function install(string $tld = 'test')
     {
+        info('Installing Acrylic DNS...');
+
         $this->createHostsFile($tld);
 
         $this->configureNetworkDNS();
 
-        $this->cli->runOrDie('cmd /C "'.$this->path().'/AcrylicUI.exe" InstallAcrylicService', function ($code, $output) {
-            warning($output);
+        $this->cli->runOrExit('cmd /C "'.$this->path('AcrylicUI.exe').'" InstallAcrylicService', function ($code, $output) {
+            error("Failed to start Acrylic DNS: $output");
         });
-
-        $this->restart();
     }
 
     /**
      * Create the AcrylicHosts file.
      *
-     * @param string $tld
-     *
+     * @param  string $tld
      * @return void
      */
-    public function createHostsFile($tld)
+    protected function createHostsFile(string $tld)
     {
         $contents = $this->files->get(__DIR__.'/../stubs/AcrylicHosts.txt');
 
         $this->files->put(
-            $this->path().'/AcrylicHosts.txt',
-            str_replace(['VALET_TLD', 'VALET_HOME_PATH'], [$tld, VALET_HOME_PATH], $contents)
+            $this->path('AcrylicHosts.txt'),
+            str_replace(['VALET_TLD', 'VALET_HOME_PATH'], [$tld, Valet::homePath()], $contents)
         );
 
-        $customConfigPath = VALET_HOME_PATH.'/AcrylicHosts.txt';
-
-        if (! $this->files->exists($customConfigPath)) {
-            $this->files->putAsUser($customConfigPath, PHP_EOL);
+        if (! $this->files->exists($configPath = Valet::homePath('AcrylicHosts.txt'))) {
+            $this->files->putAsUser($configPath, PHP_EOL);
         }
     }
 
@@ -69,7 +71,7 @@ class Acrylic
      *
      * @return void
      */
-    public function configureNetworkDNS()
+    protected function configureNetworkDNS()
     {
         $bin = realpath(__DIR__.'/../../bin');
 
@@ -82,7 +84,7 @@ class Acrylic
      * @param  string $tld
      * @return void
      */
-    public function updateTld($tld)
+    public function updateTld(string $tld)
     {
         $this->stop();
 
@@ -100,7 +102,11 @@ class Acrylic
     {
         $this->stop();
 
-        $this->cli->run('cmd /C "'.$this->path().'/AcrylicUI.exe" UninstallAcrylicService');
+        $this->cli->run('cmd /C "'.$this->path('AcrylicUI.exe').'" UninstallAcrylicService', function ($code, $output) {
+            warning("Failed to uninstall Acrylic DNS: $output");
+        });
+
+        $this->flushdns();
     }
 
     /**
@@ -110,8 +116,8 @@ class Acrylic
      */
     public function start()
     {
-        $this->cli->runOrDie('cmd /C "'.$this->path().'/AcrylicUI.exe" StartAcrylicService', function ($code, $output) {
-            warning($output);
+        $this->cli->runOrExit('cmd /C "'.$this->path('AcrylicUI.exe').'" StartAcrylicService', function ($code, $output) {
+            error("Failed to start Acrylic DNS: $output");
         });
 
         $this->flushdns();
@@ -124,7 +130,9 @@ class Acrylic
      */
     public function stop()
     {
-        $this->cli->run('cmd /C "'.$this->path().'/AcrylicUI.exe" StopAcrylicService');
+        $this->cli->run('cmd /C "'.$this->path('AcrylicUI.exe').'" StopAcrylicService', function ($code, $output) {
+            warning("Failed to stop Acrylic DNS: $output");
+        });;
 
         $this->flushdns();
     }
@@ -136,9 +144,11 @@ class Acrylic
      */
     public function restart()
     {
-        $this->stop();
+        $this->cli->run('cmd /C "'.$this->path('AcrylicUI.exe').'" RestartAcrylicService', function ($code, $output) {
+            warning("Failed to restart Acrylic DNS: $output");
+        });;
 
-        $this->start();
+        $this->flushdns();
     }
 
     /**
@@ -154,10 +164,13 @@ class Acrylic
     /**
      * Get the Acrylic path.
      *
+     * @param  string $path
      * @return string
      */
-    public function path()
+    public function path(string $path = ''): string
     {
-        return str_replace(DIRECTORY_SEPARATOR, '/', realpath(__DIR__.'/../../bin/Acrylic/'));
+        $basePath = str_replace(DIRECTORY_SEPARATOR, '/', realpath(__DIR__.'/../../bin/Acrylic'));
+
+        return $basePath.($path ? DIRECTORY_SEPARATOR.$path : $path);
     }
 }
