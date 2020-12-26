@@ -95,7 +95,8 @@ class TestProcess
     {
         PHPUnit::assertTrue(
             $this->baseProcess->isSuccessful(),
-            'Exit code ['.$this->baseProcess->getExitCode().'] is not a successful exit code.'
+            'Exit code ['.$this->baseProcess->getExitCode().'] is not a successful exit code. Error Output:'.
+            PHP_EOL.$this->baseProcess->getErrorOutput()
         );
 
         return $this;
