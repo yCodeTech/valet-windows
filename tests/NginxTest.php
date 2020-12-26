@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use Mockery as m;
 use Valet\CommandLine;
 use Valet\Configuration;
 use Valet\Filesystem;
@@ -10,7 +11,6 @@ use function Valet\resolve;
 use Valet\Site;
 use Valet\Valet;
 use Valet\WinSW;
-use Mockery as m;
 use Valet\WinSwFactory;
 
 class NginxTest extends TestCase

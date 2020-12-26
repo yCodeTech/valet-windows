@@ -2,9 +2,9 @@
 
 namespace Tests;
 
-use Tests\Support\TestProcess;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
+use Tests\Support\TestProcess;
 
 /**
  * @group integration

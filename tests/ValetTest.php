@@ -44,7 +44,7 @@ class ValetTest extends TestCase
                 'service' => 'php',
                 'winname' => 'valet_phpcgi',
                 'status' => '<fg=green>running</>',
-            ]
+            ],
         ], $services);
     }
 }
