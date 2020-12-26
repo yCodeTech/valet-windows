@@ -1,6 +1,5 @@
 .DS_Store
 vendor/
-composer.lock
 error.log
 .phpunit.result.cache
 bin/nginx/valet
