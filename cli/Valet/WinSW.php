@@ -41,7 +41,7 @@ class WinSW
         $command = 'cmd "/C cd '.$this->servicesPath().' && '.$service.' install"';
 
         $this->cli->runOrExit($command, function ($code, $output) use ($service) {
-            error("Failed to install service [$service]. Check ~/.config/valet/Log for errors. $output");
+            error("Failed to install service [$service]. Check ~/.config/valet/Log for errors.\n$output");
         });
     }
 
@@ -101,7 +101,7 @@ class WinSW
             sleep(2);
 
             $this->cli->runOrExit($command, function ($code, $output) use ($service) {
-                error("Failed to start service [$service]. Check ~/.config/valet/Log for errors. $output");
+                error("Failed to start service [$service]. Check ~/.config/valet/Log for errors.\n$output");
             });
         });
     }
@@ -117,7 +117,7 @@ class WinSW
         $command = 'cmd "/C cd '.$this->servicesPath().' && '.$service.' stop"';
 
         $this->cli->run($command, function ($code, $output) use ($service) {
-            warning("Failed to stop service [$service]. $output");
+            warning("Failed to stop service [$service].\n$output");
         });
     }
 
