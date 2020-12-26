@@ -27,7 +27,7 @@ class Valet
      *
      * @return array
      */
-    public function extensions()
+    public function extensions(): array
     {
         $path = static::homePath('Extensions');
 
@@ -46,13 +46,43 @@ class Valet
     }
 
     /**
+     * Get the installed Valet services.
+     *
+     * @return array
+     */
+    public function services(): array
+    {
+        return collect([
+            'acrylic' => 'AcrylicDNSProxySvc',
+            'nginx' => 'valet_nginx',
+            'php' => 'valet_phpcgi',
+        ])->map(function ($id, $service) {
+            $output = $this->cli->run('powershell -command "Get-Service -Name '.$id.'"');
+
+            if (strpos($output, 'Running') > -1) {
+                $status = '<fg=green>running</>';
+            } else if (strpos($output, 'Stopped') > -1) {
+                $status = '<fg=yellow>stopped</>';
+            } else {
+                $status = '<fg=red>missing</>';
+            }
+
+            return [
+                'service' => $service,
+                'winname' => $id,
+                'status' => $status,
+            ];
+        })->values()->all();
+    }
+
+    /**
      * Determine if this is the latest version of Valet.
      *
      * @param  string  $currentVersion
      * @return bool
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function onLatestVersion($currentVersion)
+    public function onLatestVersion($currentVersion): bool
     {
         $response = Request::get('https://api.github.com/repos/cretueusebiu/valet-windows/releases/latest')->send();
 

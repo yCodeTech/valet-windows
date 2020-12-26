@@ -494,6 +494,14 @@ Delete PHP from <info>C:/php</info>
     })->descriptions('Tail log file');
 
     /**
+     * List the installed Valet services.
+     */
+    $app->command('services', function () {
+        table(['Service', 'Windows Name', 'Status'], Valet::services());
+        info('Use valet start/stop/restart [service] to change status (eg: valet restart nginx).');
+    })->descriptions('List the installed Valet services.');
+
+    /**
      * Configure or display the directory-listing setting.
      */
     $app->command('directory-listing [status]', function ($status = null) {
