@@ -24,10 +24,10 @@ COPY ./tests/docker/composer.bat /bin/composer.bat
 RUN powershell -Command curl.exe https://getcomposer.org/download/2.0.8/composer.phar -o /bin/composer.phar; $env:Path += ';C:\bin;C:\valet'; [Environment]::SetEnvironmentVariable('Path', $env:Path, [EnvironmentVariableTarget]::Machine)
 
 # Copy Valet
-# COPY ./ ./
+COPY ./ ./
 
 # Install Valet
-# RUN powershell -Command valet install
+RUN powershell -Command valet install
 
 CMD [ "powershell" ]
 
