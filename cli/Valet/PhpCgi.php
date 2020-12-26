@@ -1,6 +1,7 @@
 <?php
 
 namespace Valet;
+
 use Symfony\Component\Process\PhpExecutableFinder;
 
 class PhpCgi

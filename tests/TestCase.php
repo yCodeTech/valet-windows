@@ -3,8 +3,8 @@
 namespace Tests;
 
 use Closure;
-use Mockery;
 use Illuminate\Container\Container;
+use Mockery;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase

@@ -70,8 +70,8 @@ class BasicValetDriver extends ValetDriver
 
         $fixedCandidatesAndDocroots = [
             $this->asRootPhpIndexFile($sitePath) => $sitePath,
-            $this->asPublicPhpIndexFile($sitePath) => $sitePath . '/public',
-            $this->asPublicHtmlIndexFile($sitePath) => $sitePath . '/public',
+            $this->asPublicPhpIndexFile($sitePath) => $sitePath.'/public',
+            $this->asPublicHtmlIndexFile($sitePath) => $sitePath.'/public',
         ];
 
         foreach ($fixedCandidatesAndDocroots as $candidate => $docroot) {

@@ -9,8 +9,8 @@ if (file_exists(__DIR__.'/../vendor/autoload.php')) {
     require_once __DIR__.'/../../../autoload.php';
 }
 
-use Silly\Application;
 use Illuminate\Container\Container;
+use Silly\Application;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use function Valet\info;
 use function Valet\output;
@@ -63,7 +63,7 @@ $app->command('install', function () {
  */
 if (is_dir(VALET_HOME_PATH)) {
     /**
-     * Upgrade helper: ensure the tld config exists
+     * Upgrade helper: ensure the tld config exists.
      */
     if (empty(Configuration::read()['tld'])) {
         Configuration::writeBaseConfiguration();
@@ -96,11 +96,11 @@ if (is_dir(VALET_HOME_PATH)) {
     $app->command('park [path]', function ($path = null) {
         Configuration::addPath($path ?: getcwd());
 
-        info(($path === null ? "This" : "The [{$path}]")." directory has been added to Valet's paths.");
+        info(($path === null ? 'This' : "The [{$path}]")." directory has been added to Valet's paths.");
     })->descriptions('Register the current working (or specified) directory with Valet');
 
     /**
-     * Get all the current sites within paths parked with 'park {path}'
+     * Get all the current sites within paths parked with 'park {path}'.
      */
     $app->command('parked', function () {
         $parked = Site::parked();
@@ -114,7 +114,7 @@ if (is_dir(VALET_HOME_PATH)) {
     $app->command('forget [path]', function ($path = null) {
         Configuration::removePath($path ?: getcwd());
 
-        info(($path === null ? "This" : "The [{$path}]")." directory has been removed from Valet's paths.");
+        info(($path === null ? 'This' : "The [{$path}]")." directory has been removed from Valet's paths.");
     }, ['unpark'])->descriptions('Remove the current working (or specified) directory from Valet\'s list of paths');
 
     /**
@@ -166,6 +166,7 @@ if (is_dir(VALET_HOME_PATH)) {
         if ($all) {
             Site::unsecureAll();
             Nginx::restart();
+
             return;
         }
 
@@ -178,7 +179,7 @@ if (is_dir(VALET_HOME_PATH)) {
     })->descriptions('Stop serving the given domain over HTTPS and remove the trusted TLS certificate');
 
     /**
-     * Create an Nginx proxy config for the specified domain
+     * Create an Nginx proxy config for the specified domain.
      */
     $app->command('proxy domain host', function ($domain, $host) {
         Site::proxyCreate($domain, $host);
@@ -186,7 +187,7 @@ if (is_dir(VALET_HOME_PATH)) {
     })->descriptions('Create an Nginx proxy site for the specified host. Useful for docker, mailhog etc.');
 
     /**
-     * Delete an Nginx proxy config
+     * Delete an Nginx proxy config.
      */
     $app->command('unproxy domain', function ($domain) {
         Site::proxyDelete($domain);
@@ -234,7 +235,7 @@ if (is_dir(VALET_HOME_PATH)) {
      * Open the current or given directory in the browser.
      */
     $app->command('open [domain]', function ($domain = null) {
-        $url = "http://".($domain ?: Site::host(getcwd())).'.'.Configuration::read()['tld'];
+        $url = 'http://'.($domain ?: Site::host(getcwd())).'.'.Configuration::read()['tld'];
         CommandLine::passthru("start $url");
     })->descriptions('Open the site for the current (or specified) directory in your browser');
 
@@ -400,14 +401,14 @@ Delete PHP from <info>C:/php</info>
      * Install the sudoers.d entries so password is no longer required.
      */
     $app->command('trust [--off]', function ($off) {
-        warning("This command is not required for Windows.");
+        warning('This command is not required for Windows.');
     })->descriptions('This command is not required for Windows.');
 
     /**
-     * Allow the user to change the version of php valet uses
+     * Allow the user to change the version of php valet uses.
      */
     $app->command('use [phpVersion] [--force]', function ($phpVersion, $force) {
-        warning("This command is not yet available for Windows.");
+        warning('This command is not yet available for Windows.');
 
         // if (! $phpVersion) {
         //     return info('Valet is using ' . Brew::linkedPhp());
@@ -502,13 +503,14 @@ Delete PHP from <info>C:/php</info>
         if (in_array($status, ['on', 'off'])) {
             $config[$key] = $status;
             Configuration::write($config);
+
             return output('Directory listing setting is now: '.$status);
         }
 
         $current = isset($config[$key]) ? $config[$key] : 'off';
         output('Directory listing is '.$current);
     })->descriptions('Determine directory-listing behavior. Default is off, which means a 404 will display.', [
-        'status' => 'on or off. (default=off) will show a 404 page; [on] will display a listing if project folder exists but requested URI not found'
+        'status' => 'on or off. (default=off) will show a 404 page; [on] will display a listing if project folder exists but requested URI not found',
     ]);
 
     /**

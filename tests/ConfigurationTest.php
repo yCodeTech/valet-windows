@@ -2,11 +2,11 @@
 
 namespace Tests;
 
-use Valet\Valet;
-use Valet\Filesystem;
 use Valet\Configuration;
-use function Valet\user;
+use Valet\Filesystem;
 use function Valet\resolve;
+use function Valet\user;
+use Valet\Valet;
 
 class ConfigurationTest extends TestCase
 {
@@ -163,7 +163,7 @@ class ConfigurationTest extends TestCase
             ->shouldReceive('get')->andReturn(json_encode(['foo' => 'bar']))
             ->shouldReceive('putAsUser')->with(Valet::homePath('config.json'), json_encode(
                 ['foo' => 'bar', 'bar' => 'baz'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
-            ).PHP_EOL);;
+            ).PHP_EOL);
 
         resolve(Configuration::class)->updateKey('bar', 'baz');
     }

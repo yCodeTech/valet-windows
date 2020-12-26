@@ -60,7 +60,7 @@ class Valet
     }
 
     /**
-     * Run composer global diagnose
+     * Run composer global diagnose.
      */
     public function composerGlobalDiagnose()
     {
@@ -68,7 +68,7 @@ class Valet
     }
 
     /**
-     * Run composer global update
+     * Run composer global update.
      */
     public function composerGlobalUpdate()
     {

@@ -80,7 +80,9 @@ class Diagnose
 
             $output = $this->runCommand($command);
 
-            if ($this->ignoreOutput($command)) return;
+            if ($this->ignoreOutput($command)) {
+                return;
+            }
 
             $this->afterCommand($command, $output);
 

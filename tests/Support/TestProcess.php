@@ -2,10 +2,10 @@
 
 namespace Tests\Support;
 
-use Symfony\Component\Process\Process;
+use Illuminate\Testing\AssertableJsonString;
 use PHPUnit\Framework\Assert as PHPUnit;
 use PHPUnit\Framework\Constraint\LogicalNot;
-use Illuminate\Testing\AssertableJsonString;
+use Symfony\Component\Process\Process;
 
 class TestProcess
 {
@@ -81,7 +81,7 @@ class TestProcess
      */
     public function dump()
     {
-        fwrite(STDERR, print_r($this->getOutput(), TRUE));
+        fwrite(STDERR, print_r($this->getOutput(), true));
 
         return $this;
     }

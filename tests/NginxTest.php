@@ -3,13 +3,13 @@
 namespace Tests;
 
 use Valet\CommandLine;
-use Valet\Site;
-use Valet\Nginx;
-use Valet\Filesystem;
 use Valet\Configuration;
+use Valet\Filesystem;
+use Valet\Nginx;
+use function Valet\resolve;
+use Valet\Site;
 use Valet\Valet;
 use Valet\WinSW;
-use function Valet\resolve;
 
 class NginxTest extends TestCase
 {

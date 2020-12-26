@@ -14,11 +14,11 @@ class DrupalValetDriver extends ValetDriver
     {
         $sitePath = $this->addSubdirectory($sitePath);
 
-      /**
-       * /misc/drupal.js = Drupal 7
-       * /core/lib/Drupal.php = Drupal 8
-       */
-      if (file_exists($sitePath.'/misc/drupal.js') ||
+        /**
+         * /misc/drupal.js = Drupal 7
+         * /core/lib/Drupal.php = Drupal 8.
+         */
+        if (file_exists($sitePath.'/misc/drupal.js') ||
           file_exists($sitePath.'/core/lib/Drupal.php')) {
             return true;
         }
@@ -58,7 +58,7 @@ class DrupalValetDriver extends ValetDriver
         $sitePath = $this->addSubdirectory($sitePath);
 
         if (! isset($_GET['q']) && ! empty($uri) && $uri !== '/' && strpos($uri, '/jsonapi/') === false) {
-          $_GET['q'] = $uri;
+            $_GET['q'] = $uri;
         }
 
         $matches = [];

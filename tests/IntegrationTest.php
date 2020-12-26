@@ -4,7 +4,6 @@ namespace Tests;
 
 use PHPUnit\Framework\TestCase;
 use Tests\Support\DockerContainer;
-use WinSW;
 
 /**
  * @group integration
@@ -104,9 +103,9 @@ class IntegrationTest extends TestCase
             ->assertFragment(['paths' => ['C:/Code']]);
 
         $this->container->exec([
-                'mkdir C:/Code/laravel',
-                "Set-Content -Path 'C:/Code/laravel/index.html' -Value 'hello world'"
-            ])
+            'mkdir C:/Code/laravel',
+            "Set-Content -Path 'C:/Code/laravel/index.html' -Value 'hello world'",
+        ])
             ->assertSuccessful();
 
         $this->container->exec('curl.exe --max-time 5 http://laravel.test')
@@ -173,9 +172,9 @@ class IntegrationTest extends TestCase
             ->assertContains('d----l');
 
         $this->container->exec([
-                'cd C:/Code/laravel',
-                "Set-Content -Path 'C:/Code/laravel/index.html' -Value 'hello world'",
-            ])
+            'cd C:/Code/laravel',
+            "Set-Content -Path 'C:/Code/laravel/index.html' -Value 'hello world'",
+        ])
             ->assertSuccessful();
 
         $this->container->exec('curl.exe --max-time 5 http://laravel-api.test')
@@ -238,9 +237,9 @@ class IntegrationTest extends TestCase
             ->assertContains('True');
 
         $this->container->exec([
-                'mkdir C:/Code/laravel', 'cd C:/Code/laravel', 'valet link',
-                "Set-Content -Path 'C:/Code/laravel/index.html' -Value 'hello world'",
-            ])
+            'mkdir C:/Code/laravel', 'cd C:/Code/laravel', 'valet link',
+            "Set-Content -Path 'C:/Code/laravel/index.html' -Value 'hello world'",
+        ])
             ->assertSuccessful();
 
         $this->container->exec('curl.exe --max-time 5 https://laravel.test')
@@ -259,9 +258,9 @@ class IntegrationTest extends TestCase
         // $this->container->exec('valet install')->assertSuccessful();
 
         $this->container->exec([
-                'mkdir C:/Code/laravel', 'cd C:/Code/laravel', 'valet link',
-                "Set-Content -Path 'C:/Code/laravel/index.html' -Value 'hello world'",
-            ])
+            'mkdir C:/Code/laravel', 'cd C:/Code/laravel', 'valet link',
+            "Set-Content -Path 'C:/Code/laravel/index.html' -Value 'hello world'",
+        ])
             ->assertSuccessful();
 
         $this->container->exec('valet secure laravel')
@@ -289,12 +288,12 @@ class IntegrationTest extends TestCase
         // $this->container->exec('valet install')->assertSuccessful();
 
         $this->container->exec([
-                'mkdir C:/Code/laravel1',
-                'mkdir C:/Code/laravel2',
-                'valet park C:/Code',
-                'valet secure laravel1',
-                'valet secure laravel2',
-            ])
+            'mkdir C:/Code/laravel1',
+            'mkdir C:/Code/laravel2',
+            'valet park C:/Code',
+            'valet secure laravel1',
+            'valet secure laravel2',
+        ])
             ->assertSuccessful();
 
         $this->container->exec('valet unsecure --all')
@@ -342,9 +341,9 @@ class IntegrationTest extends TestCase
         // $this->container->exec('valet install')->assertSuccessful();
 
         $this->container->exec([
-                'mkdir C:/Code/laravel',
-                "Set-Content -Path 'C:/Code/laravel/index.html' -Value 'hello world'",
-            ])
+            'mkdir C:/Code/laravel',
+            "Set-Content -Path 'C:/Code/laravel/index.html' -Value 'hello world'",
+        ])
             ->assertSuccessful();
 
         $this->container->exec('cd C:/Code/laravel; valet which')
@@ -358,9 +357,9 @@ class IntegrationTest extends TestCase
         // $this->container->exec('valet install')->assertSuccessful();
 
         $this->container->exec([
-                'mkdir C:/Code',
-                'valet park C:/Code',
-            ])
+            'mkdir C:/Code',
+            'valet park C:/Code',
+        ])
             ->assertSuccessful();
 
         $this->container->exec('valet paths')
@@ -374,10 +373,10 @@ class IntegrationTest extends TestCase
         // $this->container->exec('valet install')->assertSuccessful();
 
         $this->container->exec([
-                'Stop-Service -Name "valet_nginx"',
-                'Stop-Service -Name "valet_phpcgi"',
-                'Stop-Service -Name "AcrylicDNSProxySvc"'
-            ])
+            'Stop-Service -Name "valet_nginx"',
+            'Stop-Service -Name "valet_phpcgi"',
+            'Stop-Service -Name "AcrylicDNSProxySvc"',
+        ])
             ->assertSuccessful();
 
         $this->container->exec('valet start')
