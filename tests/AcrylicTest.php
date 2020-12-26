@@ -7,7 +7,6 @@ use Valet;
 use Valet\Acrylic;
 use Valet\CommandLine;
 use Valet\Filesystem;
-
 use function Valet\resolve;
 
 class AcrylicTest extends TestCase

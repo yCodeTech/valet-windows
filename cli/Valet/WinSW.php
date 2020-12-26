@@ -91,7 +91,7 @@ class WinSW
     /**
      * Determine if the service is installed.
      *
-     * @return boolean
+     * @return bool
      */
     public function installed(): bool
     {

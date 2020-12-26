@@ -23,7 +23,7 @@ class ProcessOutput
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isSuccessful(): bool
     {

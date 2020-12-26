@@ -120,7 +120,7 @@ class Acrylic
     /**
      * Determine if the Acrylic DNS is installed.
      *
-     * @return boolean
+     * @return bool
      */
     protected function installed(): bool
     {

@@ -2,8 +2,8 @@
 
 namespace Tests\Support;
 
-use Valet\ProcessOutput;
 use Symfony\Component\Process\Process;
+use Valet\ProcessOutput;
 
 class FakeProcessOutput extends ProcessOutput
 {
@@ -13,7 +13,7 @@ class FakeProcessOutput extends ProcessOutput
     public $output = '';
 
     /**
-     * @var boolean
+     * @var bool
      */
     public $successfull = true;
 
@@ -52,7 +52,7 @@ class FakeProcessOutput extends ProcessOutput
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isSuccessful(): bool
     {

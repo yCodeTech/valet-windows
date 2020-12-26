@@ -61,7 +61,7 @@ class Valet
 
             if (strpos($output, 'Running') > -1) {
                 $status = '<fg=green>running</>';
-            } else if (strpos($output, 'Stopped') > -1) {
+            } elseif (strpos($output, 'Stopped') > -1) {
                 $status = '<fg=yellow>stopped</>';
             } else {
                 $status = '<fg=red>missing</>';
