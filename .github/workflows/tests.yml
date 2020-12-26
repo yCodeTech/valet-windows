@@ -50,13 +50,10 @@ jobs:
 
       - name: Add Valet to system path
         run: |
-          ls
           pwd
-          echo $GITHUB_WORKSPACE
-          echo $GITHUB_WORKSPACE | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          pwd | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Run integration tests
         run: |
           echo $env:GITHUB_PATH
-          echo GITHUB_PATH
           composer test-integration-windows
