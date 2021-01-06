@@ -15,7 +15,11 @@ if ('7.2','7.3','7.4','8.0' -notcontains $phpVersion) {
 
 function Find-PhpRelease {
     $phpResponse = Invoke-WebRequest "$phpReleasesUrl/releases.json" -UseBasicParsing | ConvertFrom-Json
-    $path = $phpResponse.$phpVersion."nts-VC15-x64"."zip"."path"
+    $path = $phpResponse.$phpVersion."nts-vc15-x64"."zip"."path"
+
+    if (! $path) {
+        $path = $phpResponse.$phpVersion."nts-vs16-x64"."zip"."path"
+    }
 
     if (! $path) {
         throw "Could not find a release for PHP $phpVersion."
@@ -48,7 +52,7 @@ Remove-Item $phpZip
 
 # Download php.ini
 Write-Output "Installing php.ini..."
-$phpIniUrl = $stubsUrl + "/php" + $phpVersion.ToString().Replace('.', '') + ".ini"
+$phpIniUrl = $stubsUrl + "/php" + $phpVersion.Replace('.', '') + ".ini"
 Download-File -Source $phpIniUrl -Destination "$phpPath\php.ini"
 
 # Download cacert.pem
