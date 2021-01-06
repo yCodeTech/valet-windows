@@ -392,10 +392,8 @@ if (is_dir(VALET_HOME_PATH)) {
         info("\nValet has been removed from your system.");
 
         output("\n<fg=yellow>NOTE:</>
-Then to finish removing any Composer fragments of Valet:
-Run <info>composer global remove cretueusebiu/valet-windows</info>
-Delete PHP from <info>C:/php</info>
-<fg=yellow>If you had customized your Acrylic DNS settings in Network and Sharing Center, you will need to remove 127.0.0.1 from that list.</>
+To remove global composer dependency run: <info>composer global remove cretueusebiu/valet-windows</info>
+Delete PHP from: <info>C:/php</info>
 ");
     })->descriptions('Uninstall the Valet services', ['--force' => 'Do a forceful uninstall of Valet']);
 
