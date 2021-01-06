@@ -8,7 +8,7 @@ use Tests\Support\DockerContainer;
 /**
  * @group integration
  */
-class DockerIntegrationTest extends TestCase
+class IntegrationTest extends TestCase
 {
     /**
      * @var \Tests\Support\DockerContainerInstance
@@ -457,6 +457,11 @@ class DockerIntegrationTest extends TestCase
 
         $this->container->exec('Get-Service -Name "AcrylicDNSProxySvc"')
             ->assertContains("Cannot find any service with service name 'AcrylicDNSProxySvc'");
+
+        $this->container->exec('Test-Path ~/.config/valet')
+            ->assertContains('True');
+
+        $this->container->exec('valet uninstall --force --purge-config');
 
         $this->container->exec('Test-Path ~/.config/valet')
             ->assertContains('False');
