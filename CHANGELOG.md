@@ -5,6 +5,8 @@
 - Sync with [laravel/valet](https://github.com/laravel/valet)
 - Added support for PHP 8.0
 - Update Acrylic DNS Proxy, Nginx, WinSW
+- Fixed ssl redirect [#150](https://github.com/cretueusebiu/valet-windows/pull/150)
+- Fixed certificate keyUsage [#151](https://github.com/cretueusebiu/valet-windows/pull/151)
 - Added integration tests with Docker
 
 ## 2.1.4 - 2020-10-23
