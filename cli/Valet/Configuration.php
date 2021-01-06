@@ -274,7 +274,7 @@ class Configuration
      *
      * @return string
      */
-    protected function path(): string
+    public function path(): string
     {
         return $this->valetHomePath('config.json');
     }
