@@ -248,7 +248,7 @@ class IntegrationTest extends TestCase
 
         $this->container->exec('curl.exe -I --max-time 5 http://laravel.test')
             ->assertSuccessful()
-            ->assertContains('HTTP/1.1 301 Moved Permanently')
+            ->assertContains('HTTP/1.1 302 Moved Temporarily')
             ->assertContains('Location: https://laravel.test/');
     }
 
