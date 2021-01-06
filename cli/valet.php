@@ -499,7 +499,7 @@ Delete PHP from <info>C:/php</info>
     $app->command('services', function () {
         table(['Service', 'Windows Name', 'Status'], Valet::services());
         info('Use valet start/stop/restart [service] to change status (eg: valet restart nginx).');
-    })->descriptions('List the installed Valet services.');
+    })->descriptions('List the installed Windows services.');
 
     /**
      * Configure or display the directory-listing setting.
@@ -528,8 +528,6 @@ Delete PHP from <info>C:/php</info>
         info('Running diagnostics... (this may take a while)');
 
         Diagnose::run($print, $plain);
-
-        info('Diagnostics output has been copied to your clipboard.');
     })->descriptions('Output diagnostics to aid in debugging Valet.', [
         '--print' => 'print diagnostics output while running',
         '--plain' => 'format clipboard output as plain text',
