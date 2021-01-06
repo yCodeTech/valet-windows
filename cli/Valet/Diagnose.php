@@ -11,10 +11,10 @@ class Diagnose
      * @var array
      */
     protected $commands = [
-        // 'sw_vers',
+        'systeminfo | findstr /B /C:"OS Name" /C:"OS Version"',
         'valet --version',
         'cat ~/.config/valet/config.json',
-        'cat ~/.composer/composer.json',
+        // 'cat ~/.composer/composer.json',
         'composer global diagnose',
         'composer global outdated',
         // 'ls -al /etc/sudoers.d/',
@@ -27,18 +27,18 @@ class Diagnose
         'php -v',
         'which -a php',
         'php --ini',
-        'nginx -v',
-        'curl --version',
+        // __DIR__.'/../../bin/nginx/nginx.exe -v',
+        // 'curl --version',
         'php --ri curl',
-        '~/.composer/vendor/laravel/valet/bin/ngrok version',
-        'ls -al ~/.ngrok2',
+        // __DIR__.'/../../bin/ngrok.exe version',
+        // 'ls -al ~/.ngrok2',
         // 'brew info nginx',
         // 'brew info php',
         // 'brew info openssl',
         // 'openssl version -a',
         // 'openssl ciphers',
         // 'sudo nginx -t',
-        'which -a php-fpm',
+        // 'which -a php-fpm',
         // BREW_PREFIX.'/opt/php/sbin/php-fpm -v',
         // 'sudo '.BREW_PREFIX.'/opt/php/sbin/php-fpm -y '.PHP_SYSCONFDIR.'/php-fpm.conf --test',
         // 'ls -al ~/Library/LaunchAgents | grep homebrew',
@@ -91,11 +91,13 @@ class Diagnose
 
         $output = $this->format($results, $plainText);
 
-        $this->files->put('valet_diagnostics.txt', $output);
+        if (! $this->print) {
+            output(PHP_EOL.PHP_EOL.$output);
+        }
 
-        $this->cli->run('type valet_diagnostics.txt | clip');
-
-        $this->files->unlink('valet_diagnostics.txt');
+        // $this->files->put('valet_diagnostics.txt', $output);
+        // $this->cli->run('type valet_diagnostics.txt | clip');
+        // $this->files->unlink('valet_diagnostics.txt');
 
         $this->afterRun();
     }
