@@ -421,9 +421,7 @@ Delete PHP from: <info>C:/php</info>
      */
     $app->command('use [phpVersion] [--force]', function ($phpVersion, $force) {
         warning('This command is not available for Windows.');
-    })->descriptions('Change the version of PHP used by Valet', [
-        'phpVersion' => 'The PHP version you want to use, e.g php@7.3',
-    ]);
+    })->descriptions('This command is not available for Windows.');
 
     /**
      * Tail log file.
