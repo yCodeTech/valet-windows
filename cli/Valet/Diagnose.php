@@ -31,7 +31,7 @@ class Diagnose
         // 'curl --version',
         'php --ri curl',
         // __DIR__.'/../../bin/ngrok.exe version',
-        // 'ls -al ~/.ngrok2',
+        'ls -al ~/.ngrok2',
         // 'brew info nginx',
         // 'brew info php',
         // 'brew info openssl',

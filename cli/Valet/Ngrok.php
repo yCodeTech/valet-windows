@@ -4,7 +4,7 @@ namespace Valet;
 
 use DomainException;
 use Httpful\Request;
-use ZipArchive;
+use Illuminate\Support\Collection;
 
 class Ngrok
 {
@@ -33,15 +33,38 @@ class Ngrok
     }
 
     /**
-     * @param  string  $domain
-     * @param  int $port
+     * @param  string $command
      * @return void
      */
-    public function start(string $domain, int $port)
+    public function run(string $command)
     {
         $ngrok = realpath(__DIR__.'/../../bin/ngrok.exe');
 
-        $this->cli->passthru("start \"$domain\" \"$ngrok\" http $domain:$port -host-header=rewrite");
+        $this->cli->passthru("\"$ngrok\" $command");
+    }
+
+    /**
+     * @param  string  $domain
+     * @param  int $port
+     * @param  array $options
+     * @return void
+     */
+    public function start(string $domain, int $port, array $options = [])
+    {
+        if ($port === 443 && ! $this->hasAuthToken()) {
+            output("Forwarding to local port 443 or a local https:// URL is only available after you sign up.
+Sign up at: https://ngrok.com/signup
+Then use: valet ngrok authtoken my-token");
+            exit(1);
+        }
+
+        $options = (new Collection($options))->map(function ($value, $key) {
+            return "--$key=$value";
+        })->implode(' ');
+
+        $ngrok = realpath(__DIR__.'/../../bin/ngrok.exe');
+
+        $this->cli->passthru("start \"$domain\" \"$ngrok\" http $domain:$port $options");
     }
 
     /**
@@ -91,26 +114,10 @@ class Ngrok
     }
 
     /**
-     * Ensure that Ngrok is installed.
-     *
-     * @return void
+     * @return boolean
      */
-    public function ensureInstalled()
+    protected function hasAuthToken(): bool
     {
-        $binPath = __DIR__.'/../../bin/ngrok.exe';
-        $zipPath = __DIR__.'/../../bin/ngrok.zip';
-
-        if (file_exists($binPath)) {
-            return;
-        }
-
-        info('First time running Ngrok, downloading binary...');
-
-        file_put_contents($zipPath, fopen('https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip', 'r'));
-
-        $zip = new ZipArchive;
-        $zip->open($zipPath);
-        $zip->extractTo(__DIR__.'/../../bin');
-        $zip->close();
+        return file_exists('~/.ngrok2/ngrok.yml');
     }
 }

@@ -243,13 +243,20 @@ if (is_dir(VALET_HOME_PATH)) {
      * Generate a publicly accessible URL for your project.
      */
     // TODO: custom domain and ngrok params
-    $app->command('share', function () {
-        $host = Site::host(getcwd());
-        $tld = Configuration::read()['tld'];
-        $port = Site::port($domain = "$host.$tld");
+    $app->command('share [domain] [--authtoken=] [--host-header=] [--hostname=] [--region=] [--subdomain=]',
+        function ($domain = null, $authtoken = null, $hostheader = null, $hostname = null, $region = null, $subdomain = null) {
+        $url = ($domain ?: Site::host(getcwd())).'.'.Configuration::read()['tld'];
 
-        Ngrok::start($domain, $port);
-    })->descriptions('Generate a publicly accessible URL for your project');
+        Ngrok::start($url, Site::port($url), array_filter([
+            'authtoken' => $authtoken,
+            'host-header' => $hostheader,
+            'hostname' => $hostname,
+            'region' => $region,
+            'subdomain' => $subdomain
+        ]));
+    })->defaults([
+        'host-header' => 'rewrite',
+    ])->descriptions('Generate a publicly accessible URL for your project');
 
     /**
      * Echo the currently tunneled URL.
@@ -257,6 +264,13 @@ if (is_dir(VALET_HOME_PATH)) {
     $app->command('fetch-share-url [domain]', function ($domain = null) {
         output(Ngrok::currentTunnelUrl($domain ?: Site::host(getcwd()).'.'.Configuration::read()['tld']));
     })->descriptions('Get the URL to the current Ngrok tunnel');
+
+    /**
+     * Run ngrok commands.
+     */
+    $app->command('ngrok [args]*', function ($args) {
+        Ngrok::run(implode(' ', $args));
+    })->descriptions('Run ngrok commands');
 
     /**
      * Start the daemon services.
