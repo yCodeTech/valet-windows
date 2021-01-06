@@ -18,6 +18,10 @@ class NginxTest extends TestCase
     /** @test */
     public function install_nginx_configuration_places_nginx_base_configuration_in_proper_location()
     {
+        $this->mock(Configuration::class)
+            ->shouldReceive('get')->once()->with('php_port', 9001)
+            ->andReturn(9001);
+
         $this->partialMock(Filesystem::class)
             ->shouldReceive('putAsUser')->andReturnUsing(function ($path, $contents) {
                 $this->assertSame(realpath(__DIR__.'/../bin/nginx').'\conf/nginx.conf', $path);
