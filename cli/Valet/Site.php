@@ -502,6 +502,12 @@ class Site
             ['dNSName' => "*.$url"],
         ]);
 
+        $x509->setExtension('id-ce-keyUsage', [
+            'digitalSignature',
+            'nonRepudiation',
+            'keyEncipherment',
+        ]);
+
         $csr = $x509->saveCSR($x509->signCSR());
 
         $this->files->putAsUser($csrPath, $csr);
