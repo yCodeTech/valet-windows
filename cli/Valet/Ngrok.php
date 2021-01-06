@@ -52,9 +52,9 @@ class Ngrok
     public function start(string $domain, int $port, array $options = [])
     {
         if ($port === 443 && ! $this->hasAuthToken()) {
-            output("Forwarding to local port 443 or a local https:// URL is only available after you sign up.
+            output('Forwarding to local port 443 or a local https:// URL is only available after you sign up.
 Sign up at: https://ngrok.com/signup
-Then use: valet ngrok authtoken my-token");
+Then use: valet ngrok authtoken my-token');
             exit(1);
         }
 
@@ -114,7 +114,7 @@ Then use: valet ngrok authtoken my-token");
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     protected function hasAuthToken(): bool
     {
