@@ -408,19 +408,7 @@ Delete PHP from <info>C:/php</info>
      * Allow the user to change the version of php valet uses.
      */
     $app->command('use [phpVersion] [--force]', function ($phpVersion, $force) {
-        warning('This command is not yet available for Windows.');
-
-        // if (! $phpVersion) {
-        //     return info('Valet is using ' . Brew::linkedPhp());
-        // }
-
-        // PhpCgi::validateRequestedVersion($phpVersion);
-
-        // $newVersion = PhpCgi::useVersion($phpVersion, $force);
-
-        // Nginx::restart();
-        // info(sprintf('Valet is now using %s.', $newVersion) . PHP_EOL);
-        // info('Note that you might need to run <comment>composer global update</comment> if your PHP version change affects the dependencies of global packages required by Composer.');
+        warning('This command is not available for Windows.');
     })->descriptions('Change the version of PHP used by Valet', [
         'phpVersion' => 'The PHP version you want to use, e.g php@7.3',
     ]);
