@@ -7,7 +7,6 @@ use Symfony\Component\Process\PhpExecutableFinder;
 class PhpCgi
 {
     const PORT = 9001;
-    const SERVICE = 'phpcgiservice';
 
     /**
      * @var CommandLine
@@ -42,7 +41,7 @@ class PhpCgi
     {
         $this->cli = $cli;
         $this->files = $files;
-        $this->winsw = $winsw->make(static::SERVICE);
+        $this->winsw = $winsw->make('phpcgiservice');
         $this->configuration = $configuration;
     }
 
@@ -65,12 +64,14 @@ class PhpCgi
      */
     public function installService()
     {
-        if (! $this->winsw->installed()) {
-            $this->winsw->install([
-                'PHP_PATH' => $this->findPhpPath(),
-                'PHP_PORT' => $this->configuration->read()['php_port'] ?? PhpCgi::PORT,
-            ]);
+        if ($this->winsw->installed()) {
+            $this->winsw->uninstall();
         }
+
+        $this->winsw->install([
+            'PHP_PATH' => $this->findPhpPath(),
+            'PHP_PORT' => $this->configuration->get('php_port', PhpCgi::PORT),
+        ]);
 
         $this->winsw->restart();
     }

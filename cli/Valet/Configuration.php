@@ -104,7 +104,7 @@ class Configuration
     }
 
     /**
-     * Create the directory for Nginx logs.
+     * Create the directory for logs.
      *
      * @return void
      */
@@ -164,7 +164,7 @@ class Configuration
      */
     public function uninstall()
     {
-        $this->files->unlink(VALET_HOME_PATH);
+        $this->files->unlink($this->valetHomePath());
     }
 
     /**
@@ -202,7 +202,7 @@ class Configuration
      */
     public function removePath(string $path)
     {
-        if ($path == VALET_HOME_PATH.'/Sites') {
+        if ($path == $this->valetHomePath('Sites')) {
             info("Cannot remove this directory because this is where Valet stores its site definitions.\nRun [valet paths] for a list of parked paths.");
             exit();
         }
@@ -249,7 +249,7 @@ class Configuration
      * @param  mixed $default
      * @return mixed
      */
-    public function get($key, $default)
+    public function get($key, $default = null)
     {
         return Arr::get($this->read(), $key, $default);
     }

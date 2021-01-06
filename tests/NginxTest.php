@@ -99,7 +99,7 @@ class NginxTest extends TestCase
         $this->mock(WinSwFactory::class)
             ->shouldReceive('make')
                 ->once()
-                ->with(Nginx::SERVICE)
+                ->with('nginxservice')
                 ->andReturn($winsw);
 
         resolve(Nginx::class)->installService();

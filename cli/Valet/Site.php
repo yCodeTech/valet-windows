@@ -576,15 +576,7 @@ class Site
 
         return str_replace(
             ['VALET_HOME_PATH', 'VALET_SERVER_PATH', 'VALET_STATIC_PREFIX', 'VALET_SITE', 'VALET_CERT', 'VALET_KEY', 'HOME_PATH'],
-            [
-                $this->valetHomePath(),
-                VALET_SERVER_PATH,
-                VALET_STATIC_PREFIX,
-                $url,
-                $path.'/'.$url.'.crt',
-                $path.'/'.$url.'.key',
-                $_SERVER['HOME'],
-            ],
+            [$this->valetHomePath(), VALET_SERVER_PATH, VALET_STATIC_PREFIX, $url, $path.'/'.$url.'.crt', $path.'/'.$url.'.key', $_SERVER['HOME']],
             $siteConf
         );
     }
@@ -637,6 +629,29 @@ class Site
             table(['Site', 'SSL', 'URL', 'Path'], $remaining->toArray());
         }
         info('unsecure --all was successful.');
+    }
+
+    /**
+     * Untrust all certificates.
+     *
+     * @return void
+     */
+    public function untrustCertificates()
+    {
+        $secured = $this->parked()
+            ->merge($this->links())
+            ->sort()
+            ->where('secured', ' X');
+
+        if ($secured->isEmpty()) {
+            return;
+        }
+
+        $tld = $this->config->get('tld');
+
+        foreach ($secured->pluck('site') as $domain) {
+            $this->cli->run(sprintf('cmd "/C certutil -delstore "Root" "%s""', $domain.'.'.$tld));
+        }
     }
 
     /**

@@ -16,8 +16,9 @@ class PhpCgiTest extends TestCase
     public function install_php_cgi_service()
     {
         $this->mock(Configuration::class)
-            ->shouldReceive('read')
-            ->andReturn(['php_port' => 1234]);
+            ->shouldReceive('get')
+            ->with('php_port', 9001)
+            ->andReturn(1234);
 
         ($winsw = m::mock(WinSW::class))
             ->shouldReceive('installed')
@@ -35,7 +36,7 @@ class PhpCgiTest extends TestCase
         $this->mock(WinSwFactory::class)
             ->shouldReceive('make')
                 ->once()
-                ->with(PhpCgi::SERVICE)
+                ->with('phpcgiservice')
                 ->andReturn($winsw);
 
         resolve(PhpCgi::class)->install();

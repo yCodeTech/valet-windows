@@ -84,6 +84,8 @@ class WinSW
 
         $this->cli->run('cmd "/C cd '.$this->servicesPath().' && '.$this->service.' uninstall"');
 
+        sleep(1);
+
         $this->files->unlink($this->binaryPath());
         $this->files->unlink($this->configPath());
     }
@@ -95,7 +97,9 @@ class WinSW
      */
     public function installed(): bool
     {
-        return $this->cli->powershell("Get-Service -Name \"$this->service\"")->isSuccessful();
+        $name = 'valet_'.str_replace('service', '', $this->service);
+
+        return $this->cli->powershell("Get-Service -Name \"$name\"")->isSuccessful();
     }
 
     /**

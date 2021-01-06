@@ -46,10 +46,6 @@ if (is_dir(VALET_HOME_PATH)) {
  * Install Valet and any required services.
  */
 $app->command('install', function () {
-    // Nginx::stop();
-    // PhpCgi::stop();
-    // Acrylic::stop();
-
     Configuration::install();
     Nginx::install();
     PhpCgi::install();
@@ -359,7 +355,7 @@ if (is_dir(VALET_HOME_PATH)) {
     /**
      * Uninstall Valet entirely. Requires --force to actually remove; otherwise manual instructions are displayed.
      */
-    $app->command('uninstall [--force]', function ($input, $output, $force) {
+    $app->command('uninstall [--force] [--purge-config]', function ($input, $output, $force, $purgeConfig) {
         warning('YOU ARE ABOUT TO UNINSTALL Nginx, PHP-CGI, Acrylic DNS and all Valet configs and logs.');
 
         $helper = $this->getHelperSet()->get('question');
@@ -374,8 +370,12 @@ if (is_dir(VALET_HOME_PATH)) {
         Nginx::stop();
         PhpCgi::stop();
 
-        info('Removing certificates for all secured sites...');
-        Site::unsecureAll();
+        if ($purgeConfig) {
+            info('Removing certificates for all secured sites...');
+            Site::unsecureAll();
+        } else {
+            Site::untrustCertificates();
+        }
 
         info('Removing Nginx...');
         Nginx::uninstall();
@@ -386,15 +386,19 @@ if (is_dir(VALET_HOME_PATH)) {
         info('Removing PHP-CGI...');
         PhpCgi::uninstall();
 
-        info('Removing Valet configs...');
-        Configuration::uninstall();
+        if ($purgeConfig) {
+            info('Removing Valet configs...');
+            Configuration::uninstall();
+        }
 
         info("\nValet has been removed from your system.");
 
-        output("\n<fg=yellow>NOTE:</>
-To remove global composer dependency run: <info>composer global remove cretueusebiu/valet-windows</info>
-Delete PHP from: <info>C:/php</info>
-");
+        output(
+            "\n<fg=yellow>NOTE:</>".
+            "\nRemove composer dependency with: <info>composer global remove cretueusebiu/valet-windows</info>".
+            ($purgeConfig ? '' : "\nDelete the config files from: <info>~/.config/valet</info>").
+            "\nDelete PHP from: <info>C:/php</info>"
+        );
     })->descriptions('Uninstall the Valet services', ['--force' => 'Do a forceful uninstall of Valet']);
 
     /**
