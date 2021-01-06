@@ -430,10 +430,13 @@ Delete PHP from <info>C:/php</info>
      */
     $app->command('log [-f|--follow] [-l|--lines=] [key]', function ($follow, $lines, $key = null) {
         $defaultLogs = [
-            // 'php-fpm' => BREW_PREFIX.'/var/log/php-fpm.log',
             'nginx' => VALET_HOME_PATH.'/Log/nginx-error.log',
-            // 'mailhog' => BREW_PREFIX.'/var/log/mailhog.log',
-            // 'redis' => BREW_PREFIX.'/var/log/redis.log',
+            'nginxservice.err' => VALET_HOME_PATH.'/Log/nginxservice.err.log',
+            'nginxservice.out' => VALET_HOME_PATH.'/Log/nginxservice.out.log',
+            'nginxservice.wrapper' => VALET_HOME_PATH.'/Log/nginxservice.wrapper.log',
+            'phpcgiservice.err' => VALET_HOME_PATH.'/Log/phpcgiservice.err.log',
+            'phpcgiservice.out' => VALET_HOME_PATH.'/Log/phpcgiservice.out.log',
+            'phpcgiservice.wrapper' => VALET_HOME_PATH.'/Log/phpcgiservice.wrapper.log',
         ];
 
         $configLogs = data_get(Configuration::read(), 'logs');
@@ -456,7 +459,7 @@ Delete PHP from <info>C:/php</info>
             ]));
 
             table(
-                ['Keys', 'Files'],
+                ['Key', 'File'],
                 collect($logs)->map(function ($file, $key) {
                     return [$key, $file];
                 })->toArray()
