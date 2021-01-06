@@ -2,6 +2,8 @@
 
 namespace Valet;
 
+use Illuminate\Support\Arr;
+
 class Configuration
 {
     /**
@@ -238,6 +240,18 @@ class Configuration
     public function read(): array
     {
         return json_decode($this->files->get($this->path()), true);
+    }
+
+    /**
+     * Get an item from the configuration file using "dot" notation.
+     *
+     * @param  string|int|null $key
+     * @param  mixed $default
+     * @return mixed
+     */
+    public function get($key, $default)
+    {
+        return Arr::get($this->read(), $key, $default);
     }
 
     /**
