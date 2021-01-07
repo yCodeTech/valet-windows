@@ -27,10 +27,8 @@ class AcrylicTest extends TestCase
             });
 
         $this->mock(CommandLine::class)
-            ->shouldReceive('powershell')->andReturn(FakeProcessOutput::unsuccessfull())
-            ->shouldReceive('run')->once()->andReturnUsing(function ($command) {
-                $this->assertSame('cmd /C cd "'.realpath(__DIR__.'/../bin').'" && configuredns', $command);
-            })
+            ->shouldReceive('powershell')->once()->with('Get-Service -Name "AcrylicDNSProxySvc"')->andReturn(FakeProcessOutput::unsuccessfull())
+            ->shouldReceive('powershell')->once()->with('(Get-NetIPAddress -AddressFamily IPv4).InterfaceIndex | ForEach-Object {Set-DnsClientServerAddress -InterfaceIndex $_ -ServerAddresses (\"127.0.0.1\", \"8.8.8.8\")};(Get-NetIPAddress -AddressFamily IPv6).InterfaceIndex | ForEach-Object {Set-DnsClientServerAddress -InterfaceIndex $_ -ServerAddresses (\"::1\", \"2001:4860:4860::8888\")}')
             ->shouldReceive('runOrExit')->once()->andReturnUsing(function ($command) {
                 $this->assertSame('cmd /C "'.$this->path('AcrylicUI.exe').'" InstallAcrylicService', $command);
             })
@@ -82,7 +80,8 @@ class AcrylicTest extends TestCase
     public function uninstall_acrylic_service()
     {
         $this->mock(CommandLine::class)
-            ->shouldReceive('powershell')->andReturn(FakeProcessOutput::successfull())
+            ->shouldReceive('powershell')->once()->with('Get-Service -Name "AcrylicDNSProxySvc"')->andReturn(FakeProcessOutput::successfull())
+            ->shouldReceive('powershell')->once()->with('(Get-NetIPAddress -AddressFamily IPv4).InterfaceIndex | ForEach-Object {Set-DnsClientServerAddress -InterfaceIndex $_ -ResetServerAddresses};(Get-NetIPAddress -AddressFamily IPv6).InterfaceIndex | ForEach-Object {Set-DnsClientServerAddress -InterfaceIndex $_ -ResetServerAddresses}')
             ->shouldReceive('run')->twice()
             ->shouldReceive('run')->once()->andReturnUsing(function ($command) {
                 $this->assertSame('cmd /C "'.$this->path('AcrylicUI.exe').'" UninstallAcrylicService', $command);
