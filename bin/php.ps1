@@ -14,11 +14,12 @@ if ('7.2','7.3','7.4','8.0' -notcontains $phpVersion) {
 }
 
 function Find-PhpRelease {
+    $architecture = if ([Environment]::Is64BitProcess) {"x64"} else {"x86"}
     $phpResponse = Invoke-WebRequest "$phpReleasesUrl/releases.json" -UseBasicParsing | ConvertFrom-Json
-    $path = $phpResponse.$phpVersion."nts-vc15-x64"."zip"."path"
+    $path = $phpResponse.$phpVersion."nts-vc15-$architecture"."zip"."path"
 
     if (! $path) {
-        $path = $phpResponse.$phpVersion."nts-vs16-x64"."zip"."path"
+        $path = $phpResponse.$phpVersion."nts-vs16-$architecture"."zip"."path"
     }
 
     if (! $path) {
