@@ -77,9 +77,7 @@ class Acrylic
      */
     protected function configureNetworkDNS()
     {
-        $bin = realpath(__DIR__.'/../../bin');
-
-        $this->cli->run('cmd /C cd "'.$bin.'" && configuredns');
+        $this->cli->passthru('wmic nicconfig where (IPEnabled=TRUE) call SetDNSServerSearchOrder ("127.0.0.1", "8.8.8.8")');
     }
 
     /**
