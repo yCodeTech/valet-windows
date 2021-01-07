@@ -112,8 +112,10 @@ class NginxTest extends TestCase
     /** @test */
     public function restart_nginx_service()
     {
-        // $this->mock(CommandLine::class)
-        //     ->shouldReceive('run')->once()->with('cmd "/C taskkill /IM nginx.exe /F"');
+        $this->mock(CommandLine::class)
+            ->shouldReceive('run')
+            ->once()
+            ->with('cmd "/C taskkill /IM nginx.exe /F"');
 
         ($winsw = m::mock(WinSW::class))
             ->shouldReceive('restart')
@@ -129,8 +131,10 @@ class NginxTest extends TestCase
     /** @test */
     public function stop_nginx_service()
     {
-        // $this->mock(CommandLine::class)
-        //     ->shouldReceive('run')->once()->with('cmd "/C taskkill /IM nginx.exe /F"');
+        $this->mock(CommandLine::class)
+            ->shouldReceive('run')
+            ->once()
+            ->with('cmd "/C taskkill /IM nginx.exe /F"');
 
         ($winsw = m::mock(WinSW::class))
             ->shouldReceive('stop')
@@ -146,6 +150,11 @@ class NginxTest extends TestCase
     /** @test */
     public function uninstall_nginx_service()
     {
+        $this->mock(CommandLine::class)
+            ->shouldReceive('run')
+            ->once()
+            ->with('cmd "/C taskkill /IM nginx.exe /F"');
+
         ($winsw = m::mock(WinSW::class))
             ->shouldReceive('uninstall')
                 ->once();
