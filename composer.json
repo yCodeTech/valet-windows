@@ -56,7 +56,10 @@
             "Composer\\Config::disableProcessTimeout",
             "vendor\\bin\\phpunit --filter=IntegrationTest"
         ],
-        "build-docker": "docker build -t cretueusebiu/valet-windows -f ./tests/docker/Dockerfile ."
+        "build-docker": [
+            "Composer\\Config::disableProcessTimeout",
+            "docker build -t cretueusebiu/valet-windows -f ./tests/docker/Dockerfile ."
+        ]
     },
     "extra": {
         "branch-alias": {
