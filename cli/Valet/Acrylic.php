@@ -28,7 +28,7 @@ class Acrylic
     }
 
     /**
-     * Install the Acrylic DNS Proxy service.
+     * Install Acrylic DNS.
      *
      * @param  string $tld
      * @return void
@@ -38,16 +38,7 @@ class Acrylic
         info('Installing Acrylic DNS...');
 
         $this->createHostsFile($tld);
-
-        $this->configureNetworkDNS();
-
-        if (! $this->installed()) {
-            $this->cli->runOrExit('cmd /C "'.$this->path('AcrylicUI.exe').'" InstallAcrylicService', function ($code, $output) {
-                error("Failed to install Acrylic DNS: $output");
-            });
-        }
-
-        $this->flushdns();
+        $this->installService();
     }
 
     /**
@@ -71,13 +62,34 @@ class Acrylic
     }
 
     /**
+     * Install the Acrylic DNS service.
+     *
+     * @return void
+     */
+    protected function installService()
+    {
+        $this->uninstall();
+
+        $this->configureNetworkDNS();
+
+        $this->cli->runOrExit('cmd /C "'.$this->path('AcrylicUI.exe').'" InstallAcrylicService', function ($code, $output) {
+            error("Failed to install Acrylic DNS: $output");
+        });
+
+        $this->flushdns();
+    }
+
+    /**
      * Configure the Network DNS.
      *
      * @return void
      */
     protected function configureNetworkDNS()
     {
-        $this->cli->passthru('wmic nicconfig where (IPEnabled=TRUE) call SetDNSServerSearchOrder ("127.0.0.1", "8.8.8.8")');
+        $this->cli->powershell(implode(';', [
+            '(Get-NetIPAddress -AddressFamily IPv4).InterfaceIndex | ForEach-Object {Set-DnsClientServerAddress -InterfaceIndex $_ -ServerAddresses (\"127.0.0.1\", \"8.8.8.8\")}',
+            '(Get-NetIPAddress -AddressFamily IPv6).InterfaceIndex | ForEach-Object {Set-DnsClientServerAddress -InterfaceIndex $_ -ServerAddresses (\"::1\", \"2001:4860:4860::8888\")}',
+        ]));
     }
 
     /**
@@ -112,6 +124,8 @@ class Acrylic
             warning("Failed to uninstall Acrylic DNS: $output");
         });
 
+        $this->removeNetworkDNS();
+
         $this->flushdns();
     }
 
@@ -123,6 +137,19 @@ class Acrylic
     protected function installed(): bool
     {
         return $this->cli->powershell('Get-Service -Name "AcrylicDNSProxySvc"')->isSuccessful();
+    }
+
+    /**
+     * Remove the Network DNS.
+     *
+     * @return void
+     */
+    protected function removeNetworkDNS()
+    {
+        $this->cli->powershell(implode(';', [
+            '(Get-NetIPAddress -AddressFamily IPv4).InterfaceIndex | ForEach-Object {Set-DnsClientServerAddress -InterfaceIndex $_ -ResetServerAddresses}',
+            '(Get-NetIPAddress -AddressFamily IPv6).InterfaceIndex | ForEach-Object {Set-DnsClientServerAddress -InterfaceIndex $_ -ResetServerAddresses}',
+        ]));
     }
 
     /**
