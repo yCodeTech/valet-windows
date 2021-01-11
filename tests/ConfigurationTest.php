@@ -1,121 +1,170 @@
 <?php
 
-use Illuminate\Container\Container;
+namespace Tests;
+
 use Valet\Configuration;
 use Valet\Filesystem;
 use function Valet\resolve;
-use function Valet\swap;
 use function Valet\user;
+use Valet\Valet;
 
-class ConfigurationTest extends PHPUnit_Framework_TestCase
+class ConfigurationTest extends TestCase
 {
-    public function setUp()
+    /** @test */
+    public function configuration_directory_is_created_if_it_doesnt_exist()
     {
-        $_SERVER['SUDO_USER'] = user();
+        $this->mock(Filesystem::class)
+            ->shouldReceive('ensureDirExists')->once()->with(preg_replace('~/valet$~', '', Valet::homePath()), user())
+            ->shouldReceive('isDir')->andReturn(false)
+            ->shouldReceive('ensureDirExists')->once()->with(Valet::homePath(), user());
 
-        Container::setInstance(new Container());
-    }
-
-    public function tearDown()
-    {
-        Mockery::close();
-    }
-
-    public function test_configuration_directory_is_created_if_it_doesnt_exist()
-    {
-        $files = Mockery::mock(Filesystem::class.'[ensureDirExists,isDir]');
-        $files->shouldReceive('ensureDirExists')->once()->with(preg_replace('~/valet$~', '', VALET_HOME_PATH), user());
-        $files->shouldReceive('ensureDirExists')->once()->with(VALET_HOME_PATH, user())
-                ->shouldReceive('isDir')->once();
-        swap(Filesystem::class, $files);
         resolve(Configuration::class)->createConfigurationDirectory();
     }
 
-    public function test_drivers_directory_is_created_with_sample_driver_if_it_doesnt_exist()
+    /** @test */
+    public function drivers_directory_is_created_with_sample_driver_if_it_doesnt_exist()
     {
-        $files = Mockery::mock(Filesystem::class.'[isDir,mkdirAsUser,putAsUser]');
-        $files->shouldReceive('isDir')->with(VALET_HOME_PATH.'/Drivers')->andReturn(false);
-        $files->shouldReceive('mkdirAsUser')->with(VALET_HOME_PATH.'/Drivers');
-        $files->shouldReceive('putAsUser');
-        swap(Filesystem::class, $files);
+        $this->partialMock(Filesystem::class)
+            ->shouldReceive('isDir')->with(Valet::homePath('Drivers'))->andReturn(false)
+            ->shouldReceive('mkdirAsUser')->with(Valet::homePath('Drivers'))
+            ->shouldReceive('putAsUser');
+
         resolve(Configuration::class)->createDriversDirectory();
     }
 
-    public function test_log_directory_is_created_with_log_files_if_it_doesnt_exist()
+    /** @test */
+    public function sites_directory_is_created_if_it_doesnt_exist()
     {
-        $files = Mockery::mock(Filesystem::class.'[ensureDirExists,touch]');
-        $files->shouldReceive('ensureDirExists')->with(VALET_HOME_PATH.'/Log', user());
-        $files->shouldReceive('touch')->once();
-        swap(Filesystem::class, $files);
+        $this->mock(Filesystem::class)
+            ->shouldReceive('ensureDirExists')->once()->with(Valet::homePath('Sites'), user());
+
+        resolve(Configuration::class)->createSitesDirectory();
+    }
+
+    /** @test */
+    public function extensions_directory_is_created_if_it_doesnt_exist()
+    {
+        $this->mock(Filesystem::class)
+            ->shouldReceive('ensureDirExists')->once()->with(Valet::homePath('Extensions'), user());
+
+        resolve(Configuration::class)->createExtensionsDirectory();
+    }
+
+    /** @test */
+    public function log_directory_is_created_with_log_files_if_it_doesnt_exist()
+    {
+        $this->mock(Filesystem::class)
+            ->shouldReceive('ensureDirExists')->once()->with(Valet::homePath('Log'), user())
+            ->shouldReceive('touch')->once()->with(Valet::homePath('Log\nginx-error.log'));
+
         resolve(Configuration::class)->createLogDirectory();
     }
 
-    public function test_add_path_adds_a_path_to_the_paths_array_and_removes_duplicates()
+    /** @test */
+    public function certificates_directory_is_created_if_it_doesnt_exist()
     {
-        $config = Mockery::mock(Configuration::class.'[read,write]', [new Filesystem()]);
-        $config->shouldReceive('read')->andReturn([
-            'paths' => ['path-1', 'path-2'],
-        ]);
-        $config->shouldReceive('write')->with([
-            'paths' => ['path-1', 'path-2', 'path-3'],
-        ]);
-        $config->addPath('path-3');
+        $this->mock(Filesystem::class)
+            ->shouldReceive('ensureDirExists')->once()->with(Valet::homePath('Certificates'), user());
 
-        $config = Mockery::mock(Configuration::class.'[read,write]', [new Filesystem()]);
-        $config->shouldReceive('read')->andReturn([
-            'paths' => ['path-1', 'path-2', 'path-3'],
-        ]);
-        $config->shouldReceive('write')->with([
-            'paths' => ['path-1', 'path-2', 'path-3'],
-        ]);
-        $config->addPath('path-3');
+        resolve(Configuration::class)->createCertificatesDirectory();
     }
 
-    public function test_paths_may_be_removed_from_the_configuration()
+    /** @test */
+    public function services_directory_is_created_if_it_doesnt_exist()
     {
-        $config = Mockery::mock(Configuration::class.'[read,write]', [new Filesystem()]);
-        $config->shouldReceive('read')->andReturn([
-            'paths' => ['path-1', 'path-2'],
-        ]);
-        $config->shouldReceive('write')->with([
-            'paths' => ['path-1'],
-        ]);
-        $config->removePath('path-2');
+        $this->mock(Filesystem::class)
+            ->shouldReceive('ensureDirExists')->once()->with(Valet::homePath('Services'), user());
+
+        resolve(Configuration::class)->createServicesDirectory();
     }
 
-    public function test_prune_removes_directories_from_paths_that_no_longer_exist()
+    /** @test */
+    public function base_configuration_is_created_if_it_doesnt_exist()
     {
-        $files = Mockery::mock(Filesystem::class.'[exists,isDir]');
-        swap(Filesystem::class, $files);
-        $files->shouldReceive('exists')->with(VALET_HOME_PATH.'/config.json')->andReturn(true);
-        $files->shouldReceive('isDir')->with('path-1')->andReturn(true);
-        $files->shouldReceive('isDir')->with('path-2')->andReturn(false);
-        $config = Mockery::mock(Configuration::class.'[read,write]', [$files]);
-        $config->shouldReceive('read')->andReturn([
-            'paths' => ['path-1', 'path-2'],
-        ]);
-        $config->shouldReceive('write')->with([
-            'paths' => ['path-1'],
-        ]);
-        $config->prune();
+        $this->mock(Filesystem::class)
+            ->shouldReceive('exists')->andReturn(false)
+            ->shouldReceive('putAsUser')
+            ->shouldReceive('get')->andReturn(json_encode(['tld' => 'test', 'php_port' => 9001]));
+
+        resolve(Configuration::class)->writeBaseConfiguration();
     }
 
-    public function test_prune_doesnt_execute_if_configuration_directory_doesnt_exist()
+    /** @test */
+    public function add_path_adds_a_path_to_the_paths_array_and_removes_duplicates()
     {
-        $files = Mockery::mock(Filesystem::class.'[exists]');
-        swap(Filesystem::class, $files);
-        $files->shouldReceive('exists')->with(VALET_HOME_PATH.'/config.json')->andReturn(false);
-        $config = Mockery::mock(Configuration::class.'[read,write]', [$files]);
-        $config->shouldReceive('read')->never();
-        $config->shouldReceive('write')->never();
-        $config->prune();
+        $this->mock(Filesystem::class)
+            ->shouldReceive('get')->andReturn(json_encode([
+                'paths' => ['path-1', 'path-2'],
+            ]))
+            ->shouldReceive('putAsUser')->with(Valet::homePath('config.json'), json_encode(
+                ['paths' => ['path-1', 'path-2', 'path-3']], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+            ).PHP_EOL);
+
+        resolve(Configuration::class)->addPath('path-3');
+
+        $this->mock(Filesystem::class)
+            ->shouldReceive('get')->andReturn(json_encode([
+                'paths' => ['path-1', 'path-2', 'path-3'],
+            ]))
+            ->shouldReceive('putAsUser')->with(Valet::homePath('config.json'), json_encode(
+                ['paths' => ['path-1', 'path-2', 'path-3']], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+            ).PHP_EOL);
+
+        resolve(Configuration::class)->addPath('path-3');
     }
 
-    public function test_update_key_updates_the_specified_configuration_key()
+    /** @test */
+    public function paths_may_be_removed_from_the_configuration()
     {
-        $config = Mockery::mock(Configuration::class.'[read,write]', [new Filesystem()]);
-        $config->shouldReceive('read')->once()->andReturn(['foo' => 'bar']);
-        $config->shouldReceive('write')->once()->with(['foo' => 'bar', 'bar' => 'baz']);
-        $config->updateKey('bar', 'baz');
+        $this->mock(Filesystem::class)
+            ->shouldReceive('get')->andReturn(json_encode([
+                'paths' => ['path-1', 'path-2'],
+            ]))
+            ->shouldReceive('putAsUser')->with(Valet::homePath('config.json'), json_encode(
+                ['paths' => ['path-1']], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+            ).PHP_EOL);
+
+        resolve(Configuration::class)->removePath('path-2');
+    }
+
+    /** @test */
+    public function prune_removes_directories_from_paths_that_no_longer_exist()
+    {
+        $this->mock(Filesystem::class)
+            ->shouldReceive('exists')->with(Valet::homePath('config.json'))->andReturn(true)
+            ->shouldReceive('get')->andReturn(json_encode([
+                'paths' => ['path-1', 'path-2'],
+            ]))
+            ->shouldReceive('isDir')->with('path-1')->andReturn(true)
+            ->shouldReceive('isDir')->with('path-2')->andReturn(false)
+            ->shouldReceive('putAsUser')->with(Valet::homePath('config.json'), json_encode(
+                ['paths' => ['path-1']], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+            ).PHP_EOL);
+
+        resolve(Configuration::class)->prune();
+    }
+
+    /** @test */
+    public function prune_doesnt_execute_if_configuration_directory_doesnt_exist()
+    {
+        $this->mock(Filesystem::class)
+            ->shouldReceive('exists')->with(Valet::homePath('config.json'))->andReturn(false)
+            ->shouldReceive('get')->never()
+            ->shouldReceive('putAsUser')->never();
+
+        resolve(Configuration::class)->prune();
+    }
+
+    /** @test */
+    public function update_key_updates_the_specified_configuration_key()
+    {
+        $this->mock(Filesystem::class)
+            ->shouldReceive('exists')->with(Valet::homePath('config.json'))->andReturn(true)
+            ->shouldReceive('get')->andReturn(json_encode(['foo' => 'bar']))
+            ->shouldReceive('putAsUser')->with(Valet::homePath('config.json'), json_encode(
+                ['foo' => 'bar', 'bar' => 'baz'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+            ).PHP_EOL);
+
+        resolve(Configuration::class)->updateKey('bar', 'baz');
     }
 }

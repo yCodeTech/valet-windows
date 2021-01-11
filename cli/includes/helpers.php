@@ -2,6 +2,7 @@
 
 namespace Valet;
 
+use Exception;
 use Illuminate\Container\Container;
 use RuntimeException;
 use Symfony\Component\Console\Helper\Table;
@@ -19,13 +20,13 @@ $_SERVER['HOME'] = str_replace('\\', '/', $_SERVER['HOME']);
 define('VALET_HOME_PATH', $_SERVER['HOME'].'/.config/valet');
 define('VALET_SERVER_PATH', str_replace('\\', '/', realpath(__DIR__.'/../../server.php')));
 define('VALET_STATIC_PREFIX', '41c270e4-5535-4daa-b23e-c269744c2f45');
+
 define('VALET_LEGACY_HOME_PATH', $_SERVER['HOME'].'/.valet');
 
 /**
  * Output the given text to the console.
  *
- * @param string $output
- *
+ * @param  string $output
  * @return void
  */
 function info($output)
@@ -36,8 +37,7 @@ function info($output)
 /**
  * Output the given text to the console.
  *
- * @param string $output
- *
+ * @param  string  $output
  * @return void
  */
 function warning($output)
@@ -50,11 +50,25 @@ function warning($output)
 }
 
 /**
+ * Output the given text to the console.
+ *
+ * @param  string  $output
+ * @return void
+ */
+function error(string $output)
+{
+    if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'testing') {
+        throw new RuntimeException($output);
+    }
+
+    (new ConsoleOutput)->getErrorOutput()->writeln("<error>$output</error>");
+}
+
+/**
  * Output a table to the console.
  *
- * @param array $headers
- * @param array $rows
- *
+ * @param  array  $headers
+ * @param  array  $rows
  * @return void
  */
 function table(array $headers = [], array $rows = [])
@@ -69,8 +83,7 @@ function table(array $headers = [], array $rows = [])
 /**
  * Output the given text to the console.
  *
- * @param string $output
- *
+ * @param  string  $output
  * @return void
  */
 function output($output)
@@ -86,8 +99,7 @@ if (! function_exists('resolve')) {
     /**
      * Resolve the given class from the container.
      *
-     * @param string $class
-     *
+     * @param  string  $class
      * @return mixed
      */
     function resolve($class)
@@ -99,9 +111,8 @@ if (! function_exists('resolve')) {
 /**
  * Swap the given class implementation in the container.
  *
- * @param string $class
- * @param mixed  $instance
- *
+ * @param  string  $class
+ * @param  mixed  $instance
  * @return void
  */
 function swap($class, $instance)
@@ -113,10 +124,9 @@ if (! function_exists('retry')) {
     /**
      * Retry the given function N times.
      *
-     * @param int      $retries
-     * @param callable $retries
-     * @param int      $sleep
-     *
+     * @param  int  $retries
+     * @param  callable  $retries
+     * @param  int  $sleep
      * @return mixed
      */
     function retry($retries, $fn, $sleep = 0)
@@ -156,9 +166,8 @@ if (! function_exists('tap')) {
     /**
      * Tap the given value.
      *
-     * @param mixed    $value
-     * @param callable $callback
-     *
+     * @param  mixed     $value
+     * @param  callable  $callback
      * @return mixed
      */
     function tap($value, callable $callback)
@@ -173,9 +182,8 @@ if (! function_exists('ends_with')) {
     /**
      * Determine if a given string ends with a given substring.
      *
-     * @param string       $haystack
-     * @param string|array $needles
-     *
+     * @param  string  $haystack
+     * @param  string|array  $needles
      * @return bool
      */
     function ends_with($haystack, $needles)
@@ -190,8 +198,30 @@ if (! function_exists('ends_with')) {
     }
 }
 
+if (! function_exists('starts_with')) {
+    /**
+     * Determine if a given string starts with a given substring.
+     *
+     * @param  string  $haystack
+     * @param  string|string[]  $needles
+     * @return bool
+     */
+    function starts_with($haystack, $needles)
+    {
+        foreach ((array) $needles as $needle) {
+            if ((string) $needle !== '' && strncmp($haystack, $needle, strlen($needle)) === 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+}
+
 /**
  * Get the user.
+ *
+ * @return string
  */
 function user()
 {

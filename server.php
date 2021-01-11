@@ -17,18 +17,63 @@ function show_valet_404()
 }
 
 /**
+ * Show directory listing or 404 if directory doesn't exist.
+ */
+function show_directory_listing($valetSitePath, $uri)
+{
+    $is_root = ($uri == '/');
+    $directory = ($is_root) ? $valetSitePath : $valetSitePath.$uri;
+
+    if (! file_exists($directory)) {
+        show_valet_404();
+    }
+
+    // Sort directories at the top
+    $paths = glob("$directory/*");
+    usort($paths, function ($a, $b) {
+        return (is_dir($a) == is_dir($b)) ? strnatcasecmp($a, $b) : (is_dir($a) ? -1 : 1);
+    });
+
+    // Output the HTML for the directory listing
+    echo "<h1>Index of $uri</h1>";
+    echo '<hr>';
+    echo implode("<br>\n", array_map(function ($path) use ($uri, $is_root) {
+        $file = basename($path);
+
+        return ($is_root) ? "<a href='/$file'>/$file</a>" : "<a href='$uri/$file'>$uri/$file/</a>";
+    }, $paths));
+
+    exit;
+}
+
+/**
  * You may use wildcard DNS providers xip.io or nip.io as a tool for testing your site via an IP address.
  * It's simple to use: First determine the IP address of your local computer (like 192.168.0.10).
  * Then simply use http://project.your-ip.xip.io - ie: http://laravel.192.168.0.10.xip.io.
  */
-function valet_support_wildcard_dns($domain)
+function valet_support_wildcard_dns($domain, $config)
 {
-    if (in_array(substr($domain, -7), ['.xip.io', '.nip.io'])) {
-        // support only ip v4 for now
-        $domainPart = explode('.', $domain);
-        if (count($domainPart) > 6) {
-            $domain = implode('.', array_reverse(array_slice(array_reverse($domainPart), 6)));
-        }
+    $services = [
+        '.*.*.*.*.xip.io',
+        '.*.*.*.*.nip.io',
+        '-*-*-*-*.nip.io',
+    ];
+
+    if (isset($config['tunnel_services'])) {
+        $services = array_merge($services, (array) $config['tunnel_services']);
+    }
+
+    $patterns = [];
+    foreach ($services as $service) {
+        $pattern = preg_quote($service, '#');
+        $pattern = str_replace('\*', '.*', $pattern);
+        $patterns[] = '(.*)'.$pattern;
+    }
+
+    $pattern = implode('|', $patterns);
+
+    if (preg_match('#(?:'.$pattern.')\z#u', $domain, $matches)) {
+        $domain = array_pop($matches);
     }
 
     if (strpos($domain, ':') !== false) {
@@ -36,6 +81,20 @@ function valet_support_wildcard_dns($domain)
     }
 
     return $domain;
+}
+
+/**
+ * @param array $config Valet configuration array
+ *
+ * @return string|null If set, default site path for uncaught urls
+ * */
+function valet_default_site_path($config)
+{
+    if (isset($config['default']) && is_string($config['default']) && is_dir($config['default'])) {
+        return $config['default'];
+    }
+
+    return null;
 }
 
 /**
@@ -48,13 +107,13 @@ $valetConfig = json_decode(
 /**
  * Parse the URI and site / host for the incoming request.
  */
-$uri = urldecode(
+$uri = rawurldecode(
     explode('?', $_SERVER['REQUEST_URI'])[0]
 );
 
 $siteName = basename(
     // Filter host to support wildcard dns feature
-    valet_support_wildcard_dns($_SERVER['HTTP_HOST']),
+    valet_support_wildcard_dns($_SERVER['HTTP_HOST'], $valetConfig),
     '.'.$valetConfig['tld']
 );
 
@@ -64,23 +123,35 @@ if (strpos($siteName, 'www.') === 0) {
 
 /**
  * Determine the fully qualified path to the site.
+ * Inspects registered path directories, case-sensitive.
  */
 $valetSitePath = null;
 $domain = array_slice(explode('.', $siteName), -1)[0];
 
 foreach ($valetConfig['paths'] as $path) {
-    if (is_dir($path.'/'.$siteName)) {
-        $valetSitePath = $path.'/'.$siteName;
-        break;
-    }
+    if ($handle = opendir($path)) {
+        while (false !== ($file = readdir($handle))) {
+            if (! is_dir($path.'/'.$file)) {
+                continue;
+            }
+            if (in_array($file, ['.', '..', '.DS_Store'])) {
+                continue;
+            }
 
-    if (is_dir($path.'/'.$domain)) {
-        $valetSitePath = $path.'/'.$domain;
-        break;
+            // match dir for lowercase, because Nginx only tells us lowercase names
+            if (strtolower($file) === $siteName) {
+                $valetSitePath = $path.'/'.$file;
+                break;
+            }
+            if (strtolower($file) === $domain) {
+                $valetSitePath = $path.'/'.$file;
+            }
+        }
+        closedir($handle);
     }
 }
 
-if (is_null($valetSitePath)) {
+if (is_null($valetSitePath) && is_null($valetSitePath = valet_default_site_path($valetConfig))) {
     show_valet_404();
 }
 
@@ -100,11 +171,25 @@ if (! $valetDriver) {
 }
 
 /*
- * Ngrok uses the X-Original-Host to store the forwarded hostname.
+ * Attempt to load server environment variables.
+ */
+$valetDriver->loadServerEnvironmentVariables(
+    $valetSitePath, $siteName
+);
+
+/**
+ * ngrok uses the X-Original-Host to store the forwarded hostname.
  */
 if (isset($_SERVER['HTTP_X_ORIGINAL_HOST']) && ! isset($_SERVER['HTTP_X_FORWARDED_HOST'])) {
     $_SERVER['HTTP_X_FORWARDED_HOST'] = $_SERVER['HTTP_X_ORIGINAL_HOST'];
 }
+
+/**
+ * Attempt to load server environment variables.
+ */
+$valetDriver->loadServerEnvironmentVariables(
+    $valetSitePath, $siteName
+);
 
 /**
  * Allow driver to mutate incoming URL.
@@ -120,13 +205,6 @@ if ($uri !== '/' && ! $isPhpFile && $staticFilePath = $valetDriver->isStaticFile
     return $valetDriver->serveStaticFile($staticFilePath, $valetSitePath, $siteName, $uri);
 }
 
-/*
- * Attempt to load server environment variables.
- */
-$valetDriver->loadServerEnvironmentVariables(
-    $valetSitePath, $siteName
-);
-
 /**
  * Attempt to dispatch to a front controller.
  */
@@ -135,6 +213,10 @@ $frontControllerPath = $valetDriver->frontControllerPath(
 );
 
 if (! $frontControllerPath) {
+    if (isset($valetConfig['directory-listing']) && $valetConfig['directory-listing'] == 'on') {
+        show_directory_listing($valetSitePath, $uri);
+    }
+
     show_valet_404();
 }
 

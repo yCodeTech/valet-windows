@@ -12,10 +12,9 @@ class Magento2ValetDriver extends ValetDriver
     /**
      * Determine if the driver serves the request.
      *
-     * @param string $sitePath
-     * @param string $siteName
-     * @param string $uri
-     *
+     * @param  string  $sitePath
+     * @param  string  $siteName
+     * @param  string  $uri
      * @return bool
      */
     public function serves($sitePath, $siteName, $uri)
@@ -26,10 +25,9 @@ class Magento2ValetDriver extends ValetDriver
     /**
      * Determine if the incoming request is for a static file.
      *
-     * @param string $sitePath
-     * @param string $siteName
-     * @param string $uri
-     *
+     * @param  string  $sitePath
+     * @param  string  $siteName
+     * @param  string  $uri
      * @return string|false
      */
     public function isStaticFile($sitePath, $siteName, $uri)
@@ -78,7 +76,8 @@ class Magento2ValetDriver extends ValetDriver
      * Rewrite URLs that look like "versions12345/" to remove
      * the versions12345/ part.
      *
-     * @param string $route
+     * @param  string  $route
+     * @return string
      */
     private function handleForVersions($route)
     {
@@ -88,7 +87,7 @@ class Magento2ValetDriver extends ValetDriver
     /**
      * Determine the current MAGE_MODE.
      *
-     * @param string $sitePath
+     * @param  string $sitePath
      */
     private function checkMageMode($sitePath)
     {
@@ -96,15 +95,19 @@ class Magento2ValetDriver extends ValetDriver
             // We have already figure out mode, no need to check it again
             return;
         }
+
         if (! file_exists($sitePath.'/index.php')) {
             $this->mageMode = 'production'; // Can't use developer mode without index.php in project root
 
             return;
         }
+
         $mageConfig = [];
+
         if (file_exists($sitePath.'/app/etc/env.php')) {
             $mageConfig = require $sitePath.'/app/etc/env.php';
         }
+
         if (array_key_exists('MAGE_MODE', $mageConfig)) {
             $this->mageMode = $mageConfig['MAGE_MODE'];
         }
@@ -114,10 +117,9 @@ class Magento2ValetDriver extends ValetDriver
      * Checks to see if route is referencing any directory inside pub. This is a dynamic check so that if any new
      * directories are added to pub this driver will not need to be updated.
      *
-     * @param string $sitePath
-     * @param string $route
-     * @param string $pub
-     *
+     * @param  string  $sitePath
+     * @param  string  $route
+     * @param  string  $pub
      * @return bool
      */
     private function isPubDirectory($sitePath, $route, $pub = '')
@@ -138,10 +140,9 @@ class Magento2ValetDriver extends ValetDriver
     /**
      * Get the fully resolved path to the application's front controller.
      *
-     * @param string $sitePath
-     * @param string $siteName
-     * @param string $uri
-     *
+     * @param  string  $sitePath
+     * @param  string  $siteName
+     * @param  string  $uri
      * @return string
      */
     public function frontControllerPath($sitePath, $siteName, $uri)
@@ -149,8 +150,12 @@ class Magento2ValetDriver extends ValetDriver
         $this->checkMageMode($sitePath);
 
         if ('developer' === $this->mageMode) {
+            $_SERVER['DOCUMENT_ROOT'] = $sitePath;
+
             return $sitePath.'/index.php';
         }
+
+        $_SERVER['DOCUMENT_ROOT'] = $sitePath.'/pub';
 
         return $sitePath.'/pub/index.php';
     }

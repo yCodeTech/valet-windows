@@ -1,98 +1,87 @@
 <?php
 
-use Illuminate\Container\Container;
+namespace Tests;
+
 use Valet\CommandLine;
 use Valet\Filesystem;
 use function Valet\resolve;
-use function Valet\swap;
-use function Valet\user;
+use Valet\Valet;
 use Valet\WinSW;
+use Valet\WinSwFactory;
 
-class WinSWTest extends PHPUnit_Framework_TestCase
+class WinSWTest extends TestCase
 {
-    public function setUp()
+    /** @test */
+    public function make_winsw()
     {
-        $_SERVER['SUDO_USER'] = user();
+        $winsw = resolve(WinSwFactory::class)->make('testservice');
 
-        Container::setInstance(new Container());
+        $this->assertInstanceOf(WinSW::class, $winsw);
     }
 
-    public function tearDown()
+    /** @test */
+    public function install_service()
     {
-        Mockery::close();
+        $this->mock(Filesystem::class)
+            ->shouldReceive('get')->andReturnUsing(function ($path) {
+                $this->assertSame(realpath(__DIR__.'/../cli/Valet').'/../stubs/testservice.xml', $path);
+            })->once()
+            ->shouldReceive('put')->andReturnUsing(function ($path) {
+                $this->assertSame(Valet::homePath('Services\testservice.xml'), $path);
+            })->once()
+            ->shouldReceive('copy')->andReturnUsing(function ($from, $to) {
+                $this->assertSame(realpath(__DIR__.'/../bin/winsw/WinSW.NET4.exe'), $from);
+                $this->assertSame(Valet::homePath('Services\testservice.exe'), $to);
+            })->once();
+
+        $this->mock(CommandLine::class)
+            ->shouldReceive('runOrExit')->andReturnUsing(function ($command) {
+                $this->assertSame('cmd "/C cd '.Valet::homePath('Services').' && testservice install"', $command);
+            })->once();
+
+        $this->winsw('testservice')->install();
     }
 
-    public function test_install_service()
+    /** @test */
+    public function stop_service()
     {
-        $files = Mockery::mock(Filesystem::class);
+        $this->mock(CommandLine::class)
+            ->shouldReceive('run')->andReturnUsing(function ($command) {
+                $this->assertSame('cmd "/C cd '.Valet::homePath('Services').' && testservice stop"', $command);
+            })->once();
 
-        $files->shouldReceive('get')->andReturnUsing(function ($path) {
-            $this->assertSame(realpath(__DIR__.'/../cli/Valet').'/../stubs/testservice.xml', $path);
-        })->once();
-
-        $files->shouldReceive('putAsUser')->andReturnUsing(function ($path) {
-            $this->assertSame(VALET_HOME_PATH.'/Services/testservice.xml', $path);
-        })->once();
-
-        $files->shouldReceive('copy')->andReturnUsing(function ($from, $to) {
-            $this->assertSame(realpath(__DIR__.'/../bin').'/winsw.exe', $from);
-            $this->assertSame(VALET_HOME_PATH.'/Services/testservice.exe', $to);
-        })->once();
-
-        $cli = Mockery::mock(CommandLine::class);
-
-        $cli->shouldReceive('runOrDie')->andReturnUsing(function ($command) {
-            $this->assertSame('cmd "/C cd '.VALET_HOME_PATH.'\Services && testservice install"', $command);
-        })->once();
-
-        swap(CommandLine::class, $cli);
-        swap(Filesystem::class, $files);
-
-        resolve(WinSW::class)->install('testservice');
+        $this->winsw('testservice')->stop();
     }
 
-    public function test_stop_service()
+    /** @test */
+    public function restart_service()
     {
-        $cli = Mockery::mock(CommandLine::class);
+        $this->mock(CommandLine::class)
+            ->shouldReceive('run')->andReturnUsing(function ($command) {
+                $this->assertSame('cmd "/C cd '.Valet::homePath('Services').' && testservice restart"', $command);
+            })->once();
 
-        $cli->shouldReceive('run')->andReturnUsing(function ($command) {
-            $this->assertSame('cmd "/C cd '.VALET_HOME_PATH.'\Services && testservice stop"', $command);
-        })->once();
-
-        swap(CommandLine::class, $cli);
-
-        resolve(WinSW::class)->stop('testservice');
+        $this->winsw('testservice')->restart();
     }
 
-    public function test_restart_service()
+    /** @test */
+    public function uninstall_service()
     {
-        $cli = Mockery::mock(CommandLine::class);
+        $this->mock(CommandLine::class)
+            ->shouldReceive('run')->once()
+            ->shouldReceive('run')->andReturnUsing(function ($command) {
+                $this->assertSame('cmd "/C cd '.Valet::homePath('Services').' && testservice uninstall"', $command);
+            })->once();
 
-        $cli->shouldReceive('run')->andReturnUsing(function ($command) {
-            $this->assertSame('cmd "/C cd '.VALET_HOME_PATH.'\Services && testservice start"', $command);
-        })->once();
-
-        $winsw = Mockery::mock(WinSW::class.'[stop]', [$cli, resolve(Filesystem::class)]);
-        $winsw->shouldReceive('stop')->with('testservice')->once();
-
-        swap(WinSW::class, $winsw);
-
-        resolve(WinSW::class)->restart('testservice');
+        $this->winsw('testservice')->uninstall();
     }
 
-    public function test_uninstall_service()
+    /**
+     * @param  string $service
+     * @return \Valet\WinSW
+     */
+    protected function winsw(string $service): WinSW
     {
-        $cli = Mockery::mock(CommandLine::class);
-
-        $cli->shouldReceive('run')->andReturnUsing(function ($command) {
-            $this->assertSame('cmd "/C cd '.VALET_HOME_PATH.'\Services && testservice uninstall"', $command);
-        })->once();
-
-        $winsw = Mockery::mock(WinSW::class.'[stop]', [$cli, resolve(Filesystem::class)]);
-        $winsw->shouldReceive('stop')->with('testservice')->once();
-
-        swap(WinSW::class, $winsw);
-
-        resolve(WinSW::class)->uninstall('testservice');
+        return resolve(WinSwFactory::class)->make($service);
     }
 }

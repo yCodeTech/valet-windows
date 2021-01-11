@@ -5,19 +5,18 @@ class DrupalValetDriver extends ValetDriver
     /**
      * Determine if the driver serves the request.
      *
-     * @param string $sitePath
-     * @param string $siteName
-     * @param string $uri
-     *
+     * @param  string  $sitePath
+     * @param  string  $siteName
+     * @param  string  $uri
      * @return void
      */
     public function serves($sitePath, $siteName, $uri)
     {
         $sitePath = $this->addSubdirectory($sitePath);
 
-        /*
+        /**
          * /misc/drupal.js = Drupal 7
-         * /core/lib/Drupal.php = Drupal 8
+         * /core/lib/Drupal.php = Drupal 8.
          */
         if (file_exists($sitePath.'/misc/drupal.js') ||
           file_exists($sitePath.'/core/lib/Drupal.php')) {
@@ -28,10 +27,9 @@ class DrupalValetDriver extends ValetDriver
     /**
      * Determine if the incoming request is for a static file.
      *
-     * @param string $sitePath
-     * @param string $siteName
-     * @param string $uri
-     *
+     * @param  string  $sitePath
+     * @param  string  $siteName
+     * @param  string  $uri
      * @return string|false
      */
     public function isStaticFile($sitePath, $siteName, $uri)
@@ -50,17 +48,16 @@ class DrupalValetDriver extends ValetDriver
     /**
      * Get the fully resolved path to the application's front controller.
      *
-     * @param string $sitePath
-     * @param string $siteName
-     * @param string $uri
-     *
+     * @param  string  $sitePath
+     * @param  string  $siteName
+     * @param  string  $uri
      * @return string
      */
     public function frontControllerPath($sitePath, $siteName, $uri)
     {
         $sitePath = $this->addSubdirectory($sitePath);
 
-        if (! isset($_GET['q']) && ! empty($uri) && $uri !== '/') {
+        if (! isset($_GET['q']) && ! empty($uri) && $uri !== '/' && strpos($uri, '/jsonapi/') === false) {
             $_GET['q'] = $uri;
         }
 
@@ -109,7 +106,7 @@ class DrupalValetDriver extends ValetDriver
      *
      * @return array
      */
-    protected function possibleSubdirectories()
+    private function possibleSubdirectories()
     {
         return ['docroot', 'public', 'web'];
     }

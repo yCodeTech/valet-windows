@@ -1,3 +1,5 @@
+Write-Output "DEPRECATED: Use php.ps1 7.2 to download PHP."
+
 $phpBase = "http://windows.php.net"
 $phpPage = "http://windows.php.net/downloads/releases/"
 $phpResponse = Invoke-WebRequest $phpPage

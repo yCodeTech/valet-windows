@@ -5,9 +5,9 @@ class CraftValetDriver extends ValetDriver
     /**
      * Determine if the driver serves the request.
      *
-     * @param  string $sitePath
-     * @param  string $siteName
-     * @param  string $uri
+     * @param  string  $sitePath
+     * @param  string  $siteName
+     * @param  string  $uri
      * @return bool
      */
     public function serves($sitePath, $siteName, $uri)
@@ -18,7 +18,7 @@ class CraftValetDriver extends ValetDriver
     /**
      * Determine the name of the directory where the front controller lives.
      *
-     * @param  string $sitePath
+     * @param  string  $sitePath
      * @return string
      */
     public function frontControllerDirectory($sitePath)
@@ -37,9 +37,9 @@ class CraftValetDriver extends ValetDriver
     /**
      * Determine if the incoming request is for a static file.
      *
-     * @param  string $sitePath
-     * @param  string $siteName
-     * @param  string $uri
+     * @param  string  $sitePath
+     * @param  string  $siteName
+     * @param  string  $uri
      * @return string|false
      */
     public function isStaticFile($sitePath, $siteName, $uri)
@@ -56,9 +56,9 @@ class CraftValetDriver extends ValetDriver
     /**
      * Get the fully resolved path to the application's front controller.
      *
-     * @param  string $sitePath
-     * @param  string $siteName
-     * @param  string $uri
+     * @param  string  $sitePath
+     * @param  string  $siteName
+     * @param  string  $uri
      * @return string
      */
     public function frontControllerPath($sitePath, $siteName, $uri)

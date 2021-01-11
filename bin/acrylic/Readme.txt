@@ -21,10 +21,10 @@ with Borland Delphi 7, is freely available to anyone under the GNU General Publi
 
 For more informations please use the "Acrylic Home Page" shortcut available from the "Start Menu", or go directly to:
 
-https://mayakron.altervista.org/acrylic.php
+https://mayakron.altervista.org/support/acrylic/Home.htm
 
 Installed version is:
-1.2.2 released on February 13, 2020.
+2.0.0 released on October 31, 2020.
 
 ========================================================================================================================
 ACRYLIC DNS PROXY UI
