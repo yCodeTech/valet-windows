@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.2.0 - 2021-01-xx
+## 2.2.0 - 2021-01-11
 
 - Sync with [laravel/valet](https://github.com/laravel/valet)
 - Added support for PHP 8.0
