@@ -45,7 +45,7 @@ For more please refer to the official documentation on the [Laravel website](htt
 
 ## Known Issues
 
-- WLS2 distros fail because of Acrylic DNS Proxy ([microsoft/wsl#4929](https://github.com/microsoft/WSL/issues/4929)). Use `valet stop acrylic`, start WLS2 then `valet start acrylic`.
+- WLS2 distros fail because of Acrylic DNS Proxy ([microsoft/wsl#4929](https://github.com/microsoft/WSL/issues/4929)). Use `valet stop`, start WLS2 then `valet start`.
 - The PHP-CGI process uses port 9001. If it's already used change it in `~/.config/valet/config.json` and run `valet install` again.
 - When sharing sites the url will not be copied to the clipboard.
 - You must run the `valet` commands from the drive where Valet is installed, except for park and link. See [#12](https://github.com/cretueusebiu/valet-windows/issues/12#issuecomment-283111834).
