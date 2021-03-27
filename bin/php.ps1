@@ -3,7 +3,7 @@ $phpPath = "C:\php"
 $caCertUrl = "https://curl.haxx.se/ca/cacert.pem"
 $phpReleasesUrl = "http://windows.php.net/downloads/releases"
 $xdebugReleasesUrl = "https://xdebug.org"
-$stubsUrl = "https://raw.githubusercontent.com/edcoreweb/valet-windows/master/cli/stubs"
+$stubsUrl = "https://raw.githubusercontent.com/cretueusebiu/valet-windows/master/cli/stubs"
 
 if (Get-Command "php" -errorAction SilentlyContinue) {
     Write-Output "PHP already installed!"
