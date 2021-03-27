@@ -23,11 +23,15 @@ class ValetTest extends TestCase
             ->shouldReceive('run')
                 ->once()
                 ->with('powershell -command "Get-Service -Name valet_phpcgi"')
-                ->andReturn('Running  valet_phpcgi        valet_phpcgi');
+                ->andReturn('Running  valet_phpcgi        valet_phpcgi')
+            ->shouldReceive('run')
+                ->once()
+                ->with('powershell -command "Get-Service -Name valet_phpcgi_xdebug"')
+                ->andReturn('Running  valet_phpcgi_xdebug        valet_phpcgi_xdebug');
 
         $services = resolve(Valet::class)->services();
 
-        $this->assertCount(3, $services);
+        $this->assertCount(4, $services);
 
         $this->assertSame([
             [
@@ -43,6 +47,11 @@ class ValetTest extends TestCase
             [
                 'service' => 'php',
                 'winname' => 'valet_phpcgi',
+                'status' => '<fg=green>running</>',
+            ],
+            [
+                'service' => 'php-xdebug',
+                'winname' => 'valet_phpcgi_xdebug',
                 'status' => '<fg=green>running</>',
             ],
         ], $services);

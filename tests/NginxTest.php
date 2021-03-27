@@ -20,7 +20,9 @@ class NginxTest extends TestCase
     {
         $this->mock(Configuration::class)
             ->shouldReceive('get')->once()->with('php_port', 9001)
-            ->andReturn(9001);
+            ->andReturn(9001)
+            ->shouldReceive('get')->once()->with('php_xdebug_port', 9002)
+            ->andReturn(9002);
 
         $this->partialMock(Filesystem::class)
             ->shouldReceive('putAsUser')->andReturnUsing(function ($path, $contents) {
