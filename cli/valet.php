@@ -49,6 +49,7 @@ $app->command('install', function () {
     Configuration::install();
     Nginx::install();
     PhpCgi::install();
+    PhpCgiXdebug::install();
     Acrylic::install(Configuration::read()['tld']);
 
     output(PHP_EOL.'<info>Valet installed successfully!</info>');
@@ -81,6 +82,7 @@ if (is_dir(VALET_HOME_PATH)) {
 
         Site::resecureForNewTld($oldTld, $tld);
         PhpCgi::restart();
+        PhpCgiXdebug::restart();
         Nginx::restart();
 
         info('Your Valet TLD has been updated to ['.$tld.'].');
@@ -276,6 +278,7 @@ if (is_dir(VALET_HOME_PATH)) {
             case '':
                 Acrylic::restart();
                 PhpCgi::restart();
+                PhpCgiXdebug::restart();
                 Nginx::restart();
 
                 return info('Valet services have been started.');
@@ -291,6 +294,10 @@ if (is_dir(VALET_HOME_PATH)) {
                 PhpCgi::restart();
 
                 return info('PHP has been started.');
+            case 'php-xdebug':
+                PhpCgiXdebug::restart();
+
+                return info('PHP Xdebug has been started.');
         }
 
         return warning(sprintf('Invalid valet service name [%s]', $service));
@@ -304,6 +311,7 @@ if (is_dir(VALET_HOME_PATH)) {
             case '':
                 Acrylic::restart();
                 PhpCgi::restart();
+                PhpCgiXdebug::restart();
                 Nginx::restart();
 
                 return info('Valet services have been restarted.');
@@ -319,6 +327,10 @@ if (is_dir(VALET_HOME_PATH)) {
                 PhpCgi::restart();
 
                 return info('PHP has been restarted.');
+            case 'php-xdebug':
+                PhpCgiXdebug::restart();
+
+                return info('PHP Xdebug has been restarted.');
         }
 
         return warning(sprintf('Invalid valet service name [%s]', $service));
@@ -333,6 +345,7 @@ if (is_dir(VALET_HOME_PATH)) {
                 Acrylic::stop();
                 Nginx::stop();
                 PhpCgi::stop();
+                PhpCgiXdebug::stop();
 
                 return info('Valet services have been stopped.');
             case 'acrylic':
@@ -347,6 +360,10 @@ if (is_dir(VALET_HOME_PATH)) {
                 PhpCgi::stop();
 
                 return info('PHP has been stopped.');
+            case 'php-xdebug':
+                PhpCgiXdebug::stop();
+
+                return info('PHP Xdebug has been stopped.');
         }
 
         return warning(sprintf('Invalid valet service name [%s]', $service));
@@ -369,6 +386,7 @@ if (is_dir(VALET_HOME_PATH)) {
         Acrylic::stop();
         Nginx::stop();
         PhpCgi::stop();
+        PhpCgiXdebug::stop();
 
         if ($purgeConfig) {
             info('Removing certificates for all secured sites...');
@@ -385,6 +403,9 @@ if (is_dir(VALET_HOME_PATH)) {
 
         info('Removing PHP-CGI...');
         PhpCgi::uninstall();
+
+        info('Removing PHP-CGI Xdebug...');
+        PhpCgiXdebug::uninstall();
 
         if ($purgeConfig) {
             info('Removing Valet configs...');

@@ -50,6 +50,9 @@ class Ngrok extends Facade
 class PhpCgi extends Facade
 {
 }
+class PhpCgiXdebug extends Facade
+{
+}
 class Site extends Facade
 {
 }
