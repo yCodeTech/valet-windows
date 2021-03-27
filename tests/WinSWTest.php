@@ -36,7 +36,7 @@ class WinSWTest extends TestCase
 
         $this->mock(CommandLine::class)
             ->shouldReceive('runOrExit')->andReturnUsing(function ($command) {
-                $this->assertSame('cmd "/C cd '.Valet::homePath('Services').' && testservice install"', $command);
+                $this->assertSame('cmd "/C cd '.Valet::homePath('Services').' && '.Valet::homePath('Services\testservice').' install"', $command);
             })->once();
 
         $this->winsw('testservice')->install();
@@ -47,7 +47,7 @@ class WinSWTest extends TestCase
     {
         $this->mock(CommandLine::class)
             ->shouldReceive('run')->andReturnUsing(function ($command) {
-                $this->assertSame('cmd "/C cd '.Valet::homePath('Services').' && testservice stop"', $command);
+                $this->assertSame('cmd "/C cd '.Valet::homePath('Services').' && '.Valet::homePath('Services\testservice').' stop"', $command);
             })->once();
 
         $this->winsw('testservice')->stop();
@@ -58,7 +58,7 @@ class WinSWTest extends TestCase
     {
         $this->mock(CommandLine::class)
             ->shouldReceive('run')->andReturnUsing(function ($command) {
-                $this->assertSame('cmd "/C cd '.Valet::homePath('Services').' && testservice restart"', $command);
+                $this->assertSame('cmd "/C cd '.Valet::homePath('Services').' && '.Valet::homePath('Services\testservice').' restart"', $command);
             })->once();
 
         $this->winsw('testservice')->restart();
@@ -70,7 +70,7 @@ class WinSWTest extends TestCase
         $this->mock(CommandLine::class)
             ->shouldReceive('run')->once()
             ->shouldReceive('run')->andReturnUsing(function ($command) {
-                $this->assertSame('cmd "/C cd '.Valet::homePath('Services').' && testservice uninstall"', $command);
+                $this->assertSame('cmd "/C cd '.Valet::homePath('Services').' && '.Valet::homePath('Services\testservice').' uninstall"', $command);
             })->once();
 
         $this->winsw('testservice')->uninstall();

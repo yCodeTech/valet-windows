@@ -38,6 +38,7 @@ class Configuration
         $this->createLogDirectory();
         $this->createCertificatesDirectory();
         $this->createServicesDirectory();
+        $this->createXdebugDirectory();
         $this->writeBaseConfiguration();
 
         $this->files->chown($this->path(), user());
@@ -136,6 +137,16 @@ class Configuration
     }
 
     /**
+     * Create the directory for the Xdebug profiler.
+     *
+     * @return void
+     */
+    public function createXdebugDirectory()
+    {
+        $this->files->ensureDirExists($this->valetHomePath('Xdebug'), user());
+    }
+
+    /**
      * Write the base, initial configuration for Valet.
      *
      * @return void
@@ -143,7 +154,7 @@ class Configuration
     public function writeBaseConfiguration()
     {
         if (! $this->files->exists($this->path())) {
-            $this->write(['tld' => 'test', 'paths' => [], 'php_port' => PhpCgi::PORT]);
+            $this->write(['tld' => 'test', 'paths' => [], 'php_port' => PhpCgi::PORT, 'php_xdebug_port' => PhpCgiXdebug::PORT]);
         }
 
         $config = $this->read();
@@ -155,6 +166,7 @@ class Configuration
 
         // Add php_port if missing.
         $this->updateKey('php_port', $config['php_port'] ?? PhpCgi::PORT);
+        $this->updateKey('php_xdebug_port', $config['php_xdebug_port'] ?? PhpCgiXdebug::PORT);
     }
 
     /**
@@ -279,7 +291,8 @@ class Configuration
     public function write(array $config)
     {
         $this->files->putAsUser($this->path(), json_encode(
-            $config, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+            $config,
+            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
         ).PHP_EOL);
     }
 

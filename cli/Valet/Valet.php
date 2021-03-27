@@ -56,6 +56,7 @@ class Valet
             'acrylic' => 'AcrylicDNSProxySvc',
             'nginx' => 'valet_nginx',
             'php' => 'valet_phpcgi',
+            'php-xdebug' => 'valet_phpcgi_xdebug',
         ])->map(function ($id, $service) {
             $output = $this->cli->run('powershell -command "Get-Service -Name '.$id.'"');
 

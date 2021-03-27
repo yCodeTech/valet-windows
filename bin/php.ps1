@@ -2,7 +2,8 @@ $phpVersion = $args[0]
 $phpPath = "C:\php"
 $caCertUrl = "https://curl.haxx.se/ca/cacert.pem"
 $phpReleasesUrl = "http://windows.php.net/downloads/releases"
-$stubsUrl = "https://raw.githubusercontent.com/cretueusebiu/valet-windows/master/cli/stubs"
+$xdebugReleasesUrl = "https://xdebug.org"
+$stubsUrl = "https://raw.githubusercontent.com/edcoreweb/valet-windows/master/cli/stubs"
 
 if (Get-Command "php" -errorAction SilentlyContinue) {
     Write-Output "PHP already installed!"
@@ -27,6 +28,23 @@ function Find-PhpRelease {
     }
 
     return "$phpReleasesUrl/$path"
+}
+
+function Find-XdebugRelease {
+    $architecture = if ([Environment]::Is64BitProcess) {"-x86_64"} else {""}
+    # php_xdebug-3.0.3-7.4-vc15-nts-x86_64.dll
+    # php_xdebug-3.0.3-8.0-vs16-nts-x86_64.dll
+    $html = (Invoke-WebRequest "${xdebugReleasesUrl}/download" -UseBasicParsing).rawcontent
+
+    if ($html -match "php_xdebug-(.+)-${phpVersion}-vc15-nts${architecture}.dll") {
+        return "${xdebugReleasesUrl}/files/" + $matches[0]
+    }
+
+    if ($html -match "php_xdebug-(.+)-${phpVersion}-vs16-nts${architecture}.dll") {
+        return "${xdebugReleasesUrl}/files/" + $matches[0]
+    }
+
+    throw "Could not find a Xdebug release for PHP $phpVersion."
 }
 
 function Download-File {
@@ -54,11 +72,17 @@ Remove-Item $phpZip
 # Download php.ini
 Write-Output "Installing php.ini..."
 $phpIniUrl = $stubsUrl + "/php" + $phpVersion.Replace('.', '') + ".ini"
-Download-File -Source $phpIniUrl -Destination "$phpPath\php.ini"
+$phpIniContents = (Invoke-WebRequest $phpIniUrl -UseBasicParsing).Content
+Set-Content -Path "$phpPath\php.ini" -Value $phpIniContents.Replace('~/.config', "$HOME/.config")
 
 # Download cacert.pem
 Write-Output "Installing CA certificate..."
 Download-File -Source $caCertUrl -Destination "$phpPath\cacert.pem"
+
+# Download xdebug
+Write-Output "Downloading Xdebug..."
+$xdebugUrl = Find-XdebugRelease
+Download-File $xdebugUrl -Destination "$phpPath\ext\php_xdebug.dll"
 
 # Add PHP to path environment variable
 Write-Output "Adding PHP to path..."
