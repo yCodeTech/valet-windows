@@ -79,6 +79,15 @@ class ConfigurationTest extends TestCase
     }
 
     /** @test */
+    public function xdebug_directory_is_created_if_it_doesnt_exist()
+    {
+        $this->mock(Filesystem::class)
+            ->shouldReceive('ensureDirExists')->once()->with(Valet::homePath('Xdebug'), user());
+
+        resolve(Configuration::class)->createXdebugDirectory();
+    }
+
+    /** @test */
     public function base_configuration_is_created_if_it_doesnt_exist()
     {
         $this->mock(Filesystem::class)
@@ -97,7 +106,8 @@ class ConfigurationTest extends TestCase
                 'paths' => ['path-1', 'path-2'],
             ]))
             ->shouldReceive('putAsUser')->with(Valet::homePath('config.json'), json_encode(
-                ['paths' => ['path-1', 'path-2', 'path-3']], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+                ['paths' => ['path-1', 'path-2', 'path-3']],
+                JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
             ).PHP_EOL);
 
         resolve(Configuration::class)->addPath('path-3');
@@ -107,7 +117,8 @@ class ConfigurationTest extends TestCase
                 'paths' => ['path-1', 'path-2', 'path-3'],
             ]))
             ->shouldReceive('putAsUser')->with(Valet::homePath('config.json'), json_encode(
-                ['paths' => ['path-1', 'path-2', 'path-3']], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+                ['paths' => ['path-1', 'path-2', 'path-3']],
+                JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
             ).PHP_EOL);
 
         resolve(Configuration::class)->addPath('path-3');
@@ -121,7 +132,8 @@ class ConfigurationTest extends TestCase
                 'paths' => ['path-1', 'path-2'],
             ]))
             ->shouldReceive('putAsUser')->with(Valet::homePath('config.json'), json_encode(
-                ['paths' => ['path-1']], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+                ['paths' => ['path-1']],
+                JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
             ).PHP_EOL);
 
         resolve(Configuration::class)->removePath('path-2');
@@ -138,7 +150,8 @@ class ConfigurationTest extends TestCase
             ->shouldReceive('isDir')->with('path-1')->andReturn(true)
             ->shouldReceive('isDir')->with('path-2')->andReturn(false)
             ->shouldReceive('putAsUser')->with(Valet::homePath('config.json'), json_encode(
-                ['paths' => ['path-1']], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+                ['paths' => ['path-1']],
+                JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
             ).PHP_EOL);
 
         resolve(Configuration::class)->prune();
@@ -162,7 +175,8 @@ class ConfigurationTest extends TestCase
             ->shouldReceive('exists')->with(Valet::homePath('config.json'))->andReturn(true)
             ->shouldReceive('get')->andReturn(json_encode(['foo' => 'bar']))
             ->shouldReceive('putAsUser')->with(Valet::homePath('config.json'), json_encode(
-                ['foo' => 'bar', 'bar' => 'baz'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+                ['foo' => 'bar', 'bar' => 'baz'],
+                JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
             ).PHP_EOL);
 
         resolve(Configuration::class)->updateKey('bar', 'baz');

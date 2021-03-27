@@ -38,6 +38,7 @@ class Configuration
         $this->createLogDirectory();
         $this->createCertificatesDirectory();
         $this->createServicesDirectory();
+        $this->createXdebugDirectory();
         $this->writeBaseConfiguration();
 
         $this->files->chown($this->path(), user());
@@ -133,6 +134,16 @@ class Configuration
     public function createServicesDirectory()
     {
         $this->files->ensureDirExists($this->valetHomePath('Services'), user());
+    }
+
+    /**
+     * Create the directory for the Xdebug profiler.
+     *
+     * @return void
+     */
+    public function createXdebugDirectory()
+    {
+        $this->files->ensureDirExists($this->valetHomePath('Xdebug'), user());
     }
 
     /**
@@ -280,7 +291,8 @@ class Configuration
     public function write(array $config)
     {
         $this->files->putAsUser($this->path(), json_encode(
-            $config, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+            $config,
+            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
         ).PHP_EOL);
     }
 
