@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.3.0 - 2021-03-28
+
+- Added support for Xdebug [#165](https://github.com/cretueusebiu/valet-windows/pull/165)
+
 ## 2.2.0 - 2021-01-11
 
 - Sync with [laravel/valet](https://github.com/laravel/valet)
