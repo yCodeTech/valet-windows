@@ -243,7 +243,7 @@ if (is_dir(VALET_HOME_PATH)) {
     // TODO: custom domain and ngrok params
     $app->command('share [domain] [--authtoken=] [--host-header=] [--hostname=] [--region=] [--subdomain=]',
         function ($domain = null, $authtoken = null, $hostheader = null, $hostname = null, $region = null, $subdomain = null) {
-            $url = ($domain ?: Site::host(getcwd())).'.'.Configuration::read()['tld'];
+            $url = ($domain ?: strtolower(Site::host(getcwd()))).'.'.Configuration::read()['tld'];
 
             Ngrok::start($url, Site::port($url), array_filter([
                 'authtoken' => $authtoken,
