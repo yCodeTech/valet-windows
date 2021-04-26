@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.3.2 - 2021-01-26
+
+- Fixed service installation when user path contains spaces.
+
+## 2.3.1 - 2021-04-25
+
+- Fixed 404 error when sharing upper case folder [#168](https://github.com/cretueusebiu/valet-windows/pull/168)
+
 ## 2.3.0 - 2021-03-28
 
 - Added support for Xdebug [#165](https://github.com/cretueusebiu/valet-windows/pull/165)
