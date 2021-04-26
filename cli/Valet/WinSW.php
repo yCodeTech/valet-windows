@@ -43,7 +43,7 @@ class WinSW
     {
         $this->createConfiguration($args);
 
-        $command = 'cmd "/C cd '.$this->servicesPath().' && '.$this->servicesPath($this->service).' install"';
+        $command = 'cmd "/C cd '.$this->servicesPath().' && "'.$this->servicesPath($this->service).'" install"';
 
         $this->cli->runOrExit($command, function ($code, $output) {
             error("Failed to install service [$this->service]. Check ~/.config/valet/Log for errors.\n$output");
@@ -82,7 +82,7 @@ class WinSW
     {
         $this->stop($this->service);
 
-        $this->cli->run('cmd "/C cd '.$this->servicesPath().' && '.$this->servicesPath($this->service).' uninstall"');
+        $this->cli->run('cmd "/C cd '.$this->servicesPath().' && "'.$this->servicesPath($this->service).'" uninstall"');
 
         sleep(1);
 
@@ -99,6 +99,10 @@ class WinSW
     {
         $name = 'valet_'.str_replace('service', '', $this->service);
 
+        if ($name === 'valet_phpcgixdebug') {
+            $name = 'valet_phpcgi_xdebug';
+        }
+
         return $this->cli->powershell("Get-Service -Name \"$name\"")->isSuccessful();
     }
 
@@ -109,7 +113,7 @@ class WinSW
      */
     public function restart()
     {
-        $command = 'cmd "/C cd '.$this->servicesPath().' && '.$this->servicesPath($this->service).' restart"';
+        $command = 'cmd "/C cd '.$this->servicesPath().' && "'.$this->servicesPath($this->service).'" restart"';
 
         $this->cli->run($command, function () use ($command) {
             sleep(2);
@@ -127,7 +131,7 @@ class WinSW
      */
     public function stop()
     {
-        $command = 'cmd "/C cd '.$this->servicesPath().' && '.$this->servicesPath($this->service).' stop"';
+        $command = 'cmd "/C cd '.$this->servicesPath().' && "'.$this->servicesPath($this->service).'" stop"';
 
         $this->cli->run($command, function ($code, $output) {
             warning("Failed to stop service [$this->service].\n$output");
