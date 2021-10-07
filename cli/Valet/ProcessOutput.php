@@ -14,7 +14,7 @@ class ProcessOutput
     /**
      * Create a new test process instance.
      *
-     * @param  \Symfony\Component\Process\Process $process
+     * @param  \Symfony\Component\Process\Process  $process
      * @return void
      */
     public function __construct(Process $process)

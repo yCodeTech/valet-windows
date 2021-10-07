@@ -22,7 +22,7 @@ class WinSW
     /**
      * Create a new WinSW instance.
      *
-     * @param  CommandLine $cli
+     * @param  CommandLine  $cli
      * @param  Filesystem  $files
      * @return void
      */
@@ -161,7 +161,7 @@ class WinSW
     /**
      * Get the services path.
      *
-     * @param  string $path
+     * @param  string  $path
      * @return string
      */
     protected function servicesPath(string $path = ''): string

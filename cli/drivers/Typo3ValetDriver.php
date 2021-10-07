@@ -86,7 +86,7 @@ class Typo3ValetDriver extends ValetDriver
     /**
      * Determines if the given URI is blacklisted so that access is prevented.
      *
-     * @param string $uri
+     * @param  string  $uri
      * @return bool
      */
     private function isAccessAuthorized($uri)
@@ -145,7 +145,7 @@ class Typo3ValetDriver extends ValetDriver
      * sysext install script. domain.dev/typo3 will be redirected to /typo3/, because
      * the generated JavaScript URIs on the login screen would be broken on /typo3.
      *
-     * @param string $uri
+     * @param  string  $uri
      */
     private function handleRedirectBackendShorthandUris($uri)
     {

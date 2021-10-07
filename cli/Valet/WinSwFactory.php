@@ -17,7 +17,7 @@ class WinSwFactory
     /**
      * Create a new factory instance.
      *
-     * @param  CommandLine $cli
+     * @param  CommandLine  $cli
      * @param  Filesystem  $files
      * @return void
      */
@@ -30,7 +30,7 @@ class WinSwFactory
     /**
      * Make a new WinSW instance.
      *
-     * @param string $service
+     * @param  string  $service
      * @return WinSW
      */
     public function make(string $service)
