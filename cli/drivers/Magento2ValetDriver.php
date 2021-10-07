@@ -87,7 +87,7 @@ class Magento2ValetDriver extends ValetDriver
     /**
      * Determine the current MAGE_MODE.
      *
-     * @param  string $sitePath
+     * @param  string  $sitePath
      */
     private function checkMageMode($sitePath)
     {

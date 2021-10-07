@@ -13,7 +13,7 @@ class Valet
      * Create a new Valet instance.
      *
      * @param  CommandLine  $cli
-     * @param  Filesystem   $files
+     * @param  Filesystem  $files
      * @return void
      */
     public function __construct(CommandLine $cli, Filesystem $files)
@@ -81,6 +81,7 @@ class Valet
      *
      * @param  string  $currentVersion
      * @return bool
+     *
      * @throws \Httpful\Exception\ConnectionErrorException
      */
     public function onLatestVersion($currentVersion): bool
@@ -109,7 +110,7 @@ class Valet
     /**
      * Get the Valet home path (VALET_HOME_PATH = ~/.config/valet).
      *
-     * @param  string $path
+     * @param  string  $path
      * @return string
      */
     public static function homePath(string $path = ''): string

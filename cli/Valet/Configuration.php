@@ -14,7 +14,7 @@ class Configuration
     /**
      * Create a new Valet configuration class instance.
      *
-     * @param  Filesystem $filesystem
+     * @param  Filesystem  $filesystem
      * @return void
      */
     public function __construct(Filesystem $files)
@@ -183,7 +183,7 @@ class Configuration
      * Add the given path to the configuration.
      *
      * @param  string  $path
-     * @param  bool    $prepend
+     * @param  bool  $prepend
      * @return void
      */
     public function addPath(string $path, bool $prepend = false)
@@ -257,8 +257,8 @@ class Configuration
     /**
      * Get an item from the configuration file using "dot" notation.
      *
-     * @param  string|int|null $key
-     * @param  mixed $default
+     * @param  string|int|null  $key
+     * @param  mixed  $default
      * @return mixed
      */
     public function get($key, $default = null)
@@ -270,7 +270,7 @@ class Configuration
      * Update a specific key in the configuration file.
      *
      * @param  string  $key
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return array
      */
     public function updateKey(string $key, $value): array
@@ -309,7 +309,7 @@ class Configuration
     /**
      * Get the Valet home path.
      *
-     * @param  string $path
+     * @param  string  $path
      * @return string
      */
     protected function valetHomePath(string $path = ''): string

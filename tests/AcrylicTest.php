@@ -92,7 +92,7 @@ class AcrylicTest extends TestCase
     }
 
     /**
-     * @param  string $path
+     * @param  string  $path
      * @return string
      */
     protected function path(string $path = ''): string

@@ -8,7 +8,7 @@ use Symfony\Component\Process\Process;
 class DockerContainerInstance extends SpatieDockerContainerInstance
 {
     /**
-     * @param  string|array $command
+     * @param  string|array  $command
      * @return \Tests\Support\TestProcess
      */
     public function exec($command): TestProcess

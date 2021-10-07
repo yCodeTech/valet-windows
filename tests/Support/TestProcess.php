@@ -19,7 +19,7 @@ class TestProcess
     /**
      * Create a new test process instance.
      *
-     * @param  \Symfony\Component\Process\Process $process
+     * @param  \Symfony\Component\Process\Process  $process
      * @return void
      */
     public function __construct(Process $process)
@@ -42,7 +42,7 @@ class TestProcess
     /**
      * Validate and return the decoded output JSON.
      *
-     * @param  string|null $key
+     * @param  string|null  $key
      * @return mixed
      */
     public function json(string $key = null)
@@ -105,7 +105,7 @@ class TestProcess
     /**
      * Assert that the output contains the given string.
      *
-     * @param  string $needle
+     * @param  string  $needle
      * @return self
      */
     public function assertContains(string $needle): self
@@ -118,7 +118,7 @@ class TestProcess
     /**
      * Assert that the output does not contain the given string.
      *
-     * @param  string $needle
+     * @param  string  $needle
      * @return self
      */
     public function assertNotContains(string $needle)

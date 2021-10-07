@@ -77,7 +77,7 @@ class WinSWTest extends TestCase
     }
 
     /**
-     * @param  string $service
+     * @param  string  $service
      * @return \Valet\WinSW
      */
     protected function winsw(string $service): WinSW

@@ -42,8 +42,8 @@ class CommandLine
     /**
      * Run the given command as the non-root user.
      *
-     * @param  string   $command
-     * @param  callable $onError
+     * @param  string  $command
+     * @param  callable  $onError
      * @return ProcessOutput
      */
     public function run($command, callable $onError = null)
@@ -55,7 +55,7 @@ class CommandLine
      * Run the given command.
      *
      * @param  string  $command
-     * @param  callable $onError
+     * @param  callable  $onError
      * @return ProcessOutput
      */
     public function runAsUser($command, callable $onError = null)
@@ -67,7 +67,7 @@ class CommandLine
      * Run the given command with PowerShell.
      *
      * @param  string  $command
-     * @param  callable|null $onError
+     * @param  callable|null  $onError
      * @return ProcessOutput
      */
     public function powershell(string $command, callable $onError = null)
@@ -86,8 +86,8 @@ class CommandLine
     /**
      * Run the given command and exit if fails.
      *
-     * @param  string   $command
-     * @param  callable $onError (int $code, string $output)
+     * @param  string  $command
+     * @param  callable  $onError  (int $code, string $output)
      * @return ProcessOutput
      */
     public function runOrExit($command, callable $onError = null)
@@ -105,7 +105,7 @@ class CommandLine
      * Run the given command.
      *
      * @param  string  $command
-     * @param  callable $onError
+     * @param  callable  $onError
      * @return ProcessOutput
      */
     public function runCommand($command, callable $onError = null)

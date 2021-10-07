@@ -18,9 +18,9 @@ class Filesystem
     /**
      * Create a directory.
      *
-     * @param  string       $path
+     * @param  string  $path
      * @param  string|null  $owner
-     * @param  int          $mode
+     * @param  int  $mode
      * @return void
      */
     public function mkdir($path, $owner = null, $mode = 0755)
@@ -35,9 +35,9 @@ class Filesystem
     /**
      * Ensure that the given directory exists.
      *
-     * @param  string       $path
+     * @param  string  $path
      * @param  string|null  $owner
-     * @param  int          $mode
+     * @param  int  $mode
      * @return void
      */
     public function ensureDirExists($path, $owner = null, $mode = 0755)
@@ -51,7 +51,7 @@ class Filesystem
      * Create a directory as the non-root user.
      *
      * @param  string  $path
-     * @param  int     $mode
+     * @param  int  $mode
      * @return void
      */
     public function mkdirAsUser($path, $mode = 0755)
@@ -62,7 +62,7 @@ class Filesystem
     /**
      * Touch the given path.
      *
-     * @param  string       $path
+     * @param  string  $path
      * @param  string|null  $owner
      * @return string
      */
@@ -113,8 +113,8 @@ class Filesystem
     /**
      * Write to the given file.
      *
-     * @param  string       $path
-     * @param  string       $contents
+     * @param  string  $path
+     * @param  string  $contents
      * @param  string|null  $owner
      * @return void
      */
@@ -142,8 +142,8 @@ class Filesystem
     /**
      * Append the contents to the given file.
      *
-     * @param  string       $path
-     * @param  string       $contents
+     * @param  string  $path
+     * @param  string  $contents
      * @param  string|null  $owner
      * @return void
      */
@@ -335,8 +335,7 @@ class Filesystem
     /**
      * Determine if the given path is a broken symbolic link.
      *
-     * @param string $path
-     *
+     * @param  string  $path
      * @return bool
      */
     public function isBrokenLink($path)

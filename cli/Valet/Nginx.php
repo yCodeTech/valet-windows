@@ -32,12 +32,11 @@ class Nginx
     /**
      * Create a new Nginx instance.
      *
-     * @param CommandLine   $cli
-     * @param Filesystem    $files
-     * @param Configuration $configuration
-     * @param Site          $site
-     * @param WinSW         $winsw
-     *
+     * @param  CommandLine  $cli
+     * @param  Filesystem  $files
+     * @param  Configuration  $configuration
+     * @param  Site  $site
+     * @param  WinSW  $winsw
      * @return void
      */
     public function __construct(CommandLine $cli, Filesystem $files,
@@ -207,7 +206,7 @@ class Nginx
     /**
      * Get the Nginx path.
      *
-     * @param  string $path
+     * @param  string  $path
      * @return string
      */
     public function path(string $path = ''): string
