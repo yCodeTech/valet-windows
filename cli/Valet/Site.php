@@ -16,8 +16,8 @@ class Site
      * Create a new Site instance.
      *
      * @param  Configuration  $config
-     * @param  CommandLine    $cli
-     * @param  Filesystem     $files
+     * @param  CommandLine  $cli
+     * @param  Filesystem  $files
      * @return void
      */
     public function __construct(Configuration $config, CommandLine $cli, Filesystem $files)
@@ -30,7 +30,7 @@ class Site
     /**
      * Get the name of the site.
      *
-     * @param  string|null $name
+     * @param  string|null  $name
      * @return string
      */
     private function getRealSiteName($name)
@@ -196,8 +196,8 @@ class Site
     /**
      * Identify whether a site is for a proxy by reading the host name from its config file.
      *
-     * @param string $site Site name without TLD
-     * @param string $configContents Config file contents
+     * @param  string  $site  Site name without TLD
+     * @param  string  $configContents  Config file contents
      * @return string|null
      */
     public function getProxyHostForSite($site, $configContents = null)
@@ -228,7 +228,7 @@ class Site
     /**
      * Get all certificates from config folder.
      *
-     * @param string $path
+     * @param  string  $path
      * @return \Illuminate\Support\Collection
      */
     public function getCertificates($path = null)
@@ -258,8 +258,8 @@ class Site
     /**
      * @deprecated Use getSites instead which works for both normal and symlinked paths.
      *
-     * @param  string $path
-     * @param  \Illuminate\Support\Collection $certs
+     * @param  string  $path
+     * @param  \Illuminate\Support\Collection  $certs
      * @return \Illuminate\Support\Collection
      */
     public function getLinks($path, $certs)
@@ -271,8 +271,8 @@ class Site
      * Get list of sites and return them formatted
      * Will work for symlink and normal site paths.
      *
-     * @param  string $path
-     * @param  \Illuminate\Support\Collection $certs
+     * @param  string  $path
+     * @param  \Illuminate\Support\Collection  $certs
      * @return \Illuminate\Support\Collection
      */
     public function getSites($path, $certs)
@@ -369,9 +369,9 @@ class Site
     /**
      * Parse Nginx site config file contents to swap old domain to new.
      *
-     * @param  string $siteConf Nginx site config content
-     * @param  string $old  Old domain
-     * @param  string $new  New domain
+     * @param  string  $siteConf  Nginx site config content
+     * @param  string  $old  Old domain
+     * @param  string  $new  New domain
      * @return string
      */
     public function replaceOldDomainWithNew($siteConf, $old, $new)
@@ -431,7 +431,7 @@ class Site
     /**
      * Get the port of the given host.
      *
-     * @param  string $url
+     * @param  string  $url
      * @return int
      */
     public function port(string $url): int
@@ -448,7 +448,7 @@ class Site
     /**
      * Create and trust a certificate for the given URL.
      *
-     * @param  string $url
+     * @param  string  $url
      * @return void
      */
     public function createCertificate($url)
@@ -467,7 +467,7 @@ class Site
     /**
      * Create the private key for the TLS certificate.
      *
-     * @param  string $keyPath
+     * @param  string  $keyPath
      * @return void
      */
     public function createPrivateKey(string $keyPath)
@@ -481,9 +481,9 @@ class Site
     /**
      * Create the signing request for the TLS certificate.
      *
-     * @param  string $url
-     * @param  string $keyPath
-     * @param  string $csrPath
+     * @param  string  $url
+     * @param  string  $keyPath
+     * @param  string  $csrPath
      * @return void
      */
     public function createSigningRequest(string $url, string $keyPath, string $csrPath)
@@ -516,10 +516,9 @@ class Site
     /**
      * Create the signed TLS certificate.
      *
-     * @param string $keyPath
-     * @param string $csrPath
-     * @param string $crtPath
-     *
+     * @param  string  $keyPath
+     * @param  string  $csrPath
+     * @param  string  $crtPath
      * @return void
      */
     public function createSignedCertificate(string $keyPath, string $csrPath, string $crtPath)
@@ -549,7 +548,7 @@ class Site
     /**
      * Trust the given certificate file in the Windows Certmgr.
      *
-     * @param  string $crtPath
+     * @param  string  $crtPath
      * @return void
      */
     public function trustCertificate(string $crtPath)
@@ -584,7 +583,7 @@ class Site
     /**
      * Unsecure the given URL so that it will use HTTP again.
      *
-     * @param  string $url
+     * @param  string  $url
      * @return void
      */
     public function unsecure($url)
@@ -657,8 +656,8 @@ class Site
     /**
      * Build the Nginx proxy config for the specified domain.
      *
-     * @param  string  $url The domain name to serve
-     * @param  string  $host The URL to proxy to, eg: http://127.0.0.1:8080
+     * @param  string  $url  The domain name to serve
+     * @param  string  $host  The URL to proxy to, eg: http://127.0.0.1:8080
      * @return string
      */
     public function proxyCreate($url, $host)

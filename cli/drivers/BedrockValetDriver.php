@@ -62,7 +62,7 @@ class BedrockValetDriver extends BasicValetDriver
     /**
      * Redirect to uri with trailing slash.
      *
-     * @param  string $uri
+     * @param  string  $uri
      * @return string
      */
     private function forceTrailingSlash($uri)

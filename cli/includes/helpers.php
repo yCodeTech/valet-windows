@@ -26,7 +26,7 @@ define('VALET_LEGACY_HOME_PATH', $_SERVER['HOME'].'/.valet');
 /**
  * Output the given text to the console.
  *
- * @param  string $output
+ * @param  string  $output
  * @return void
  */
 function info($output)
@@ -166,7 +166,7 @@ if (! function_exists('tap')) {
     /**
      * Tap the given value.
      *
-     * @param  mixed     $value
+     * @param  mixed  $value
      * @param  callable  $callback
      * @return mixed
      */

@@ -33,7 +33,7 @@ class Ngrok
     }
 
     /**
-     * @param  string $command
+     * @param  string  $command
      * @return void
      */
     public function run(string $command)
@@ -45,8 +45,8 @@ class Ngrok
 
     /**
      * @param  string  $domain
-     * @param  int $port
-     * @param  array $options
+     * @param  int  $port
+     * @param  array  $options
      * @return void
      */
     public function start(string $domain, int $port, array $options = [])

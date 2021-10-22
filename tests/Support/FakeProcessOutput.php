@@ -18,7 +18,7 @@ class FakeProcessOutput extends ProcessOutput
     public $successfull = true;
 
     /**
-     * @param  string $output
+     * @param  string  $output
      * @return self
      */
     public static function successfull(string $output = ''): self
@@ -31,7 +31,7 @@ class FakeProcessOutput extends ProcessOutput
     }
 
     /**
-     * @param  string $output
+     * @param  string  $output
      * @return self
      */
     public static function unsuccessfull(string $output = ''): self
