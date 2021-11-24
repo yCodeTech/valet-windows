@@ -69,7 +69,7 @@ class WinSW
 
         $this->files->put(
             $this->configPath(),
-            str_replace(array_keys($args), array_values($args), $config)
+            str_replace(array_keys($args), array_values($args), $config ?: '')
         );
     }
 

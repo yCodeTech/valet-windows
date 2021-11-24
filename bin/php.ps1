@@ -10,7 +10,7 @@ if (Get-Command "php" -errorAction SilentlyContinue) {
     exit
 }
 
-if ('7.2','7.3','7.4','8.0' -notcontains $phpVersion) {
+if ('7.2','7.3','7.4','8.0','8.1' -notcontains $phpVersion) {
     throw "Invalid PHP version [$phpVersion]."
 }
 
@@ -85,9 +85,11 @@ $xdebugUrl = Find-XdebugRelease
 Download-File $xdebugUrl -Destination "$phpPath\ext\php_xdebug.dll"
 
 # Add PHP to path environment variable
-Write-Output "Adding PHP to path..."
-$env:Path += ";" + $phpPath
-[Environment]::SetEnvironmentVariable("Path", $env:Path, [EnvironmentVariableTarget]::Machine)
+if ($env:Path -notlike "*$phpPath*") {
+    Write-Output "Adding PHP to path..."
+    $env:Path += ";" + $phpPath
+    [Environment]::SetEnvironmentVariable("Path", $env:Path, [EnvironmentVariableTarget]::Machine)
+}
 
 # Done
 Write-Output "PHP installed successfully!`n"
