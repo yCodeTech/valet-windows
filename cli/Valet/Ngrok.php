@@ -118,6 +118,6 @@ Then use: valet ngrok authtoken my-token');
      */
     protected function hasAuthToken(): bool
     {
-        return file_exists('~/.ngrok2/ngrok.yml');
+        return file_exists($_SERVER['HOME'].'/.ngrok2/ngrok.yml');
     }
 }

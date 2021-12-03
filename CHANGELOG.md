@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.4.1 - 2021-12-03
+
+- Fixed `valet share`.
+
 ## 2.4.0 - 2021-11-24
 
 - Added support for PHP 8.1.
