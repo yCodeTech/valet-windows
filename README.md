@@ -22,11 +22,11 @@ Before installation, make sure that no other programs such as Apache or Nginx ar
 - If you don't have PHP installed, open PowerShell (3.0+) as Administrator and run: 
 
 ```bash
-# PHP 8.0
-Set-ExecutionPolicy RemoteSigned -Scope Process; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri "https://github.com/cretueusebiu/valet-windows/raw/master/bin/php.ps1" -OutFile $env:temp\php.ps1; .$env:temp\php.ps1 "8.0"
-
 # PHP 8.1
 Set-ExecutionPolicy RemoteSigned -Scope Process; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri "https://github.com/cretueusebiu/valet-windows/raw/master/bin/php.ps1" -OutFile $env:temp\php.ps1; .$env:temp\php.ps1 "8.1"
+
+# PHP 8.0
+Set-ExecutionPolicy RemoteSigned -Scope Process; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri "https://github.com/cretueusebiu/valet-windows/raw/master/bin/php.ps1" -OutFile $env:temp\php.ps1; .$env:temp\php.ps1 "8.0"
 
 # PHP 7.4
 Set-ExecutionPolicy RemoteSigned -Scope Process; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri "https://github.com/cretueusebiu/valet-windows/raw/master/bin/php.ps1" -OutFile $env:temp\php.ps1; .$env:temp\php.ps1 "7.4"
@@ -40,7 +40,7 @@ Set-ExecutionPolicy RemoteSigned -Scope Process; [System.Net.ServicePointManager
 
 - Run the `valet install` command. This will configure and install Valet and register Valet's daemon to launch when your system starts.
 
-- If you're installing on Windows 10, you may need to [manually configure](http://mayakron.altervista.org/wikibase/show.php?id=AcrylicWindows10Configuration) Windows to use the Acrylic DNS proxy.
+- If you're installing on Windows 10/11, you may need to [manually configure](https://mayakron.altervista.org/support/acrylic/Windows10Configuration.htm) Windows to use the Acrylic DNS proxy.
 
 Valet will automatically start its daemon each time your machine boots. There is no need to run `valet start` or `valet install` ever again once the initial Valet installation is complete.
 
