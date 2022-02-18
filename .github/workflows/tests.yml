@@ -24,14 +24,11 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           extensions: curl
+          tools: composer:v2
           coverage: none
 
       - name: Install dependencies
-        uses: nick-invision/retry@v1
-        with:
-          timeout_minutes: 2
-          max_attempts: 2
-          command: composer install --prefer-dist --no-interaction --no-progress --ignore-platform-reqs
+        run: composer install --prefer-dist --no-interaction --no-progress
 
       - name: Run unit tests
         run: composer test-unit
