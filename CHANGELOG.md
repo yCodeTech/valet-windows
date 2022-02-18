@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.5.0 - 2022-02-18
+
+- Update Acrylic DNS Proxy.
+- Update composer dependencies.
+
 ## 2.4.1 - 2021-12-03
 
 - Fixed `valet share`.
