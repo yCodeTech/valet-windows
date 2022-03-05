@@ -43,6 +43,78 @@ if (is_dir(VALET_HOME_PATH)) {
 }
 
 /**
+ * Add PHP
+ */
+$app->command('php:add [path]', function ($path) {
+    info("Adding {$path}...");
+
+    if($php = Configuration::addPhp($path)) {
+//        \PhpCgi::uninstall($php['version']);
+
+        \PhpCgi::install($php['version']);
+
+        info("PHP {$php['version']} from {$path} has been added. You can make it default by running `valet use` command");
+    }
+})->descriptions('Add PHP by specifying a path');
+
+/**
+ * Remove PHP
+ */
+$app->command('php:remove [path]', function ($path) {
+    info("Removing {$path}...");
+
+    if($php = Configuration::getPhp($path)) {
+        \PhpCgi::uninstall($php['version']);
+
+        \PhpCgiXdebug::uninstall($php['version']);
+    }
+
+    if(Configuration::removePhp($path)) {
+        info("PHP {$php['version']} from {$path} has been removed.");
+    }
+})->descriptions('Remove PHP by specifying a path');
+
+/**
+ */
+$app->command('php:install', function () {
+    info('Reinstalling services...');
+
+    PhpCgi::uninstall();
+
+    PhpCgi::install();
+});
+
+/**
+ */
+$app->command('php:uninstall', function () {
+    info('Uninstalling PHP services...');
+
+    PhpCgi::uninstall();
+
+    info('PHP services uninstalled. Run php:install to install again');
+});
+
+/**
+ */
+$app->command('xdebug:install', function () {
+    info('Reinstalling xDebug services...');
+
+    PhpCgiXdebug::uninstall();
+
+    PhpCgiXdebug::install();
+});
+
+/**
+ */
+$app->command('xdebug:uninstall', function () {
+    info('Uninstalling xDebug services...');
+
+    PhpCgiXdebug::uninstall();
+
+    info('xDebug services uninstalled. Run xdebug:install to install again');
+});
+
+/**
  * Install Valet and any required services.
  */
 $app->command('install', function () {
@@ -94,6 +166,8 @@ if (is_dir(VALET_HOME_PATH)) {
     $app->command('park [path]', function ($path = null) {
         Configuration::addPath($path ?: getcwd());
 
+//        Site::publishParkedNginxConf($path ?: getcwd());
+
         info(($path === null ? 'This' : "The [{$path}]")." directory has been added to Valet's paths.");
     })->descriptions('Register the current working (or specified) directory with Valet');
 
@@ -105,6 +179,16 @@ if (is_dir(VALET_HOME_PATH)) {
 
         table(['Site', 'SSL', 'URL', 'Path'], $parked->all());
     })->descriptions('Display all the current sites within parked paths');
+
+//    /**
+//     * Get all the current sites within paths parked with 'park {path}'.
+//     */
+//    $app->command('nginx:publish', function ($type) {
+//        if($type === 'nginx') {
+//            Site::publishNginxConf();
+//        }
+//
+//    })->descriptions('Publish ');
 
     /**
      * Remove the current working directory from the paths configuration.

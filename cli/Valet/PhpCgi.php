@@ -24,6 +24,15 @@ class PhpCgi
     protected $winsw;
 
     /**
+     * @var WinSwFactory
+     */
+    protected $winswFactory;
+
+    /**
+     */
+    protected $phpWinSws;
+
+    /**
      * @var Configuration
      */
     protected $configuration;
@@ -37,12 +46,26 @@ class PhpCgi
      * @param  Configuration  $configuration
      * @return void
      */
-    public function __construct(CommandLine $cli, Filesystem $files, WinSwFactory $winsw, Configuration $configuration)
+    public function __construct(CommandLine $cli, Filesystem $files, WinSwFactory $winswFactory, Configuration $configuration)
     {
         $this->cli = $cli;
         $this->files = $files;
-        $this->winsw = $winsw->make('phpcgiservice');
+        $this->winswFactory = $winswFactory;
         $this->configuration = $configuration;
+
+        $phps = $this->configuration->get('php', []);
+
+        foreach ($phps as $php) {
+            $phpServiceName = "php{$php['version']}cgiservice";
+            $phpXdebugServiceName = "php{$php['version']}cgixdebugservice";
+
+            $this->phpWinSws[$php['version']] = [
+                'phpServiceName' => $phpServiceName,
+                'phpCgiName' => "valet_php{$php['version']}cgi-{$php['port']}",
+                'php' => $php,
+                'winsw' => $this->winswFactory->make($phpServiceName),
+            ];
+        }
     }
 
     /**
@@ -50,11 +73,22 @@ class PhpCgi
      *
      * @return void
      */
-    public function install()
+    public function install($phpVersion = null)
     {
-        info('Installing PHP-CGI service...');
+        $phps = $this->configuration->get('php', []);
 
-        $this->installService();
+        if($phpVersion) {
+            if(! isset($this->phpWinSws[$phpVersion])) {
+                warning("PHP service for version {$phpVersion} not found");
+            }
+
+            $this->installService($phpVersion);
+            return;
+        }
+
+        foreach ($phps as $php) {
+            $this->installService($php['version']);
+        }
     }
 
     /**
@@ -62,18 +96,31 @@ class PhpCgi
      *
      * @return void
      */
-    public function installService()
+    public function installService($phpVersion, $phpCgiServiceConfig = null, $installConfig = null)
     {
-        if ($this->winsw->installed()) {
-            $this->winsw->uninstall();
+        $phpWinSw = $this->phpWinSws[$phpVersion];
+
+        if ($phpWinSw['winsw']->installed()) {
+            $phpWinSw['winsw']->uninstall();
         }
 
-        $this->winsw->install([
-            'PHP_PATH' => $this->findPhpPath(),
-            'PHP_PORT' => $this->configuration->get('php_port', PhpCgi::PORT),
+        // copy default phpcgiservice stub to create a new one
+        $phpCgiServiceConfigArgs['PHPCGINAME'] = $phpWinSw['phpCgiName'];
+        $phpCgiServiceConfig = $phpCgiServiceConfig ?? file_get_contents(__DIR__."/../stubs/phpcgiservice.xml");
+
+        $this->files->put(
+            (__DIR__."/../stubs/{$phpWinSw['phpServiceName']}.xml"),
+            str_replace(array_keys($phpCgiServiceConfigArgs), array_values($phpCgiServiceConfigArgs), $phpCgiServiceConfig ?: '')
+        );
+
+        info("Installing PHP-CGI [{$phpWinSw['phpCgiName']}] service...");
+
+        $phpWinSw['winsw']->install($installConfig ?? [
+            'PHP_PATH' => $phpWinSw['php']['path'],
+            'PHP_PORT' => $phpWinSw['php']['port'],
         ]);
 
-        $this->winsw->restart();
+        $phpWinSw['winsw']->restart();
     }
 
     /**
@@ -81,9 +128,35 @@ class PhpCgi
      *
      * @return void
      */
-    public function uninstall()
+    public function uninstall($phpVersion = null)
     {
-        $this->winsw->uninstall();
+        if($phpVersion) {
+            if(! isset($this->phpWinSws[$phpVersion])) {
+                warning("PHP service for version [{$phpVersion}] not found");
+            }
+            $this->uninstallService($phpVersion);
+            return;
+        }
+
+        $phps = $this->configuration->get('php', []);
+
+        foreach ($phps as $php) {
+            $this->uninstallService($php['version']);
+        }
+    }
+
+    /**
+     * Install the Windows service.
+     *
+     * @return void
+     */
+    public function uninstallService($phpVersion)
+    {
+        $phpWinSw = $this->phpWinSws[$phpVersion];
+
+        info("Uninstalling PHP-CGI [{$phpWinSw['phpCgiName']}] service...");
+
+        $phpWinSw['winsw']->uninstall();
     }
 
     /**
@@ -93,7 +166,9 @@ class PhpCgi
      */
     public function restart()
     {
-        $this->winsw->restart();
+        foreach ($this->phpWinSws as $phpWinSw) {
+            $phpWinSw['winsw']->restart();
+        }
     }
 
     /**
@@ -103,7 +178,9 @@ class PhpCgi
      */
     public function stop()
     {
-        $this->winsw->stop();
+        foreach ($this->phpWinSws as $phpWinSw) {
+            $phpWinSw['winsw']->stop();
+        }
     }
 
     /**
@@ -111,7 +188,7 @@ class PhpCgi
      *
      * @return string
      */
-    protected function findPhpPath(): string
+    public function findDefaultPhpPath(): string
     {
         if (! $php = (new PhpExecutableFinder)->find()) {
             $php = $this->cli->runOrExit('where php', function () {
@@ -120,5 +197,47 @@ class PhpCgi
         }
 
         return pathinfo(explode("\n", $php)[0], PATHINFO_DIRNAME);
+    }
+
+    /**
+     * Find the PHP path.
+     *
+     * @return mixed
+     */
+    public function findPhpVersion($phpPath)
+    {
+        $phpExecPath = "{$phpPath}\php.exe";
+        if(! file_exists($phpExecPath)) {
+            error("Failed to find the PHP executable in {$phpPath}");
+            return null;
+        }
+
+        $phpVersion = $this->cli->runOrExit("{$phpExecPath} -r \"echo PHP_VERSION;\"", function ($code, $output) use($phpPath) {
+            error("Failed to find the PHP version for {$phpPath}");
+        });
+
+        return $phpVersion->getOutput();
+    }
+
+    /**
+     * @deprecated
+     *
+     * Find the PHP paths.
+     *
+     * @return array
+     */
+    protected function findPhpPaths()
+    {
+        $directories = glob('C:\*' , GLOB_ONLYDIR);
+        $phpDirs = [];
+        foreach ($directories as $dir) {
+            if(substr( $dir, 0, 7 ) === "C:\php-") {
+                $phpDirs[] = $dir;
+            }
+
+            // TODO check if it's actually a php directory
+        }
+
+        return $phpDirs;
     }
 }

@@ -398,6 +398,18 @@ class Site
      *
      * @return array
      */
+    public function publishParkedNginxConf($parkedPath)
+    {
+        $parked = $this->parked();
+
+        // TODO
+    }
+
+    /**
+     * Get all of the URLs that are currently secured.
+     *
+     * @return array
+     */
     public function secured()
     {
         return collect($this->files->scandir($this->certificatesPath()))
@@ -556,6 +568,26 @@ class Site
         $this->cli->runOrExit(sprintf('cmd "/C certutil -addstore "Root" "%s""', $crtPath), function ($code, $output) {
             error("Failed to trust certificate: $output");
         });
+    }
+
+    /**
+     * Build the unsecured Nginx server for the given URL.
+     *
+     * @param  string  $url
+     * @param  string  $siteConf  (optional) Nginx site config file content
+     * @return string
+     */
+    public function buildUnsecureNginxServer($url, $siteConf = null)
+    {
+        if ($siteConf === null) {
+            $siteConf = $this->files->get(__DIR__.'/../stubs/unsecure.valet.conf');
+        }
+
+        return str_replace(
+            ['VALET_HOME_PATH', 'VALET_SERVER_PATH', 'VALET_STATIC_PREFIX', 'VALET_SITE', 'HOME_PATH'],
+            [$this->valetHomePath(), VALET_SERVER_PATH, VALET_STATIC_PREFIX, $url, $_SERVER['HOME']],
+            $siteConf
+        );
     }
 
     /**
