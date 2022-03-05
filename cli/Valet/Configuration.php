@@ -200,7 +200,7 @@ class Configuration
     }
 
     /**
-     * Get the given php path configuration.
+     * Get the php configuration by path
      *
      * @param  string  $phpPath
      * @return mixed
@@ -213,6 +213,23 @@ class Configuration
 
         return collect($config['php'])->filter(function($item) use($phpPath) {
             return $phpPath === $item['path'];
+        })->first();
+    }
+
+    /**
+     * Get the php configuration by version
+     *
+     * @param  string  $phpVersion
+     * @return mixed
+     */
+    public function getPhpByVersion($phpVersion)
+    {
+        $phpVersion = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $phpVersion);
+
+        $config = $this->read();
+
+        return collect($config['php'])->filter(function($item) use($phpVersion) {
+            return $phpVersion === $item['version'];
         })->first();
     }
 

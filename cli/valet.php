@@ -53,6 +53,8 @@ $app->command('php:add [path]', function ($path) {
 
         \PhpCgi::install($php['version']);
 
+        \PhpCgiXdebug::install($php['version']);
+
         info("PHP {$php['version']} from {$path} has been added. You can make it default by running `valet use` command");
     }
 })->descriptions('Add PHP by specifying a path');
@@ -63,7 +65,16 @@ $app->command('php:add [path]', function ($path) {
 $app->command('php:remove [path]', function ($path) {
     info("Removing {$path}...");
 
-    if($php = Configuration::getPhp($path)) {
+    $config = Configuration::read();
+    $defaultPhp = $config['default_php'];
+    $php = Configuration::getPhp($path);
+
+    if($php['version'] === $defaultPhp) {
+        warning("Default PHP {$php['version']} cannot be removed. Change default PHP version by running [valet use VERSION]");
+        return;
+    }
+
+    if($php) {
         \PhpCgi::uninstall($php['version']);
 
         \PhpCgiXdebug::uninstall($php['version']);
@@ -96,6 +107,24 @@ $app->command('php:uninstall', function () {
 
 /**
  */
+$app->command('php:list', function () {
+    info('Listing PHP services...');
+
+    $config = Configuration::read();
+    $defaultPhpVersion = $config['default_php'];
+
+    $php = $config['php'] ?? [];
+
+    $php = collect($php)->map(function ($item) use($defaultPhpVersion) {
+        $item['default'] = $defaultPhpVersion === $item['version'] ? 'X' : '';
+        return $item;
+    })->toArray();
+
+    table(['Version', 'Path', 'Port', 'xDebug Port', 'Default'], $php);
+});
+
+/**
+ */
 $app->command('xdebug:install', function () {
     info('Reinstalling xDebug services...');
 
@@ -112,6 +141,13 @@ $app->command('xdebug:uninstall', function () {
     PhpCgiXdebug::uninstall();
 
     info('xDebug services uninstalled. Run xdebug:install to install again');
+});
+
+/**
+ */
+$app->command('site:php [site] [phpversion]', function () {
+    info('Uninstalling xDebug services...');
+
 });
 
 /**
@@ -528,9 +564,55 @@ if (is_dir(VALET_HOME_PATH)) {
     /**
      * Allow the user to change the version of php valet uses.
      */
-    $app->command('use [phpVersion] [--force]', function ($phpVersion, $force) {
-        warning('This command is not available for Windows.');
-    })->descriptions('This command is not available for Windows.');
+    $app->command('use [phpNeedle] [--force]', function ($phpNeedle, $force) {
+        $php = Configuration::getPhp($phpNeedle);
+
+        if(empty($php)) {
+            $php = Configuration::getPhpByVersion($phpNeedle);
+        }
+
+        if(empty($php)) {
+            warning("Cannot find PHP [$phpNeedle] in the list. Example command [valet use 7.3]");
+        }
+
+        info("Setting the default PHP version to [$phpNeedle].");
+
+        if($php) {
+            Configuration::updateKey('default_php', $php['version']);
+        }
+
+//        if (! $phpVersion) {
+//            $path = getcwd().'/.valetphprc';
+//
+//
+//            $linkedVersion = Brew::linkedPhp();
+//            if (! file_exists($path)) {
+//                return info(sprintf('Valet is using %s.', $linkedVersion));
+//            }
+//
+//            $phpVersion = trim(file_get_contents($path));
+//            info('Found \''.$path.'\' specifying version: '.$phpVersion);
+//
+//            if ($linkedVersion == $phpVersion) {
+//                return info(sprintf('Valet is already using %s.', $linkedVersion));
+//            }
+//        }
+
+
+        info("Stopping Nginx...");
+        Nginx::stop();
+
+        Nginx::installConfiguration();
+
+        Nginx::restart();
+
+        info(sprintf('Valet is now using %s.', $php['version']).PHP_EOL);
+        info('Note that you might need to run <comment>composer global update</comment> if your PHP version change affects the dependencies of global packages required by Composer.');
+
+
+    })->descriptions('Change the version of PHP used by valet', [
+        'phpNeedle' => 'The PHP version you want to use, e.g 7.3',
+    ]);
 
     /**
      * Tail log file.
