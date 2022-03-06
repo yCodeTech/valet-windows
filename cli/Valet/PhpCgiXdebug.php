@@ -7,16 +7,6 @@ class PhpCgiXdebug extends PhpCgi
     const PORT = 9100;
 
     /**
-     * @var WinSW
-     */
-    protected $winsw;
-
-    /**
-     * @var WinSwFactory
-     */
-    protected $winswFactory;
-
-    /**
      * @inheritDoc
      */
     public function __construct(CommandLine $cli, Filesystem $files, WinSwFactory $winswFactory, Configuration $configuration)
@@ -47,6 +37,7 @@ class PhpCgiXdebug extends PhpCgi
             }
 
             $this->installService($phpVersion);
+
             return;
         }
 

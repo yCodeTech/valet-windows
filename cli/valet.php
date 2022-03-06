@@ -49,7 +49,6 @@ $app->command('php:add [path]', function ($path) {
     info("Adding {$path}...");
 
     if ($php = Configuration::addPhp($path)) {
-
         \PhpCgi::install($php['version']);
 
         \PhpCgiXdebug::install($php['version']);
@@ -70,6 +69,7 @@ $app->command('php:remove [path]', function ($path) {
 
     if ($php['version'] === $defaultPhp) {
         warning("Default PHP {$php['version']} cannot be removed. Change default PHP version by running [valet use VERSION]");
+
         return;
     }
 
@@ -119,6 +119,7 @@ $app->command('php:list', function () {
 
     $php = collect($php)->map(function ($item) use ($defaultPhpVersion) {
         $item['default'] = $defaultPhpVersion === $item['version'] ? 'X' : '';
+
         return $item;
     })->toArray();
 

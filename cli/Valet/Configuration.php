@@ -211,7 +211,7 @@ class Configuration
 
         $config = $this->read();
 
-        return collect($config['php'])->filter(function($item) use ($phpPath) {
+        return collect($config['php'])->filter(function ($item) use ($phpPath) {
             return $phpPath === $item['path'];
         })->first();
     }
@@ -228,7 +228,7 @@ class Configuration
 
         $config = $this->read();
 
-        return collect($config['php'])->filter(function($item) use ($phpVersion) {
+        return collect($config['php'])->filter(function ($item) use ($phpVersion) {
             return $phpVersion === $item['version'];
         })->first();
     }
@@ -257,11 +257,13 @@ class Configuration
         // forcing user to run uninstall to stop services and remove entry
         if (in_array($phpPath, $existingPaths)) {
             warning("PHP path {$phpPath} already added to valet");
+
             return null;
         }
 
         if (isset($config['php'][$phpVersion])) {
             warning("PHP version {$phpVersion} already added to valet from this path {$phpPath}");
+
             return null;
         }
 
@@ -302,10 +304,11 @@ class Configuration
 
         if (! in_array($phpPath, $existingPaths)) {
             warning("PHP path {$phpPath} not found in valet");
+
             return null;
         }
 
-        $php = collect($config['php'])->filter(function($item) use ($phpPath) {
+        $php = collect($config['php'])->filter(function ($item) use ($phpPath) {
             return $phpPath === $item['path'];
         })->first();
 

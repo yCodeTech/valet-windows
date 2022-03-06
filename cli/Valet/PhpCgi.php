@@ -28,7 +28,7 @@ class PhpCgi
      */
     protected $winswFactory;
 
-    /**
+    /**@var array
      */
     protected $phpWinSws;
 
