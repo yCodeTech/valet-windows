@@ -41,8 +41,8 @@ class PhpCgiXdebug extends PhpCgi
     {
         $phps = $this->configuration->get('php', []);
 
-        if($phpVersion) {
-            if(! isset($this->phpWinSws[$phpVersion])) {
+        if ($phpVersion) {
+            if (! isset($this->phpWinSws[$phpVersion])) {
                 warning("PHP xDebug service for version {$phpVersion} not found");
             }
 
@@ -64,7 +64,7 @@ class PhpCgiXdebug extends PhpCgi
     {
         $phpWinSw = $this->phpWinSws[$phpVersion];
 
-        $phpCgiServiceConfig = $phpCgiServiceConfig ?? file_get_contents(__DIR__."/../stubs/phpcgixdebugservice.xml");
+        $phpCgiServiceConfig = $phpCgiServiceConfig ?? file_get_contents(__DIR__.'/../stubs/phpcgixdebugservice.xml');
         $installConfig = $installConfig ?? [
             'PHP_PATH' => $phpWinSw['php']['path'],
             'PHP_XDEBUG_PORT' => $phpWinSw['php']['xdebug_port'],

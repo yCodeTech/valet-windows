@@ -106,7 +106,7 @@ class PhpCgi
 
         // copy default phpcgiservice stub to create a new one
         $phpCgiServiceConfigArgs['PHPCGINAME'] = $phpWinSw['phpCgiName'];
-        $phpCgiServiceConfig = $phpCgiServiceConfig ?? file_get_contents(__DIR__."/../stubs/phpcgiservice.xml");
+        $phpCgiServiceConfig = $phpCgiServiceConfig ?? file_get_contents(__DIR__.'/../stubs/phpcgiservice.xml');
 
         $this->files->put(
             (__DIR__."/../stubs/{$phpWinSw['phpServiceName']}.xml"),
@@ -130,8 +130,8 @@ class PhpCgi
      */
     public function uninstall($phpVersion = null)
     {
-        if($phpVersion) {
-            if(! isset($this->phpWinSws[$phpVersion])) {
+        if ($phpVersion) {
+            if (! isset($this->phpWinSws[$phpVersion])) {
                 warning("PHP service for version [{$phpVersion}] not found");
             }
             $this->uninstallService($phpVersion);
@@ -207,37 +207,15 @@ class PhpCgi
     public function findPhpVersion($phpPath)
     {
         $phpExecPath = "{$phpPath}\php.exe";
-        if(! file_exists($phpExecPath)) {
+        if (! file_exists($phpExecPath)) {
             error("Failed to find the PHP executable in {$phpPath}");
             return null;
         }
 
-        $phpVersion = $this->cli->runOrExit("{$phpExecPath} -r \"echo PHP_VERSION;\"", function ($code, $output) use($phpPath) {
+        $phpVersion = $this->cli->runOrExit("{$phpExecPath} -r \"echo PHP_VERSION;\"", function ($code, $output) use ($phpPath) {
             error("Failed to find the PHP version for {$phpPath}");
         });
 
         return $phpVersion->getOutput();
-    }
-
-    /**
-     * @deprecated
-     *
-     * Find the PHP paths.
-     *
-     * @return array
-     */
-    protected function findPhpPaths()
-    {
-        $directories = glob('C:\*' , GLOB_ONLYDIR);
-        $phpDirs = [];
-        foreach ($directories as $dir) {
-            if(substr( $dir, 0, 7 ) === "C:\php-") {
-                $phpDirs[] = $dir;
-            }
-
-            // TODO check if it's actually a php directory
-        }
-
-        return $phpDirs;
     }
 }
