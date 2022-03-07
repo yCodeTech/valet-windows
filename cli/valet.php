@@ -561,11 +561,12 @@ if (is_dir(VALET_HOME_PATH)) {
 
     /**
      * Allow the user to change the version of php valet uses.
+     *
      *  @param string $phpVersion can be 'default' or PHP version eg. 8.1.12
      */
     $app->command('use [phpVersion] [--site=]', function ($phpVersion, $site) {
         if (empty($phpVersion)) {
-            warning("Please enter a PHP version. Example command [valet use 7.3]");
+            warning('Please enter a PHP version. Example command [valet use 7.3]');
             return;
         }
 

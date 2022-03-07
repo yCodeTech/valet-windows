@@ -727,7 +727,6 @@ class Site
         }
     }
 
-
     /**
      * Build the TLS secured Nginx server for the given URL.
      *
