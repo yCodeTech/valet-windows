@@ -567,6 +567,7 @@ if (is_dir(VALET_HOME_PATH)) {
     $app->command('use [phpVersion] [--site=]', function ($phpVersion, $site) {
         if (empty($phpVersion)) {
             warning('Please enter a PHP version. Example command [valet use 7.3]');
+
             return;
         }
 
