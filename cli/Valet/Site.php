@@ -438,10 +438,10 @@ class Site
 
         $this->installSiteConfig($site, $php['version']);
 
-//        \Nginx::restart();
+        info('Restarting Nginx...');
+        \Nginx::stop();
+        \Nginx::restart();
         info("The site [$site] is now using $phpVersion.");
-
-        return;
     }
 
     /**
@@ -486,7 +486,7 @@ class Site
             if (starts_with($siteConf, '# Valet isolated PHP version')) {
                 $firstLine = explode(PHP_EOL, $siteConf)[0];
 
-                return trim(str_replace("# Valet isolated PHP version : ", '', $firstLine));
+                return trim(str_replace('# Valet isolated PHP version : ', '', $firstLine));
             }
         }
     }
@@ -525,7 +525,7 @@ class Site
 
         $siteConf = $this->buildSecureNginxServer($url, $siteConf);
 
-        // If the user had isolated the PHP version for this site, swap out .sock file
+        // If the user had isolated the PHP version for this site, swap out the PHP version
         if ($phpVersion) {
             $php = $this->config->getPhpByVersion($phpVersion);
             $siteConf = $this->replacePhpVersionInSiteConf($siteConf, $php['port'], $phpVersion);
@@ -681,6 +681,7 @@ class Site
 
         if (empty($php)) {
             warning("Cannot find PHP [$phpVersion] in the list.");
+
             return;
         }
 
@@ -720,7 +721,7 @@ class Site
         if ($this->files->exists($this->certificatesPath($valetSite, 'crt'))) {
             $this->files->putAsUser($this->nginxPath($valetSite), $siteConf);
         } else {
-            if($existingSiteConf) {
+            if ($existingSiteConf) {
                 $this->files->putAsUser($this->nginxPath($valetSite), $siteConf);
             }
         }
@@ -766,7 +767,7 @@ class Site
         // Remove `Valet isolated PHP version` line from config
         $siteConf = preg_replace('/# Valet isolated PHP version.*\n/', '', $siteConf);
 
-        if($phpVersion) {
+        if ($phpVersion) {
             $siteConf = '# Valet isolated PHP version : '.$phpVersion.PHP_EOL.$siteConf;
         }
 

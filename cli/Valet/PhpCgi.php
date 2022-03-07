@@ -83,6 +83,7 @@ class PhpCgi
             }
 
             $this->installService($phpVersion);
+
             return;
         }
 
@@ -135,6 +136,7 @@ class PhpCgi
                 warning("PHP service for version [{$phpVersion}] not found");
             }
             $this->uninstallService($phpVersion);
+
             return;
         }
 
@@ -209,6 +211,7 @@ class PhpCgi
         $phpExecPath = "{$phpPath}\php.exe";
         if (! file_exists($phpExecPath)) {
             error("Failed to find the PHP executable in {$phpPath}");
+
             return null;
         }
 

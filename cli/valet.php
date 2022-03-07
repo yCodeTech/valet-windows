@@ -564,21 +564,14 @@ if (is_dir(VALET_HOME_PATH)) {
      *  @param string $phpVersion can be 'default' or PHP version eg. 8.1.12
      */
     $app->command('use [phpVersion] [--site=]', function ($phpVersion, $site) {
-        if(empty($phpVersion)) {
+        if (empty($phpVersion)) {
             warning("Please enter a PHP version. Example command [valet use 7.3]");
             return;
         }
 
-        if($site) {
+        if ($site) {
             Site::usePhp($phpVersion, $site);
 
-            info('Stopping Nginx...');
-            Nginx::stop();
-//            Nginx::installConfiguration();
-//            Nginx::installServer();
-//            Nginx::installNginxDirectory();
-//            Nginx::installService();
-            Nginx::restart();
             return;
         }
 
@@ -605,7 +598,7 @@ if (is_dir(VALET_HOME_PATH)) {
         info('Note that you might need to run <comment>composer global update</comment> if your PHP version change affects the dependencies of global packages required by Composer.');
     })->descriptions('Change the version of PHP used by valet', [
         'phpVersion' => 'The PHP version you want to use, e.g 7.3',
-//        '--site' => 'Isolate PHP version of a specific valet site. e.g: --site=site.test',
+        '--site' => 'Isolate PHP version of a specific valet site. e.g: --site=site.test',
     ]);
 
     /**

@@ -314,6 +314,7 @@ class Configuration
 
         if ($php['version'] === $config['default_php']) {
             error("Default PHP {$php['version']} cannot be removed");
+
             return null;
         }
 
