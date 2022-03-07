@@ -91,13 +91,16 @@ class Nginx
      */
     public function installServer()
     {
+        $defaultPhpVersion = $this->configuration->get('default_php');
+        $defaultPhp = $this->configuration->getPhpByVersion($defaultPhpVersion);
+
         $this->files->ensureDirExists($this->path('valet'));
 
         $this->files->putAsUser(
             $this->path('valet/valet.conf'),
             str_replace(
-                ['VALET_HOME_PATH', 'VALET_SERVER_PATH', 'VALET_STATIC_PREFIX', 'HOME_PATH'],
-                [VALET_HOME_PATH, VALET_SERVER_PATH, VALET_STATIC_PREFIX, $_SERVER['HOME']],
+                ['VALET_HOME_PATH', 'VALET_SERVER_PATH', 'VALET_STATIC_PREFIX', 'HOME_PATH', 'VALET_PHP_PORT'],
+                [VALET_HOME_PATH, VALET_SERVER_PATH, VALET_STATIC_PREFIX, $_SERVER['HOME'], $defaultPhp['port']],
                 $this->files->get(__DIR__.'/../stubs/valet.conf')
             )
         );

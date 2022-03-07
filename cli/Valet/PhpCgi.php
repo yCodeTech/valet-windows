@@ -77,8 +77,8 @@ class PhpCgi
     {
         $phps = $this->configuration->get('php', []);
 
-        if($phpVersion) {
-            if(! isset($this->phpWinSws[$phpVersion])) {
+        if ($phpVersion) {
+            if (! isset($this->phpWinSws[$phpVersion])) {
                 warning("PHP service for version {$phpVersion} not found");
             }
 

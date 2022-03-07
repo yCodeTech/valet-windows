@@ -561,35 +561,51 @@ if (is_dir(VALET_HOME_PATH)) {
 
     /**
      * Allow the user to change the version of php valet uses.
+     *  @param string $phpVersion can be 'default' or PHP version eg. 8.1.12
      */
-    $app->command('use [phpNeedle] [--force]', function ($phpNeedle, $force) {
-        $php = Configuration::getPhp($phpNeedle);
+    $app->command('use [phpVersion] [--site=]', function ($phpVersion, $site) {
+        if(empty($phpVersion)) {
+            warning("Please enter a PHP version. Example command [valet use 7.3]");
+            return;
+        }
+
+        if($site) {
+            Site::usePhp($phpVersion, $site);
+
+            info('Stopping Nginx...');
+            Nginx::stop();
+//            Nginx::installConfiguration();
+//            Nginx::installServer();
+//            Nginx::installNginxDirectory();
+//            Nginx::installService();
+            Nginx::restart();
+            return;
+        }
+
+        $php = Configuration::getPhpByVersion($phpVersion);
 
         if (empty($php)) {
-            $php = Configuration::getPhpByVersion($phpNeedle);
+            warning("Cannot find PHP [$phpVersion] in the list. Example command [valet use 7.3]");
         }
 
-        if (empty($php)) {
-            warning("Cannot find PHP [$phpNeedle] in the list. Example command [valet use 7.3]");
-        }
+        info("Setting the default PHP version to [$phpVersion].");
 
-        info("Setting the default PHP version to [$phpNeedle].");
-
-        if ($php) {
-            Configuration::updateKey('default_php', $php['version']);
-        }
+        Configuration::updateKey('default_php', $php['version']);
 
         info('Stopping Nginx...');
         Nginx::stop();
 
         Nginx::installConfiguration();
-
+        Nginx::installServer();
+        Nginx::installNginxDirectory();
+        Nginx::installService();
         Nginx::restart();
 
         info(sprintf('Valet is now using %s.', $php['version']).PHP_EOL);
         info('Note that you might need to run <comment>composer global update</comment> if your PHP version change affects the dependencies of global packages required by Composer.');
     })->descriptions('Change the version of PHP used by valet', [
-        'phpNeedle' => 'The PHP version you want to use, e.g 7.3',
+        'phpVersion' => 'The PHP version you want to use, e.g 7.3',
+//        '--site' => 'Isolate PHP version of a specific valet site. e.g: --site=site.test',
     ]);
 
     /**
