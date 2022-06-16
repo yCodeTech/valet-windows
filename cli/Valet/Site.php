@@ -296,10 +296,12 @@ class Site
         })->map(function ($path, $site) use ($certs, $config) {
             $secured = $certs->has($site);
             $url = ($secured ? 'https' : 'http').'://'.$site.'.'.$config['tld'];
+            $phpVersion = $this->customPhpVersion($site.'.'.$config['tld']);
 
             return [
                 'site' => $site,
                 'secured' => $secured ? ' X' : '',
+                'php' => $phpVersion,
                 'url' => $url,
                 'path' => $path,
             ];
