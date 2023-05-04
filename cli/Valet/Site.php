@@ -297,11 +297,12 @@ class Site
             $secured = $certs->has($site);
             $url = ($secured ? 'https' : 'http').'://'.$site.'.'.$config['tld'];
             $phpVersion = $this->customPhpVersion($site.'.'.$config['tld']);
+			$defaultVersion = $this->config->get('default_php');
 
             return [
                 'site' => $site,
                 'secured' => $secured ? ' X' : '',
-                'php' => $phpVersion,
+                'php' => $phpVersion ? "$phpVersion <info>(isolated)</info>" : "$defaultVersion (default)",
                 'url' => $url,
                 'path' => $path,
             ];
