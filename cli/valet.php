@@ -211,7 +211,7 @@ if (is_dir(VALET_HOME_PATH)) {
     $app->command('parked', function () {
         $parked = Site::parked();
 
-        table(['Site', 'SSL', 'URL', 'Path'], $parked->all());
+        table(['Site', 'SSL', 'PHP', 'URL', 'Path'], $parked->all());
     })->descriptions('Display all the current sites within parked paths');
 
 //    /**
@@ -252,7 +252,7 @@ if (is_dir(VALET_HOME_PATH)) {
     $app->command('links', function () {
         $links = Site::links();
 
-        table(['Site', 'SSL', 'Php', 'URL', 'Path'], $links->all());
+        table(['Site', 'SSL', 'PHP', 'URL', 'Path'], $links->all());
     })->descriptions('Display all of the registered Valet links');
 
     /**
