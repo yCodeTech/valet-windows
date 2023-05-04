@@ -302,7 +302,7 @@ class Site
             return [
                 'site' => $site,
                 'secured' => $secured ? ' X' : '',
-                'php' => $phpVersion ? "$phpVersion <info>(isolated)</info>" : "$defaultVersion (default)",
+                'php' => $phpVersion ? "<info>$phpVersion (isolated)</info>" : "$defaultVersion (default)",
                 'url' => $url,
                 'path' => $path,
             ];
