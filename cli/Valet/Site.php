@@ -271,7 +271,7 @@ class Site
 	/**
 	 * Determines which PHP version the current working directory is using.
 	 *
-	 * @param  string  $cwd
+	 * @param  string  $cwd The current working directory (cwd)
 	 * @return Array [ "site" => [sitename], "php" => [PHP version] ]
 	 */
 	public function whichPhp($cwd)
@@ -324,7 +324,7 @@ class Site
 	 * Will work for symlink and normal site paths.
 	 *
 	 * @param  string  $path
-	 * @param  \Illuminate\Support\Collection  $certs
+	 * @param  \Illuminate\Support\Collection $certs
 	 * @return \Illuminate\Support\Collection
 	 */
 	public function getSites($path, $certs)
@@ -339,7 +339,6 @@ class Site
 
 		$parked = $this->createSiteObject($path);
 
-
 		return $parked->map(function ($path, $site) use ($certs, $config, $links) {
 
 			$alias = ""; // Default variable string.
@@ -347,18 +346,60 @@ class Site
 			$url = ($secured ? 'https' : 'http') . '://' . $site . '.' . $config['tld'];
 			$aliasUrl = ""; // Default variable string.
 
+			// Get the PHP version.
+			$phpVersion = $this->getPhpVersion($site);
 
-			$phpVersion = $this->customPhpVersion($site . '.' . $config['tld']);
-			$defaultVersion = $this->config->get('default_php');
+			// If the path equals the linked site path...
+			if ($path === $links->get("path")) {
+				// Set the alias to the linked site custom name.
+				$alias = $links->get("site");
+				// Set the alias url.
+				$aliasUrl = ($secured ? 'https' : 'http') . '://' . $links->get("site") . '.' . $config['tld'];
+				$phpVersion = $this->getPhpVersion($links["site"], true);
+			}
 
 			return [
 				'site' => $site,
+				'alias' => $alias,
 				'secured' => $secured ? ' X' : '',
-				'php' => $phpVersion ? "<info>$phpVersion (isolated)</info>" : "$defaultVersion (default)",
+				'php' => $phpVersion,
 				'url' => $url,
-				'path' => $path,
+				'aliasUrl' => $aliasUrl,
+				'path' => $path
 			];
 		});
+	}
+
+	/**
+	 * Get the PHP version for the given site.
+	 * @param String $site
+	 * @param Boolean $symlink Are we getting the version for a symbolic link site? Default `false`.
+	 * @return String PHP version
+	 */
+	public function getPhpVersion($site, $symlink = false)
+	{
+		$tld = $this->config->get('tld');
+
+		// Get the default version.
+		$defaultVersion = $this->config->get('default_php');
+		// Get the isolated PHP version of the sites if set.
+		$phpVersion = $this->customPhpVersion($site . '.' . $tld);
+
+		// If symlink is true
+		if ($symlink === true) {
+			// Get the isolated PHP version of the linked site if set.
+			$phpVersion = $this->customPhpVersion($site . '.' . $tld);
+		}
+
+		// If either the parked or symbolic link site isolated phpVersion is empty,
+		// then it must be using the default version.
+		if (empty($phpVersion)) {
+			return "$defaultVersion (default)";
+		}
+		// Otherwise, return the isolated version.
+		else {
+			return "<info>$phpVersion (isolated)</info>";
+		}
 	}
 
 	/**
