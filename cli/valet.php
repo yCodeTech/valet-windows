@@ -127,6 +127,17 @@ $app->command('php:list', function () {
 })->descriptions('List all PHP services');
 
 /**
+ * Determines which PHP version the current working directory is using.
+ */
+$app->command('php:which', function () {
+
+	$which = Site::whichPhp(basename(getcwd()));
+
+	info("This site {$which['site']} is using PHP {$which['php']}");
+
+})->descriptions('Determine which PHP version the working directory is using');
+
+/**
  * Install PHP xDebug services.
  */
 $app->command('xdebug:install', function () {
