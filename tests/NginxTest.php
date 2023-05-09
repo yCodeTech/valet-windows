@@ -15,156 +15,156 @@ use Valet\WinSwFactory;
 
 class NginxTest extends TestCase
 {
-    /** @test */
-    public function install_nginx_configuration_places_nginx_base_configuration_in_proper_location()
-    {
-        $this->mock(Configuration::class)
-            ->shouldReceive('get')->once()->with('php_port', 9001)
-            ->andReturn(9001)
-            ->shouldReceive('get')->once()->with('php_xdebug_port', 9002)
-            ->andReturn(9002);
+	/** @test */
+	public function install_nginx_configuration_places_nginx_base_configuration_in_proper_location()
+	{
+		$this->mock(Configuration::class)
+			->shouldReceive('get')->once()->with('php_port', 9001)
+			->andReturn(9001)
+			->shouldReceive('get')->once()->with('php_xdebug_port', 9002)
+			->andReturn(9002);
 
-        $this->partialMock(Filesystem::class)
-            ->shouldReceive('putAsUser')->andReturnUsing(function ($path, $contents) {
-                $this->assertSame(realpath(__DIR__.'/../bin/nginx').'\conf/nginx.conf', $path);
-                $this->assertStringContainsString('include "'.Valet::homePath().'/Nginx/*', $contents);
-            })->once();
+		$this->partialMock(Filesystem::class)
+			->shouldReceive('putAsUser')->andReturnUsing(function ($path, $contents) {
+				$this->assertSame(realpath(__DIR__.'/../bin/nginx').'\conf/nginx.conf', $path);
+				$this->assertStringContainsString('include "'.Valet::homePath().'/Nginx/*', $contents);
+			})->once();
 
-        resolve(Nginx::class)->installConfiguration();
-    }
+		resolve(Nginx::class)->installConfiguration();
+	}
 
-    /** @test */
-    public function install_nginx_directories_creates_location_for_site_specific_configuration()
-    {
-        $this->mock(Filesystem::class)
-            ->shouldReceive('isDir')->with(Valet::homePath('Nginx'))->andReturn(false)
-            ->shouldReceive('mkdirAsUser')->with(Valet::homePath('Nginx'))->once()
-            ->shouldReceive('putAsUser')->with(Valet::homePath('Nginx\.keep'), "\n")->once();
+	/** @test */
+	public function install_nginx_directories_creates_location_for_site_specific_configuration()
+	{
+		$this->mock(Filesystem::class)
+			->shouldReceive('isDir')->with(Valet::homePath('Nginx'))->andReturn(false)
+			->shouldReceive('mkdirAsUser')->with(Valet::homePath('Nginx'))->once()
+			->shouldReceive('putAsUser')->with(Valet::homePath('Nginx\.keep'), "\n")->once();
 
-        $this->mock(Configuration::class)
-            ->shouldReceive('read')
-            ->andReturn(['tld' => 'test']);
+		$this->mock(Configuration::class)
+			->shouldReceive('read')
+			->andReturn(['tld' => 'test']);
 
-        $this->mock(Site::class)
-            ->shouldReceive('resecureForNewTld');
+		$this->mock(Site::class)
+			->shouldReceive('resecureForNewTld');
 
-        resolve(Nginx::class)->installNginxDirectory();
-    }
+		resolve(Nginx::class)->installNginxDirectory();
+	}
 
-    /** @test */
-    public function nginx_directory_is_never_created_if_it_already_exists()
-    {
-        $this->mock(Filesystem::class)
-            ->shouldReceive('isDir')->with(Valet::homePath('Nginx'))->andReturn(true)
-            ->shouldReceive('mkdirAsUser')->never()
-            ->shouldReceive('putAsUser')->with(Valet::homePath('Nginx\.keep'), "\n")->once();
+	/** @test */
+	public function nginx_directory_is_never_created_if_it_already_exists()
+	{
+		$this->mock(Filesystem::class)
+			->shouldReceive('isDir')->with(Valet::homePath('Nginx'))->andReturn(true)
+			->shouldReceive('mkdirAsUser')->never()
+			->shouldReceive('putAsUser')->with(Valet::homePath('Nginx\.keep'), "\n")->once();
 
-        $this->mock(Configuration::class)
-            ->shouldReceive('read')
-            ->andReturn(['tld' => 'test']);
+		$this->mock(Configuration::class)
+			->shouldReceive('read')
+			->andReturn(['tld' => 'test']);
 
-        $this->mock(Site::class)
-            ->shouldReceive('resecureForNewTld');
+		$this->mock(Site::class)
+			->shouldReceive('resecureForNewTld');
 
-        resolve(Nginx::class)->installNginxDirectory();
-    }
+		resolve(Nginx::class)->installNginxDirectory();
+	}
 
-    /** @test */
-    public function install_nginx_directories_rewrites_secure_nginx_files()
-    {
-        $this->mock(Filesystem::class)
-            ->shouldReceive('isDir')->with(Valet::homePath('Nginx'))->andReturn(false)
-            ->shouldReceive('mkdirAsUser')->with(Valet::homePath('Nginx'))->once()
-            ->shouldReceive('putAsUser')->with(Valet::homePath('Nginx\.keep'), "\n")->once();
+	/** @test */
+	public function install_nginx_directories_rewrites_secure_nginx_files()
+	{
+		$this->mock(Filesystem::class)
+			->shouldReceive('isDir')->with(Valet::homePath('Nginx'))->andReturn(false)
+			->shouldReceive('mkdirAsUser')->with(Valet::homePath('Nginx'))->once()
+			->shouldReceive('putAsUser')->with(Valet::homePath('Nginx\.keep'), "\n")->once();
 
-        $this->mock(Configuration::class)
-            ->shouldReceive('read')
-            ->andReturn(['tld' => 'test']);
+		$this->mock(Configuration::class)
+			->shouldReceive('read')
+			->andReturn(['tld' => 'test']);
 
-        $this->mock(Site::class)
-            ->shouldReceive('resecureForNewTld', ['test', 'test']);
+		$this->mock(Site::class)
+			->shouldReceive('resecureForNewTld', ['test', 'test']);
 
-        resolve(Nginx::class)->installNginxDirectory();
-    }
+		resolve(Nginx::class)->installNginxDirectory();
+	}
 
-    /** @test */
-    public function install_nginx_service()
-    {
-        ($winsw = m::mock(WinSW::class))
-            ->shouldReceive('installed')
-                ->once()
-                ->andReturn(false)
-            ->shouldReceive('install')
-                ->once()
-                ->with([
-                    'NGINX_PATH' => realpath(__DIR__.'/../bin/nginx'),
-                ])
-            ->shouldReceive('restart')
-                ->once();
+	/** @test */
+	public function install_nginx_service()
+	{
+		($winsw = m::mock(WinSW::class))
+			->shouldReceive('installed')
+				->once()
+				->andReturn(false)
+			->shouldReceive('install')
+				->once()
+				->with([
+					'NGINX_PATH' => realpath(__DIR__.'/../bin/nginx'),
+				])
+			->shouldReceive('restart')
+				->once();
 
-        $this->mock(WinSwFactory::class)
-            ->shouldReceive('make')
-                ->once()
-                ->with('nginxservice')
-                ->andReturn($winsw);
+		$this->mock(WinSwFactory::class)
+			->shouldReceive('make')
+				->once()
+				->with('nginxservice')
+				->andReturn($winsw);
 
-        resolve(Nginx::class)->installService();
-    }
+		resolve(Nginx::class)->installService();
+	}
 
-    /** @test */
-    public function restart_nginx_service()
-    {
-        $this->mock(CommandLine::class)
-            ->shouldReceive('run')
-            ->once()
-            ->with('cmd "/C taskkill /IM nginx.exe /F"');
+	/** @test */
+	public function restart_nginx_service()
+	{
+		$this->mock(CommandLine::class)
+			->shouldReceive('run')
+			->once()
+			->with('cmd "/C taskkill /IM nginx.exe /F"');
 
-        ($winsw = m::mock(WinSW::class))
-            ->shouldReceive('restart')
-                ->once();
+		($winsw = m::mock(WinSW::class))
+			->shouldReceive('restart')
+				->once();
 
-        $this->mock(WinSwFactory::class)
-            ->shouldReceive('make')
-                ->andReturn($winsw);
+		$this->mock(WinSwFactory::class)
+			->shouldReceive('make')
+				->andReturn($winsw);
 
-        resolve(Nginx::class)->restart();
-    }
+		resolve(Nginx::class)->restart();
+	}
 
-    /** @test */
-    public function stop_nginx_service()
-    {
-        $this->mock(CommandLine::class)
-            ->shouldReceive('run')
-            ->once()
-            ->with('cmd "/C taskkill /IM nginx.exe /F"');
+	/** @test */
+	public function stop_nginx_service()
+	{
+		$this->mock(CommandLine::class)
+			->shouldReceive('run')
+			->once()
+			->with('cmd "/C taskkill /IM nginx.exe /F"');
 
-        ($winsw = m::mock(WinSW::class))
-            ->shouldReceive('stop')
-                ->once();
+		($winsw = m::mock(WinSW::class))
+			->shouldReceive('stop')
+				->once();
 
-        $this->mock(WinSwFactory::class)
-            ->shouldReceive('make')
-                ->andReturn($winsw);
+		$this->mock(WinSwFactory::class)
+			->shouldReceive('make')
+				->andReturn($winsw);
 
-        resolve(Nginx::class)->stop();
-    }
+		resolve(Nginx::class)->stop();
+	}
 
-    /** @test */
-    public function uninstall_nginx_service()
-    {
-        $this->mock(CommandLine::class)
-            ->shouldReceive('run')
-            ->once()
-            ->with('cmd "/C taskkill /IM nginx.exe /F"');
+	/** @test */
+	public function uninstall_nginx_service()
+	{
+		$this->mock(CommandLine::class)
+			->shouldReceive('run')
+			->once()
+			->with('cmd "/C taskkill /IM nginx.exe /F"');
 
-        ($winsw = m::mock(WinSW::class))
-            ->shouldReceive('uninstall')
-                ->once();
+		($winsw = m::mock(WinSW::class))
+			->shouldReceive('uninstall')
+				->once();
 
-        $this->mock(WinSwFactory::class)
-            ->shouldReceive('make')
-                ->andReturn($winsw);
+		$this->mock(WinSwFactory::class)
+			->shouldReceive('make')
+				->andReturn($winsw);
 
-        resolve(Nginx::class)->uninstall();
-    }
+		resolve(Nginx::class)->uninstall();
+	}
 }
