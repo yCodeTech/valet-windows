@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<ruleset name="yCodeTech">
+	<description>yCodeTech's Coding Standards</description>
+
+	<!-- Scan all files in directory -->
+	<file>.</file>
+
+	<!-- Scan only PHP files -->
+	<arg name="extensions" value="php"/>
+
+	<!-- Ignore WordPress and Composer dependencies -->
+	<exclude-pattern>web/wp</exclude-pattern>
+	<exclude-pattern>web/app/plugins</exclude-pattern>
+	<exclude-pattern>web/app/mu-plugins</exclude-pattern>
+	<exclude-pattern>vendor/</exclude-pattern>
+	<exclude-pattern>web/app/uploads/</exclude-pattern>
+
+	<!-- Show colors in console -->
+	<arg value="-colors"/>
+
+	<!-- Show sniff codes in all reports -->
+	<arg value="ns"/>
+
+	<!-- Use PSR-2 as a base -->
+	<rule ref="PSR2">
+		<!-- Allow tab indent -->
+		<exclude name="Generic.WhiteSpace.DisallowTabIndent"/>
+		<!-- Allow php files to end without blank line -->
+		<exclude name="PSR2.Files.EndFileNewline"/>
+
+		<!-- Allow braces on the same line as the function declaration. -->
+		<exclude name="Squiz.Functions.MultiLineFunctionDeclaration.BraceOnSameLine" />
+		<!-- Allow inline if statements without braces -->
+		<exclude name="Generic.ControlStructures.InlineControlStructure" />
+
+		<exclude name="PSR2.Classes.ClassDeclaration.OpenBraceNewLine" />
+		<exclude name="Squiz.ControlStructures.ControlSignature.SpaceAfterCloseBrace" />
+		<exclude name="PSR1.Classes.ClassDeclaration.MissingNamespace" />
+		<exclude name="PEAR.Functions.ValidDefaultValue.NotAtEnd" />
+		
+	</rule>
+	<!-- Allow same line starting brackets for classes -->
+	<rule ref="Generic.Functions.OpeningFunctionBraceKernighanRitchie" />
+	<!-- Disallow space indent -->
+	<rule ref="Generic.WhiteSpace.DisallowSpaceIndent"/>
+	<rule ref="Generic.WhiteSpace.ScopeIndent">
+		<properties>
+			<property name="indent" value="4"/>
+			<property name="tabIndent" value="true"/>
+		</properties>
+	</rule>
+	<!-- Disallow spaces after opening and closing braces -->
+	<rule ref="PEAR.Functions.FunctionCallSignature">
+		<properties>
+			<property name="requiredSpacesAfterOpen" value="0" />
+			<property name="requiredSpacesBeforeClose" value="0" />
+			<property name="allowMultipleArguments" value="false"/>
+		</properties>
+	</rule>
+</ruleset>
