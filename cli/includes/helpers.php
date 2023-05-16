@@ -75,9 +75,27 @@ function table(array $headers = [], array $rows = [])
 {
 	$table = new Table(new ConsoleOutput());
 
-	$table->setVertical()->setHeaders($headers)->setRows($rows);
+	// Symfony Console component from 6.1 added support for a vertical table.
+	// But older versions won't reconise the function and will
+	// spit out errors. So to avoid this, we need to check
+	// whether the method exists and if it does, we can use it.
+	if (method_exists(Table::class, 'setVertical')) {
+		$table->setVertical();
+	}
+
+	$table->setHeaders($headers)->setRows($rows);
 
 	$table->render();
+}
+
+/**
+ * Defines the default table headers.
+ *
+ * @return array ['Site', 'Alias', 'SSL', 'PHP', 'URL', 'Alias URL', 'Path']
+ */
+function default_table_headers()
+{
+	return ['Site', 'Alias', 'SSL', 'PHP', 'URL', 'Alias URL', 'Path'];
 }
 
 /**

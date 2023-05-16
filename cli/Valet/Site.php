@@ -185,7 +185,7 @@ class Site
 
 			return [
 				'site' => $site,
-				'secured' => $secured ? ' X' : '',
+				'secured' => $secured ? '✔' : '',
 				'url' => $url,
 				'path' => $host,
 			];
@@ -257,22 +257,10 @@ class Site
 	}
 
 	/**
-	 * @deprecated Use getSites instead which works for both normal and symlinked paths.
-	 *
-	 * @param  string  $path
-	 * @param  \Illuminate\Support\Collection  $certs
-	 * @return \Illuminate\Support\Collection
-	 */
-	public function getLinks($path, $certs)
-	{
-		return $this->getSites($path, $certs);
-	}
-
-	/**
 	 * Determines which PHP version the current working directory is using.
 	 *
 	 * @param  string  $cwd The current working directory (cwd)
-	 * @return Array [ "site" => [sitename], "php" => [PHP version] ]
+	 * @return array [ "site" => [sitename], "php" => [PHP version] ]
 	 */
 	public function whichPhp($cwd)
 	{
@@ -361,7 +349,7 @@ class Site
 			return [
 				'site' => $site,
 				'alias' => $alias,
-				'secured' => $secured ? ' X' : '',
+				'secured' => $secured ? '✔' : '',
 				'php' => $phpVersion,
 				'url' => $url,
 				'aliasUrl' => $aliasUrl,
@@ -372,9 +360,9 @@ class Site
 
 	/**
 	 * Get the PHP version for the given site.
-	 * @param String $site
-	 * @param Boolean $symlink Are we getting the version for a symbolic link site? Default `false`.
-	 * @return String PHP version
+	 * @param string $site
+	 * @param boolean $symlink Are we getting the version for a symbolic link site? Default `false`.
+	 * @return string PHP version
 	 */
 	public function getPhpVersion($site, $symlink = false)
 	{
@@ -502,28 +490,18 @@ class Site
 	}
 
 	/**
-	 * Get the site URL from a directory if it's a valid Valet site.
+	 * Isolate a given directory to use a specific version of PHP.
 	 *
+	 * @param string $phpVersion
 	 * @param  string  $directory
 	 * @return string|false
 	 */
-	public function usePhp($phpVersion, $directory)
+	public function isolate($phpVersion, $directory)
 	{
 		$site = $this->getSiteUrl($directory);
 
 		if (!$site) {
 			throw new DomainException("The {$directory} site could not be found in Valet's site list.");
-		}
-
-		// Remove isolation for this site
-		if ($phpVersion == 'default') {
-			// Example output: "7.4"
-			$oldCustomPhpVersion = $this->customPhpVersion($site);
-			$this->removeIsolation($site);
-			\Nginx::restart();
-			info("The site [$site] is now using the default PHP version.");
-
-			return;
 		}
 
 		$php = $this->config->getPhpByVersion($phpVersion);
@@ -538,6 +516,29 @@ class Site
 		\Nginx::stop();
 		\Nginx::restart();
 		info("The site [$site] is now using $phpVersion.");
+	}
+
+	/**
+	 * Remove PHP version isolation for a given directory.
+	 */
+	public function unisolate($directory)
+	{
+		$site = $this->getSiteUrl($directory);
+
+		// If a site has an SSL certificate, we need to keep its custom config file, but we can
+		// just re-generate it without defining a custom `valet.sock` file
+		if ($this->files->exists($this->certificatesPath($site, 'crt'))) {
+			$siteConf = $this->buildSecureNginxServer($site);
+			$this->files->putAsUser($this->nginxPath($site), $siteConf);
+		} else {
+			// When site doesn't have SSL, we can remove the custom nginx config file to remove isolation
+			$this->files->unlink($this->nginxPath($site));
+		}
+
+		\Nginx::stop();
+		\Nginx::restart();
+
+		info(sprintf('The site [%s] is now using the default PHP version.', $site));
 	}
 
 	/**
@@ -569,7 +570,7 @@ class Site
 	}
 
 	/**
-	 * Extract PHP version of exising nginx conifg.
+	 * Extract PHP version of exising nginx config.
 	 *
 	 * @param  string  $url
 	 * @return string|void
@@ -798,32 +799,6 @@ class Site
 	}
 
 	/**
-	 * Remove PHP Version isolation from a specific site.
-	 *
-	 * @param  string  $valetSite
-	 * @return void
-	 */
-	public function removeIsolation($valetSite)
-	{
-		$existingSiteConf = $this->getSiteConfigFileContents($valetSite);
-
-		if (empty($existingSiteConf)) {
-			$siteConf = $this->buildSecureNginxServer($valetSite);
-		}
-
-		$siteConf = $this->replacePhpVersionInSiteConf($valetSite, '$valet_php_port');
-
-		// If a site has an SSL certificate, we need to keep its custom config file
-		if ($this->files->exists($this->certificatesPath($valetSite, 'crt'))) {
-			$this->files->putAsUser($this->nginxPath($valetSite), $siteConf);
-		} else {
-			if ($existingSiteConf) {
-				$this->files->putAsUser($this->nginxPath($valetSite), $siteConf);
-			}
-		}
-	}
-
-	/**
 	 * Build the TLS secured Nginx server for the given URL.
 	 *
 	 * @param  string  $url
@@ -903,14 +878,14 @@ class Site
 		$secured = $this->parked()
 			->merge($this->links())
 			->sort()
-			->where('secured', ' X');
+			->where('secured', '✔');
 
 		if ($secured->count() === 0) {
 			return info('No sites to unsecure. You may list all servable sites or links by running <comment>valet parked</comment> or <comment>valet links</comment>.');
 		}
 
 		info('Attempting to unsecure the following sites:');
-		table(['Site', 'SSL', 'URL', 'Path'], $secured->toArray());
+		table(default_table_headers(), $secured->toArray());
 
 		foreach ($secured->pluck('site') as $url) {
 			$this->unsecure($url . '.' . $tld);
@@ -919,10 +894,10 @@ class Site
 		$remaining = $this->parked()
 			->merge($this->links())
 			->sort()
-			->where('secured', ' X');
+			->where('secured', '✔');
 		if ($remaining->count() > 0) {
 			warning('We were not succesful in unsecuring the following sites:');
-			table(['Site', 'SSL', 'URL', 'Path'], $remaining->toArray());
+			table(default_table_headers(), $remaining->toArray());
 		}
 		info('unsecure --all was successful.');
 	}
@@ -937,7 +912,7 @@ class Site
 		$secured = $this->parked()
 			->merge($this->links())
 			->sort()
-			->where('secured', ' X');
+			->where('secured', '✔');
 
 		if ($secured->isEmpty()) {
 			return;

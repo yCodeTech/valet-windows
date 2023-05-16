@@ -15,6 +15,7 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 use function Valet\info;
 use function Valet\output;
 use function Valet\table;
+use function Valet\default_table_headers;
 use function Valet\warning;
 
 /**
@@ -29,7 +30,7 @@ if (is_dir(VALET_LEGACY_HOME_PATH) && !is_dir(VALET_HOME_PATH)) {
  */
 Container::setInstance(new Container);
 
-$version = '2.5.0';
+$version = '3.0';
 
 $app = new Application('Laravel Valet', $version);
 
@@ -169,7 +170,7 @@ $app->command('install', function () {
 	PhpCgiXdebug::install();
 	Acrylic::install(Configuration::read()['tld']);
 
-	output(PHP_EOL . '<info>Valet installed successfully!</info>');
+	output(PHP_EOL . '<info>Valet installed successfully! Please use `valet start` to start the services.</info>');
 })->descriptions('Install the Valet services');
 
 /**
@@ -222,7 +223,7 @@ if (is_dir(VALET_HOME_PATH)) {
 	$app->command('parked', function () {
 		$parked = Site::parked();
 
-		table(['Site', 'Alias', 'SSL', 'PHP', 'URL', 'Alias URL', 'Path'], $parked->all());
+		table(default_table_headers(), $parked->all());
 	})->descriptions('Display all the current sites within parked paths');
 
 	//    /**
@@ -581,19 +582,15 @@ if (is_dir(VALET_HOME_PATH)) {
 	})->descriptions('This command is not required for Windows.');
 
 	/**
-	 * Allow the user to change the version of php valet uses.
+	 * Set or change the default PHP version valet uses.
 	 *
-	 *  @param string $phpVersion can be 'default' or PHP version eg. 8.1.12
+	 *  @param string $phpVersion The PHP version eg. 8.1.8, or an alias eg. 8.1 to be set as the default
+	 *
+	 * ###### Note: If using the alias, and mulitple versions of 8.1 are available eg. 8.1.8 and 8.1.18; then the most latest version will be used, eg. 8.1.18.
 	 */
-	$app->command('use [phpVersion] [--site=]', function ($phpVersion, $site) {
+	$app->command('use [phpVersion]', function ($phpVersion) {
 		if (empty($phpVersion)) {
-			warning('Please enter a PHP version. Example command [valet use 7.3]');
-
-			return;
-		}
-
-		if ($site) {
-			Site::usePhp($phpVersion, $site);
+			warning('Please enter a PHP version. Example command [valet use 8.1]');
 
 			return;
 		}
@@ -601,7 +598,8 @@ if (is_dir(VALET_HOME_PATH)) {
 		$php = Configuration::getPhpByVersion($phpVersion);
 
 		if (empty($php)) {
-			warning("Cannot find PHP [$phpVersion] in the list. Example command [valet use 7.3]");
+			warning("Cannot find PHP [$phpVersion] in the list. Example command [valet use 8.1]");
+			return false;
 		}
 
 		info("Setting the default PHP version to [$phpVersion].");
@@ -621,7 +619,45 @@ if (is_dir(VALET_HOME_PATH)) {
 		info('Note that you might need to run <comment>composer global update</comment> if your PHP version change affects the dependencies of global packages required by Composer.');
 	})->descriptions('Change the version of PHP used by valet', [
 			'phpVersion' => 'The PHP version you want to use, e.g 7.3',
-			'--site' => 'Isolate PHP version of a specific valet site. e.g: --site=site.test',
+		]);
+
+	/**
+	 * Isolate the current working directory or a specified site to specific PHP version.
+	 * @param string $phpVersion The PHP version you want to use, eg. "7.4.33"; or an alias, eg. "7.4"
+	 * @param string $site The site you want to optionally specify, eg. "my-project" or "my-project.[tld]". If not specified, current working directory will be used.
+	 */
+	$app->command('isolate [phpVersion] [--site=]', function ($phpVersion, $site = null) {
+		if (!$site) {
+			$site = basename(getcwd());
+		}
+
+		if (empty($phpVersion)) {
+			warning('Please enter a PHP version. Example command [valet isolate 7.4]');
+
+			return;
+		}
+
+		Site::isolate($phpVersion, $site);
+
+	})->descriptions('Change the version of PHP used by Valet to serve the current working directory', [
+			'phpVersion' => 'The PHP version you want to use; e.g php@8.1',
+			'--site' => 'Specify the site to isolate (e.g. if the site isn\'t linked as its directory name)',
+		]);
+
+	/**
+	 * Remove [unisolate] an isolated site.
+	 * @param string $phpVersion The PHP version you want to use, eg. "7.4.33"; or an alias, eg. "7.4"
+	 * @param string $site The site you want to optionally specify, eg. "my-project" or "my-project.[tld]". If not specified, current working directory will be used.
+	 */
+	$app->command('unisolate [--site=]', function ($output, $site = null) {
+		if (!$site) {
+			$site = basename(getcwd());
+		}
+
+		Site::unisolate($site);
+
+	})->descriptions('Remove PHP version isolation for a given directory', [
+			'--site' => 'Specify the site to unisolate (e.g. if the site isn\'t linked as its directory name)',
 		]);
 
 	/**

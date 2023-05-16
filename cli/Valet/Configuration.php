@@ -229,7 +229,7 @@ class Configuration
 		$config = $this->read();
 
 		return collect($config['php'])->filter(function ($item) use ($phpVersion) {
-			return $phpVersion === $item['version'] || $phpVersion === $item['alias'];
+			return $phpVersion === $item['version'] || $phpVersion === $item['version_alias'];
 		})->first();
 	}
 
@@ -276,10 +276,14 @@ class Configuration
 
 		$config['php'][$phpVersion] = [
 			'version' => $phpVersion,
+			'version_alias' => number_format((float) $phpVersion, 1, '.', ''),
 			'path' => $phpPath,
 			'port' => $phpPort,
 			'xdebug_port' => $phpXdebugPort,
 		];
+
+		// Sort the PHP array by version number in descending order. Ie. 8.1.18, 8.1.8, 7.4.33
+		krsort($config['php'], SORT_NATURAL);
 
 		$this->write($config);
 
