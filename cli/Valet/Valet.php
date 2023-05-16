@@ -31,7 +31,7 @@ class Valet
 	{
 		$path = static::homePath('Extensions');
 
-		if (! $this->files->isDir($path)) {
+		if (!$this->files->isDir($path)) {
 			return [];
 		}
 
@@ -40,7 +40,7 @@ class Valet
 				return is_dir($file);
 			})
 			->map(function ($file) use ($path) {
-				return $path.DIRECTORY_SEPARATOR.$file;
+				return $path . DIRECTORY_SEPARATOR . $file;
 			})
 			->values()->all();
 	}
@@ -58,7 +58,7 @@ class Valet
 			'php' => 'valet_phpcgi',
 			'php-xdebug' => 'valet_phpcgi_xdebug',
 		])->map(function ($id, $service) {
-			$output = $this->cli->run('powershell -command "Get-Service -Name '.$id.'"');
+			$output = $this->cli->run('powershell -command "Get-Service -Name ' . $id . '"');
 
 			if (strpos($output, 'Running') > -1) {
 				$status = '<fg=green>running</>';
@@ -86,7 +86,7 @@ class Valet
 	 */
 	public function onLatestVersion($currentVersion): bool
 	{
-		$response = Request::get('https://api.github.com/repos/cretueusebiu/valet-windows/releases/latest')->send();
+		$response = Request::get('https://api.github.com/repos/ycodetech/valet-windows/releases/latest')->send();
 
 		return version_compare($currentVersion, trim($response->body->tag_name, 'v'), '>=');
 	}
@@ -115,6 +115,6 @@ class Valet
 	 */
 	public static function homePath(string $path = ''): string
 	{
-		return VALET_HOME_PATH.($path ? DIRECTORY_SEPARATOR.$path : $path);
+		return VALET_HOME_PATH . ($path ? DIRECTORY_SEPARATOR . $path : $path);
 	}
 }

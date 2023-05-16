@@ -17,7 +17,7 @@ class IntegrationTest extends TestCase
 
 	public function setUp(): void
 	{
-		$this->container = DockerContainer::create('cretueusebiu/valet-windows')
+		$this->container = DockerContainer::create('ycodetech/valet-windows')
 			->command('ping -t localhost')
 			->start();
 	}
@@ -237,7 +237,9 @@ class IntegrationTest extends TestCase
 			->assertContains('True');
 
 		$this->container->exec([
-			'mkdir C:/Code/laravel', 'cd C:/Code/laravel', 'valet link',
+			'mkdir C:/Code/laravel',
+			'cd C:/Code/laravel',
+			'valet link',
 			"Set-Content -Path 'C:/Code/laravel/index.html' -Value 'hello world'",
 		])
 			->assertSuccessful();
@@ -258,7 +260,9 @@ class IntegrationTest extends TestCase
 		// $this->container->exec('valet install')->assertSuccessful();
 
 		$this->container->exec([
-			'mkdir C:/Code/laravel', 'cd C:/Code/laravel', 'valet link',
+			'mkdir C:/Code/laravel',
+			'cd C:/Code/laravel',
+			'valet link',
 			"Set-Content -Path 'C:/Code/laravel/index.html' -Value 'hello world'",
 		])
 			->assertSuccessful();

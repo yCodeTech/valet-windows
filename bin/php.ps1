@@ -3,7 +3,7 @@ $phpPath = "C:\php"
 $caCertUrl = "https://curl.haxx.se/ca/cacert.pem"
 $phpReleasesUrl = "http://windows.php.net/downloads/releases"
 $xdebugReleasesUrl = "https://xdebug.org"
-$stubsUrl = "https://raw.githubusercontent.com/cretueusebiu/valet-windows/master/cli/stubs"
+$stubsUrl = "https://raw.githubusercontent.com/ycodetech/valet-windows/master/cli/stubs"
 
 if (Get-Command "php" -errorAction SilentlyContinue) {
     Write-Output "PHP already installed!"
@@ -34,7 +34,7 @@ function Find-XdebugRelease {
     $architecture = if ([Environment]::Is64BitProcess) {"-x86_64"} else {""}
     # php_xdebug-3.0.3-7.4-vc15-nts-x86_64.dll
     # php_xdebug-3.0.3-8.0-vs16-nts-x86_64.dll
-    $html = (Invoke-WebRequest "${xdebugReleasesUrl}/download" -UseBasicParsing).rawcontent
+    $html = (Invoke-WebRequest "${xdebugReleasesUrl}/download/historical" -UseBasicParsing).rawcontent
 
     if ($html -match "php_xdebug-(.+)-${phpVersion}-vc15-nts${architecture}.dll") {
         return "${xdebugReleasesUrl}/files/" + $matches[0]

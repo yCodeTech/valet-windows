@@ -1,69 +1,77 @@
 {
-    "name": "cretueusebiu/valet-windows",
-    "description": "A more enjoyable local development experience for Windows.",
-    "keywords": ["laravel", "valet", "windows"],
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Taylor Otwell",
-            "email": "taylor@laravel.com"
-        },
-        {
-            "name": "Adam Wathan",
-            "email": "adam.wathan@gmail.com"
-        },
-        {
-            "name": "Cretu Eusebiu",
-            "email": "me@cretueusebiu.com"
-        }
-    ],
-    "autoload": {
-        "files": [
-            "cli/includes/compatibility.php",
-            "cli/includes/facades.php",
-            "cli/includes/helpers.php"
-        ],
-        "psr-4": {
-            "Valet\\": "cli/Valet/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Tests\\": "tests/"
-        }
-    },
-    "require": {
-        "php": "^7.4|^8.0",
-        "illuminate/container": "^8.0|^9.0",
-        "mnapoli/silly": "^1.7",
-        "symfony/process": "^4.0|^5.0|^6.0",
-        "nategood/httpful": "^0.3",
-        "phpseclib/phpseclib": "^3.0",
-        "illuminate/collections": "^8.0|^9.0"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "^8.5|^9.5",
-        "mockery/mockery": "^1.4",
-        "spatie/docker": "^1.7",
-        "illuminate/testing": "^8.20|^9.0"
-    },
-    "bin": [
-        "valet"
-    ],
-    "scripts": {
-        "test-unit": "vendor\\bin\\phpunit --exclude-group=integration",
-        "test-integration": [
-            "Composer\\Config::disableProcessTimeout",
-            "vendor\\bin\\phpunit --filter=IntegrationTest"
-        ],
-        "build-docker": [
-            "Composer\\Config::disableProcessTimeout",
-            "docker build -t cretueusebiu/valet-windows -f ./tests/docker/Dockerfile ."
-        ]
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "2.x-dev"
-        }
-    }
+	"name": "ycodetech/valet-windows",
+	"description": "A more enjoyable local development experience for Windows. A Windows port of the popular Laravel Valet and a fork of cretueusebiu/valet-windows, with new features.",
+	"keywords": [
+		"laravel",
+		"valet",
+		"windows"
+	],
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Taylor Otwell",
+			"email": "taylor@laravel.com"
+		},
+		{
+			"name": "Adam Wathan",
+			"email": "adam.wathan@gmail.com"
+		},
+		{
+			"name": "Cretu Eusebiu",
+			"email": "me@cretueusebiu.com"
+		},
+		{
+			"name": "ycodetech",
+			"email": "stuart-norman@hotmail.com"
+		}
+	],
+	"autoload": {
+		"files": [
+			"cli/includes/compatibility.php",
+			"cli/includes/facades.php",
+			"cli/includes/helpers.php"
+		],
+		"psr-4": {
+			"Valet\\": "cli/Valet/"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"Tests\\": "tests/"
+		}
+	},
+	"require": {
+		"php": "^7.4|^8.0",
+		"illuminate/container": "^8.0|^9.0",
+		"mnapoli/silly": "^1.7",
+		"symfony/process": "^4.0|^5.0|^6.0",
+		"nategood/httpful": "^0.3",
+		"phpseclib/phpseclib": "^3.0",
+		"illuminate/collections": "^8.0|^9.0"
+	},
+	"require-dev": {
+		"phpunit/phpunit": "^8.5|^9.5",
+		"mockery/mockery": "^1.4",
+		"spatie/docker": "^1.7",
+		"illuminate/testing": "^8.20|^9.0"
+	},
+	"bin": [
+		"valet"
+	],
+	"scripts": {
+		"test-unit": "vendor\\bin\\phpunit --exclude-group=integration",
+		"test-integration": [
+			"Composer\\Config::disableProcessTimeout",
+			"vendor\\bin\\phpunit --filter=IntegrationTest"
+		],
+		"build-docker": [
+			"Composer\\Config::disableProcessTimeout",
+			"docker build -t ycodetech/valet-windows -f ./tests/docker/Dockerfile ."
+		]
+	},
+	"extra": {
+		"branch-alias": {
+			"dev-master": "2.x-dev"
+		}
+	}
 }
