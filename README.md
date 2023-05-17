@@ -1,4 +1,4 @@
-<p align="center"><img src="./laravel_valet_windows_3_logo.svg"></p>
+<p align="center"><img src="./laravel_valet_windows_3_logo.svg" width="50%"></p>
 
 <p align="center">
 <a href="https://github.com/cretueusebiu/valet-windows/actions?query=workflow%3Atests"><img src="https://github.com/cretueusebiu/valet-windows/workflows/Tests/badge.svg" alt="Build Status"></a>
