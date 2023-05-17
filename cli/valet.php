@@ -661,6 +661,15 @@ if (is_dir(VALET_HOME_PATH)) {
 		]);
 
 	/**
+	 * List isolated sites.
+	 */
+	$app->command('isolated', function ($output) {
+
+		Site::isolated();
+
+	})->descriptions('List isolated sites.');
+
+	/**
 	 * Tail log file.
 	 */
 	$app->command('log [-f|--follow] [-l|--lines=] [key]', function ($follow, $lines, $key = null) {

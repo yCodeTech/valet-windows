@@ -542,6 +542,29 @@ class Site
 	}
 
 	/**
+	 * Get list of isolated sites.
+	 */
+	public function isolated()
+	{
+		$dir = $this->nginxPath();
+		$tld = $this->config->read()['tld'];
+
+		$isolated = collect($this->files->scandir($dir))
+			->filter(function ($site, $key) use ($tld) {
+				// keep sites that match our TLD
+				return ends_with($site, ".$tld.conf");
+			})->map(function ($site, $key) use ($tld) {
+
+			return [
+				"site" => str_replace(".conf", '', $site),
+				"php" => $this->customPhpVersion($site)
+			];
+
+		});
+		table(["Site", "PHP"], $isolated->all());
+	}
+
+	/**
 	 * Get the site URL from a directory if it's a valid Valet site.
 	 *
 	 * @param  string  $directory
