@@ -125,7 +125,7 @@ $app->command('php:list', function () {
 		return $item;
 	})->toArray();
 
-	table(['Version', 'Version Alias', 'Path', 'Port', 'xDebug Port', 'Default'], $php);
+	table(['Version', 'Version Alias', 'Path', 'Port', 'xDebug Port', 'Default'], $php, true);
 })->descriptions('List all PHP services');
 
 /**

@@ -83,7 +83,7 @@ function error(string $output)
  * @param  array  $rows
  * @return void
  */
-function table(array $headers = [], array $rows = [])
+function table(array $headers = [], array $rows = [], $setHorizontal = false)
 {
 	$table = new Table(new ConsoleOutput());
 
@@ -91,7 +91,7 @@ function table(array $headers = [], array $rows = [])
 	// But older versions won't reconise the function and will
 	// spit out errors. So to avoid this, we need to check
 	// whether the method exists and if it does, we can use it.
-	if (method_exists(Table::class, 'setVertical')) {
+	if (method_exists(Table::class, 'setVertical') && !$setHorizontal) {
 		$table->setVertical();
 	}
 
