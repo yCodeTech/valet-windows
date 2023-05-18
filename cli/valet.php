@@ -120,12 +120,12 @@ $app->command('php:list', function () {
 	$php = $config['php'] ?? [];
 
 	$php = collect($php)->map(function ($item) use ($defaultPhpVersion) {
-		$item['default'] = $defaultPhpVersion === $item['version'] ? 'X' : '';
+		$item['default'] = $defaultPhpVersion === $item['version'] ? '✔' : '';
 
 		return $item;
 	})->toArray();
 
-	table(['Version', 'Path', 'Port', 'xDebug Port', 'Default'], $php);
+	table(['Version', 'Version Alias', 'Path', 'Port', 'xDebug Port', 'Default'], $php);
 })->descriptions('List all PHP services');
 
 /**
@@ -662,6 +662,9 @@ if (is_dir(VALET_HOME_PATH)) {
 	 * Remove [unisolate] an isolated site.
 	 * @param string $phpVersion The PHP version you want to use, eg. "7.4.33"; or an alias, eg. "7.4"
 	 * @param string $site The site you want to optionally specify, eg. "my-project" or "my-project.[tld]". If not specified, current working directory will be used.
+	 * 
+	 * @param boolean|null $all
+	 * 
 	 */
 	$app->command('unisolate [--site=] [--all]', function ($output, $site = null, $all = null) {
 		if ($all) {
