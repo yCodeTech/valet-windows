@@ -627,25 +627,36 @@ if (is_dir(VALET_HOME_PATH)) {
 
 	/**
 	 * Isolate the current working directory or a specified site to specific PHP version.
+	 * 
 	 * @param string $phpVersion The PHP version you want to use, eg. "7.4.33"; or an alias, eg. "7.4"
-	 * @param string $site The site you want to optionally specify, eg. "my-project" or "my-project.[tld]". If not specified, current working directory will be used.
+	 * @param array $sites The site you want to optionally specify, eg. "my-project" or "my-project.[tld]". If not specified, current working directory will be used. 
+	 * To specify multiple sites, you use it like:
+	 * `--sites=my-project --sites=another-site`
 	 */
-	$app->command('isolate [phpVersion] [--site=]', function ($phpVersion, $site = null) {
-		if (!$site) {
-			$site = basename(getcwd());
-		}
-
+	$app->command('isolate [phpVersion] [--sites=]*', function ($phpVersion, $sites = array()) {
 		if (empty($phpVersion)) {
 			warning('Please enter a PHP version. Example command [valet isolate 7.4]');
 
 			return;
 		}
 
-		Site::isolate($phpVersion, $site);
+		// If $sites is empty, then isolate the current working directory.
+		if (!$sites) {
+			$site = basename(getcwd());
+			Site::isolate($phpVersion, $site);
 
-	})->descriptions('Isolate the current working directory or a specified site to a specific PHP version', [
+			return;
+		}
+
+		// Loop through the sites array and isolate each one.
+		foreach ($sites as $site) {
+			Site::isolate($phpVersion, $site);
+		}
+
+
+	})->descriptions('Isolate the current working directory or a specified site(s) to a specific PHP version', [
 			'phpVersion' => 'The PHP version you want to use; e.g 7.4',
-			'--site' => 'Specify the site to isolate',
+			'--sites' => 'Specify the site to isolate',
 		]);
 
 	/**
