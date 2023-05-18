@@ -653,7 +653,6 @@ if (is_dir(VALET_HOME_PATH)) {
 			Site::isolate($phpVersion, $site);
 		}
 
-
 	})->descriptions('Isolate the current working directory or a specified site(s) to a specific PHP version', [
 			'phpVersion' => 'The PHP version you want to use; e.g 7.4',
 			'--sites' => 'Specify the site to isolate',
@@ -664,7 +663,17 @@ if (is_dir(VALET_HOME_PATH)) {
 	 * @param string $phpVersion The PHP version you want to use, eg. "7.4.33"; or an alias, eg. "7.4"
 	 * @param string $site The site you want to optionally specify, eg. "my-project" or "my-project.[tld]". If not specified, current working directory will be used.
 	 */
-	$app->command('unisolate [--site=]', function ($output, $site = null) {
+	$app->command('unisolate [--site=] [--all]', function ($output, $site = null, $all = null) {
+		if ($all) {
+			$isolated = Site::isolated();
+
+			foreach ($isolated as $array) {
+				Site::unisolate($array["site"]);
+			}
+
+			return;
+		}
+
 		if (!$site) {
 			$site = basename(getcwd());
 		}
@@ -673,6 +682,7 @@ if (is_dir(VALET_HOME_PATH)) {
 
 	})->descriptions('Remove [unisolate] an isolated site.', [
 			'--site' => 'Specify the site to unisolate',
+			'--all' => 'Optionally remove all isolated sites'
 		]);
 
 	/**
