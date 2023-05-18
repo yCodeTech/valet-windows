@@ -35,6 +35,18 @@ function info($output)
 }
 
 /**
+ * Debugging only.
+ * Output the given array to the console using var_dump.
+ *
+ * @param  string  $output
+ * @return void
+ */
+function info_dump($output)
+{
+	output('<info>' . var_dump($output) . '</info>');
+}
+
+/**
  * Output the given text to the console.
  *
  * @param  string  $output

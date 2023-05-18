@@ -33,7 +33,7 @@ if (is_dir(VALET_LEGACY_HOME_PATH) && !is_dir(VALET_HOME_PATH)) {
  */
 Container::setInstance(new Container);
 
-$app = new Application('Laravel Valet', $version);
+$app = new Application('Laravel Valet Windows', $version);
 
 /**
  * Prune missing directories and symbolic links on every command.
@@ -257,7 +257,9 @@ if (is_dir(VALET_HOME_PATH)) {
 		if ($secure) {
 			$this->runCommand('secure ' . $name);
 		}
-	})->descriptions('Link the current working directory to Valet');
+	})->descriptions('Link the current working directory to Valet with a given name', [
+			'--secure' => 'Optionally secure the site'
+		]);
 
 	/**
 	 * Display all of the registered symbolic links.
@@ -274,14 +276,14 @@ if (is_dir(VALET_HOME_PATH)) {
 		});
 
 		table(['Site', 'SSL', 'PHP', 'URL', 'Path'], $links->all());
-	})->descriptions('Display all of the registered Valet links');
+	})->descriptions('Display all of the registered Valet symbolic links');
 
 	/**
 	 * Unlink a link from the Valet links directory.
 	 */
 	$app->command('unlink [name]', function ($name) {
 		info('The [' . Site::unlink($name) . '] symbolic link has been removed.');
-	})->descriptions('Remove the specified Valet link');
+	})->descriptions('Remove the specified Valet symbolic link');
 
 	/**
 	 * Secure the given domain with a trusted TLS certificate.
@@ -618,8 +620,9 @@ if (is_dir(VALET_HOME_PATH)) {
 
 		info(sprintf('Valet is now using %s.', $php['version']) . PHP_EOL);
 		info('Note that you might need to run <comment>composer global update</comment> if your PHP version change affects the dependencies of global packages required by Composer.');
-	})->descriptions('Change the version of PHP used by valet', [
-			'phpVersion' => 'The PHP version you want to use, e.g 7.3',
+
+	})->descriptions('Change the default version of PHP used by valet', [
+			'phpVersion' => 'The PHP version you want to use, e.g 8.1',
 		]);
 
 	/**
@@ -640,9 +643,9 @@ if (is_dir(VALET_HOME_PATH)) {
 
 		Site::isolate($phpVersion, $site);
 
-	})->descriptions('Change the version of PHP used by Valet to serve the current working directory', [
-			'phpVersion' => 'The PHP version you want to use; e.g php@8.1',
-			'--site' => 'Specify the site to isolate (e.g. if the site isn\'t linked as its directory name)',
+	})->descriptions('Isolate the current working directory or a specified site to a specific PHP version', [
+			'phpVersion' => 'The PHP version you want to use; e.g 7.4',
+			'--site' => 'Specify the site to isolate',
 		]);
 
 	/**
@@ -657,8 +660,8 @@ if (is_dir(VALET_HOME_PATH)) {
 
 		Site::unisolate($site);
 
-	})->descriptions('Remove PHP version isolation for a given directory', [
-			'--site' => 'Specify the site to unisolate (e.g. if the site isn\'t linked as its directory name)',
+	})->descriptions('Remove [unisolate] an isolated site.', [
+			'--site' => 'Specify the site to unisolate',
 		]);
 
 	/**
@@ -666,7 +669,15 @@ if (is_dir(VALET_HOME_PATH)) {
 	 */
 	$app->command('isolated', function ($output) {
 
-		Site::isolated();
+		$isolated = Site::isolated();
+
+		if (count($isolated) === 0) {
+			info("There are no isolated sites.");
+			return;
+		}
+
+		table(["Site", "PHP"], $isolated->all());
+
 
 	})->descriptions('List isolated sites.');
 

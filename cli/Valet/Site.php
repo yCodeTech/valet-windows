@@ -556,12 +556,13 @@ class Site
 			})->map(function ($site, $key) use ($tld) {
 
 			return [
-				"site" => str_replace(".conf", '', $site),
+				"site" => str_replace(".code.conf", '', $site),
 				"php" => $this->customPhpVersion($site)
 			];
 
 		});
-		table(["Site", "PHP"], $isolated->all());
+
+		return $isolated;
 	}
 
 	/**
