@@ -247,9 +247,13 @@ if (is_dir(VALET_HOME_PATH)) {
 	}, ['unpark'])->descriptions('Remove the current working (or specified) directory from Valet\'s list of paths');
 
 	/**
-	 * Register a symbolic link with Valet.
+	 * Register the current working directory as a symbolic link with Valet.
+	 * 
+	 * @param string $name Give the site an optional name instead of using the path.
+	 * @param boolean $secure Secure the site with an SSL certificate.
+	 * @param string $isolate Optionally provide a PHP version to isolate the symbolic link site.
 	 */
-	$app->command('link [name] [--secure]', function ($name, $secure) {
+	$app->command('link [name] [--secure] [--isolate=]', function ($name, $secure, $isolate = null) {
 		$linkPath = Site::link(getcwd(), $name = $name ?: basename(getcwd()));
 
 		info('A [' . $name . '] symbolic link has been created in [' . $linkPath . '].');
@@ -257,8 +261,13 @@ if (is_dir(VALET_HOME_PATH)) {
 		if ($secure) {
 			$this->runCommand('secure ' . $name);
 		}
+
+		if ($isolate) {
+			Site::isolate($isolate, $name);
+		}
 	})->descriptions('Link the current working directory to Valet with a given name', [
-			'--secure' => 'Optionally secure the site'
+			'--secure' => 'Optionally secure the site',
+			'--isolate' => 'Isolate the site to a specified PHP version'
 		]);
 
 	/**
@@ -282,7 +291,18 @@ if (is_dir(VALET_HOME_PATH)) {
 	 * Unlink a link from the Valet links directory.
 	 */
 	$app->command('unlink [name]', function ($name) {
-		info('The [' . Site::unlink($name) . '] symbolic link has been removed.');
+		$name = Site::unlink($name);
+
+		if (Site::isSecured($name)) {
+			info('Unsecuring ' . $name . '...');
+
+			$site = $name . '.' . Configuration::read()['tld'];
+			Site::unsecure($site);
+
+			Nginx::restart();
+		}
+
+		info('The [' . $name . '] symbolic link has been removed.');
 	})->descriptions('Remove the specified Valet symbolic link');
 
 	/**

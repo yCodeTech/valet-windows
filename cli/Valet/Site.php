@@ -626,6 +626,18 @@ class Site
 	}
 
 	/**
+	 * Determine if site is secured.
+	 * @param string $site
+	 * @return bool
+	 */
+	public function isSecured($site)
+	{
+		$tld = $this->config->read()['tld'];
+
+		return in_array($site . '.' . $tld, $this->secured());
+	}
+
+	/**
 	 * Secure the given host with TLS.
 	 *
 	 * @param  string  $url
