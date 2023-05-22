@@ -120,7 +120,7 @@ $app->command('php:list', function () {
 	$php = $config['php'] ?? [];
 
 	$php = collect($php)->map(function ($item) use ($defaultPhpVersion) {
-		$item['default'] = $defaultPhpVersion === $item['version'] ? '✔' : '';
+		$item['default'] = $defaultPhpVersion === $item['version'] ? 'X' : '';
 
 		return $item;
 	})->toArray();
@@ -284,7 +284,7 @@ if (is_dir(VALET_HOME_PATH)) {
 			return $value;
 		});
 
-		table(['Site', 'SSL', 'PHP', 'URL', 'Path'], $links->all());
+		table(['Site', 'SSL', 'PHP', 'URL', 'Path'], $links->all(), true);
 	})->descriptions('Display all of the registered Valet symbolic links');
 
 	/**
@@ -660,9 +660,10 @@ if (is_dir(VALET_HOME_PATH)) {
 			return;
 		}
 
-		// If $sites is empty, then isolate the current working directory.
+		// If $site is empty, then isolate the current working directory.
 		if (!$site) {
 			$site = basename(getcwd());
+			info("Isolating the current working directory...");
 			Site::isolate($phpVersion, $site);
 
 			return;
@@ -699,6 +700,7 @@ if (is_dir(VALET_HOME_PATH)) {
 
 		if (!$site) {
 			$site = basename(getcwd());
+			info("Unisolating the current working directory...");
 		}
 
 		Site::unisolate($site);

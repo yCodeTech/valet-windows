@@ -185,7 +185,7 @@ class Site
 
 			return [
 				'site' => $site,
-				'secured' => $secured ? '✔' : '',
+				'secured' => $secured ? 'X' : '',
 				'url' => $url,
 				'path' => $host,
 			];
@@ -349,7 +349,7 @@ class Site
 			return [
 				'site' => $site,
 				'alias' => $alias,
-				'secured' => $secured ? '✔' : '',
+				'secured' => $secured ? 'X' : '',
 				'php' => $phpVersion,
 				'url' => $url,
 				'aliasUrl' => $aliasUrl,
@@ -914,7 +914,7 @@ class Site
 		$secured = $this->parked()
 			->merge($this->links())
 			->sort()
-			->where('secured', '✔');
+			->where('secured', 'X');
 
 		if ($secured->count() === 0) {
 			return info('No sites to unsecure. You may list all servable sites or links by running <comment>valet parked</comment> or <comment>valet links</comment>.');
@@ -930,7 +930,7 @@ class Site
 		$remaining = $this->parked()
 			->merge($this->links())
 			->sort()
-			->where('secured', '✔');
+			->where('secured', 'X');
 		if ($remaining->count() > 0) {
 			warning('We were not succesful in unsecuring the following sites:');
 			table(default_table_headers(), $remaining->toArray());
@@ -948,7 +948,7 @@ class Site
 		$secured = $this->parked()
 			->merge($this->links())
 			->sort()
-			->where('secured', '✔');
+			->where('secured', 'X');
 
 		if ($secured->isEmpty()) {
 			return;
