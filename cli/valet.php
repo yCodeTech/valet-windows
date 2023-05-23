@@ -16,6 +16,7 @@ use Illuminate\Container\Container;
 use Silly\Application;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use function Valet\info;
+use function Valet\info_dump;
 use function Valet\output;
 use function Valet\table;
 use function Valet\default_table_headers;
@@ -343,7 +344,21 @@ if (is_dir(VALET_HOME_PATH)) {
 		info('The [' . $url . '] site will now serve traffic over HTTP.');
 	})->descriptions('Stop serving the given domain over HTTPS and remove the trusted TLS certificate');
 
-	// TODO: Add a secured command.
+	/**
+	 * Display all of the currently secured sites.
+	 */
+	$app->command('secured', function ($output) {
+		$sites = collect(Site::secured())->map(function ($url) {
+			return ['Site' => $url];
+		});
+
+		if (count($sites) === 0) {
+			info("There are no secured sites.");
+			return false;
+		}
+
+		table(['Site'], $sites->all(), true);
+	})->descriptions('Display all of the currently secured sites');
 
 	/**
 	 * Create an Nginx proxy config for the specified domain.

@@ -476,18 +476,6 @@ class Site
 	}
 
 	/**
-	 * Get all of the URLs that are currently secured.
-	 *
-	 * @return array
-	 */
-	public function publishParkedNginxConf($parkedPath)
-	{
-		$parked = $this->parked();
-
-		// TODO
-	}
-
-	/**
 	 * Isolate a given directory to use a specific version of PHP.
 	 *
 	 * @param string $phpVersion

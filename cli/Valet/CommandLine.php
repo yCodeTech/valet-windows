@@ -14,7 +14,7 @@ class CommandLine
 	 */
 	public function quietly($command)
 	{
-		$this->runCommand($command.' > /dev/null 2>&1');
+		$this->runCommand($command . ' > /dev/null 2>&1');
 	}
 
 	/**
@@ -25,7 +25,7 @@ class CommandLine
 	 */
 	public function quietlyAsUser($command)
 	{
-		$this->quietly($command.' > /dev/null 2>&1');
+		$this->quietly($command . ' > /dev/null 2>&1');
 	}
 
 	/**
@@ -73,14 +73,6 @@ class CommandLine
 	public function powershell(string $command, callable $onError = null)
 	{
 		return $this->runCommand("powershell -command \"$command\"", $onError);
-	}
-
-	/**
-	 * @deprecated
-	 */
-	public function runOrDie($command, callable $onError = null)
-	{
-		return $this->runOrExit($command, $onError);
 	}
 
 	/**
