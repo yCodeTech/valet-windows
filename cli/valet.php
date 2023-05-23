@@ -291,9 +291,12 @@ if (is_dir(VALET_HOME_PATH)) {
 	 * Unlink a link from the Valet links directory.
 	 */
 	$app->command('unlink [name]', function ($name) {
-		$name = Site::unlink($name);
 
-		if (Site::isSecured($name)) {
+		if (Site::isIsolated($name) === true) {
+			Site::unisolate($name);
+		}
+
+		if (Site::isSecured($name) === true) {
 			info('Unsecuring ' . $name . '...');
 
 			$site = $name . '.' . Configuration::read()['tld'];
@@ -301,8 +304,11 @@ if (is_dir(VALET_HOME_PATH)) {
 
 			Nginx::restart();
 		}
+		// Unlink the site.
+		Site::unlink($name);
 
 		info('The [' . $name . '] symbolic link has been removed.');
+
 	})->descriptions('Remove the specified Valet symbolic link');
 
 	/**
@@ -336,6 +342,8 @@ if (is_dir(VALET_HOME_PATH)) {
 
 		info('The [' . $url . '] site will now serve traffic over HTTP.');
 	})->descriptions('Stop serving the given domain over HTTPS and remove the trusted TLS certificate');
+
+	// TODO: Add a secured command.
 
 	/**
 	 * Create an Nginx proxy config for the specified domain.

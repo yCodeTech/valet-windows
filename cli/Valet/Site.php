@@ -403,8 +403,6 @@ class Site
 		if ($this->files->exists($path = $this->sitesPath($name))) {
 			$this->files->unlink($path);
 		}
-
-		return $name;
 	}
 
 	/**
@@ -525,6 +523,11 @@ class Site
 	{
 		$site = $this->getSiteUrl($directory);
 
+		// Make sure the site exists, otherwise stop executing.
+		if (!$site) {
+			return false;
+		}
+
 		// If a site has an SSL certificate, we need to keep its custom config file, but we can
 		// just re-generate it without defining a custom `valet.sock` file
 		if ($this->files->exists($this->certificatesPath($site, 'crt'))) {
@@ -535,6 +538,7 @@ class Site
 			$this->files->unlink($this->nginxPath($site));
 		}
 
+		info('Restarting Nginx...');
 		\Nginx::stop();
 		\Nginx::restart();
 
@@ -549,20 +553,31 @@ class Site
 		$dir = $this->nginxPath();
 		$tld = $this->config->read()['tld'];
 
-		$isolated = collect($this->files->scandir($dir))
-			->filter(function ($site, $key) use ($tld) {
-				// keep sites that match our TLD
-				return ends_with($site, ".$tld.conf");
-			})->map(function ($site, $key) use ($tld) {
-
+		$isolated = collect($this->files->scandir($dir))->filter(function ($site, $key) use ($tld) {
+			// keep sites that match our TLD
+			return ends_with($site, ".$tld.conf");
+		})->map(function ($site, $key) use ($tld) {
 			return [
-				"site" => str_replace(".code.conf", '', $site),
+				"site" => str_replace(".$tld.conf", '', $site),
 				"php" => $this->customPhpVersion($site)
 			];
-
 		});
 
 		return $isolated;
+	}
+
+	/**
+	 * Determine if site is isolated.
+	 * @param string $site
+	 * @return bool
+	 */
+	public function isIsolated($site)
+	{
+		$isolated = $this->isolated()->map(function ($arr, $key) {
+			return ["site" => $arr["site"]];
+		})->flatten()->all();
+
+		return in_array($site, $isolated);
 	}
 
 	/**
@@ -585,7 +600,7 @@ class Site
 
 		if (!$this->parked()->merge($this->links())->where('site', $directory)->count() > 0) {
 			// Invalid directory provided
-			warning('Invalid site or directory given');
+			error('Invalid site or directory given');
 
 			return false;
 		}
@@ -610,31 +625,6 @@ class Site
 				return trim(str_replace('# Valet isolated PHP version : ', '', $firstLine));
 			}
 		}
-	}
-
-	/**
-	 * Get all of the URLs that are currently secured.
-	 *
-	 * @return array
-	 */
-	public function secured()
-	{
-		return collect($this->files->scandir($this->certificatesPath()))
-			->map(function ($file) {
-				return str_replace(['.key', '.csr', '.crt', '.conf'], '', $file);
-			})->unique()->values()->all();
-	}
-
-	/**
-	 * Determine if site is secured.
-	 * @param string $site
-	 * @return bool
-	 */
-	public function isSecured($site)
-	{
-		$tld = $this->config->read()['tld'];
-
-		return in_array($site . '.' . $tld, $this->secured());
 	}
 
 	/**
@@ -667,6 +657,92 @@ class Site
 		$this->files->putAsUser(
 			$this->nginxPath($url), $this->buildSecureNginxServer($url, $siteConf)
 		);
+	}
+
+	/**
+	 * Unsecure the given URL so that it will use HTTP again.
+	 *
+	 * @param  string  $url
+	 * @return void
+	 */
+	public function unsecure($url)
+	{
+		// Extract in order to later preserve custom PHP version config when unsecuring. Example output: "8.1.2"
+		$phpVersion = $this->customPhpVersion($url);
+
+		if ($this->files->exists($this->certificatesPath($url, 'crt'))) {
+			$this->files->unlink($this->nginxPath($url));
+
+			$this->files->unlink($this->certificatesPath($url, 'key'));
+			$this->files->unlink($this->certificatesPath($url, 'csr'));
+			$this->files->unlink($this->certificatesPath($url, 'crt'));
+		}
+
+		$this->cli->run(sprintf('cmd "/C certutil -delstore "Root" "%s""', $url));
+
+		// If the user had isolated the PHP version for this site, swap out .sock file
+		if ($phpVersion) {
+			$this->installSiteConfig($url, $phpVersion);
+		}
+	}
+
+	/**
+	 * Unsecure all URLs so that they will use HTTP again.
+	 */
+	public function unsecureAll()
+	{
+		$tld = $this->config->read()['tld'];
+
+		$secured = $this->parked()
+			->merge($this->links())
+			->sort()
+			->where('secured', 'X');
+
+		if ($secured->count() === 0) {
+			return info('No sites to unsecure. You may list all servable sites or links by running <comment>valet parked</comment> or <comment>valet links</comment>.');
+		}
+
+		info('Attempting to unsecure the following sites:');
+		table(default_table_headers(), $secured->toArray());
+
+		foreach ($secured->pluck('site') as $url) {
+			$this->unsecure($url . '.' . $tld);
+		}
+
+		$remaining = $this->parked()
+			->merge($this->links())
+			->sort()
+			->where('secured', 'X');
+		if ($remaining->count() > 0) {
+			warning('We were not succesful in unsecuring the following sites:');
+			table(default_table_headers(), $remaining->toArray());
+		}
+		info('unsecure --all was successful.');
+	}
+
+	/**
+	 * Get all of the URLs that are currently secured.
+	 *
+	 * @return array
+	 */
+	public function secured()
+	{
+		return collect($this->files->scandir($this->certificatesPath()))
+			->map(function ($file) {
+				return str_replace(['.key', '.csr', '.crt', '.conf'], '', $file);
+			})->unique()->values()->all();
+	}
+
+	/**
+	 * Determine if site is secured.
+	 * @param string $site
+	 * @return bool
+	 */
+	public function isSecured($site)
+	{
+		$tld = $this->config->read()['tld'];
+
+		return in_array($site . '.' . $tld, $this->secured());
 	}
 
 	/**
@@ -878,64 +954,6 @@ class Site
 		}
 
 		return $siteConf;
-	}
-
-	/**
-	 * Unsecure the given URL so that it will use HTTP again.
-	 *
-	 * @param  string  $url
-	 * @return void
-	 */
-	public function unsecure($url)
-	{
-		// Extract in order to later preserve custom PHP version config when unsecuring. Example output: "8.1.2"
-		$phpVersion = $this->customPhpVersion($url);
-
-		if ($this->files->exists($this->certificatesPath($url, 'crt'))) {
-			$this->files->unlink($this->nginxPath($url));
-
-			$this->files->unlink($this->certificatesPath($url, 'key'));
-			$this->files->unlink($this->certificatesPath($url, 'csr'));
-			$this->files->unlink($this->certificatesPath($url, 'crt'));
-		}
-
-		$this->cli->run(sprintf('cmd "/C certutil -delstore "Root" "%s""', $url));
-
-		// If the user had isolated the PHP version for this site, swap out .sock file
-		if ($phpVersion) {
-			$this->installSiteConfig($url, $phpVersion);
-		}
-	}
-
-	public function unsecureAll()
-	{
-		$tld = $this->config->read()['tld'];
-
-		$secured = $this->parked()
-			->merge($this->links())
-			->sort()
-			->where('secured', 'X');
-
-		if ($secured->count() === 0) {
-			return info('No sites to unsecure. You may list all servable sites or links by running <comment>valet parked</comment> or <comment>valet links</comment>.');
-		}
-
-		info('Attempting to unsecure the following sites:');
-		table(default_table_headers(), $secured->toArray());
-
-		foreach ($secured->pluck('site') as $url) {
-			$this->unsecure($url . '.' . $tld);
-		}
-
-		$remaining = $this->parked()
-			->merge($this->links())
-			->sort()
-			->where('secured', 'X');
-		if ($remaining->count() > 0) {
-			warning('We were not succesful in unsecuring the following sites:');
-			table(default_table_headers(), $remaining->toArray());
-		}
-		info('unsecure --all was successful.');
 	}
 
 	/**

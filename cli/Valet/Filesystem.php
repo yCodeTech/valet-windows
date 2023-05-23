@@ -42,7 +42,7 @@ class Filesystem
 	 */
 	public function ensureDirExists($path, $owner = null, $mode = 0755)
 	{
-		if (! $this->isDir($path)) {
+		if (!$this->isDir($path)) {
 			$this->mkdir($path, $owner, $mode);
 		}
 	}
@@ -246,11 +246,13 @@ class Filesystem
 				exec("cd \"{$dir}\" && rmdir {$link}");
 			} else {
 				@unlink($path);
+				@rmdir($path);
 			}
 		} elseif ($this->isDir($path)) {
-			exec('cmd /C rmdir /s /q "'.$path.'"');
+			exec('cmd /C rmdir /s /q "' . $path . '"');
 		} elseif (file_exists($path)) {
 			@unlink($path);
+			@rmdir($path);
 		}
 	}
 
@@ -324,12 +326,12 @@ class Filesystem
 	public function removeBrokenLinksAt($path)
 	{
 		collect($this->scandir($path))
-				->filter(function ($file) use ($path) {
-					return $this->isBrokenLink($path.'/'.$file);
-				})
-				->each(function ($file) use ($path) {
-					$this->unlink($path.'/'.$file);
-				});
+			->filter(function ($file) use ($path) {
+				return $this->isBrokenLink($path . '/' . $file);
+			})
+			->each(function ($file) use ($path) {
+				$this->unlink($path . '/' . $file);
+			});
 	}
 
 	/**
@@ -352,8 +354,8 @@ class Filesystem
 	public function scandir($path)
 	{
 		return collect(scandir($path))
-					->reject(function ($file) {
-						return in_array($file, ['.', '..']);
-					})->values()->all();
+			->reject(function ($file) {
+				return in_array($file, ['.', '..']);
+			})->values()->all();
 	}
 }
