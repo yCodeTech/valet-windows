@@ -228,6 +228,8 @@ if (is_dir(VALET_HOME_PATH)) {
 		table(default_table_headers(), $parked->all());
 	})->descriptions('Display all the current sites within parked paths');
 
+	// TODO: List all sites in parked and linked and proxied
+
 	//    /**
 //     * Get all the current sites within paths parked with 'park {path}'.
 //     */
@@ -619,13 +621,6 @@ if (is_dir(VALET_HOME_PATH)) {
 			output('Upgrade instructions can be found in the docs: https://github.com/cretueusebiu/valet-windows#upgrading');
 		}
 	})->descriptions('Determine if this is the latest version of Valet');
-
-	/**
-	 * Install the sudoers.d entries so password is no longer required.
-	 */
-	$app->command('trust [--off]', function ($off) {
-		warning('This command is not required for Windows.');
-	})->descriptions('This command is not required for Windows.');
 
 	/**
 	 * Set or change the default PHP version valet uses.
