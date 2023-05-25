@@ -52,28 +52,36 @@ class Valet
 	 */
 	public function services(): array
 	{
+		$phps = \Configuration::get('php', []);
+
+		$phpCGIs = collect([]);
+		$phpXdebugCGIs = collect([]);
+		foreach ($phps as $php) {
+			$phpCGIs->put("php {$php['version']}", \PhpCgi::getPhpCgiName($php['version']));
+			$phpXdebugCGIs->put("php-xdebug {$php['version']}", \PhpCgiXdebug::getPhpCgiName($php['version']));
+		}
+
 		return collect([
 			'acrylic' => 'AcrylicDNSProxySvc',
 			'nginx' => 'valet_nginx',
-			'php' => 'valet_phpcgi',
-			'php-xdebug' => 'valet_phpcgi_xdebug',
-		])->map(function ($id, $service) {
-			$output = $this->cli->run('powershell -command "Get-Service -Name ' . $id . '"');
+		])->merge($phpCGIs)->merge($phpXdebugCGIs)
+			->map(function ($id, $service) {
+				$output = $this->cli->run('powershell -command "Get-Service -Name ' . $id . '"');
 
-			if (strpos($output, 'Running') > -1) {
-				$status = '<fg=green>running</>';
-			} elseif (strpos($output, 'Stopped') > -1) {
-				$status = '<fg=yellow>stopped</>';
-			} else {
-				$status = '<fg=red>missing</>';
-			}
+				if (strpos($output, 'Running') > -1) {
+					$status = '<fg=green>running</>';
+				} elseif (strpos($output, 'Stopped') > -1) {
+					$status = '<fg=yellow>stopped</>';
+				} else {
+					$status = '<fg=red>missing</>';
+				}
 
-			return [
-				'service' => $service,
-				'winname' => $id,
-				'status' => $status,
-			];
-		})->values()->all();
+				return [
+					'service' => $service,
+					'winname' => $id,
+					'status' => $status,
+				];
+			})->values()->all();
 	}
 
 	/**

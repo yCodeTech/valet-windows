@@ -78,7 +78,7 @@ class PhpCgi
 		$phps = $this->configuration->get('php', []);
 
 		if ($phpVersion) {
-			if (! isset($this->phpWinSws[$phpVersion])) {
+			if (!isset($this->phpWinSws[$phpVersion])) {
 				warning("PHP service for version {$phpVersion} not found");
 			}
 
@@ -107,10 +107,10 @@ class PhpCgi
 
 		// copy default phpcgiservice stub to create a new one
 		$phpCgiServiceConfigArgs['PHPCGINAME'] = $phpWinSw['phpCgiName'];
-		$phpCgiServiceConfig = $phpCgiServiceConfig ?? file_get_contents(__DIR__.'/../stubs/phpcgiservice.xml');
+		$phpCgiServiceConfig = $phpCgiServiceConfig ?? file_get_contents(__DIR__ . '/../stubs/phpcgiservice.xml');
 
 		$this->files->put(
-			(__DIR__."/../stubs/{$phpWinSw['phpServiceName']}.xml"),
+			(__DIR__ . "/../stubs/{$phpWinSw['phpServiceName']}.xml"),
 			str_replace(array_keys($phpCgiServiceConfigArgs), array_values($phpCgiServiceConfigArgs), $phpCgiServiceConfig ?: '')
 		);
 
@@ -132,7 +132,7 @@ class PhpCgi
 	public function uninstall($phpVersion = null)
 	{
 		if ($phpVersion) {
-			if (! isset($this->phpWinSws[$phpVersion])) {
+			if (!isset($this->phpWinSws[$phpVersion])) {
 				warning("PHP service for version [{$phpVersion}] not found");
 			}
 			$this->uninstallService($phpVersion);
@@ -192,7 +192,7 @@ class PhpCgi
 	 */
 	public function findDefaultPhpPath(): string
 	{
-		if (! $php = (new PhpExecutableFinder)->find()) {
+		if (!$php = (new PhpExecutableFinder)->find()) {
 			$php = $this->cli->runOrExit('where php', function () {
 				error('Failed to find PHP. Make sure it\'s added to the path environment variables.');
 			});
@@ -209,7 +209,7 @@ class PhpCgi
 	public function findPhpVersion($phpPath)
 	{
 		$phpExecPath = "{$phpPath}\php.exe";
-		if (! file_exists($phpExecPath)) {
+		if (!file_exists($phpExecPath)) {
 			error("Failed to find the PHP executable in {$phpPath}");
 
 			return null;
@@ -220,5 +220,16 @@ class PhpCgi
 		});
 
 		return $phpVersion->getOutput();
+	}
+
+	/**
+	 * Get the CGI name
+	 * 
+	 * @param string $phpVersion
+	 * @return string
+	 */
+	public function getPhpCgiName($phpVersion)
+	{
+		return $this->phpWinSws[$phpVersion]["phpCgiName"];
 	}
 }

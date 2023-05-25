@@ -825,6 +825,8 @@ if (is_dir(VALET_HOME_PATH)) {
 	 * List the installed Valet services.
 	 */
 	$app->command('services', function () {
+		info("Checking the Valet services...");
+
 		table(['Service', 'Windows Name', 'Status'], Valet::services());
 		info('Use valet start/stop/restart [service] to change status (eg: valet restart nginx).');
 	})->descriptions('List the installed Windows services.');
