@@ -264,7 +264,7 @@ if (is_dir(VALET_HOME_PATH)) {
 	 * Register the current working directory as a symbolic link with Valet.
 	 * 
 	 * @param string $name Give the site an optional name instead of using the path.
-	 * @param boolean $secure Secure the site with an SSL certificate.
+	 * @param boolean $secure Secure the site with an TLS certificate.
 	 * @param string $isolate Optionally provide a PHP version to isolate the symbolic link site.
 	 */
 	$app->command('link [name] [--secure] [--isolate=]', function ($name, $secure, $isolate = null) {
@@ -298,7 +298,7 @@ if (is_dir(VALET_HOME_PATH)) {
 			return $value;
 		});
 
-		table(['Site', 'SSL', 'PHP', 'URL', 'Path'], $links->all(), true);
+		table(['Site', 'Secure', 'PHP', 'URL', 'Path'], $links->all(), true);
 	})->descriptions('Display all of the registered Valet symbolic links');
 
 	/**
@@ -395,7 +395,7 @@ if (is_dir(VALET_HOME_PATH)) {
 	$app->command('proxies', function () {
 		$proxies = Site::proxies();
 
-		table(['Site', 'SSL', 'URL', 'Host'], $proxies->all());
+		table(['Site', 'Secure', 'URL', 'Host'], $proxies->all());
 	})->descriptions('Display all of the proxy sites');
 
 	/**

@@ -117,7 +117,7 @@ class Configuration
 	}
 
 	/**
-	 * Create the directory for SSL certificates.
+	 * Create the directory for SSL/TLS certificates.
 	 *
 	 * @return void
 	 */

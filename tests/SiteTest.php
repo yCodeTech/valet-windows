@@ -17,9 +17,9 @@ class SiteTest extends TestCase
 	{
 		parent::tearDown();
 
-		exec('cmd /C rmdir /s /q "'.__DIR__.DIRECTORY_SEPARATOR.'output"');
-		mkdir(__DIR__.'/output');
-		touch(__DIR__.'/output/.gitkeep');
+		exec('cmd /C rmdir /s /q "' . __DIR__ . DIRECTORY_SEPARATOR . 'output"');
+		mkdir(__DIR__ . '/output');
+		touch(__DIR__ . '/output/.gitkeep');
 	}
 
 	public function test_get_certificates_will_return_with_multi_segment_tld()
@@ -58,7 +58,7 @@ class SiteTest extends TestCase
 			->andReturn(false);
 		$files->shouldReceive('realpath')
 			->twice()
-			->andReturn($dirPath.'/sitetwo', $dirPath.'/sitethree');
+			->andReturn($dirPath . '/sitetwo', $dirPath . '/sitethree');
 		$files->shouldReceive('isDir')->andReturn(true);
 		$files->shouldReceive('ensureDirExists')
 			->once()
@@ -90,13 +90,13 @@ class SiteTest extends TestCase
 			'site' => 'sitetwo',
 			'secured' => '',
 			'url' => 'http://sitetwo.local',
-			'path' => $dirPath.'/sitetwo',
+			'path' => $dirPath . '/sitetwo',
 		], $sites->first());
 		$this->assertSame([
 			'site' => 'sitethree',
-			'secured' => ' X',
+			'secured' => 'X',
 			'url' => 'https://sitethree.local',
-			'path' => $dirPath.'/sitethree',
+			'path' => $dirPath . '/sitethree',
 		], $sites->last());
 	}
 
@@ -110,13 +110,13 @@ class SiteTest extends TestCase
 			->andReturn(['sitetwo']);
 		$files->shouldReceive('isLink')
 			->once()
-			->with($dirPath.'/sitetwo')
+			->with($dirPath . '/sitetwo')
 			->andReturn(false);
 		$files->shouldReceive('realpath')
 			->once()
-			->with($dirPath.'/sitetwo')
-			->andReturn($dirPath.'/sitetwo');
-		$files->shouldReceive('isDir')->once()->with($dirPath.'/sitetwo')->andReturn(true);
+			->with($dirPath . '/sitetwo')
+			->andReturn($dirPath . '/sitetwo');
+		$files->shouldReceive('isDir')->once()->with($dirPath . '/sitetwo')->andReturn(true);
 		$files->shouldReceive('ensureDirExists')
 			->once()
 			->with($dirPath, user());
@@ -138,7 +138,7 @@ class SiteTest extends TestCase
 			'site' => 'sitetwo',
 			'secured' => '',
 			'url' => 'http://sitetwo.local',
-			'path' => $dirPath.'/sitetwo',
+			'path' => $dirPath . '/sitetwo',
 		], $sites->first());
 	}
 
@@ -151,7 +151,7 @@ class SiteTest extends TestCase
 			->with($dirPath)
 			->andReturn(['sitetwo', 'siteone']);
 		$files->shouldReceive('isLink')->andReturn(false);
-		$files->shouldReceive('realpath')->andReturn($dirPath.'/sitetwo', $dirPath.'/siteone');
+		$files->shouldReceive('realpath')->andReturn($dirPath . '/sitetwo', $dirPath . '/siteone');
 		$files->shouldReceive('isDir')->twice()
 			->andReturn(false, true);
 		$files->shouldReceive('ensureDirExists')
@@ -175,7 +175,7 @@ class SiteTest extends TestCase
 			'site' => 'siteone',
 			'secured' => '',
 			'url' => 'http://siteone.local',
-			'path' => $dirPath.'/siteone',
+			'path' => $dirPath . '/siteone',
 		], $sites->first());
 	}
 
@@ -189,11 +189,11 @@ class SiteTest extends TestCase
 			->andReturn(['siteone']);
 		$files->shouldReceive('isLink')
 			->once()
-			->with($dirPath.'/siteone')
+			->with($dirPath . '/siteone')
 			->andReturn(true);
 		$files->shouldReceive('readLink')
 			->once()
-			->with($dirPath.'/siteone')
+			->with($dirPath . '/siteone')
 			->andReturn($linkedPath = '/Users/usertest/linkedpath/siteone');
 		$files->shouldReceive('isDir')->andReturn(true);
 		$files->shouldReceive('ensureDirExists')
@@ -224,39 +224,39 @@ class SiteTest extends TestCase
 	public function test_symlink_creates_symlink_to_given_path()
 	{
 		$files = Mockery::mock(Filesystem::class);
-		$files->shouldReceive('ensureDirExists')->once()->with(VALET_HOME_PATH.'/Sites', user());
+		$files->shouldReceive('ensureDirExists')->once()->with(VALET_HOME_PATH . '/Sites', user());
 		$config = Mockery::mock(Configuration::class);
-		$config->shouldReceive('prependPath')->once()->with(VALET_HOME_PATH.'/Sites');
-		$files->shouldReceive('symlinkAsUser')->once()->with('target', VALET_HOME_PATH.'/Sites/link');
+		$config->shouldReceive('prependPath')->once()->with(VALET_HOME_PATH . '/Sites');
+		$files->shouldReceive('symlinkAsUser')->once()->with('target', VALET_HOME_PATH . '/Sites/link');
 
 		swap(Filesystem::class, $files);
 		swap(Configuration::class, $config);
 
 		$linkPath = resolve(Site::class)->link('target', 'link');
-		$this->assertSame(VALET_HOME_PATH.'/Sites/link', $linkPath);
+		$this->assertSame(VALET_HOME_PATH . '/Sites/link', $linkPath);
 	}
 
 	public function test_unlink_removes_existing_symlink()
 	{
-		file_put_contents(__DIR__.'/output/file.out', 'test');
-		symlink(__DIR__.'/output/file.out', __DIR__.'/output/link');
+		file_put_contents(__DIR__ . '/output/file.out', 'test');
+		symlink(__DIR__ . '/output/file.out', __DIR__ . '/output/link');
 		$site = resolve(StubForRemovingLinks::class);
 		$site->unlink('link');
-		$this->assertFileDoesNotExist(__DIR__.'/output/link');
+		$this->assertFileDoesNotExist(__DIR__ . '/output/link');
 
 		$site = resolve(StubForRemovingLinks::class);
 		$site->unlink('link');
-		$this->assertFileDoesNotExist(__DIR__.'/output/link');
+		$this->assertFileDoesNotExist(__DIR__ . '/output/link');
 	}
 
 	public function test_prune_links_removes_broken_symlinks_in_sites_path()
 	{
-		file_put_contents(__DIR__.'/output/file.out', 'test');
-		symlink(__DIR__.'/output/file.out', __DIR__.'/output/link');
-		unlink(__DIR__.'/output/file.out');
+		file_put_contents(__DIR__ . '/output/file.out', 'test');
+		symlink(__DIR__ . '/output/file.out', __DIR__ . '/output/link');
+		unlink(__DIR__ . '/output/file.out');
 		$site = resolve(StubForRemovingLinks::class);
 		$site->pruneLinks();
-		$this->assertFileDoesNotExist(__DIR__.'/output/link');
+		$this->assertFileDoesNotExist(__DIR__ . '/output/link');
 	}
 
 	public function test_certificates_trim_tld_for_custom_tlds()
@@ -317,7 +317,7 @@ class SiteTest extends TestCase
 		$this->assertEquals([
 			'some-proxy.com' => [
 				'site' => 'some-proxy.com',
-				'secured' => ' X',
+				'secured' => 'X',
 				'url' => 'https://some-proxy.com.test',
 				'path' => 'https://127.0.0.1:8443',
 			],
@@ -356,7 +356,7 @@ class SiteTest extends TestCase
 		$this->assertEquals([
 			'my-new-proxy.com' => [
 				'site' => 'my-new-proxy.com',
-				'secured' => ' X',
+				'secured' => 'X',
 				'url' => 'https://my-new-proxy.com.test',
 				'path' => 'https://127.0.0.1:9443',
 			],
@@ -385,7 +385,7 @@ class SiteTest extends TestCase
 		$this->assertEquals([
 			'my-new-proxy.com' => [
 				'site' => 'my-new-proxy.com',
-				'secured' => ' X',
+				'secured' => 'X',
 				'url' => 'https://my-new-proxy.com.test',
 				'path' => 'https://127.0.0.1:7443',
 			],
@@ -400,7 +400,7 @@ class SiteTest extends TestCase
 		$this->assertEquals([
 			'my-new-proxy.com' => [
 				'site' => 'my-new-proxy.com',
-				'secured' => ' X',
+				'secured' => 'X',
 				'url' => 'https://my-new-proxy.com.test',
 				'path' => 'https://127.0.0.1:9443',
 			],
@@ -440,7 +440,7 @@ class SiteTest extends TestCase
 		$this->assertEquals([
 			'my-new-proxy.com' => [
 				'site' => 'my-new-proxy.com',
-				'secured' => ' X',
+				'secured' => 'X',
 				'url' => 'https://my-new-proxy.com.test',
 				'path' => 'https://127.0.0.1:9443',
 			],
@@ -472,7 +472,7 @@ class SiteTest extends TestCase
 		$this->assertEquals([
 			'my-new-proxy.com' => [
 				'site' => 'my-new-proxy.com',
-				'secured' => ' X',
+				'secured' => 'X',
 				'url' => 'https://my-new-proxy.com.test',
 				'path' => 'https://127.0.0.1:9443',
 			],
@@ -511,8 +511,8 @@ class FixturesSiteFake extends Site
 
 	public function valetHomePath()
 	{
-		if (! isset($this->valetHomePath)) {
-			throw new \RuntimeException(static::class.' needs to be configured using useFixtures or useOutput');
+		if (!isset($this->valetHomePath)) {
+			throw new \RuntimeException(static::class . ' needs to be configured using useFixtures or useOutput');
 		}
 
 		return $this->valetHomePath;
@@ -524,7 +524,7 @@ class FixturesSiteFake extends Site
 	 */
 	public function useFixture($fixtureName)
 	{
-		$this->valetHomePath = __DIR__.'/fixtures/'.$fixtureName;
+		$this->valetHomePath = __DIR__ . '/fixtures/' . $fixtureName;
 	}
 
 	/**
@@ -533,7 +533,7 @@ class FixturesSiteFake extends Site
 	 */
 	public function useOutput()
 	{
-		$this->valetHomePath = __DIR__.'/output';
+		$this->valetHomePath = __DIR__ . '/output';
 	}
 
 	public function createCa()
@@ -559,8 +559,8 @@ class FixturesSiteFake extends Site
 
 		$counter = $this->crtCounter++;
 
-		file_put_contents($crtPath, 'crt:'.$urlWithTld.':'.$counter);
-		file_put_contents($keyPath, 'key:'.$urlWithTld.':'.$counter);
+		file_put_contents($crtPath, 'crt:' . $urlWithTld . ':' . $counter);
+		file_put_contents($keyPath, 'key:' . $urlWithTld . ':' . $counter);
 	}
 
 	public function fakeSecure($urlWithTld)
@@ -605,8 +605,8 @@ class FixturesSiteFake extends Site
 		$crtPath = $this->certificatesPath($urlWithTld, 'crt');
 		$keyPath = $this->certificatesPath($urlWithTld, 'key');
 
-		SiteTest::assertEquals('crt:'.$urlWithTld.':'.$counter, file_get_contents($crtPath));
-		SiteTest::assertEquals('key:'.$urlWithTld.':'.$counter, file_get_contents($keyPath));
+		SiteTest::assertEquals('crt:' . $urlWithTld . ':' . $counter, file_get_contents($crtPath));
+		SiteTest::assertEquals('key:' . $urlWithTld . ':' . $counter, file_get_contents($keyPath));
 	}
 }
 
@@ -614,6 +614,6 @@ class StubForRemovingLinks extends Site
 {
 	public function sitesPath($additionalPath = null)
 	{
-		return __DIR__.'/output'.($additionalPath ? '/'.$additionalPath : '');
+		return __DIR__ . '/output' . ($additionalPath ? '/' . $additionalPath : '');
 	}
 }

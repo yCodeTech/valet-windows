@@ -103,11 +103,11 @@ function table(array $headers = [], array $rows = [], $setHorizontal = false)
 /**
  * Defines the default table headers.
  *
- * @return array ['Site', 'Alias', 'SSL', 'PHP', 'URL', 'Alias URL', 'Path']
+ * @return array ['Site', 'Alias', 'Secure', 'PHP', 'URL', 'Alias URL', 'Path']
  */
 function default_table_headers()
 {
-	return ['Site', 'Alias', 'SSL', 'PHP', 'URL', 'Alias URL', 'Path'];
+	return ['Site', 'Alias', 'Secure', 'PHP', 'URL', 'Alias URL', 'Path'];
 }
 
 /**

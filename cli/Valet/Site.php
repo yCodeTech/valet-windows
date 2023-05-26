@@ -407,13 +407,13 @@ class Site
 			return false;
 		}
 
-		// If a site has an SSL certificate, we need to keep its custom config file, but we can
+		// If a site has an SSL/TLS certificate, we need to keep its custom config file, but we can
 		// just re-generate it without defining a custom `valet.sock` file
 		if ($this->files->exists($this->certificatesPath($site, 'crt'))) {
 			$siteConf = $this->buildSecureNginxServer($site);
 			$this->files->putAsUser($this->nginxPath($site), $siteConf);
 		} else {
-			// When site doesn't have SSL, we can remove the custom nginx config file to remove isolation
+			// When site doesn't have SSL/TLS, we can remove the custom nginx config file to remove isolation
 			$this->files->unlink($this->nginxPath($site));
 		}
 
@@ -977,7 +977,7 @@ class Site
 
 			return [$site => $host];
 		})->reject(function ($host, $site) {
-			// If proxy host is null, it may be just a normal SSL stub, or something else; either way we exclude it from the list
+			// If proxy host is null, it may be just a normal SSL/TLS stub, or something else; either way we exclude it from the list
 			return $host === '(other)';
 		})->map(function ($host, $site) use ($certs, $tld) {
 			$secured = $certs->has($site);
