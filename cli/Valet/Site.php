@@ -500,9 +500,13 @@ class Site
 		$phpVersion = $this->customPhpVersion($url);
 		$this->unsecure($url);
 
+		$this->files->ensureDirExists($this->caPath(), user());
+
 		$this->files->ensureDirExists($this->certificatesPath(), user());
 
 		$this->files->ensureDirExists($this->nginxPath(), user());
+
+		$this->createCa();
 
 		$this->createCertificate($url);
 
@@ -537,6 +541,8 @@ class Site
 			$this->files->unlink($this->certificatesPath($url, 'csr'));
 			$this->files->unlink($this->certificatesPath($url, 'crt'));
 		}
+
+		$this->cli->run(sprintf('cmd "/C certutil -delstore "CA" "%s""', $url));
 
 		$this->cli->run(sprintf('cmd "/C certutil -delstore "Root" "%s""', $url));
 
@@ -681,6 +687,60 @@ class Site
 	}
 
 	/**
+	 * If CA and root certificates are nonexistent, create them and trust the root cert.
+	 *
+	 * @return void
+	 */
+	public function createCa()
+	{
+		$caPemPath = $this->caPath('LaravelValetCASelfSigned.crt');
+		$caKeyPath = $this->caPath('LaravelValetCASelfSigned.key');
+
+		if ($this->files->exists($caKeyPath) && $this->files->exists($caPemPath)) {
+			return;
+		}
+
+		$oName = 'Laravel Valet Windows 3 CA Self Signed Organization';
+		$cName = 'Laravel Valet Windows 3 CA Self Signed CN';
+
+		if ($this->files->exists($caKeyPath)) {
+			$this->files->unlink($caKeyPath);
+		}
+		if ($this->files->exists($caPemPath)) {
+			$this->files->unlink($caPemPath);
+		}
+
+		$this->cli->runOrExit(sprintf('cmd "/C certutil -delstore "Root" "%s""', $cName), function ($code, $output) {
+			error("Failed to trust certificate: $output");
+		});
+
+		$CAPrivKey = RSA::createKey()->withPadding(RSA::ENCRYPTION_PKCS1 | RSA::SIGNATURE_PKCS1);
+		$CAPubKey = $CAPrivKey->getPublicKey();
+
+		$CASubject = new X509;
+		$CASubject->setDNProp('emailaddress', 'rootcertificate@laravel.valet');
+		$CASubject->setDNProp('ou', 'Developers');
+		$CASubject->setDNProp('cn', $cName);
+		$CASubject->setDNProp('o', $oName);
+		$CASubject->setPublicKey($CAPubKey);
+
+		$CAIssuer = new X509;
+		$CAIssuer->setPrivateKey($CAPrivKey);
+		$CAIssuer->setDN($CASubject->getDN());
+
+		$x509 = new X509;
+		$x509->makeCA();
+		$result = $x509->sign($CAIssuer, $CASubject);
+
+		$CAPem = $x509->saveX509($result);
+
+		$this->files->putAsUser($caPemPath, $CAPem);
+		$this->files->putAsUser($caKeyPath, $CAPrivKey);
+
+		$this->trustCa($caPemPath);
+	}
+
+	/**
 	 * Create and trust a certificate for the given URL.
 	 *
 	 * @param  string  $url
@@ -691,10 +751,12 @@ class Site
 		$keyPath = $this->certificatesPath($url, 'key');
 		$csrPath = $this->certificatesPath($url, 'csr');
 		$crtPath = $this->certificatesPath($url, 'crt');
+		$caPemPath = $this->caPath('LaravelValetCASelfSigned.crt');
+		$caKeyPath = $this->caPath('LaravelValetCASelfSigned.key');
 
 		$this->createPrivateKey($keyPath);
 		$this->createSigningRequest($url, $keyPath, $csrPath);
-		$this->createSignedCertificate($keyPath, $csrPath, $crtPath);
+		$this->createSignedCertificate($keyPath, $csrPath, $crtPath, $caPemPath, $caKeyPath);
 
 		$this->trustCertificate($crtPath);
 	}
@@ -754,9 +816,11 @@ class Site
 	 * @param  string  $keyPath
 	 * @param  string  $csrPath
 	 * @param  string  $crtPath
+	 * @param  string  $caPemPath
+	 * @param  string  $caKeyPath
 	 * @return void
 	 */
-	public function createSignedCertificate(string $keyPath, string $csrPath, string $crtPath)
+	public function createSignedCertificate(string $keyPath, string $csrPath, string $crtPath, string $caPemPath, string $caKeyPath)
 	{
 		/** @var \phpseclib3\Crypt\RSA\PrivateKey */
 		$privKey = RSA::load($this->files->get($keyPath));
@@ -765,10 +829,21 @@ class Site
 		$subject = new X509();
 		$subject->loadCSR($this->files->get($csrPath));
 		$subject->setPublicKey($privKey->getPublicKey());
+		$subject->setDNProp('emailaddress', 'valet');
+		$subject->setDNProp('ou', 'Laravel Valet Windows 3');
+		$subject->setDNProp('l', 'Laravel Valet Windows 3');
+		$subject->setDNProp('o', 'Laravel Valet Windows 3');
+		$subject->setDNProp('st', 'MN');
+		$subject->setDNProp('c', 'US');
+
+		$ca = new X509();
+		$ca->loadX509($this->files->get($caPemPath));
+
+		$caPrivKey = RSA::load($this->files->get($caKeyPath))->withPadding(RSA::ENCRYPTION_PKCS1 | RSA::SIGNATURE_PKCS1);
 
 		$issuer = new X509();
-		$issuer->setPrivateKey($privKey);
-		$issuer->setDN($subject->getDN());
+		$issuer->setPrivateKey($caPrivKey);
+		$issuer->setDN($ca->getIssuerDN());
 
 		$x509 = new X509();
 		$x509->makeCA();
@@ -781,6 +856,20 @@ class Site
 	}
 
 	/**
+	 * Trust the given root certificate file in the Windows Certmgr.
+	 *
+	 * @param  string  $pemPath
+	 * @return void
+	 */
+	public function trustCa($caPemPath)
+	{
+		echo $caPemPath;
+		$this->cli->runOrExit(sprintf('cmd "/C certutil -addstore "Root" "%s""', $caPemPath), function ($code, $output) {
+			error("Failed to trust certificate: $output");
+		});
+	}
+
+	/**
 	 * Trust the given certificate file in the Windows Certmgr.
 	 *
 	 * @param  string  $crtPath
@@ -788,9 +877,34 @@ class Site
 	 */
 	public function trustCertificate(string $crtPath)
 	{
-		$this->cli->runOrExit(sprintf('cmd "/C certutil -addstore "Root" "%s""', $crtPath), function ($code, $output) {
+		$this->cli->runOrExit(sprintf('cmd "/C certutil -addstore "CA" "%s""', $crtPath), function ($code, $output) {
 			error("Failed to trust certificate: $output");
 		});
+	}
+
+	/**
+	 * Untrust all certificates.
+	 *
+	 * @return void
+	 */
+	public function untrustCertificates()
+	{
+		$secured = $this->parked()
+			->merge($this->links())
+			->sort()
+			->where('secured', 'X');
+
+		if ($secured->isEmpty()) {
+			return;
+		}
+
+		$tld = $this->config->get('tld');
+
+		foreach ($secured->pluck('site') as $domain) {
+			$this->cli->run(sprintf('cmd "/C certutil -delstore "CA" "%s""', $domain . '.' . $tld));
+
+			$this->cli->run(sprintf('cmd "/C certutil -delstore "Root" "%s""', $domain . '.' . $tld));
+		}
 	}
 
 	/**
@@ -872,29 +986,6 @@ class Site
 		}
 
 		return $siteConf;
-	}
-
-	/**
-	 * Untrust all certificates.
-	 *
-	 * @return void
-	 */
-	public function untrustCertificates()
-	{
-		$secured = $this->parked()
-			->merge($this->links())
-			->sort()
-			->where('secured', 'X');
-
-		if ($secured->isEmpty()) {
-			return;
-		}
-
-		$tld = $this->config->get('tld');
-
-		foreach ($secured->pluck('site') as $domain) {
-			$this->cli->run(sprintf('cmd "/C certutil -delstore "Root" "%s""', $domain . '.' . $tld));
-		}
 	}
 
 	/**
@@ -1055,5 +1146,15 @@ class Site
 		$extension = $extension ? '.' . $extension : '';
 
 		return $this->valetHomePath() . '/Certificates' . $url . $extension;
+	}
+
+	/**
+	 * Get the path to the Valet CA certificates.
+	 *
+	 * @return string
+	 */
+	public function caPath($caFile = null)
+	{
+		return $this->valetHomePath() . '/CA' . ($caFile ? '/' . $caFile : '');
 	}
 }
