@@ -7,7 +7,64 @@
 <a href="https://packagist.org/packages/cretueusebiu/valet-windows"><img src="https://poser.pugx.org/cretueusebiu/valet-windows/license.svg" alt="License"></a>
 </p>
 
-<p align="center">Windows port of the popular development environment <a href="https://github.com/laravel/valet">Laravel Valet</a>.</p>
+<p align="center">This is a Windows port of the popular Mac development environment <a href="https://github.com/laravel/valet">Laravel Valet</a>.</p>
+<p align="center">Laravel Valet <i>Windows</i> 3 is a much needed updated fork of <a href="https://github.com/cretueusebiu/valet-windows">cretueusebiu/valet-windows</a>, with lots of improvements and new commands. This version hopes to achieve as much parity as possible with the Mac version.</p>
+
+[Introduction](#introduction) | [Documentation](#documentation) | [Commands](#commands) | [Commands Not Supported](#commands-not-supported) | [Known Issues](#known-issues) | [Xdebug](#xdebug) | [Testing](#testing) | [Contributions](#contributions)
+
+---
+
+<table>
+  <tr>
+    <th>Commands Section</th>
+    <td><a href="#php-services">PHP Services</a></td>
+    <td><a href="#using-php-versions">Using PHP Versions</a></td>
+    <td><a href="#parked-and-linked">Parked and Linked</a></td>
+    <td><a href="#other-commands">Other Commands</a></td>
+  </tr>
+  <tr>
+    <th>Command</th>
+    <td><a href="#phpadd">php:add</a></td>
+    <td align="center"><a href="#use">use</a></td>
+    <td align="center"><a href="#link">link</a></td>
+    <td align="center"><a href="#services">services</a></td>
+  </tr>
+  <tr>
+  <th></th>
+    <td><a href="#phpremove">php:remove</a></td>
+    <td align="center"><a href="#isolate">isolate</a></td>
+    <td align="center"><a href="#unlink">unlink</a></td>
+    <td></td>
+  </tr>
+  <tr>
+  <th></th>
+    <td><a href="#phplist">php:list</a></td>
+    <td align="center"><a href="#unisolate">unisolate</a></td>
+    <td align="center"><a href="#links">links</a></td>
+    <td></td>
+  </tr>
+  <tr>
+  <th></th>
+    <td><a href="#phpwhich">php:which</a></td>
+    <td align="center"><a href="#isolated">isolated</a></td>
+    <td align="center"><a href="#parked">parked</a></td>
+    <td></td>
+  </tr>
+  <tr>
+  <th></th>
+    <td><a href="#phpinstall">php:install</a></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+  <th></th>
+    <td><a href="#phpuninstall">php:uninstall</a></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+</table>
 
 ## Introduction
 
@@ -369,6 +426,18 @@ Next, you can run the integration tests with:
 ```bash
 composer test-integration
 ```
+
+## Contributions
+
+Taylor Otwell, et al - [Laravel Valet](https://github.com/laravel/valet)
+
+Cretueusebiu - [Valet Windows port](https://github.com/cretueusebiu/valet-windows)
+
+Iamroi - [Valet Windows: Feature PR for multiple PHP support](https://github.com/cretueusebiu/valet-windows/pull/195)
+
+Damsfx - [Valet Windows: Patch 1 PR on Iamroi's repo to add PHP versions to `links` command](https://github.com/iamroi/valet-windows/pull/1)
+
+yCodeTech - [Laravel Valet Windows 3](https://github.com/yCodeTech/valet-windows)
 
 ## Changelog
 
