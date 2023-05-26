@@ -134,6 +134,7 @@ $app->command('php:list', function () {
  * @param null|string $site Optional site name
  */
 $app->command('php:which [site]', function ($site = null) {
+	$txt = !$site ? "The current working directory" : "The specified site";
 
 	if (!$site) {
 		$site = basename(getcwd());
@@ -141,7 +142,12 @@ $app->command('php:which [site]', function ($site = null) {
 
 	$which = Site::whichPhp($site);
 
-	info("This site {$which['site']} is using PHP {$which['php']}");
+	if ($which === null) {
+		warning("The site doesn't exist.");
+		return false;
+	}
+
+	info("{$txt} {$which['site']} is using PHP {$which['php']}");
 
 })->descriptions('Determine which PHP version the current working directory or a specified site is using');
 
@@ -827,7 +833,7 @@ if (is_dir(VALET_HOME_PATH)) {
 	$app->command('services', function () {
 		info("Checking the Valet services...");
 
-		table(['Service', 'Windows Name', 'Status'], Valet::services());
+		table(['Service', 'Windows Name', 'Status'], Valet::services(), true);
 		info('Use valet start/stop/restart [service] to change status (eg: valet restart nginx).');
 	})->descriptions('List the installed Windows services.');
 
