@@ -103,6 +103,33 @@ class Site
 	}
 
 	/**
+	 * Unlink the given symbolic link.
+	 *
+	 * @param  string  $name
+	 * @return void
+	 */
+	public function unlink($name)
+	{
+		$name = $this->getRealSiteName($name);
+
+		if ($this->files->exists($path = $this->sitesPath($name))) {
+			$this->files->unlink($path);
+		}
+	}
+
+	/**
+	 * Remove all broken symbolic links.
+	 *
+	 * @return void
+	 */
+	public function pruneLinks()
+	{
+		$this->files->ensureDirExists($this->sitesPath(), user());
+
+		$this->files->removeBrokenLinksAt($this->sitesPath());
+	}
+
+	/**
 	 * Pretty print out all links in Valet.
 	 *
 	 * @return \Illuminate\Support\Collection
@@ -147,76 +174,6 @@ class Site
 		return $parkedLinks;
 	}
 
-	/**
-	 * Get all sites which are proxies (not Links, and contain proxy_pass directive).
-	 *
-	 * @return \Illuminate\Support\Collection
-	 */
-	public function proxies()
-	{
-		$dir = $this->nginxPath();
-		$tld = $this->config->read()['tld'];
-		$links = $this->links();
-		$certs = $this->getCertificates();
-
-		if (!$this->files->exists($dir)) {
-			return collect();
-		}
-
-		$proxies = collect($this->files->scandir($dir))
-			->filter(function ($site, $key) use ($tld) {
-				// keep sites that match our TLD
-				return ends_with($site, ".$tld.conf");
-			})->map(function ($site, $key) use ($tld) {
-			// remove the TLD suffix for consistency
-			return str_replace(".$tld.conf", '', $site);
-		})->reject(function ($site, $key) use ($links) {
-			return $links->has($site);
-		})->mapWithKeys(function ($site) {
-			$host = $this->getProxyHostForSite($site) ?: '(other)';
-
-			return [$site => $host];
-		})->reject(function ($host, $site) {
-			// If proxy host is null, it may be just a normal SSL stub, or something else; either way we exclude it from the list
-			return $host === '(other)';
-		})->map(function ($host, $site) use ($certs, $tld) {
-			$secured = $certs->has($site);
-			$url = ($secured ? 'https' : 'http') . '://' . $site . '.' . $tld;
-
-			return [
-				'site' => $site,
-				'secured' => $secured ? 'X' : '',
-				'url' => $url,
-				'path' => $host,
-			];
-		});
-
-		return $proxies;
-	}
-
-	/**
-	 * Identify whether a site is for a proxy by reading the host name from its config file.
-	 *
-	 * @param  string  $site  Site name without TLD
-	 * @param  string  $configContents  Config file contents
-	 * @return string|null
-	 */
-	public function getProxyHostForSite($site, $configContents = null)
-	{
-		$siteConf = $configContents ?: $this->getSiteConfigFileContents($site);
-
-		if (empty($siteConf)) {
-			return null;
-		}
-
-		$host = null;
-		if (preg_match('~proxy_pass\s+(?<host>https?://.*)\s*;~', $siteConf, $patterns)) {
-			$host = trim($patterns['host']);
-		}
-
-		return $host;
-	}
-
 	public function getSiteConfigFileContents($site, $suffix = null)
 	{
 		$config = $this->config->read();
@@ -254,34 +211,6 @@ class Site
 
 			return substr($certWithoutSuffix, 0, strrpos($certWithoutSuffix, $trimToString));
 		})->flip();
-	}
-
-	/**
-	 * Determines which PHP version the current working directory is using.
-	 *
-	 * @param  string  $cwd The current working directory (cwd)
-	 * @return array [ "site" => [sitename], "php" => [PHP version] ]
-	 */
-	public function whichPhp($cwd)
-	{
-		$currentSite = $this->parked()->filter(function ($site, $key) use ($cwd) {
-			if ($key === $cwd)
-				return $site;
-		});
-
-		foreach ($currentSite as $value) {
-			foreach ($value as $key => $val) {
-				$site = $cwd;
-				$site .= !empty($value["alias"]) ? " (alias: {$value["alias"]})" : "";
-
-				if ($key === "php") {
-					return [
-						"site" => $site,
-						"php" => $val
-					];
-				}
-			}
-		}
 	}
 
 	/**
@@ -391,88 +320,50 @@ class Site
 	}
 
 	/**
-	 * Unlink the given symbolic link.
+	 * Extract PHP version of exising nginx config.
 	 *
-	 * @param  string  $name
-	 * @return void
+	 * @param  string  $url
+	 * @return string|void
 	 */
-	public function unlink($name)
+	public function customPhpVersion($url)
 	{
-		$name = $this->getRealSiteName($name);
+		if ($this->files->exists($this->nginxPath($url))) {
+			$siteConf = $this->files->get($this->nginxPath($url));
 
-		if ($this->files->exists($path = $this->sitesPath($name))) {
-			$this->files->unlink($path);
-		}
-	}
+			if (starts_with($siteConf, '# Valet isolated PHP version')) {
+				$firstLine = explode(PHP_EOL, $siteConf)[0];
 
-	/**
-	 * Remove all broken symbolic links.
-	 *
-	 * @return void
-	 */
-	public function pruneLinks()
-	{
-		$this->files->ensureDirExists($this->sitesPath(), user());
-
-		$this->files->removeBrokenLinksAt($this->sitesPath());
-	}
-
-	/**
-	 * Resecure all currently secured sites with a fresh tld.
-	 *
-	 * @param  string  $oldTld
-	 * @param  string  $tld
-	 * @return void
-	 */
-	public function resecureForNewTld($oldTld, $tld)
-	{
-		if (!$this->files->exists($this->certificatesPath())) {
-			return;
-		}
-
-		$secured = $this->secured();
-
-		foreach ($secured as $url) {
-			$newUrl = str_replace('.' . $oldTld, '.' . $tld, $url);
-			$siteConf = $this->getSiteConfigFileContents($url, '.' . $oldTld);
-
-			if (!empty($siteConf) && strpos($siteConf, '# valet stub: proxy.valet.conf') === 0) {
-				// proxy config
-				$this->unsecure($url);
-				$this->secure($newUrl, $this->replaceOldDomainWithNew($siteConf, $url, $newUrl));
-			} else {
-				// normal config
-				$this->unsecure($url);
-				$this->secure($newUrl);
+				return trim(str_replace('# Valet isolated PHP version : ', '', $firstLine));
 			}
 		}
 	}
 
 	/**
-	 * Parse Nginx site config file contents to swap old domain to new.
+	 * Determines which PHP version the current working directory is using.
 	 *
-	 * @param  string  $siteConf  Nginx site config content
-	 * @param  string  $old  Old domain
-	 * @param  string  $new  New domain
-	 * @return string
+	 * @param  string  $cwd The current working directory (cwd)
+	 * @return array|null [ "site" => [sitename], "php" => [PHP version] ]
 	 */
-	public function replaceOldDomainWithNew($siteConf, $old, $new)
+	public function whichPhp($cwd)
 	{
-		$lookups = [];
-		$lookups[] = '~server_name .*;~';
-		$lookups[] = '~error_log .*;~';
-		$lookups[] = '~ssl_certificate_key .*;~';
-		$lookups[] = '~ssl_certificate .*;~';
+		$currentSite = $this->parked()->filter(function ($site, $key) use ($cwd) {
+			if ($key === $cwd)
+				return $site;
+		});
 
-		foreach ($lookups as $lookup) {
-			preg_match($lookup, $siteConf, $matches);
-			foreach ($matches as $match) {
-				$replaced = str_replace($old, $new, $match);
-				$siteConf = str_replace($match, $replaced, $siteConf);
+		foreach ($currentSite as $value) {
+			foreach ($value as $key => $val) {
+				$site = $cwd;
+				$site .= !empty($value["alias"]) ? " (alias: {$value["alias"]})" : "";
+
+				if ($key === "php") {
+					return [
+						"site" => $site,
+						"php" => $val
+					];
+				}
 			}
 		}
-
-		return $siteConf;
 	}
 
 	/**
@@ -480,7 +371,7 @@ class Site
 	 *
 	 * @param string $phpVersion
 	 * @param  string  $directory
-	 * @return string|false
+	 * @return void
 	 */
 	public function isolate($phpVersion, $directory)
 	{
@@ -594,25 +485,6 @@ class Site
 		}
 
 		return $directory . '.' . $tld;
-	}
-
-	/**
-	 * Extract PHP version of exising nginx config.
-	 *
-	 * @param  string  $url
-	 * @return string|void
-	 */
-	public function customPhpVersion($url)
-	{
-		if ($this->files->exists($this->nginxPath($url))) {
-			$siteConf = $this->files->get($this->nginxPath($url));
-
-			if (starts_with($siteConf, '# Valet isolated PHP version')) {
-				$firstLine = explode(PHP_EOL, $siteConf)[0];
-
-				return trim(str_replace('# Valet isolated PHP version : ', '', $firstLine));
-			}
-		}
 	}
 
 	/**
@@ -731,6 +603,64 @@ class Site
 		$tld = $this->config->read()['tld'];
 
 		return in_array($site . '.' . $tld, $this->secured());
+	}
+
+	/**
+	 * Resecure all currently secured sites with a fresh tld.
+	 *
+	 * @param  string  $oldTld
+	 * @param  string  $tld
+	 * @return void
+	 */
+	public function resecureForNewTld($oldTld, $tld)
+	{
+		if (!$this->files->exists($this->certificatesPath())) {
+			return;
+		}
+
+		$secured = $this->secured();
+
+		foreach ($secured as $url) {
+			$newUrl = str_replace('.' . $oldTld, '.' . $tld, $url);
+			$siteConf = $this->getSiteConfigFileContents($url, '.' . $oldTld);
+
+			if (!empty($siteConf) && strpos($siteConf, '# valet stub: proxy.valet.conf') === 0) {
+				// proxy config
+				$this->unsecure($url);
+				$this->secure($newUrl, $this->replaceOldDomainWithNew($siteConf, $url, $newUrl));
+			} else {
+				// normal config
+				$this->unsecure($url);
+				$this->secure($newUrl);
+			}
+		}
+	}
+
+	/**
+	 * Parse Nginx site config file contents to swap old domain to new.
+	 *
+	 * @param  string  $siteConf  Nginx site config content
+	 * @param  string  $old  Old domain
+	 * @param  string  $new  New domain
+	 * @return string
+	 */
+	public function replaceOldDomainWithNew($siteConf, $old, $new)
+	{
+		$lookups = [];
+		$lookups[] = '~server_name .*;~';
+		$lookups[] = '~error_log .*;~';
+		$lookups[] = '~ssl_certificate_key .*;~';
+		$lookups[] = '~ssl_certificate .*;~';
+
+		foreach ($lookups as $lookup) {
+			preg_match($lookup, $siteConf, $matches);
+			foreach ($matches as $match) {
+				$replaced = str_replace($old, $new, $match);
+				$siteConf = str_replace($match, $replaced, $siteConf);
+			}
+		}
+
+		return $siteConf;
 	}
 
 	/**
@@ -868,7 +798,7 @@ class Site
 	 *
 	 * @param  string  $valetSite
 	 * @param  string  $phpVersion
-	 * @return string
+	 * @return string|null
 	 */
 	public function installSiteConfig($valetSite, $phpVersion)
 	{
@@ -972,7 +902,7 @@ class Site
 	 *
 	 * @param  string  $url  The domain name to serve
 	 * @param  string  $host  The URL to proxy to, eg: http://127.0.0.1:8080
-	 * @return string
+	 * @return void
 	 */
 	public function proxyCreate($url, $host)
 	{
@@ -1015,6 +945,76 @@ class Site
 		$this->files->unlink($this->nginxPath($url));
 
 		info('Valet will no longer proxy [https://' . $url . '].');
+	}
+
+	/**
+	 * Get all sites which are proxies (not Links, and contain proxy_pass directive).
+	 *
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function proxies()
+	{
+		$dir = $this->nginxPath();
+		$tld = $this->config->read()['tld'];
+		$links = $this->links();
+		$certs = $this->getCertificates();
+
+		if (!$this->files->exists($dir)) {
+			return collect();
+		}
+
+		$proxies = collect($this->files->scandir($dir))
+			->filter(function ($site, $key) use ($tld) {
+				// keep sites that match our TLD
+				return ends_with($site, ".$tld.conf");
+			})->map(function ($site, $key) use ($tld) {
+			// remove the TLD suffix for consistency
+			return str_replace(".$tld.conf", '', $site);
+		})->reject(function ($site, $key) use ($links) {
+			return $links->has($site);
+		})->mapWithKeys(function ($site) {
+			$host = $this->getProxyHostForSite($site) ?: '(other)';
+
+			return [$site => $host];
+		})->reject(function ($host, $site) {
+			// If proxy host is null, it may be just a normal SSL stub, or something else; either way we exclude it from the list
+			return $host === '(other)';
+		})->map(function ($host, $site) use ($certs, $tld) {
+			$secured = $certs->has($site);
+			$url = ($secured ? 'https' : 'http') . '://' . $site . '.' . $tld;
+
+			return [
+				'site' => $site,
+				'secured' => $secured ? 'X' : '',
+				'url' => $url,
+				'path' => $host,
+			];
+		});
+
+		return $proxies;
+	}
+
+	/**
+	 * Identify whether a site is for a proxy by reading the host name from its config file.
+	 *
+	 * @param  string  $site  Site name without TLD
+	 * @param  string  $configContents  Config file contents
+	 * @return string|null
+	 */
+	public function getProxyHostForSite($site, $configContents = null)
+	{
+		$siteConf = $configContents ?: $this->getSiteConfigFileContents($site);
+
+		if (empty($siteConf)) {
+			return null;
+		}
+
+		$host = null;
+		if (preg_match('~proxy_pass\s+(?<host>https?://.*)\s*;~', $siteConf, $patterns)) {
+			$host = trim($patterns['host']);
+		}
+
+		return $host;
 	}
 
 	public function valetHomePath()
