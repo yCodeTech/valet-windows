@@ -36,6 +36,7 @@
     <td><a href="#phpremove">php:remove</a></td>
     <td align="center"><a href="#isolate">isolate</a></td>
     <td align="center"><a href="#unlink">unlink</a></td>
+    <td align="center"><a href="#secure">secure</a></td>
     <td></td>
   </tr>
   <tr>
@@ -367,6 +368,19 @@ Checking the Valet services...
 | php-xdebug 7.4.33 | valet_php7.4.33cgi_xdebug-9104 | running |
 +-------------------+--------------------------------+---------+
 ```
+
+##### secure
+
+```
+secure [domain]   Secure the specified domain with a trusted TLS certificate.
+```
+
+```console
+$ valet secure site1
+The [site1.test] site has been secured with a fresh TLS certificate.
+```
+
+###### Note: If you use VS Code integrated terminal, the secure command (or secure option in on other commands) won't work and will need to be ran in a standalone terminal with admin privileges.
 
 ### Commands not supported
 
