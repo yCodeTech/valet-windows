@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Container\Container;
 use RuntimeException;
 use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
 if (!isset($_SERVER['HOME'])) {
@@ -62,18 +63,43 @@ function warning($output)
 }
 
 /**
- * Output the given text to the console.
+ * Output errors to the console.
  *
  * @param  string  $output
+ * @param  boolean $exception
  * @return void
  */
-function error(string $output)
+function error(string $output, $exception = false)
 {
 	if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'testing') {
 		throw new RuntimeException($output);
 	}
+	if (!$exception) {
+		(new ConsoleOutput)->getErrorOutput()->writeln("<error>$output</error>");
+	}
+	throw new \Exception($output);
+}
 
-	(new ConsoleOutput)->getErrorOutput()->writeln("<error>$output</error>");
+if (!function_exists('array_is_list')) {
+	/**
+	 * Checks whether a given `array` is a list
+	 * 
+	 * *This function was introduced in PHP 8.1, so this is a polyfill only in usage on PHP versions below 8.1 (thanks to this StackOverflow answer: https://stackoverflow.com/a/173479/2358222).*
+	 * 
+	 * Determines if the given `array` is a list. An `array` is considered a list if its keys consist of consecutive numbers from `0` to `count($array)-1`.
+	 * https://www.php.net/manual/function.array-is-list.php
+	 * 
+	 * @param $array The `array` being evaluated.
+	 * 
+	 * @return bool Returns `true` if `array` is a list, `false` otherwise.
+	 */
+	function array_is_list(array $array)
+	{
+		if ($array === []) {
+			return true;
+		}
+		return array_keys($arr) === range(0, count($array) - 1);
+	}
 }
 
 /**
@@ -83,7 +109,7 @@ function error(string $output)
  * @param  array  $rows
  * @return void
  */
-function table(array $headers = [], array $rows = [], $setHorizontal = false)
+function table(array $headers = [], array $rows = [], $setHorizontal = false, $title = null)
 {
 	$table = new Table(new ConsoleOutput());
 
@@ -95,7 +121,18 @@ function table(array $headers = [], array $rows = [], $setHorizontal = false)
 		$table->setVertical();
 	}
 
+	if ($title) {
+		$table->setHeaderTitle($title);
+	}
+	if ($setHorizontal) {
+		$rows = addTableSeparator($rows);
+	}
+
 	$table->setHeaders($headers)->setRows($rows);
+
+	changeColumnMaxWidth($table, $headers, ["URL", "Path"], 30);
+
+	$table->setStyle('box');
 
 	$table->render();
 }
@@ -103,11 +140,70 @@ function table(array $headers = [], array $rows = [], $setHorizontal = false)
 /**
  * Defines the default table headers.
  *
- * @return array ['Site', 'Alias', 'Secure', 'PHP', 'URL', 'Alias URL', 'Path']
+ * @return array ['Site', 'Alias', 'Secured', 'PHP', 'URL', 'Alias URL', 'Path']
  */
 function default_table_headers()
 {
-	return ['Site', 'Alias', 'Secure', 'PHP', 'URL', 'Alias URL', 'Path'];
+	return ['Site', 'Alias', 'Secured', 'PHP', 'URL', 'Alias URL', 'Path'];
+}
+
+/**
+ * Change the max width of specified table columns.
+ * 
+ * @param Table $table The table instance
+ * @param array $headers Table headers
+ * @param array $columns The column names to change the width of
+ * @param int $maxWidth The maximum width of the columns
+ */
+function changeColumnMaxWidth($table, $headers, $columns, $maxWidth)
+{
+	foreach ($columns as $column) {
+		$index = array_search($column, $headers);
+		// (column, width) - column is zero based.
+		$table->setColumnMaxWidth($index, $maxWidth);
+	}
+}
+
+/**
+ * Add a table separator inbetween all the rows.
+ * 
+ * @param array $rows The array of rows
+ */
+function addTableSeparator($rows)
+{
+	$separatedRows;
+
+	foreach ($rows as $key => $value) {
+		// If the array is NOT a numerical indexed list, 
+		// ie: it's an associative array...
+		if (!array_is_list($rows)) {
+			// Set the array element as it was originally.
+			$separatedRows[$key] = $value;
+
+			// If element is not the last, then add the table separator.
+			if ($key !== array_key_last($rows)) {
+				$separatedRows[] = new TableSeparator();
+			}
+		}
+		// Otherwise, it's an indexed list...
+		else {
+			// If element is the first, then add it as it originally was.
+			if ($key === array_key_first($rows)) {
+				$separatedRows[$key] = $value;
+			}
+			// Otherwise, increment the index (so that that it doesn't
+			// interfere with the separator).
+			else {
+				$separatedRows[$key + 1] = $value;
+			}
+			// If element is not the last, then add the table separator.
+			if ($key !== array_key_last($rows)) {
+				$separatedRows[$key + 1] = new TableSeparator();
+			}
+		}
+	}
+
+	return $separatedRows;
 }
 
 /**
@@ -181,6 +277,7 @@ if (!function_exists('retry')) {
 }
 
 /**
+ * @deprecated
  * Verify that the script is currently running as "sudo".
  *
  * @return void

@@ -711,7 +711,7 @@ class Site
 		}
 
 		$this->cli->runOrExit(sprintf('cmd "/C certutil -delstore "Root" "%s""', $cName), function ($code, $output) {
-			error("Failed to trust certificate: $output");
+			error("Failed to delete certificate: $output", true);
 		});
 
 		$CAPrivKey = RSA::createKey()->withPadding(RSA::ENCRYPTION_PKCS1 | RSA::SIGNATURE_PKCS1);
@@ -865,7 +865,7 @@ class Site
 	{
 		echo $caPemPath;
 		$this->cli->runOrExit(sprintf('cmd "/C certutil -addstore "Root" "%s""', $caPemPath), function ($code, $output) {
-			error("Failed to trust certificate: $output");
+			error("Failed to trust certificate: $output", true);
 		});
 	}
 
@@ -878,7 +878,7 @@ class Site
 	public function trustCertificate(string $crtPath)
 	{
 		$this->cli->runOrExit(sprintf('cmd "/C certutil -addstore "CA" "%s""', $crtPath), function ($code, $output) {
-			error("Failed to trust certificate: $output");
+			error("Failed to trust certificate: $output", true);
 		});
 	}
 
