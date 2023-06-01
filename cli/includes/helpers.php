@@ -276,19 +276,6 @@ if (!function_exists('retry')) {
 	}
 }
 
-/**
- * @deprecated
- * Verify that the script is currently running as "sudo".
- *
- * @return void
- */
-function should_be_sudo()
-{
-	if (!isset($_SERVER['SUDO_USER'])) {
-		throw new Exception('This command must be run with sudo.');
-	}
-}
-
 if (!function_exists('tap')) {
 	/**
 	 * Tap the given value.
