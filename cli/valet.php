@@ -239,17 +239,56 @@ if (is_dir(VALET_HOME_PATH)) {
 		table(default_table_headers(), $parked->all());
 	})->descriptions('Display all the current sites within parked paths');
 
-	// TODO: List all sites in parked and linked and proxied
+	/**
+	 * Get all the parked, linked and proxied sites.
+	 */
+	$app->command('sites', function () {
+		$parked = Site::parked();
+		$links = Site::links();
+		$proxies = Site::proxies();
 
-	//    /**
-//     * Get all the current sites within paths parked with 'park {path}'.
-//     */
-//    $app->command('nginx:publish', function ($type) {
-//        if($type === 'nginx') {
-//            Site::publishNginxConf();
-//        }
-//
-//    })->descriptions('Publish ');
+		// Recreate the list of links and remove the key of alias and aliasUrl,
+		// as this is unnecessary for this command.
+		$parked = $parked->map(function ($value, $key) {
+			unset($value['secured']);
+			unset($value['alias']);
+			unset($value['aliasUrl']);
+
+			$php = explode(" ", $value['php']);
+
+			if (str_contains($php[0], "<info>")) {
+				$php[0] = str_replace("<info>", "", $php[0]);
+				$php[1] = str_replace("</info>", "", $php[1]);
+
+				$value['php'] = "<info>{$php[0]}</info>" . "\n" . "<info>{$php[1]}</info>";
+			} else {
+				$value['php'] = $php[0] . "\n" . $php[1];
+			}
+			return $value;
+		});
+
+		$links = $links->map(function ($value, $key) {
+			unset($value['secured']);
+			unset($value['alias']);
+			unset($value['aliasUrl']);
+			return $value;
+		});
+		$proxies = $proxies->map(function ($value, $key) {
+			unset($value['secured']);
+			return $value;
+		});
+
+		if (count($parked) > 0) {
+			table(['Site', 'PHP', 'URL', 'Path'], $parked->all(), true, "Parked");
+		}
+		if (count($links) > 0) {
+			table(['Site', 'PHP', 'URL', 'Path'], $links->all(), true, "Linked");
+		}
+		if (count($proxies) > 0) {
+			table(['Site', 'URL', 'Host'], $proxies->all(), true, "Proxied");
+		}
+
+	})->descriptions('Get all the parked, linked and proxied sites');
 
 	/**
 	 * Remove the current working directory from the paths configuration.
@@ -298,7 +337,7 @@ if (is_dir(VALET_HOME_PATH)) {
 			return $value;
 		});
 
-		table(['Site', 'Secure', 'PHP', 'URL', 'Path'], $links->all(), true);
+		table(['Site', 'Secured', 'PHP', 'URL', 'Path'], $links->all(), true);
 	})->descriptions('Display all of the registered Valet symbolic links');
 
 	/**
@@ -395,7 +434,7 @@ if (is_dir(VALET_HOME_PATH)) {
 	$app->command('proxies', function () {
 		$proxies = Site::proxies();
 
-		table(['Site', 'Secure', 'URL', 'Host'], $proxies->all());
+		table(['Site', 'Secured', 'URL', 'Host'], $proxies->all());
 	})->descriptions('Display all of the proxy sites');
 
 	/**
