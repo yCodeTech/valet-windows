@@ -38,7 +38,7 @@ class Ngrok
 	 */
 	public function run(string $command)
 	{
-		$ngrok = realpath(__DIR__.'/../../bin/ngrok.exe');
+		$ngrok = realpath(__DIR__ . '/../../bin/ngrok.exe');
 
 		$this->cli->passthru("\"$ngrok\" $command");
 	}
@@ -51,10 +51,10 @@ class Ngrok
 	 */
 	public function start(string $domain, int $port, array $options = [])
 	{
-		if ($port === 443 && ! $this->hasAuthToken()) {
+		if ($port === 443 && !$this->hasAuthToken()) {
 			output('Forwarding to local port 443 or a local https:// URL is only available after you sign up.
-Sign up at: https://ngrok.com/signup
-Then use: valet ngrok authtoken my-token');
+Sign up at: <fg=blue>https://ngrok.com/signup</>
+Then use: <fg=magenta>valet set-ngrok-token [token]</>');
 			exit(1);
 		}
 
@@ -62,7 +62,7 @@ Then use: valet ngrok authtoken my-token');
 			return "--$key=$value";
 		})->implode(' ');
 
-		$ngrok = realpath(__DIR__.'/../../bin/ngrok.exe');
+		$ngrok = realpath(__DIR__ . '/../../bin/ngrok.exe');
 
 		$this->cli->passthru("start \"$domain\" \"$ngrok\" http $domain:$port $options");
 	}
@@ -86,7 +86,7 @@ Then use: valet ngrok authtoken my-token');
 				}
 			}, 250);
 
-			if (! empty($response)) {
+			if (!empty($response)) {
 				return $response;
 			}
 		}
@@ -118,6 +118,6 @@ Then use: valet ngrok authtoken my-token');
 	 */
 	protected function hasAuthToken(): bool
 	{
-		return file_exists($_SERVER['HOME'].'/.ngrok2/ngrok.yml');
+		return file_exists(Valet::homePath() . '/Ngrok/ngrok.yml');
 	}
 }

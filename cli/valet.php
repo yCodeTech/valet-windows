@@ -503,10 +503,27 @@ if (is_dir(VALET_HOME_PATH)) {
 
 	/**
 	 * Run ngrok commands.
+	 * 
+	 * @param array $args
 	 */
 	$app->command('ngrok [args]*', function ($args) {
 		Ngrok::run(implode(' ', $args));
 	})->descriptions('Run ngrok commands');
+
+	/**
+	 * Set the ngrok auth token.
+	 * @param string $token Your personal ngrok authtoken
+	 * @return void
+	 */
+	$app->command('set-ngrok-token [token]', function ($token = null) {
+		if ($token === null) {
+			warning("Please provide your ngrok authtoken.");
+			return;
+		}
+
+		Ngrok::run("authtoken $token --config=" . Valet::homePath() . "/Ngrok/ngrok.yml");
+
+	})->descriptions('Set the Ngrok auth token');
 
 	/**
 	 * Start the daemon services.
