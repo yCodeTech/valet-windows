@@ -171,37 +171,14 @@ function changeColumnMaxWidth($table, $headers, $columns, $maxWidth)
  */
 function addTableSeparator($rows)
 {
-	$separatedRows;
-
-	foreach ($rows as $key => $value) {
-		// If the array is NOT a numerical indexed list, 
-		// ie: it's an associative array...
-		if (!array_is_list($rows)) {
-			// Set the array element as it was originally.
-			$separatedRows[$key] = $value;
-
-			// If element is not the last, then add the table separator.
-			if ($key !== array_key_last($rows)) {
-				$separatedRows[] = new TableSeparator();
-			}
-		}
-		// Otherwise, it's an indexed list...
-		else {
-			// If element is the first, then add it as it originally was.
-			if ($key === array_key_first($rows)) {
-				$separatedRows[$key] = $value;
-			}
-			// Otherwise, increment the index (so that that it doesn't
-			// interfere with the separator).
-			else {
-				$separatedRows[$key + 1] = $value;
-			}
-			// If element is not the last, then add the table separator.
-			if ($key !== array_key_last($rows)) {
-				$separatedRows[$key + 1] = new TableSeparator();
-			}
-		}
-	}
+	/**
+	 * Create a new laravel collection and add the table separator
+	 * inbetween all the rows.
+	 * Code from https://laracasts.com/discuss/channels/site-improvements/php-array-insert-between-each-item
+	 */
+	$separatedRows = collect($rows)->flatMap(function ($item) {
+		return [$item, new TableSeparator()];
+	})->slice(0, -1)->toArray();
 
 	return $separatedRows;
 }
