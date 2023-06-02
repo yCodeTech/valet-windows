@@ -49,7 +49,7 @@ class Ngrok
 	 * @param  array  $options
 	 * @return void
 	 */
-	public function start(string $domain, int $port, array $options = [])
+	public function start(string $site, int $port, array $options = [])
 	{
 		if ($port === 443 && !$this->hasAuthToken()) {
 			output('Forwarding to local port 443 or a local https:// URL is only available after you sign up.
@@ -64,7 +64,21 @@ Then use: <fg=magenta>valet set-ngrok-token [token]</>');
 
 		$ngrok = realpath(__DIR__ . '/../../bin/ngrok.exe');
 
-		$this->cli->passthru("start \"$domain\" \"$ngrok\" http $domain:$port $options");
+		$newCMDtitle = "\"Sharing $site\"";
+		$ngrokCommand = "\"$ngrok\" http $site:$port " . $this->getNgrokConfig() . " $options";
+
+		$this->cli->passthru("start $newCMDtitle $ngrokCommand");
+	}
+
+	/**
+	 * Get the ngrok configuration
+	 * @return string Returns the ngrok config path as a CLI --flag:
+	 * 
+	 * `--config C:/Users/Username/ .config/valet/Ngrok/ngrok.yml`
+	 */
+	public function getNgrokConfig()
+	{
+		return "--config " . Valet::homePath() . "/Ngrok/ngrok.yml";
 	}
 
 	/**

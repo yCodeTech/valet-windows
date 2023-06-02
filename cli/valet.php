@@ -478,16 +478,15 @@ if (is_dir(VALET_HOME_PATH)) {
 	 */
 	// TODO: custom domain and ngrok params
 	$app->command(
-		'share [domain] [--authtoken=] [--host-header=] [--hostname=] [--region=] [--subdomain=]',
-		function ($domain = null, $authtoken = null, $hostheader = null, $hostname = null, $region = null, $subdomain = null) {
-			$url = ($domain ?: strtolower(Site::host(getcwd()))) . '.' . Configuration::read()['tld'];
+		'share [site] [--domain=] [--host-header=] [--region=]',
+		function ($site = null, $domain = null, $hostheader = null, $region = null) {
+
+			$url = ($site ?: strtolower(Site::host(getcwd()))) . '.' . Configuration::read()['tld'];
 
 			Ngrok::start($url, Site::port($url), array_filter([
-				'authtoken' => $authtoken,
+				'domain' => $domain,
 				'host-header' => $hostheader,
-				'hostname' => $hostname,
 				'region' => $region,
-				'subdomain' => $subdomain,
 			]));
 		}
 	)->defaults([
@@ -521,7 +520,7 @@ if (is_dir(VALET_HOME_PATH)) {
 			return;
 		}
 
-		Ngrok::run("authtoken $token --config=" . Valet::homePath() . "/Ngrok/ngrok.yml");
+		Ngrok::run("authtoken $token " . Ngrok::getNgrokConfig());
 
 	})->descriptions('Set the Ngrok auth token');
 
