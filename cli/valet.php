@@ -686,10 +686,10 @@ if (is_dir(VALET_HOME_PATH)) {
 	 */
 	$app->command('on-latest-version', function () use ($version) {
 		if (Valet::onLatestVersion($version)) {
-			output('Yes');
+			info('Yes');
 		} else {
-			output(sprintf('Your version of Valet (%s) is not the latest version available.', $version));
-			output('Upgrade instructions can be found in the docs: https://github.com/cretueusebiu/valet-windows#upgrading');
+			warning(sprintf('Your version of Valet Windows (%s) is not the latest version available.', $version));
+			output("You can use <fg=cyan>composer global update</> to update to the latest release.\nPlease read the documentation and the Changelog for information on possible breaking changes.");
 		}
 	})->descriptions('Determine if this is the latest version of Valet');
 

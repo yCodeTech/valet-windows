@@ -2,7 +2,8 @@
 
 namespace Valet;
 
-use Httpful\Request;
+use GuzzleHttp\Client;
+use Composer\CaBundle\CaBundle;
 
 class Valet
 {
@@ -90,13 +91,30 @@ class Valet
 	 * @param  string  $currentVersion
 	 * @return bool
 	 *
-	 * @throws \Httpful\Exception\ConnectionErrorException
+	 * @throws \GuzzleHttp\Exception
 	 */
 	public function onLatestVersion($currentVersion): bool
 	{
-		$response = Request::get('https://api.github.com/repos/ycodetech/valet-windows/releases/latest')->send();
+		/**
+		 * Set a new GuzzleHttp client and use the Composer\CaBundle package
+		 * to find and use the TLS CA bundle in order to verify the TLS/SSL
+		 * certificate of the requesting website/API.
+		 * Otherwise, Guzzle errors out with a curl error.
+		 * 
+		 * Code from StackOverflow answer: https://stackoverflow.com/a/53823135/2358222
+		 */
+		$client = new Client([
+			\GuzzleHttp\RequestOptions::VERIFY => CaBundle::getSystemCaRootBundlePath()
+		]);
 
-		return version_compare($currentVersion, trim($response->body->tag_name, 'v'), '>=');
+		// Create a GuzzleHttp get request to the ngrok tunnels API.
+		$get = $client->request(
+			"GET",
+			'https://api.github.com/repos/ycodetech/valet-windows/releases/latest'
+		);
+		$response = json_decode($get->getBody()->getContents());
+
+		return version_compare($currentVersion, trim($response->tag_name, 'v'), '>=');
 	}
 
 	/**
