@@ -3,7 +3,7 @@
 namespace Valet;
 
 use DomainException;
-use Httpful\Request;
+use GuzzleHttp\Client;
 use Illuminate\Support\Collection;
 
 class Ngrok
@@ -49,7 +49,7 @@ class Ngrok
 	 * @param  array  $options
 	 * @return void
 	 */
-	public function start(string $site, int $port, array $options = [])
+	public function start(string $site, int $port, $debug = false, array $options = [])
 	{
 		if ($port === 443 && !$this->hasAuthToken()) {
 			output('Forwarding to local port 443 or a local https:// URL is only available after you sign up.
@@ -67,7 +67,9 @@ Then use: <fg=magenta>valet set-ngrok-token [token]</>');
 		$newCMDtitle = "\"Sharing $site\"";
 		$ngrokCommand = "\"$ngrok\" http $site:$port " . $this->getNgrokConfig() . " $options";
 
-		$this->cli->passthru("start $newCMDtitle $ngrokCommand");
+		$newCMD = ($debug) ? "" : "start $newCMDtitle";
+
+		$this->cli->passthru("$newCMD $ngrokCommand");
 	}
 
 	/**
@@ -83,26 +85,30 @@ Then use: <fg=magenta>valet set-ngrok-token [token]</>');
 
 	/**
 	 * Get the current tunnel URL from the Ngrok API.
+	 * @param string $site The site
 	 *
-	 * @return string
+	 * @return string $url The current tunnel URL
 	 */
-	public function currentTunnelUrl(string $domain = null)
+	public function currentTunnelUrl(string $site)
 	{
-		// wait a second for ngrok to start before attempting to find available tunnels
-		// sleep(1);
+		// Set a new GuzzleHttp client.
+		$client = new Client();
 
-		foreach ($this->tunnelsEndpoints as $endpoint) {
-			$response = retry(20, function () use ($endpoint, $domain) {
-				$body = Request::get($endpoint)->send()->body;
+		// Create a GuzzleHttp get request to the ngrok tunnels API.
+		$response = $client->get('http://127.0.0.1:4040/api/tunnels');
 
-				if (isset($body->tunnels) && count($body->tunnels) > 0) {
-					return $this->findHttpTunnelUrl($body->tunnels, $domain);
-				}
-			}, 250);
+		// Get the contents of the API response.
+		$response = $response->getBody()->getContents();
+		// Decode the json response into a properly formed PHP array.
+		$tunnels = json_decode($response, true);
 
-			if (!empty($response)) {
-				return $response;
-			}
+		// Find and get the public URL of the site.
+		$url = $this->findHttpTunnelUrl($tunnels["tunnels"], $site);
+
+		if (!empty($url)) {
+			// Use | clip to copy the URL to the clipboard.
+			$this->cli->passthru("echo $url | clip");
+			return $url;
 		}
 
 		throw new DomainException('Tunnel not established.');
@@ -121,8 +127,8 @@ Then use: <fg=magenta>valet set-ngrok-token [token]</>');
 		// find the one responding on HTTP. Each tunnel has an HTTP and a HTTPS address
 		// but for local dev purposes we just desire the plain HTTP URL endpoint.
 		foreach ($tunnels as $tunnel) {
-			if ($tunnel->proto === 'http' && strpos($tunnel->config->addr, $domain)) {
-				return $tunnel->public_url;
+			if (($tunnel["proto"] === 'http' || $tunnel["proto"] === 'https') && strpos($tunnel["config"]["addr"], $domain)) {
+				return $tunnel["public_url"];
 			}
 		}
 	}

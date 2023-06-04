@@ -478,12 +478,12 @@ if (is_dir(VALET_HOME_PATH)) {
 	 */
 	// TODO: custom domain and ngrok params
 	$app->command(
-		'share [site] [--domain=] [--host-header=] [--region=]',
-		function ($site = null, $domain = null, $hostheader = null, $region = null) {
+		'share [site] [--domain=] [--host-header=] [--region=] [--debug]',
+		function ($site = null, $domain = null, $hostheader = null, $region = null, $debug) {
 
 			$url = ($site ?: strtolower(Site::host(getcwd()))) . '.' . Configuration::read()['tld'];
 
-			Ngrok::start($url, Site::port($url), array_filter([
+			Ngrok::start($url, Site::port($url), $debug, array_filter([
 				'domain' => $domain,
 				'host-header' => $hostheader,
 				'region' => $region,
@@ -496,8 +496,13 @@ if (is_dir(VALET_HOME_PATH)) {
 	/**
 	 * Echo the currently tunneled URL.
 	 */
-	$app->command('fetch-share-url [domain]', function ($domain = null) {
-		output(Ngrok::currentTunnelUrl($domain ?: Site::host(getcwd()) . '.' . Configuration::read()['tld']));
+	$app->command('fetch-share-url [site]', function ($site = null) {
+		$site = $site ?: Site::host(getcwd()) . '.' . Configuration::read()['tld'];
+
+		$url = Ngrok::currentTunnelUrl($site);
+		info("The public URL for $site is: <fg=blue>$url</>");
+		info("It has been copied to your clipboard.");
+
 	})->descriptions('Get the URL to the current Ngrok tunnel');
 
 	/**
