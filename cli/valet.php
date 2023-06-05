@@ -504,10 +504,11 @@ if (is_dir(VALET_HOME_PATH)) {
 	/**
 	 * Run ngrok commands.
 	 * 
-	 * @param array $args
+	 * @param array $commands The ngrok commands and options/flags (without the `--` prefix),
+	 * eg. `valet ngrok config add-authtoken [token] config=C:/ngrok.yml`
 	 */
-	$app->command('ngrok [args]*', function ($args) {
-		Ngrok::run(implode(' ', $args));
+	$app->command('ngrok [commands]*', function ($commands) {
+		Ngrok::run(Ngrok::prefixNgrokFlags($commands));
 	})->descriptions('Run ngrok commands');
 
 	/**
