@@ -44,9 +44,10 @@ class Ngrok
 	}
 
 	/**
-	 * @param  string  $domain
-	 * @param  int  $port
-	 * @param  array  $options
+	 * @param  string  $site The site
+	 * @param  int  $port The site's port
+	 * @param bool $debug Allow debug error output
+	 * @param  array  $options Options/flags to pass to ngrok
 	 * @return void
 	 */
 	public function start(string $site, int $port, $debug = false, array $options = [])
@@ -58,8 +59,16 @@ Then use: <fg=magenta>valet set-ngrok-token [token]</>');
 			exit(1);
 		}
 
-		$options = (new Collection($options))->map(function ($value, $key) {
-			return "--$key=$value";
+		// If host-header is not specified,
+		// then set it into the array with a default value of rewrite.
+		if (!stripos(json_encode($options), 'host-header')) {
+			$options[] .= "host-header=rewrite";
+		}
+
+		// Create a new options array with the -- prefixed to each option
+		// and implode the array into a single space-delimited string.
+		$options = (new Collection($options))->map(function ($value) {
+			return "--$value";
 		})->implode(' ');
 
 		$ngrok = realpath(__DIR__ . '/../../bin/ngrok.exe');

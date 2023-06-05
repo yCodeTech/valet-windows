@@ -475,23 +475,19 @@ if (is_dir(VALET_HOME_PATH)) {
 
 	/**
 	 * Generate a publicly accessible URL for your project.
+	 * @param string $site The site
+	 * @param array $options The options/flags to pass to ngrok
+	 * @param bool $debug Allow debug error output
 	 */
-	// TODO: custom domain and ngrok params
 	$app->command(
-		'share [site] [--domain=] [--host-header=] [--region=] [--debug]',
-		function ($site = null, $domain = null, $hostheader = null, $region = null, $debug) {
+		'share [site] [options]* [--debug]',
+		function ($site = null, $options = [], $debug) {
 
 			$url = ($site ?: strtolower(Site::host(getcwd()))) . '.' . Configuration::read()['tld'];
 
-			Ngrok::start($url, Site::port($url), $debug, array_filter([
-				'domain' => $domain,
-				'host-header' => $hostheader,
-				'region' => $region,
-			]));
+			Ngrok::start($url, Site::port($url), $debug, $options);
 		}
-	)->defaults([
-			'host-header' => 'rewrite',
-		])->descriptions('Generate a publicly accessible URL for your project');
+	)->descriptions('Generate a publicly accessible URL for your project');
 
 	/**
 	 * Echo the currently tunneled URL.
