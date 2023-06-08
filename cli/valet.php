@@ -54,21 +54,30 @@ $app->command('php:add [path]', function ($path) {
 	if ($php = Configuration::addPhp($path)) {
 		\PhpCgi::install($php['version']);
 
-		\PhpCgiXdebug::install($php['version']);
+		// \PhpCgiXdebug::install($php['version']);
 
 		info("PHP {$php['version']} from {$path} has been added. You can make it default by running `valet use` command");
 	}
 })->descriptions('Add PHP by specifying a path');
 
+// TODO: Add command to install php xdebug services instead of automatically installing, especially when they're not beign used.
+
 /**
  * Remove PHP.
  */
-$app->command('php:remove [path]', function ($path) {
-	info("Removing {$path}...");
+$app->command('php:remove [phpVersion] [--path=]', function ($phpVersion, $path) {
+	$txt = $phpVersion ? "version $phpVersion" : "path $path";
+	info("Removing $txt...");
 
 	$config = Configuration::read();
 	$defaultPhp = $config['default_php'];
-	$php = Configuration::getPhp($path);
+
+	$php = $phpVersion ? Configuration::getPhpByVersion($phpVersion) : Configuration::getPhp($path);
+
+	if (!$php) {
+		warning("PHP $txt not found in valet");
+		return;
+	}
 
 	if ($php['version'] === $defaultPhp) {
 		warning("Default PHP {$php['version']} cannot be removed. Change default PHP version by running [valet use VERSION]");
@@ -82,8 +91,8 @@ $app->command('php:remove [path]', function ($path) {
 		\PhpCgiXdebug::uninstall($php['version']);
 	}
 
-	if (Configuration::removePhp($path)) {
-		info("PHP {$php['version']} from {$path} has been removed.");
+	if (Configuration::removePhp($php['path'])) {
+		info("PHP {$php['version']} from {$php['path']} has been removed.");
 	}
 })->descriptions('Remove PHP by specifying a path');
 
@@ -488,6 +497,9 @@ if (is_dir(VALET_HOME_PATH)) {
 			Ngrok::start($url, Site::port($url), $debug, $options);
 		}
 	)->descriptions('Generate a publicly accessible URL for your project');
+
+	// TODO: Share-tool for Expose (https://expose.dev/) 
+	// and 2 open-source clients like localtunnel (https://github.com/localtunnel/localtunnel)
 
 	/**
 	 * Echo the currently tunneled URL.
