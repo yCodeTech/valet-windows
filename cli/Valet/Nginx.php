@@ -223,6 +223,6 @@ class Nginx
 	 */
 	public function path(string $path = ''): string
 	{
-		return realpath(valetBinPath() . 'nginx-1.25.0') . ($path ? DIRECTORY_SEPARATOR . $path : $path);
+		return realpath(valetBinPath() . 'nginx') . ($path ? DIRECTORY_SEPARATOR . $path : $path);
 	}
 }
