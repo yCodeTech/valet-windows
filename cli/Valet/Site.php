@@ -860,7 +860,6 @@ class Site
 	 */
 	public function trustCa($caPemPath)
 	{
-		echo $caPemPath;
 		$this->cli->runOrExit(sprintf('cmd "/C certutil -addstore "Root" "%s""', $caPemPath), function ($code, $output) {
 			error("Failed to trust certificate: $output", true);
 		});
