@@ -330,7 +330,7 @@ class Site
 		if ($this->files->exists($this->nginxPath($url))) {
 			$siteConf = $this->files->get($this->nginxPath($url));
 
-			if (starts_with($siteConf, '# Valet isolated PHP version')) {
+			if (str_starts_with($siteConf, '# Valet isolated PHP version')) {
 				$firstLine = explode(PHP_EOL, $siteConf)[0];
 
 				return trim(str_replace('# Valet isolated PHP version : ', '', $firstLine));
@@ -377,10 +377,6 @@ class Site
 	{
 		$site = $this->getSiteUrl($directory);
 
-		if (!$site) {
-			throw new DomainException("The {$directory} site could not be found in Valet's site list.");
-		}
-
 		$php = $this->config->getPhpByVersion($phpVersion);
 
 		if (empty($php)) {
@@ -400,12 +396,13 @@ class Site
 	 */
 	public function unisolate($directory)
 	{
-		$site = $this->getSiteUrl($directory);
-
-		// Make sure the site exists, otherwise stop executing.
-		if (!$site) {
+		// Make sure the site is isolated, otherwise stop executing.
+		if (!$this->isIsolated($directory)) {
+			error("Can't unisolate {$directory} because the site is not isolated.");
 			return false;
 		}
+
+		$site = $this->getSiteUrl($directory);
 
 		// If a site has an SSL/TLS certificate, we need to keep its custom config file, but we can
 		// just re-generate it without defining a custom `valet.sock` file
@@ -468,10 +465,12 @@ class Site
 	public function getSiteUrl($directory)
 	{
 		$tld = $this->config->read()['tld'];
+		$txt = "";
 
 		// Allow user to use dot as current dir's site `--site=.`
-		if ($directory == '.' || $directory == './') {
+		if ($directory == '.' || $directory == './' || $directory == null) {
 			$directory = $this->host(getcwd());
+			$txt = "The current working directory";
 		}
 
 		// Remove .tld from sitename if it was provided
@@ -479,9 +478,7 @@ class Site
 
 		if (!$this->parked()->merge($this->links())->where('site', $directory)->count() > 0) {
 			// Invalid directory provided
-			error('Invalid site or directory given');
-
-			return false;
+			throw new DomainException("$txt '$directory' is an invalid site.");
 		}
 
 		return $directory . '.' . $tld;
@@ -968,7 +965,7 @@ class Site
 	}
 
 	/**
-	 * Replace .sock file in an Nginx site configuration file contents.
+	 * Replace PHP version and port in an Nginx site configuration file contents.
 	 *
 	 * @param  string  $siteConf
 	 * @param  string  $phpPort

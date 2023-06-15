@@ -74,10 +74,11 @@ function error(string $output, $exception = false)
 	if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'testing') {
 		throw new RuntimeException($output);
 	}
-	if (!$exception) {
+	if ($exception === true) {
+		throw new \Exception("asafsfs" . $output);
+	} else {
 		(new ConsoleOutput)->getErrorOutput()->writeln("<error>$output</error>");
 	}
-	throw new \Exception($output);
 }
 
 if (!function_exists('array_is_list')) {
@@ -289,15 +290,18 @@ if (!function_exists('ends_with')) {
 	}
 }
 
-if (!function_exists('starts_with')) {
+if (!function_exists('str_starts_with')) {
 	/**
 	 * Determine if a given string starts with a given substring.
+	 * 
+	 * `str_starts_with` function was introduced in PHP 8.
+	 * This is a polyfill for backwards compatibility.
 	 *
 	 * @param  string  $haystack
 	 * @param  string|string[]  $needles
 	 * @return bool
 	 */
-	function starts_with($haystack, $needles)
+	function str_starts_with($haystack, $needles)
 	{
 		foreach ((array) $needles as $needle) {
 			if ((string) $needle !== '' && strncmp($haystack, $needle, strlen($needle)) === 0) {
@@ -325,4 +329,13 @@ function user()
 	}
 
 	return $_SERVER['SUDO_USER'];
+}
+
+/**
+ * Get the bin path.
+ * @return string `"c:\Users\YourName\AppData\Roaming\Composer\vendor\ycodetech\valet-windows\bin\"`
+ */
+function valetBinPath()
+{
+	return __DIR__ . '/../../bin/';
 }

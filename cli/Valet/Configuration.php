@@ -358,6 +358,7 @@ class Configuration
 
 	/**
 	 * Remove the given path from the configuration.
+	 * Used by `valet forget`
 	 *
 	 * @param  string  $path
 	 * @return void

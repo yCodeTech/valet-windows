@@ -7,28 +7,6 @@ use Symfony\Component\Process\Process;
 class CommandLine
 {
 	/**
-	 * Simple global function to run commands.
-	 *
-	 * @param  string  $command
-	 * @return void
-	 */
-	public function quietly($command)
-	{
-		$this->runCommand($command . ' > /dev/null 2>&1');
-	}
-
-	/**
-	 * Simple global function to run commands.
-	 *
-	 * @param  string  $command
-	 * @return void
-	 */
-	public function quietlyAsUser($command)
-	{
-		$this->quietly($command . ' > /dev/null 2>&1');
-	}
-
-	/**
 	 * Pass the command to the command line and display the output.
 	 *
 	 * @param  string  $command
@@ -37,6 +15,21 @@ class CommandLine
 	public function passthru($command)
 	{
 		passthru($command);
+	}
+
+	/**
+	 * Pass the given valet command to the command line with elevated privileges using gsudo.
+	 * 
+	 * gsudo is a sudo equivalent of the Mac `sudo` utility. It allows the user to run commands as the root user with elevated privileges with minimal amount of UAC popups, ie. only 1 UAC popup.
+	 * 
+	 * https://github.com/gerardog/gsudo
+	 * 
+	 * @param string $valetCommand The valet command to run.
+	 */
+	public function sudo($valetCommand)
+	{
+		$gsudo = realpath(valetBinPath() . 'gsudo/gsudo.exe') . " --system -d ";
+		$this->passthru($gsudo . " $valetCommand");
 	}
 
 	/**

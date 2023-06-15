@@ -54,13 +54,9 @@ $app->command('php:add [path]', function ($path) {
 	if ($php = Configuration::addPhp($path)) {
 		\PhpCgi::install($php['version']);
 
-		// \PhpCgiXdebug::install($php['version']);
-
 		info("PHP {$php['version']} from {$path} has been added. You can make it default by running `valet use` command");
 	}
 })->descriptions('Add PHP by specifying a path');
-
-// TODO: Add command to install php xdebug services instead of automatically installing, especially when they're not beign used.
 
 /**
  * Remove PHP.
@@ -88,7 +84,9 @@ $app->command('php:remove [phpVersion] [--path=]', function ($phpVersion, $path)
 	if ($php) {
 		\PhpCgi::uninstall($php['version']);
 
-		\PhpCgiXdebug::uninstall($php['version']);
+		// TODO: Change commands to install php xdebug services only when the xbug command is used instead of automatically installing, especially when they're not be used. And only uninstall/restart them if they're added.
+
+		// \PhpCgiXdebug::uninstall($php['version']);
 	}
 
 	if (Configuration::removePhp($php['path'])) {
@@ -183,13 +181,27 @@ $app->command('xdebug:uninstall', function () {
 })->descriptions('Uninstall all PHP xDebug services from [valet php:list]');
 
 /**
+ * A sudo-like command to use valet commands with elevated privileges that only require 1 User Account Control popup.
+ */
+$app->command('sudo [valetCommand]*', function ($valetCommand = null) {
+	if (!$valetCommand) {
+		return;
+	}
+	$valetCommand = implode(" ", $valetCommand);
+
+	$valetCommand = str_starts_with($valetCommand, 'valet') ? $valetCommand : "valet $valetCommand";
+
+	CommandLine::sudo($valetCommand);
+});
+
+/**
  * Install Valet and any required services.
  */
 $app->command('install', function () {
 	Configuration::install();
 	Nginx::install();
 	PhpCgi::install();
-	PhpCgiXdebug::install();
+	// PhpCgiXdebug::install();
 	Acrylic::install(Configuration::read()['tld']);
 
 	output(PHP_EOL . '<info>Valet installed successfully! Please use `valet start` to start the services.</info>');
@@ -222,7 +234,7 @@ if (is_dir(VALET_HOME_PATH)) {
 
 		Site::resecureForNewTld($oldTld, $tld);
 		PhpCgi::restart();
-		PhpCgiXdebug::restart();
+		// PhpCgiXdebug::restart();
 		Nginx::restart();
 
 		info('Your Valet TLD has been updated to [' . $tld . '].');
@@ -328,9 +340,9 @@ if (is_dir(VALET_HOME_PATH)) {
 			Site::isolate($isolate, $name);
 		}
 	})->descriptions('Link the current working directory to Valet with a given name', [
-			'--secure' => 'Optionally secure the site',
-			'--isolate' => 'Isolate the site to a specified PHP version'
-		]);
+				'--secure' => 'Optionally secure the site',
+				'--isolate' => 'Isolate the site to a specified PHP version'
+			]);
 
 	/**
 	 * Display all of the registered symbolic links.
@@ -377,7 +389,7 @@ if (is_dir(VALET_HOME_PATH)) {
 	 * Secure the given domain with a trusted TLS certificate.
 	 */
 	$app->command('secure [domain]', function ($domain = null) {
-		$url = ($domain ?: Site::host(getcwd())) . '.' . Configuration::read()['tld'];
+		$url = Site::getSiteURL($domain);
 
 		Site::secure($url);
 
@@ -397,7 +409,7 @@ if (is_dir(VALET_HOME_PATH)) {
 			return;
 		}
 
-		$url = ($domain ?: Site::host(getcwd())) . '.' . Configuration::read()['tld'];
+		$url = Site::getSiteURL($domain);
 
 		Site::unsecure($url);
 		Nginx::restart();
@@ -546,7 +558,7 @@ if (is_dir(VALET_HOME_PATH)) {
 			case '':
 				Acrylic::restart();
 				PhpCgi::restart();
-				PhpCgiXdebug::restart();
+				// PhpCgiXdebug::restart();
 				Nginx::restart();
 
 				return info('Valet services have been started.');
@@ -573,13 +585,14 @@ if (is_dir(VALET_HOME_PATH)) {
 
 	/**
 	 * Restart the daemon services.
+	 * TODO: Change start and restart to share the same function instead of duplicating code.
 	 */
 	$app->command('restart [service]', function ($service) {
 		switch ($service) {
 			case '':
 				Acrylic::restart();
 				PhpCgi::restart();
-				PhpCgiXdebug::restart();
+				// PhpCgiXdebug::restart();
 				Nginx::restart();
 
 				return info('Valet services have been restarted.');
@@ -613,7 +626,7 @@ if (is_dir(VALET_HOME_PATH)) {
 				Acrylic::stop();
 				Nginx::stop();
 				PhpCgi::stop();
-				PhpCgiXdebug::stop();
+				// PhpCgiXdebug::stop();
 
 				return info('Valet services have been stopped.');
 			case 'acrylic':
@@ -654,7 +667,7 @@ if (is_dir(VALET_HOME_PATH)) {
 		Acrylic::stop();
 		Nginx::stop();
 		PhpCgi::stop();
-		PhpCgiXdebug::stop();
+		// PhpCgiXdebug::stop();
 
 		if ($purgeConfig) {
 			info('Removing certificates for all secured sites...');
@@ -672,8 +685,8 @@ if (is_dir(VALET_HOME_PATH)) {
 		info('Removing PHP-CGI...');
 		PhpCgi::uninstall();
 
-		info('Removing PHP-CGI Xdebug...');
-		PhpCgiXdebug::uninstall();
+		// info('Removing PHP-CGI Xdebug...');
+		// PhpCgiXdebug::uninstall();
 
 		if ($purgeConfig) {
 			info('Removing Valet configs...');
@@ -740,8 +753,8 @@ if (is_dir(VALET_HOME_PATH)) {
 		info('Note that you might need to run <comment>composer global update</comment> if your PHP version change affects the dependencies of global packages required by Composer.');
 
 	})->descriptions('Change the default version of PHP used by valet', [
-			'phpVersion' => 'The PHP version you want to use, e.g 8.1',
-		]);
+				'phpVersion' => 'The PHP version you want to use, e.g 8.1',
+			]);
 
 	/**
 	 * Isolate the current working directory or a specified site to specific PHP version.
@@ -760,7 +773,6 @@ if (is_dir(VALET_HOME_PATH)) {
 
 		// If $site is empty, then isolate the current working directory.
 		if (!$site) {
-			$site = basename(getcwd());
 			info("Isolating the current working directory...");
 			Site::isolate($phpVersion, $site);
 
@@ -773,9 +785,9 @@ if (is_dir(VALET_HOME_PATH)) {
 		}
 
 	})->descriptions('Isolate the current working directory or a specified site(s) to a specific PHP version', [
-			'phpVersion' => 'The PHP version you want to use; e.g 7.4',
-			'--site' => 'Specify the site to isolate',
-		]);
+				'phpVersion' => 'The PHP version you want to use; e.g 7.4',
+				'--site' => 'Specify the site to isolate',
+			]);
 
 	/**
 	 * Remove [unisolate] an isolated site.
@@ -797,16 +809,15 @@ if (is_dir(VALET_HOME_PATH)) {
 		}
 
 		if (!$site) {
-			$site = basename(getcwd());
 			info("Unisolating the current working directory...");
 		}
 
 		Site::unisolate($site);
 
 	})->descriptions('Remove [unisolate] an isolated site.', [
-			'--site' => 'Specify the site to unisolate',
-			'--all' => 'Optionally remove all isolated sites'
-		]);
+				'--site' => 'Specify the site to unisolate',
+				'--all' => 'Optionally remove all isolated sites'
+			]);
 
 	/**
 	 * List isolated sites.
@@ -923,8 +934,8 @@ if (is_dir(VALET_HOME_PATH)) {
 		$current = isset($config[$key]) ? $config[$key] : 'off';
 		output('Directory listing is ' . $current);
 	})->descriptions('Determine directory-listing behavior. Default is off, which means a 404 will display.', [
-			'status' => 'on or off. (default=off) will show a 404 page; [on] will display a listing if project folder exists but requested URI not found',
-		]);
+				'status' => 'on or off. (default=off) will show a 404 page; [on] will display a listing if project folder exists but requested URI not found',
+			]);
 
 	/**
 	 * Output diagnostics to aid in debugging Valet.
@@ -934,9 +945,9 @@ if (is_dir(VALET_HOME_PATH)) {
 
 		Diagnose::run($print, $plain);
 	})->descriptions('Output diagnostics to aid in debugging Valet.', [
-			'--print' => 'print diagnostics output while running',
-			'--plain' => 'format clipboard output as plain text',
-		]);
+				'--print' => 'print diagnostics output while running',
+				'--plain' => 'format clipboard output as plain text',
+			]);
 }
 
 /**
