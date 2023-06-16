@@ -437,7 +437,7 @@ class Site
 				"site" => str_replace(".$tld.conf", '', $site),
 				"php" => $this->customPhpVersion($site)
 			];
-		});
+		})->whereNotIn('php', '');
 
 		return $isolated;
 	}
