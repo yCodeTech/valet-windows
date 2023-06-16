@@ -29,7 +29,7 @@ class CommandLine
 	public function sudo($valetCommand)
 	{
 		$gsudo = realpath(valetBinPath() . 'gsudo/gsudo.exe') . " --system -d ";
-		$this->passthru($gsudo . " $valetCommand");
+		$this->passthru($gsudo . "$valetCommand");
 	}
 
 	/**

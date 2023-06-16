@@ -103,7 +103,7 @@ $app->command('php:install', function () {
 	PhpCgi::uninstall();
 
 	PhpCgi::install();
-})->descriptions('Reinstall all PHP services from [valet php:list]');
+})->descriptions('Reinstall all PHP services from <fg=green>valet php:list</>');
 
 /**
  * Uninstall PHP services.
@@ -114,7 +114,7 @@ $app->command('php:uninstall', function () {
 	PhpCgi::uninstall();
 
 	info('PHP services uninstalled. Run php:install to install again');
-})->descriptions('Uninstall all PHP services from [valet php:list]');
+})->descriptions('Uninstall all PHP services from <fg=green>valet php:list</>');
 
 /**
  * List all PHP services.
@@ -167,7 +167,7 @@ $app->command('xdebug:install', function () {
 	PhpCgiXdebug::uninstall();
 
 	PhpCgiXdebug::install();
-})->descriptions('Reinstall all PHP xDebug services from [valet php:list]');
+})->descriptions('Reinstall all PHP xDebug services from <fg=green>valet php:list</>');
 
 /**
  * uninstall PHP xDebug services.
@@ -178,12 +178,17 @@ $app->command('xdebug:uninstall', function () {
 	PhpCgiXdebug::uninstall();
 
 	info('xDebug services uninstalled. Run xdebug:install to install again');
-})->descriptions('Uninstall all PHP xDebug services from [valet php:list]');
+})->descriptions('Uninstall all PHP xDebug services from <fg=green>valet php:list</>');
 
 /**
  * A sudo-like command to use valet commands with elevated privileges that only require 1 User Account Control popup.
+ * @param array|null $valetCommand The valet command plus arguments and values
+ * @param string|null $valetOptions The valet options without the leading `--`. Multiple options must be separated by double slashes `//`.
+ * Example: `--valetOptions=isolate//secure` will be ran as `--isolate --secure`.
+ * 
+ * @example `valet sudo link example --valetOptions=isolate//secure`
  */
-$app->command('sudo [valetCommand]*', function ($valetCommand = null) {
+$app->command('sudo valetCommand* [--valetOptions=]', function ($valetCommand = null, $valetOptions = null) {
 	if (!$valetCommand) {
 		return;
 	}
@@ -191,8 +196,18 @@ $app->command('sudo [valetCommand]*', function ($valetCommand = null) {
 
 	$valetCommand = str_starts_with($valetCommand, 'valet') ? $valetCommand : "valet $valetCommand";
 
+	if ($valetOptions != null) {
+		$valetOptions = Valet\prefixOptions(explode("//", $valetOptions));
+	}
+
+	$valetCommand = implode(" ", [$valetCommand, $valetOptions]);
+
 	CommandLine::sudo($valetCommand);
-});
+
+})->descriptions("A sudo-like command to use valet commands with elevated privileges that only require 1 User Account Control popup.", [
+			"valetCommand" => "The valet command and its arguments and values, separated by spaces.",
+			"--valetOptions" => "Specify options without the leading <fg=green>--</>. Multiple options must be separated by double slashes <fg=green>//</>."
+		]);
 
 /**
  * Install Valet and any required services.
@@ -364,7 +379,7 @@ if (is_dir(VALET_HOME_PATH)) {
 	/**
 	 * Unlink a link from the Valet links directory.
 	 */
-	$app->command('unlink [name]', function ($name) {
+	$app->command('unlink name', function ($name) {
 
 		if (Site::isIsolated($name) === true) {
 			Site::unisolate($name);

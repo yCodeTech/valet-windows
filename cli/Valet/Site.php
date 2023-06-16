@@ -396,13 +396,13 @@ class Site
 	 */
 	public function unisolate($directory)
 	{
+		$site = $this->getSiteUrl($directory);
 		// Make sure the site is isolated, otherwise stop executing.
-		if (!$this->isIsolated($directory)) {
-			error("Can't unisolate {$directory} because the site is not isolated.");
+		if (!$this->isIsolated($site)) {
+			error("Can't unisolate {$site} because the site is not isolated.");
 			return false;
 		}
 
-		$site = $this->getSiteUrl($directory);
 
 		// If a site has an SSL/TLS certificate, we need to keep its custom config file, but we can
 		// just re-generate it without defining a custom `valet.sock` file
@@ -453,7 +453,7 @@ class Site
 			return ["site" => $arr["site"]];
 		})->flatten()->all();
 
-		return in_array($site, $isolated);
+		return in_array(explode(".", $site)[0], $isolated);
 	}
 
 	/**

@@ -339,3 +339,11 @@ function valetBinPath()
 {
 	return __DIR__ . '/../../bin/';
 }
+
+function prefixOptions($options)
+{
+	return (new \Illuminate\Support\Collection($options))->map(function ($value) {
+		// Prefix the option with "--".
+		return "--$value";
+	})->implode(' ');
+}
