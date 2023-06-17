@@ -75,7 +75,7 @@ function error(string $output, $exception = false)
 		throw new RuntimeException($output);
 	}
 	if ($exception === true) {
-		throw new \Exception("asafsfs" . $output);
+		throw new \Exception($output);
 	} else {
 		(new ConsoleOutput)->getErrorOutput()->writeln("<error>$output</error>");
 	}

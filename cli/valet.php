@@ -45,6 +45,8 @@ if (is_dir(VALET_HOME_PATH)) {
 	Site::pruneLinks();
 }
 
+// TODO: Make some commands namespaced like the php:[command]'s, possibly for Ngrok, isolate, links and parked?
+
 /**
  * Add PHP.
  */
