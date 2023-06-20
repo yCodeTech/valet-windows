@@ -571,40 +571,19 @@ if (is_dir(VALET_HOME_PATH)) {
 	 * Start the daemon services.
 	 */
 	$app->command('start [service]', function ($service) {
-		switch ($service) {
-			case '':
-				Acrylic::restart();
-				PhpCgi::restart();
-				// PhpCgiXdebug::restart();
-				Nginx::restart();
-
-				return info('Valet services have been started.');
-			case 'acrylic':
-				Acrylic::restart();
-
-				return info('Acrylic DNS has been started.');
-			case 'nginx':
-				Nginx::restart();
-
-				return info('Nginx has been started.');
-			case 'php':
-				PhpCgi::restart();
-
-				return info('PHP has been started.');
-			case 'php-xdebug':
-				PhpCgiXdebug::restart();
-
-				return info('PHP Xdebug has been started.');
-		}
-
-		return warning(sprintf('Invalid valet service name [%s]', $service));
+		CommandLine::passthru('valet restart ' . $service . ' --dev-txt=started');
 	})->descriptions('Start the Valet services');
 
 	/**
 	 * Restart the daemon services.
-	 * TODO: Change start and restart to share the same function instead of duplicating code.
 	 */
-	$app->command('restart [service]', function ($service) {
+	$app->command('restart [service] [--dev-txt=]', function ($service, $devTxt = "restarted") {
+
+		if (!in_array($devTxt, ["started", "restarted"])) {
+			warning("The <bg=gray>--dev-txt</> option is for internal use only. Please don't use it, it doesn't do anything.");
+			return;
+		}
+
 		switch ($service) {
 			case '':
 				Acrylic::restart();
@@ -612,27 +591,31 @@ if (is_dir(VALET_HOME_PATH)) {
 				// PhpCgiXdebug::restart();
 				Nginx::restart();
 
-				return info('Valet services have been restarted.');
+				return info("Valet services have been $devTxt.");
 			case 'acrylic':
 				Acrylic::restart();
 
-				return info('Acrylic DNS has been restarted.');
+				return info("Acrylic DNS has been $devTxt.");
 			case 'nginx':
 				Nginx::restart();
 
-				return info('Nginx has been restarted.');
+				return info("Nginx has been $devTxt.");
 			case 'php':
 				PhpCgi::restart();
 
-				return info('PHP has been restarted.');
+				return info("PHP has been $devTxt.");
 			case 'php-xdebug':
 				PhpCgiXdebug::restart();
 
-				return info('PHP Xdebug has been restarted.');
+				return info("PHP Xdebug has been $devTxt.");
 		}
 
 		return warning(sprintf('Invalid valet service name [%s]', $service));
-	})->descriptions('Restart the Valet services');
+
+	})->descriptions('Restart the Valet services', [
+				"service" => "The valet service name [acrylic, nginx, php, php-xdebug]",
+				"--dev-txt" => "INTERNAL USE ONLY"
+			]);
 
 	/**
 	 * Stop the daemon services.
