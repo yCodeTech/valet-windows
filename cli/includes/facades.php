@@ -11,7 +11,7 @@ class Facade
 	 */
 	public static function containerKey()
 	{
-		return 'Valet\\'.basename(str_replace('\\', '/', get_called_class()));
+		return 'Valet\\' . basename(str_replace('\\', '/', get_called_class()));
 	}
 
 	/**
@@ -63,5 +63,8 @@ class WinSW extends Facade
 {
 }
 class Acrylic extends Facade
+{
+}
+class Ansicon extends Facade
 {
 }

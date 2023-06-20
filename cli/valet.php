@@ -220,6 +220,7 @@ $app->command('install', function () {
 	PhpCgi::install();
 	// PhpCgiXdebug::install();
 	Acrylic::install(Configuration::read()['tld']);
+	Ansicon::install();
 
 	output(PHP_EOL . '<info>Valet installed successfully! Please use `valet start` to start the services.</info>');
 })->descriptions('Install the Valet services');
@@ -687,6 +688,9 @@ if (is_dir(VALET_HOME_PATH)) {
 
 		// info('Removing PHP-CGI Xdebug...');
 		// PhpCgiXdebug::uninstall();
+
+		info("Uninstalling Ansicon...");
+		Ansicon::uninstall();
 
 		if ($purgeConfig) {
 			info('Removing Valet configs...');
