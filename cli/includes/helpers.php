@@ -81,6 +81,20 @@ function error(string $output, $exception = false)
 	}
 }
 
+/**
+ * Output the given text to the console.
+ *
+ * @param  string  $output
+ * @return void
+ */
+function output($output)
+{
+	if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'testing') {
+		return;
+	}
+	(new ConsoleOutput())->writeln($output);
+}
+
 if (!function_exists('array_is_list')) {
 	/**
 	 * Checks whether a given `array` is a list
@@ -182,21 +196,6 @@ function addTableSeparator($rows)
 	})->slice(0, -1)->toArray();
 
 	return $separatedRows;
-}
-
-/**
- * Output the given text to the console.
- *
- * @param  string  $output
- * @return void
- */
-function output($output)
-{
-	if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'testing') {
-		return;
-	}
-
-	(new ConsoleOutput())->writeln($output);
 }
 
 if (!function_exists('resolve')) {
