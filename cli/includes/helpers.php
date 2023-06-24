@@ -75,10 +75,28 @@ function error(string $output, $exception = false)
 		throw new RuntimeException($output);
 	}
 	if ($exception === true) {
-		throw new \Exception($output);
+		$errors = error_get_last();
+
+		$outputTxt = getErrorTypeName($errors['type']) . ": "
+			. "$output\n"
+			. $errors['message']
+			. "\n{$errors['file']}:{$errors['line']}";
+		throw new \Exception($outputTxt);
 	} else {
 		(new ConsoleOutput)->getErrorOutput()->writeln("<error>$output</error>");
 	}
+}
+
+/**
+ * Get the error type name.
+ * Eg.: Inputs error code `0`, outputs error name `"FATAL"`
+ * 
+ * @param mixed $code The numeric error type/code
+ * @return string The error type name
+ */
+function getErrorTypeName($code)
+{
+	return $code == 0 ? "FATAL" : array_search($code, get_defined_constants(true)['Core']);
 }
 
 /**
