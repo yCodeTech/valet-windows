@@ -135,7 +135,7 @@ $app->command('php:list', function () {
 		return $item;
 	})->toArray();
 
-	table(['Version', 'Version Alias', 'Path', 'Port', 'xDebug Port', 'Default'], $php, true);
+	table(['Version', 'Version Alias', 'Path', 'Port', 'Xdebug Port', 'Default'], $php, true);
 })->descriptions('List all PHP services');
 
 /**
@@ -161,26 +161,26 @@ $app->command('php:which [site]', function ($site = null) {
 })->descriptions('Determine which PHP version the current working directory or a specified site is using');
 
 /**
- * Install PHP xDebug services.
+ * Install PHP Xdebug services.
  */
 $app->command('xdebug:install', function () {
-	info('Reinstalling xDebug services...');
+	info('Reinstalling Xdebug services...');
 
 	PhpCgiXdebug::uninstall();
 
 	PhpCgiXdebug::install();
-})->descriptions('Reinstall all PHP xDebug services from <fg=green>valet php:list</>');
+})->descriptions('Reinstall all PHP Xdebug services from <fg=green>valet php:list</>');
 
 /**
- * uninstall PHP xDebug services.
+ * uninstall PHP Xdebug services.
  */
 $app->command('xdebug:uninstall', function () {
-	info('Uninstalling xDebug services...');
+	info('Uninstalling Xdebug services...');
 
 	PhpCgiXdebug::uninstall();
 
-	info('xDebug services uninstalled. Run xdebug:install to install again');
-})->descriptions('Uninstall all PHP xDebug services from <fg=green>valet php:list</>');
+	info('Xdebug services uninstalled. Run xdebug:install to install again');
+})->descriptions('Uninstall all PHP Xdebug services from <fg=green>valet php:list</>');
 
 /**
  * A sudo-like command to use valet commands with elevated privileges that only require 1 User Account Control popup.
@@ -701,7 +701,7 @@ if (is_dir(VALET_HOME_PATH)) {
 
 		output(
 			"\n<fg=yellow>NOTE:</>" .
-			"\nRemove composer dependency with: <info>composer global remove cretueusebiu/valet-windows</info>" .
+			"\nRemove composer dependency with: <info>composer global remove ycodetech/valet-windows</info>" .
 			($purgeConfig ? '' : "\nDelete the config files from: <info>~/.config/valet</info>") .
 			"\nDelete PHP from: <info>C:/php</info>"
 		);
