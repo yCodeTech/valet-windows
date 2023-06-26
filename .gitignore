@@ -7,3 +7,6 @@ bin/nginx/conf/nginx.conf
 bin/nginx/conf/fastcgi_params
 bin/acrylic/AcrylicCache.dat
 bin/acrylic/AcrylicHosts.txt
+.vscode
+composer.lock
+logo assets
