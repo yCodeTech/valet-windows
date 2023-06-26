@@ -38,7 +38,7 @@ class Ngrok
 	 */
 	public function run(string $command)
 	{
-		$ngrok = realpath(__DIR__ . '/../../bin/ngrok.exe');
+		$ngrok = realpath(valetBinPath() . 'ngrok.exe');
 
 		$this->cli->passthru("\"$ngrok\" $command");
 	}
@@ -67,7 +67,7 @@ Then use: <fg=magenta>valet set-ngrok-token [token]</>');
 
 		$options = $this->prefixNgrokFlags($options);
 
-		$ngrok = realpath(__DIR__ . '/../../bin/ngrok.exe');
+		$ngrok = realpath(valetBinPath() . 'ngrok.exe');
 
 		$newCMDtitle = "\"Sharing $site\"";
 		$ngrokCommand = "\"$ngrok\" http $site:$port " . $this->getNgrokConfig() . " $options";

@@ -177,7 +177,9 @@ class Filesystem
 	 */
 	public function copy($from, $to)
 	{
-		copy($from, $to);
+		// The @ operator suppresses pre-error messages that occur in PHP internally.
+		// We need to surpress the messages in order to properly handle them.
+		@copy($from, $to) or error("Failed to copy", true);
 	}
 
 	/**

@@ -45,6 +45,8 @@ if (is_dir(VALET_HOME_PATH)) {
 	Site::pruneLinks();
 }
 
+// TODO: Make some commands namespaced like the php:[command]'s, possibly for Ngrok, isolate, links and parked?
+
 /**
  * Add PHP.
  */
@@ -54,13 +56,9 @@ $app->command('php:add [path]', function ($path) {
 	if ($php = Configuration::addPhp($path)) {
 		\PhpCgi::install($php['version']);
 
-		// \PhpCgiXdebug::install($php['version']);
-
 		info("PHP {$php['version']} from {$path} has been added. You can make it default by running `valet use` command");
 	}
 })->descriptions('Add PHP by specifying a path');
-
-// TODO: Add command to install php xdebug services instead of automatically installing, especially when they're not beign used.
 
 /**
  * Remove PHP.
@@ -88,7 +86,9 @@ $app->command('php:remove [phpVersion] [--path=]', function ($phpVersion, $path)
 	if ($php) {
 		\PhpCgi::uninstall($php['version']);
 
-		\PhpCgiXdebug::uninstall($php['version']);
+		// TODO: Change commands to install php xdebug services only when the xbug command is used instead of automatically installing, especially when they're not be used. And only uninstall/restart them if they're added.
+
+		// \PhpCgiXdebug::uninstall($php['version']);
 	}
 
 	if (Configuration::removePhp($php['path'])) {
@@ -105,7 +105,7 @@ $app->command('php:install', function () {
 	PhpCgi::uninstall();
 
 	PhpCgi::install();
-})->descriptions('Reinstall all PHP services from [valet php:list]');
+})->descriptions('Reinstall all PHP services from <fg=green>valet php:list</>');
 
 /**
  * Uninstall PHP services.
@@ -116,7 +116,7 @@ $app->command('php:uninstall', function () {
 	PhpCgi::uninstall();
 
 	info('PHP services uninstalled. Run php:install to install again');
-})->descriptions('Uninstall all PHP services from [valet php:list]');
+})->descriptions('Uninstall all PHP services from <fg=green>valet php:list</>');
 
 /**
  * List all PHP services.
@@ -135,7 +135,7 @@ $app->command('php:list', function () {
 		return $item;
 	})->toArray();
 
-	table(['Version', 'Version Alias', 'Path', 'Port', 'xDebug Port', 'Default'], $php, true);
+	table(['Version', 'Version Alias', 'Path', 'Port', 'Xdebug Port', 'Default'], $php, true);
 })->descriptions('List all PHP services');
 
 /**
@@ -161,26 +161,55 @@ $app->command('php:which [site]', function ($site = null) {
 })->descriptions('Determine which PHP version the current working directory or a specified site is using');
 
 /**
- * Install PHP xDebug services.
+ * Install PHP Xdebug services.
  */
 $app->command('xdebug:install', function () {
-	info('Reinstalling xDebug services...');
+	info('Reinstalling Xdebug services...');
 
 	PhpCgiXdebug::uninstall();
 
 	PhpCgiXdebug::install();
-})->descriptions('Reinstall all PHP xDebug services from [valet php:list]');
+})->descriptions('Reinstall all PHP Xdebug services from <fg=green>valet php:list</>');
 
 /**
- * uninstall PHP xDebug services.
+ * uninstall PHP Xdebug services.
  */
 $app->command('xdebug:uninstall', function () {
-	info('Uninstalling xDebug services...');
+	info('Uninstalling Xdebug services...');
 
 	PhpCgiXdebug::uninstall();
 
-	info('xDebug services uninstalled. Run xdebug:install to install again');
-})->descriptions('Uninstall all PHP xDebug services from [valet php:list]');
+	info('Xdebug services uninstalled. Run xdebug:install to install again');
+})->descriptions('Uninstall all PHP Xdebug services from <fg=green>valet php:list</>');
+
+/**
+ * A sudo-like command to use valet commands with elevated privileges that only require 1 User Account Control popup.
+ * @param array|null $valetCommand The valet command plus arguments and values
+ * @param string|null $valetOptions The valet options without the leading `--`. Multiple options must be separated by double slashes `//`.
+ * Example: `--valetOptions=isolate//secure` will be ran as `--isolate --secure`.
+ * 
+ * @example `valet sudo link example --valetOptions=isolate//secure`
+ */
+$app->command('sudo valetCommand* [--valetOptions=]', function ($valetCommand = null, $valetOptions = null) {
+	if (!$valetCommand) {
+		return;
+	}
+	$valetCommand = implode(" ", $valetCommand);
+
+	$valetCommand = str_starts_with($valetCommand, 'valet') ? $valetCommand : "valet $valetCommand";
+
+	if ($valetOptions != null) {
+		$valetOptions = Valet\prefixOptions(explode("//", $valetOptions));
+	}
+
+	$valetCommand = implode(" ", [$valetCommand, $valetOptions]);
+
+	CommandLine::sudo($valetCommand);
+
+})->descriptions("A sudo-like command to use valet commands with elevated privileges that only require 1 User Account Control popup.", [
+			"valetCommand" => "The valet command and its arguments and values, separated by spaces.",
+			"--valetOptions" => "Specify options without the leading <fg=green>--</>. Multiple options must be separated by double slashes <fg=green>//</>."
+		]);
 
 /**
  * Install Valet and any required services.
@@ -189,8 +218,9 @@ $app->command('install', function () {
 	Configuration::install();
 	Nginx::install();
 	PhpCgi::install();
-	PhpCgiXdebug::install();
+	// PhpCgiXdebug::install();
 	Acrylic::install(Configuration::read()['tld']);
+	Ansicon::install();
 
 	output(PHP_EOL . '<info>Valet installed successfully! Please use `valet start` to start the services.</info>');
 })->descriptions('Install the Valet services');
@@ -222,7 +252,7 @@ if (is_dir(VALET_HOME_PATH)) {
 
 		Site::resecureForNewTld($oldTld, $tld);
 		PhpCgi::restart();
-		PhpCgiXdebug::restart();
+		// PhpCgiXdebug::restart();
 		Nginx::restart();
 
 		info('Your Valet TLD has been updated to [' . $tld . '].');
@@ -328,9 +358,9 @@ if (is_dir(VALET_HOME_PATH)) {
 			Site::isolate($isolate, $name);
 		}
 	})->descriptions('Link the current working directory to Valet with a given name', [
-			'--secure' => 'Optionally secure the site',
-			'--isolate' => 'Isolate the site to a specified PHP version'
-		]);
+				'--secure' => 'Optionally secure the site',
+				'--isolate' => 'Isolate the site to a specified PHP version'
+			]);
 
 	/**
 	 * Display all of the registered symbolic links.
@@ -352,7 +382,7 @@ if (is_dir(VALET_HOME_PATH)) {
 	/**
 	 * Unlink a link from the Valet links directory.
 	 */
-	$app->command('unlink [name]', function ($name) {
+	$app->command('unlink name', function ($name) {
 
 		if (Site::isIsolated($name) === true) {
 			Site::unisolate($name);
@@ -377,7 +407,7 @@ if (is_dir(VALET_HOME_PATH)) {
 	 * Secure the given domain with a trusted TLS certificate.
 	 */
 	$app->command('secure [domain]', function ($domain = null) {
-		$url = ($domain ?: Site::host(getcwd())) . '.' . Configuration::read()['tld'];
+		$url = Site::getSiteURL($domain);
 
 		Site::secure($url);
 
@@ -397,7 +427,7 @@ if (is_dir(VALET_HOME_PATH)) {
 			return;
 		}
 
-		$url = ($domain ?: Site::host(getcwd())) . '.' . Configuration::read()['tld'];
+		$url = Site::getSiteURL($domain);
 
 		Site::unsecure($url);
 		Nginx::restart();
@@ -542,67 +572,51 @@ if (is_dir(VALET_HOME_PATH)) {
 	 * Start the daemon services.
 	 */
 	$app->command('start [service]', function ($service) {
-		switch ($service) {
-			case '':
-				Acrylic::restart();
-				PhpCgi::restart();
-				PhpCgiXdebug::restart();
-				Nginx::restart();
-
-				return info('Valet services have been started.');
-			case 'acrylic':
-				Acrylic::restart();
-
-				return info('Acrylic DNS has been started.');
-			case 'nginx':
-				Nginx::restart();
-
-				return info('Nginx has been started.');
-			case 'php':
-				PhpCgi::restart();
-
-				return info('PHP has been started.');
-			case 'php-xdebug':
-				PhpCgiXdebug::restart();
-
-				return info('PHP Xdebug has been started.');
-		}
-
-		return warning(sprintf('Invalid valet service name [%s]', $service));
+		CommandLine::passthru('valet restart ' . $service . ' --dev-txt=started');
 	})->descriptions('Start the Valet services');
 
 	/**
 	 * Restart the daemon services.
 	 */
-	$app->command('restart [service]', function ($service) {
+	$app->command('restart [service] [--dev-txt=]', function ($service, $devTxt = "restarted") {
+
+		if (!in_array($devTxt, ["started", "restarted"])) {
+			warning("The <bg=gray>--dev-txt</> option is for internal use only. Please don't use it, it doesn't do anything.");
+			return;
+		}
+
 		switch ($service) {
 			case '':
 				Acrylic::restart();
 				PhpCgi::restart();
-				PhpCgiXdebug::restart();
+				// PhpCgiXdebug::restart();
 				Nginx::restart();
 
-				return info('Valet services have been restarted.');
+				return info("Valet services have been $devTxt.");
 			case 'acrylic':
 				Acrylic::restart();
 
-				return info('Acrylic DNS has been restarted.');
+				return info("Acrylic DNS has been $devTxt.");
 			case 'nginx':
 				Nginx::restart();
 
-				return info('Nginx has been restarted.');
+				return info("Nginx has been $devTxt.");
 			case 'php':
 				PhpCgi::restart();
 
-				return info('PHP has been restarted.');
+				return info("PHP has been $devTxt.");
 			case 'php-xdebug':
 				PhpCgiXdebug::restart();
 
-				return info('PHP Xdebug has been restarted.');
+				return info("PHP Xdebug has been $devTxt.");
 		}
 
 		return warning(sprintf('Invalid valet service name [%s]', $service));
-	})->descriptions('Restart the Valet services');
+
+	})->descriptions('Restart the Valet services', [
+				"service" => "The valet service name [acrylic, nginx, php, php-xdebug]",
+				"--dev-txt" => "INTERNAL USE ONLY"
+			]);
 
 	/**
 	 * Stop the daemon services.
@@ -613,7 +627,7 @@ if (is_dir(VALET_HOME_PATH)) {
 				Acrylic::stop();
 				Nginx::stop();
 				PhpCgi::stop();
-				PhpCgiXdebug::stop();
+				// PhpCgiXdebug::stop();
 
 				return info('Valet services have been stopped.');
 			case 'acrylic':
@@ -654,7 +668,7 @@ if (is_dir(VALET_HOME_PATH)) {
 		Acrylic::stop();
 		Nginx::stop();
 		PhpCgi::stop();
-		PhpCgiXdebug::stop();
+		// PhpCgiXdebug::stop();
 
 		if ($purgeConfig) {
 			info('Removing certificates for all secured sites...');
@@ -672,8 +686,11 @@ if (is_dir(VALET_HOME_PATH)) {
 		info('Removing PHP-CGI...');
 		PhpCgi::uninstall();
 
-		info('Removing PHP-CGI Xdebug...');
-		PhpCgiXdebug::uninstall();
+		// info('Removing PHP-CGI Xdebug...');
+		// PhpCgiXdebug::uninstall();
+
+		info("Uninstalling Ansicon...");
+		Ansicon::uninstall();
 
 		if ($purgeConfig) {
 			info('Removing Valet configs...');
@@ -684,7 +701,7 @@ if (is_dir(VALET_HOME_PATH)) {
 
 		output(
 			"\n<fg=yellow>NOTE:</>" .
-			"\nRemove composer dependency with: <info>composer global remove cretueusebiu/valet-windows</info>" .
+			"\nRemove composer dependency with: <info>composer global remove ycodetech/valet-windows</info>" .
 			($purgeConfig ? '' : "\nDelete the config files from: <info>~/.config/valet</info>") .
 			"\nDelete PHP from: <info>C:/php</info>"
 		);
@@ -740,8 +757,8 @@ if (is_dir(VALET_HOME_PATH)) {
 		info('Note that you might need to run <comment>composer global update</comment> if your PHP version change affects the dependencies of global packages required by Composer.');
 
 	})->descriptions('Change the default version of PHP used by valet', [
-			'phpVersion' => 'The PHP version you want to use, e.g 8.1',
-		]);
+				'phpVersion' => 'The PHP version you want to use, e.g 8.1',
+			]);
 
 	/**
 	 * Isolate the current working directory or a specified site to specific PHP version.
@@ -760,7 +777,6 @@ if (is_dir(VALET_HOME_PATH)) {
 
 		// If $site is empty, then isolate the current working directory.
 		if (!$site) {
-			$site = basename(getcwd());
 			info("Isolating the current working directory...");
 			Site::isolate($phpVersion, $site);
 
@@ -773,9 +789,9 @@ if (is_dir(VALET_HOME_PATH)) {
 		}
 
 	})->descriptions('Isolate the current working directory or a specified site(s) to a specific PHP version', [
-			'phpVersion' => 'The PHP version you want to use; e.g 7.4',
-			'--site' => 'Specify the site to isolate',
-		]);
+				'phpVersion' => 'The PHP version you want to use; e.g 7.4',
+				'--site' => 'Specify the site to isolate',
+			]);
 
 	/**
 	 * Remove [unisolate] an isolated site.
@@ -797,16 +813,15 @@ if (is_dir(VALET_HOME_PATH)) {
 		}
 
 		if (!$site) {
-			$site = basename(getcwd());
 			info("Unisolating the current working directory...");
 		}
 
 		Site::unisolate($site);
 
 	})->descriptions('Remove [unisolate] an isolated site.', [
-			'--site' => 'Specify the site to unisolate',
-			'--all' => 'Optionally remove all isolated sites'
-		]);
+				'--site' => 'Specify the site to unisolate',
+				'--all' => 'Optionally remove all isolated sites'
+			]);
 
 	/**
 	 * List isolated sites.
@@ -923,8 +938,8 @@ if (is_dir(VALET_HOME_PATH)) {
 		$current = isset($config[$key]) ? $config[$key] : 'off';
 		output('Directory listing is ' . $current);
 	})->descriptions('Determine directory-listing behavior. Default is off, which means a 404 will display.', [
-			'status' => 'on or off. (default=off) will show a 404 page; [on] will display a listing if project folder exists but requested URI not found',
-		]);
+				'status' => 'on or off. (default=off) will show a 404 page; [on] will display a listing if project folder exists but requested URI not found',
+			]);
 
 	/**
 	 * Output diagnostics to aid in debugging Valet.
@@ -934,9 +949,9 @@ if (is_dir(VALET_HOME_PATH)) {
 
 		Diagnose::run($print, $plain);
 	})->descriptions('Output diagnostics to aid in debugging Valet.', [
-			'--print' => 'print diagnostics output while running',
-			'--plain' => 'format clipboard output as plain text',
-		]);
+				'--print' => 'print diagnostics output while running',
+				'--plain' => 'format clipboard output as plain text',
+			]);
 }
 
 /**

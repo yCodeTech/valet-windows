@@ -74,10 +74,43 @@ function error(string $output, $exception = false)
 	if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'testing') {
 		throw new RuntimeException($output);
 	}
-	if (!$exception) {
+	if ($exception === true) {
+		$errors = error_get_last();
+
+		$outputTxt = getErrorTypeName($errors['type']) . ": "
+			. "$output\n"
+			. $errors['message']
+			. "\n{$errors['file']}:{$errors['line']}";
+		throw new \Exception($outputTxt);
+	} else {
 		(new ConsoleOutput)->getErrorOutput()->writeln("<error>$output</error>");
 	}
-	throw new \Exception($output);
+}
+
+/**
+ * Get the error type name.
+ * Eg.: Inputs error code `0`, outputs error name `"FATAL"`
+ * 
+ * @param mixed $code The numeric error type/code
+ * @return string The error type name
+ */
+function getErrorTypeName($code)
+{
+	return $code == 0 ? "FATAL" : array_search($code, get_defined_constants(true)['Core']);
+}
+
+/**
+ * Output the given text to the console.
+ *
+ * @param  string  $output
+ * @return void
+ */
+function output($output)
+{
+	if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'testing') {
+		return;
+	}
+	(new ConsoleOutput())->writeln($output);
 }
 
 if (!function_exists('array_is_list')) {
@@ -183,21 +216,6 @@ function addTableSeparator($rows)
 	return $separatedRows;
 }
 
-/**
- * Output the given text to the console.
- *
- * @param  string  $output
- * @return void
- */
-function output($output)
-{
-	if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'testing') {
-		return;
-	}
-
-	(new ConsoleOutput())->writeln($output);
-}
-
 if (!function_exists('resolve')) {
 	/**
 	 * Resolve the given class from the container.
@@ -289,15 +307,18 @@ if (!function_exists('ends_with')) {
 	}
 }
 
-if (!function_exists('starts_with')) {
+if (!function_exists('str_starts_with')) {
 	/**
 	 * Determine if a given string starts with a given substring.
+	 * 
+	 * `str_starts_with` function was introduced in PHP 8.
+	 * This is a polyfill for backwards compatibility.
 	 *
 	 * @param  string  $haystack
 	 * @param  string|string[]  $needles
 	 * @return bool
 	 */
-	function starts_with($haystack, $needles)
+	function str_starts_with($haystack, $needles)
 	{
 		foreach ((array) $needles as $needle) {
 			if ((string) $needle !== '' && strncmp($haystack, $needle, strlen($needle)) === 0) {
@@ -325,4 +346,21 @@ function user()
 	}
 
 	return $_SERVER['SUDO_USER'];
+}
+
+/**
+ * Get the bin path.
+ * @return string `"c:\Users\YourName\AppData\Roaming\Composer\vendor\ycodetech\valet-windows\bin\"`
+ */
+function valetBinPath()
+{
+	return __DIR__ . '/../../bin/';
+}
+
+function prefixOptions($options)
+{
+	return (new \Illuminate\Support\Collection($options))->map(function ($value) {
+		// Prefix the option with "--".
+		return "--$value";
+	})->implode(' ');
 }
