@@ -37,7 +37,6 @@
     <td align="center"><a href="#isolate">isolate</a></td>
     <td align="center"><a href="#unlink">unlink</a></td>
     <td align="center"><a href="#secure">secure</a></td>
-    <td></td>
   </tr>
   <tr>
   <th></th>
@@ -81,18 +80,18 @@ Before installation, make sure that no other programs such as Apache or Nginx ar
 
 - If you don't have PHP installed, open PowerShell (3.0+) as Administrator and run:
 
-```powershell
-# PHP 8.1
-Set-ExecutionPolicy RemoteSigned -Scope Process; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri "https://github.com/ycodetech/valet-windows/raw/master/bin/php.ps1" -OutFile $env:temp\php.ps1; .$env:temp\php.ps1 "8.1"
+  ```powershell
+  # PHP 8.1
+  Set-ExecutionPolicy RemoteSigned -Scope Process; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri "https://github.com/ycodetech/valet-windows/raw/master/bin/php.ps1" -OutFile $env:temp\php.ps1; .$env:temp\php.ps1 "8.1"
 
-# PHP 8.0
-Set-ExecutionPolicy RemoteSigned -Scope Process; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri "https://github.com/ycodetech/valet-windows/raw/master/bin/php.ps1" -OutFile $env:temp\php.ps1; .$env:temp\php.ps1 "8.0"
+  # PHP 8.0
+  Set-ExecutionPolicy RemoteSigned -Scope Process; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri "https://github.com/ycodetech/valet-windows/raw/master/bin/php.ps1" -OutFile $env:temp\php.ps1; .$env:temp\php.ps1 "8.0"
 
-# PHP 7.4
-Set-ExecutionPolicy RemoteSigned -Scope Process; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri "https://github.com/ycodetech/valet-windows/raw/master/bin/php.ps1" -OutFile $env:temp\php.ps1; .$env:temp\php.ps1 "7.4"
-```
+  # PHP 7.4
+  Set-ExecutionPolicy RemoteSigned -Scope Process; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri "https://github.com/ycodetech/valet-windows/raw/master/bin/php.ps1" -OutFile $env:temp\php.ps1; .$env:temp\php.ps1 "7.4"
+  ```
 
-> This script will download and install PHP for you and add it to your environment path variable. PowerShell is only required for this step.
+  This script will download and install PHP for you and add it to your environment path variable. PowerShell is only required for this step.
 
 - If you don't have Composer installed, make sure to [install](https://getcomposer.org/Composer-Setup.exe) it.
 
@@ -382,6 +381,23 @@ The [site1.test] site has been secured with a fresh TLS certificate.
 
 ###### Note: If you use VS Code integrated terminal, the secure command (or secure option in on other commands) won't work and will need to be ran in a standalone terminal with admin privileges.
 
+##### share
+
+```
+share [domain] Generate a publicly accessible URL for the specified project.
+	  [--debug] Output error messages to the current terminal.
+```
+
+```console
+$ valet share site1
+```
+
+A new CMD terminal will be launched with the ngrok information, including the public URL to share.
+
+###### Note: The URL won't be copied to the clipboard, however, in a separate terminal, you can use the `fetch-share-url` command.
+
+###### Note: If you're already sharing a project, and try to share another project simultaneously, the new cmd window may open for a split second and then close. This is due to ngrok failing silently, and won't output any error messages. To output the errors, pass the `--debug` flag to the command. This will cause ngrok to try to run in the current terminal instead of a new window, thus sending the error messages.
+
 ### Commands not supported
 
 `valet loopback`
@@ -395,6 +411,8 @@ The [site1.test] site has been secured with a fresh TLS certificate.
 `valet composer` (proxying commands to Composer CLI)
 
 `valet which-php` - In favour of the `valet php:which` command
+
+`valet share-tool`
 
 For other commands that have not changed, please refer to the official documentation on the [Laravel website](https://laravel.com/docs/8.x/valet#serving-sites).
 
@@ -418,6 +436,12 @@ For other commands that have not changed, please refer to the official documenta
   NOTE #1: This will of course downgrade all global packages. Depending on the packages, it may break some things. If you just want to downgrade valet dependencies, then you can specify the valet namespace. `composer global update ycodetech/valet-windows`.
 
   NOTE #2: It's recommended to use PHP 8.1 anyway, downgrading will mean some things may break or cause visual glitches in the terminal output. So downgrade at your own risk.
+
+- If you're using a framework that uses a .env file and sets the domain name, such as `WP_HOME` for Laravel Bedrock, then make sure the TLD is the same as the one set for Valet. Otherwise, when trying to reach a site, the site will auto redirect to use the TLD in set in the .env.
+
+  Example: `WP_HOME='http://mySite.test'`, Valet gets a request to `http://mySite.dev`, the site will auto redirect to `http://mySite.test`.
+
+  If this still happens after changing the TLD, then it has been cached by the browser, despite NGINX specifying headers not to cache. To rectify try `"Empty cache and hard reload"` option of the page reload button.
 
 ## Xdebug
 
