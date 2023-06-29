@@ -969,7 +969,8 @@ class Site
 	 */
 	public function replacePhpVersionInSiteConf($siteConf, $phpPort, $phpVersion = null)
 	{
-		$siteConf = preg_replace('/127.0.0.1:[0-9]*;/', "127.0.0.1:{$phpPort};", $siteConf);
+		// @deprecated Further tests needed
+		// $siteConf = preg_replace('/127.0.0.1:[0-9]*;/', "127.0.0.1:{$phpPort};", $siteConf);
 		$siteConf = str_replace('127.0.0.1:$valet_php_port;', "127.0.0.1:{$phpPort};", $siteConf);
 
 		// Remove `Valet isolated PHP version` line from config
