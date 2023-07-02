@@ -35,8 +35,6 @@ class Acrylic
 	 */
 	public function install(string $tld = 'test')
 	{
-		info('Installing Acrylic DNS...');
-
 		$this->createHostsFile($tld);
 		$this->installService();
 	}

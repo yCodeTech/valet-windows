@@ -27,8 +27,6 @@ class Ansicon
 	 */
 	public function install()
 	{
-		info("Installing Ansicon...");
-
 		$this->cli->runOrExit(valetBinPath() . "ansicon/ansicon.exe -i", function ($code, $output) {
 			warning("Failed to install ansicon.\n$output");
 		});

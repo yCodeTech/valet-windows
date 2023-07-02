@@ -7,6 +7,7 @@ use Illuminate\Container\Container;
 use RuntimeException;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableSeparator;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
 if (!isset($_SERVER['HOME'])) {
@@ -90,7 +91,7 @@ function error(string $output, $exception = false)
 /**
  * Get the error type name.
  * Eg.: Inputs error code `0`, outputs error name `"FATAL"`
- * 
+ *
  * @param mixed $code The numeric error type/code
  * @return string The error type name
  */
@@ -116,14 +117,14 @@ function output($output)
 if (!function_exists('array_is_list')) {
 	/**
 	 * Checks whether a given `array` is a list
-	 * 
+	 *
 	 * *This function was introduced in PHP 8.1, so this is a polyfill only in usage on PHP versions below 8.1 (thanks to this StackOverflow answer: https://stackoverflow.com/a/173479/2358222).*
-	 * 
+	 *
 	 * Determines if the given `array` is a list. An `array` is considered a list if its keys consist of consecutive numbers from `0` to `count($array)-1`.
 	 * https://www.php.net/manual/function.array-is-list.php
-	 * 
+	 *
 	 * @param $array The `array` being evaluated.
-	 * 
+	 *
 	 * @return bool Returns `true` if `array` is a list, `false` otherwise.
 	 */
 	function array_is_list(array $array)
@@ -182,7 +183,7 @@ function default_table_headers()
 
 /**
  * Change the max width of specified table columns.
- * 
+ *
  * @param Table $table The table instance
  * @param array $headers Table headers
  * @param array $columns The column names to change the width of
@@ -199,7 +200,7 @@ function changeColumnMaxWidth($table, $headers, $columns, $maxWidth)
 
 /**
  * Add a table separator inbetween all the rows.
- * 
+ *
  * @param array $rows The array of rows
  */
 function addTableSeparator($rows)
@@ -310,7 +311,7 @@ if (!function_exists('ends_with')) {
 if (!function_exists('str_starts_with')) {
 	/**
 	 * Determine if a given string starts with a given substring.
-	 * 
+	 *
 	 * `str_starts_with` function was introduced in PHP 8.
 	 * This is a polyfill for backwards compatibility.
 	 *
@@ -363,4 +364,38 @@ function prefixOptions($options)
 		// Prefix the option with "--".
 		return "--$value";
 	})->implode(' ');
+}
+
+/**
+ * Display a progress bar
+ *
+ * @param int $maxItems Max items/steps
+ * @param string $message The message
+ * @param string $startingTxt The text for the `%placeholder%` at the start of the progressbar, which is placed after `$message`. Default: `"services"`
+ *
+ * @return ProgressBar The ProgressBar object that holds various methods of the class. Including:
+ *
+ * - `setMessage($string, $placeholderName)` To set the message of the `%placeholder%` during progress.
+ * - `advance([$num])` To advance the progress by 1 (if option omitted), optionally specify a number to progress by.
+ */
+function progressbar($maxItems, $message, $startingTxt = "services")
+{
+	ProgressBar::setFormatDefinition('custom', " %current%/%max% %bar% %percent%% %message% %placeholder%...");
+
+	$progressBar = new ProgressBar(new ConsoleOutput(), $maxItems);
+
+	$progressBar->setFormat('custom');
+	// the finished part of the bar
+	$progressBar->setBarCharacter('<fg=green>█</>');
+	// the unfinished part of the bar
+	$progressBar->setEmptyBarCharacter(' ');
+	// the progress character
+	$progressBar->setProgressCharacter('<fg=green>█</>');
+
+	$progressBar->setMessage($message, "message");
+	$progressBar->setMessage($startingTxt, "placeholder");
+	$progressBar->start();
+
+	return $progressBar;
+
 }

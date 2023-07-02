@@ -215,7 +215,7 @@ class Site
 
 	/**
 	 * Create a site object (aka associative array) using Laravel Collection with site details, like name, php version, etc.
-	 * 
+	 *
 	 * @param string $path Either the path to the parked sites directory or the symbolic link sites directory.
 	 * @return \Illuminate\Support\Collection
 	 */
@@ -562,7 +562,8 @@ class Site
 			->where('secured', 'X');
 
 		if ($secured->count() === 0) {
-			return info('No sites to unsecure. You may list all servable sites or links by running <comment>valet parked</comment> or <comment>valet links</comment>.');
+
+			return info("No sites to unsecure. You may list all servable sites or links by running <comment>valet parked</comment> or <comment>valet links</comment>.");
 		}
 
 		info('Attempting to unsecure the following sites:');
@@ -577,10 +578,11 @@ class Site
 			->sort()
 			->where('secured', 'X');
 		if ($remaining->count() > 0) {
-			warning('We were not succesful in unsecuring the following sites:');
+			warning('We were not successful in unsecuring the following sites:');
 			table(default_table_headers(), $remaining->toArray());
+			return;
 		}
-		info('unsecure --all was successful.');
+		info('Unsecured all sites.');
 	}
 
 	/**

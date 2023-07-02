@@ -62,27 +62,34 @@ class Valet
 			$phpXdebugCGIs->put("php-xdebug {$php['version']}", \PhpCgiXdebug::getPhpCgiName($php['version']));
 		}
 
-		return collect([
+
+		$services = collect([
 			'acrylic' => 'AcrylicDNSProxySvc',
 			'nginx' => 'valet_nginx',
-		])->merge($phpCGIs)->merge($phpXdebugCGIs)
-			->map(function ($id, $service) {
-				$output = $this->cli->run('powershell -command "Get-Service -Name ' . $id . '"');
+		])->merge($phpCGIs)->merge($phpXdebugCGIs);
 
-				if (strpos($output, 'Running') > -1) {
-					$status = '<fg=green>running</>';
-				} elseif (strpos($output, 'Stopped') > -1) {
-					$status = '<fg=yellow>stopped</>';
-				} else {
-					$status = '<fg=red>missing</>';
-				}
+		$progressBar = progressbar($services->count(), "Checking");
 
-				return [
-					'service' => $service,
-					'winname' => $id,
-					'status' => $status,
-				];
-			})->values()->all();
+		return $services->map(function ($id, $service) use ($progressBar) {
+			$output = $this->cli->run('powershell -command "Get-Service -Name ' . $id . '"');
+
+			$progressBar->setMessage(ucfirst($service), "placeholder");
+			$progressBar->advance();
+
+			if (strpos($output, 'Running') > -1) {
+				$status = '<fg=green>running</>';
+			} elseif (strpos($output, 'Stopped') > -1) {
+				$status = '<fg=yellow>stopped</>';
+			} else {
+				$status = '<fg=red>missing</>';
+			}
+
+			return [
+				'service' => $service,
+				'winname' => $id,
+				'status' => $status,
+			];
+		})->values()->all();
 	}
 
 	/**
@@ -100,7 +107,7 @@ class Valet
 		 * to find and use the TLS CA bundle in order to verify the TLS/SSL
 		 * certificate of the requesting website/API.
 		 * Otherwise, Guzzle errors out with a curl error.
-		 * 
+		 *
 		 * Code from StackOverflow answer: https://stackoverflow.com/a/53823135/2358222
 		 */
 		$client = new Client([

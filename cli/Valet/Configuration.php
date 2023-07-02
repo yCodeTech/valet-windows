@@ -29,8 +29,6 @@ class Configuration
 	 */
 	public function install()
 	{
-		info('Installing Configuration...');
-
 		$this->createConfigurationDirectory();
 		$this->createDriversDirectory();
 		$this->createSitesDirectory();
@@ -256,13 +254,13 @@ class Configuration
 		// don't want to overwrite existing config as there might be phpcgi service running for it
 		// forcing user to run uninstall to stop services and remove entry
 		if (in_array($phpPath, $existingPaths)) {
-			warning("PHP path {$phpPath} already added to valet");
+			warning("\nPHP path {$phpPath} already added to valet");
 
 			return null;
 		}
 
 		if (isset($config['php'][$phpVersion])) {
-			warning("PHP version {$phpVersion} already added to valet from this path {$phpPath}");
+			warning("\nPHP version {$phpVersion} already added to valet from this path {$phpPath}");
 
 			return null;
 		}

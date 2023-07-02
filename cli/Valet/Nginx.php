@@ -59,8 +59,6 @@ class Nginx
 	 */
 	public function install()
 	{
-		info('Installing Nginx...');
-
 		$this->installConfiguration();
 		$this->installServer();
 		$this->installNginxDirectory();

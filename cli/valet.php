@@ -21,6 +21,7 @@ use function Valet\output;
 use function Valet\table;
 use function Valet\default_table_headers;
 use function Valet\warning;
+use function Valet\progressbar;
 
 /**
  * Relocate config dir to ~/.config/valet/ if found in old location.
@@ -187,7 +188,7 @@ $app->command('xdebug:uninstall', function () {
  * @param array|null $valetCommand The valet command plus arguments and values
  * @param string|null $valetOptions The valet options without the leading `--`. Multiple options must be separated by double slashes `//`.
  * Example: `--valetOptions=isolate//secure` will be ran as `--isolate --secure`.
- * 
+ *
  * @example `valet sudo link example --valetOptions=isolate//secure`
  */
 $app->command('sudo valetCommand* [--valetOptions=]', function ($valetCommand = null, $valetOptions = null) {
@@ -215,15 +216,41 @@ $app->command('sudo valetCommand* [--valetOptions=]', function ($valetCommand = 
  * Install Valet and any required services.
  */
 $app->command('install', function () {
-	Configuration::install();
-	Nginx::install();
-	PhpCgi::install();
-	// PhpCgiXdebug::install();
-	Acrylic::install(Configuration::read()['tld']);
-	Ansicon::install();
 
-	output(PHP_EOL . '<info>Valet installed successfully! Please use `valet start` to start the services.</info>');
-})->descriptions('Install the Valet services');
+	$progressBar = progressbar(5, "Installing");
+	sleep(1);
+
+	$progressBar->setMessage("Configuration", "placeholder");
+	$progressBar->advance();
+	Configuration::install();
+	sleep(1);
+
+	$progressBar->setMessage("Nginx", "placeholder");
+	$progressBar->advance();
+	Nginx::install();
+	sleep(1);
+
+	$progressBar->setMessage("PHP CGI", "placeholder");
+	$progressBar->advance();
+	PhpCgi::install();
+	sleep(1);
+
+	// PhpCgiXdebug::install();
+
+	$progressBar->setMessage("Acrylic", "placeholder");
+	$progressBar->advance();
+	Acrylic::install(Configuration::read()['tld']);
+	sleep(1);
+
+	$progressBar->setMessage("Ansicon", "placeholder");
+	$progressBar->advance();
+	Ansicon::install();
+	sleep(1);
+
+	$progressBar->finish();
+	output(PHP_EOL . '<info>Valet installed and started successfully!</info>');
+
+})->descriptions('Install and start the Valet services');
 
 /**
  * Most commands are available only if valet is installed.
@@ -340,7 +367,7 @@ if (is_dir(VALET_HOME_PATH)) {
 
 	/**
 	 * Register the current working directory as a symbolic link with Valet.
-	 * 
+	 *
 	 * @param string $name Give the site an optional name instead of using the path.
 	 * @param boolean $secure Secure the site with an TLS certificate.
 	 * @param string $isolate Optionally provide a PHP version to isolate the symbolic link site.
@@ -528,7 +555,7 @@ if (is_dir(VALET_HOME_PATH)) {
 		}
 	)->descriptions('Generate a publicly accessible URL for your project');
 
-	// TODO: Share-tool for Expose (https://expose.dev/) 
+	// TODO: Share-tool for Expose (https://expose.dev/)
 	// and 2 open-source clients like localtunnel (https://github.com/localtunnel/localtunnel)
 
 	/**
@@ -545,7 +572,7 @@ if (is_dir(VALET_HOME_PATH)) {
 
 	/**
 	 * Run ngrok commands.
-	 * 
+	 *
 	 * @param array $commands The ngrok commands and options/flags (without the `--` prefix),
 	 * eg. `valet ngrok config add-authtoken [token] config=C:/ngrok.yml`
 	 */
@@ -587,12 +614,29 @@ if (is_dir(VALET_HOME_PATH)) {
 
 		switch ($service) {
 			case '':
-				Acrylic::restart();
-				PhpCgi::restart();
-				// PhpCgiXdebug::restart();
-				Nginx::restart();
+				$progressBar = progressbar(3, $devTxt === "started" ? "Starting" : "Restarting");
+				sleep(1);
 
-				return info("Valet services have been $devTxt.");
+				$progressBar->setMessage('Acrylic', "placeholder");
+				$progressBar->advance();
+				Acrylic::restart();
+				sleep(1);
+
+				$progressBar->setMessage('PhpCgi', "placeholder");
+				$progressBar->advance();
+				PhpCgi::restart();
+				sleep(1);
+
+				// PhpCgiXdebug::restart();
+
+				$progressBar->setMessage('Nginx', "placeholder");
+				$progressBar->advance();
+				Nginx::restart();
+				sleep(1);
+
+				$progressBar->finish();
+				return info("\nValet services have been $devTxt.");
+
 			case 'acrylic':
 				Acrylic::restart();
 
@@ -624,12 +668,30 @@ if (is_dir(VALET_HOME_PATH)) {
 	$app->command('stop [service]', function ($service) {
 		switch ($service) {
 			case '':
+				$progressBar = progressbar(5, "Stopping");
+				sleep(1);
+
+				$progressBar->setMessage("Acrylic", "placeholder");
+				$progressBar->advance();
 				Acrylic::stop();
+				sleep(1);
+
+				$progressBar->setMessage("Nginx", "placeholder");
+				$progressBar->advance();
 				Nginx::stop();
+				sleep(1);
+
+				$progressBar->setMessage("Nginx", "placeholder");
+				$progressBar->advance();
 				PhpCgi::stop();
+				sleep(1);
+
+
 				// PhpCgiXdebug::stop();
 
-				return info('Valet services have been stopped.');
+				$progressBar->finish();
+				return info("\nValet services have been stopped.");
+
 			case 'acrylic':
 				Acrylic::stop();
 
@@ -655,48 +717,82 @@ if (is_dir(VALET_HOME_PATH)) {
 	 * Uninstall Valet entirely. Requires --force to actually remove; otherwise manual instructions are displayed.
 	 */
 	$app->command('uninstall [--force] [--purge-config]', function ($input, $output, $force, $purgeConfig) {
-		warning('YOU ARE ABOUT TO UNINSTALL Nginx, PHP-CGI, Acrylic DNS and all Valet configs and logs.');
 
 		$helper = $this->getHelperSet()->get('question');
-		$question = new ConfirmationQuestion("Are you sure you want to proceed? yes/no\n", false);
+		if (!$force) {
+			warning('YOU ARE ABOUT TO UNINSTALL Nginx, PHP-CGI, Acrylic DNS, Ansicon, and all Valet configs and logs.');
+			$question = new ConfirmationQuestion("Are you sure you want to proceed? yes/no\n", false);
+		}
 		if (!$force && !$helper->ask($input, $output, $question)) {
 			return warning('Uninstall aborted.');
 		}
 
-		info('Stopping services...');
+		$progressBar = progressbar(5, "Stopping");
+		sleep(1);
 
+		$progressBar->setMessage("Acrylic", "placeholder");
+		$progressBar->advance();
 		Acrylic::stop();
+		sleep(1);
+
+		$progressBar->setMessage("Nginx", "placeholder");
+		$progressBar->advance();
 		Nginx::stop();
+		sleep(1);
+
+		$progressBar->setMessage("PHP CGI", "placeholder");
+		$progressBar->advance();
 		PhpCgi::stop();
+		sleep(1);
+
 		// PhpCgiXdebug::stop();
 
+		$progressBar->finish();
+
 		if ($purgeConfig) {
-			info('Removing certificates for all secured sites...');
+			info("\nRemoving certificates for all secured sites...");
 			Site::unsecureAll();
+			sleep(1);
+
 		} else {
 			Site::untrustCertificates();
 		}
+		$progressBar->clear();
+		$progressBar = progressbar(5, "Uninstalling");
+		sleep(1);
 
-		info('Removing Nginx...');
+		$progressBar->setMessage("Nginx", "placeholder");
+		$progressBar->advance();
 		Nginx::uninstall();
+		sleep(1);
 
-		info('Removing Acrylic DNS...');
+		$progressBar->setMessage("Acrylic", "placeholder");
+		$progressBar->advance();
 		Acrylic::uninstall();
+		sleep(1);
 
-		info('Removing PHP-CGI...');
+		$progressBar->setMessage("PHP CGI", "placeholder");
+		$progressBar->advance();
 		PhpCgi::uninstall();
+		sleep(1);
 
-		// info('Removing PHP-CGI Xdebug...');
 		// PhpCgiXdebug::uninstall();
 
-		info("Uninstalling Ansicon...");
+		$progressBar->setMessage("Ansicon", "placeholder");
+		$progressBar->advance();
 		Ansicon::uninstall();
+		sleep(1);
 
 		if ($purgeConfig) {
-			info('Removing Valet configs...');
+			$progressBar->setMaxSteps(6);
+
+			$progressBar->setMessage("Configuration", "placeholder");
+			$progressBar->advance();
 			Configuration::uninstall();
+			sleep(1);
 		}
 
+		$progressBar->finish();
 		info("\nValet has been removed from your system.");
 
 		output(
@@ -705,7 +801,7 @@ if (is_dir(VALET_HOME_PATH)) {
 			($purgeConfig ? '' : "\nDelete the config files from: <info>~/.config/valet</info>") .
 			"\nDelete PHP from: <info>C:/php</info>"
 		);
-	})->descriptions('Uninstall the Valet services', ['--force' => 'Do a forceful uninstall of Valet']);
+	})->descriptions('Uninstall the Valet services', ['--force' => 'Force an uninstall without confirmation.']);
 
 	/**
 	 * Determine if this is the latest release of Valet.
@@ -762,9 +858,9 @@ if (is_dir(VALET_HOME_PATH)) {
 
 	/**
 	 * Isolate the current working directory or a specified site to specific PHP version.
-	 * 
+	 *
 	 * @param string $phpVersion The PHP version you want to use, eg. "7.4.33"; or an alias, eg. "7.4"
-	 * @param array $site The site you want to optionally specify, eg. "my-project" or "my-project.[tld]". If not specified, current working directory will be used. 
+	 * @param array $site The site you want to optionally specify, eg. "my-project" or "my-project.[tld]". If not specified, current working directory will be used.
 	 * To specify multiple sites, you use it like:
 	 * `--site=my-project --site=another-site`
 	 */
@@ -797,9 +893,9 @@ if (is_dir(VALET_HOME_PATH)) {
 	 * Remove [unisolate] an isolated site.
 	 * @param string $phpVersion The PHP version you want to use, eg. "7.4.33"; or an alias, eg. "7.4"
 	 * @param string $site The site you want to optionally specify, eg. "my-project" or "my-project.[tld]". If not specified, current working directory will be used.
-	 * 
+	 *
 	 * @param boolean|null $all
-	 * 
+	 *
 	 */
 	$app->command('unisolate [--site=] [--all]', function ($output, $site = null, $all = null) {
 		if ($all) {
@@ -917,8 +1013,12 @@ if (is_dir(VALET_HOME_PATH)) {
 	$app->command('services', function () {
 		info("Checking the Valet services...");
 
-		table(['Service', 'Windows Name', 'Status'], Valet::services(), true);
+		$services = Valet::services();
+		output("\n");
+
+		table(['Service', 'Windows Name', 'Status'], $services, true);
 		info('Use valet start/stop/restart [service] to change status (eg: valet restart nginx).');
+
 	})->descriptions('List the installed Windows services.');
 
 	/**
