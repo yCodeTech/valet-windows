@@ -1,16 +1,16 @@
 <p align="center"><img src="./laravel_valet_windows_3_logo.svg" style="width:500px"></p>
 
 <p align="center">
-
-<!-- <a href="https://packagist.org/packages/cretueusebiu/valet-windows"><img src="https://poser.pugx.org/cretueusebiu/valet-windows/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/cretueusebiu/valet-windows"><img src="https://poser.pugx.org/cretueusebiu/valet-windows/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/cretueusebiu/valet-windows"><img src="https://poser.pugx.org/cretueusebiu/valet-windows/license.svg" alt="License"></a> -->
+<a href="https://packagist.org/packages/ycodetech/valet-windows"><img src="https://poser.pugx.org/ycodetech/valet-windows/downloads" alt="Total Downloads"></a>
+<!-- <a href="https://packagist.org/packages/cretueusebiu/valet-windows"><img src="https://poser.pugx.org/cretueusebiu/valet-windows/v/stable.svg" alt="Latest Stable Version"></a>-->
+<a href="https://packagist.org/packages/cretueusebiu/valet-windows"><img src="https://poser.pugx.org/ycodetech/valet-windows/license" alt="License"></a>
 </p>
 
 <p align="center">This is a Windows port of the popular Mac development environment <a href="https://github.com/laravel/valet">Laravel Valet</a>.</p>
 <p align="center">Laravel Valet <i>Windows</i> 3 is a much needed updated fork of <a href="https://github.com/cretueusebiu/valet-windows">cretueusebiu/valet-windows</a>, with lots of improvements and new commands. This version hopes to achieve as much parity as possible with the Mac version.</p>
 
 ## !! This is in active development, official release coming soon !!
+
 ### !! The dev release can now be installed via `composer global require ycodetech/valet-windows` !!
 
 <br>
