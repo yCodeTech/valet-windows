@@ -13,6 +13,8 @@
 
 ### !! The dev release can now be installed via `composer global require ycodetech/valet-windows` !!
 
+<p align="center"><img src="./composer_laravel_valet_windows_3_logo.svg" style="width:400px"></p>
+
 <br>
 
 [Introduction](#introduction) | [Documentation](#documentation) | [Commands](#commands) | [Commands Not Supported](#commands-not-supported) | [Known Issues](#known-issues) | [Xdebug](#xdebug) | [Testing](#testing) | [Contributions](#contributions)
