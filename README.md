@@ -1,4 +1,4 @@
-<p align="center"><img src="./laravel_valet_windows_3_logo.svg" width="50%"></p>
+<p align="center"><img src="./laravel_valet_windows_3_logo.svg" style="width:500px"></p>
 
 <p align="center">
 
