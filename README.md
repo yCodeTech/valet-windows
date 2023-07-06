@@ -11,7 +11,7 @@
 <p align="center">Laravel Valet <i>Windows</i> 3 is a much needed updated fork of <a href="https://github.com/cretueusebiu/valet-windows">cretueusebiu/valet-windows</a>, with lots of improvements and new commands. This version hopes to achieve as much parity as possible with the Mac version.</p>
 
 ## !! This is in active development, official release coming soon !!
-### !! The dev release can now be installed via `composer ycodetech/valet-windows` !!
+### !! The dev release can now be installed via `composer global require ycodetech/valet-windows` !!
 
 <br>
 
