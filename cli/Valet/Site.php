@@ -393,12 +393,13 @@ class Site
 
 	/**
 	 * Remove PHP version isolation for a given directory.
+	 * @param bool $isOldTLD Is it the old TLD? Only used in the `reisolateForNewTld` function. Default: `false`.
 	 */
-	public function unisolate($directory)
+	public function unisolate($directory, $isOldTLD = false)
 	{
-		$site = $this->getSiteUrl($directory);
-		// Make sure the site is isolated, otherwise stop executing.
-		if (!$this->isIsolated($site)) {
+		$site = $isOldTLD ? $directory : $this->getSiteUrl($directory);
+		// Make sure the isOldTLD is false AND the site is isolated, otherwise stop executing.
+		if (!$isOldTLD && !$this->isIsolated($site)) {
 			error("Can't unisolate {$site} because the site is not isolated.");
 			return false;
 		}
@@ -423,11 +424,13 @@ class Site
 
 	/**
 	 * Get list of isolated sites.
+	 * @param string $oldTld The old TLD. Only used by `reisolateForNewTld()` when changing the TLD.
+	 *
 	 */
-	public function isolated()
+	public function isolated($oldTld = null)
 	{
 		$dir = $this->nginxPath();
-		$tld = $this->config->read()['tld'];
+		$tld = $oldTld ?: $this->config->read()['tld'];
 
 		$isolated = collect($this->files->scandir($dir))->filter(function ($site, $key) use ($tld) {
 			// keep sites that match our TLD
@@ -454,6 +457,34 @@ class Site
 		})->flatten()->all();
 
 		return in_array(explode(".", $site)[0], $isolated);
+	}
+
+	/**
+	 * Reisolate all currently isolated sites with the new tld.
+	 *
+	 * @param  string  $oldTld
+	 * @param  string  $tld
+	 * @return void
+	 */
+	public function reisolateForNewTld($oldTld, $tld)
+	{
+		$isolated = $this->isolated($oldTld)->pluck("site")->all();
+
+		foreach ($isolated as $url) {
+			$oldUrl = $url . '.' . $oldTld;
+			$newUrl = $url . '.' . $tld;
+			// Only used to determine if it's actually an isolated site.
+			$siteConf = $this->getSiteConfigFileContents($url, '.' . $oldTld);
+
+			// If the site conf is not empty, and it has the keywords isolated,
+			// then it's an isolated site, so we can unisolate the old TLD,
+			// and reisolate it with the new TLD.
+			if (!empty($siteConf) && strpos($siteConf, '# Valet isolated') === 0) {
+				$phpVersion = $this->customPhpVersion($oldUrl);
+				$this->unisolate($oldUrl, true);
+				$this->isolate($phpVersion, $newUrl);
+			}
+		}
 	}
 
 	/**

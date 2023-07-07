@@ -278,6 +278,8 @@ if (is_dir(VALET_HOME_PATH)) {
 		Configuration::updateKey('tld', $tld);
 
 		Site::resecureForNewTld($oldTld, $tld);
+		Site::reisolateForNewTld($oldTld, $tld);
+
 		PhpCgi::restart();
 		// PhpCgiXdebug::restart();
 		Nginx::restart();
