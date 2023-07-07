@@ -46,8 +46,6 @@ if (is_dir(VALET_HOME_PATH)) {
 	Site::pruneLinks();
 }
 
-// TODO: Make some commands namespaced like the php:[command]'s, possibly for Ngrok, isolate, links and parked?
-
 /**
  * Add PHP.
  */
@@ -832,11 +830,6 @@ if (is_dir(VALET_HOME_PATH)) {
 		}
 
 		$php = Configuration::getPhpByVersion($phpVersion);
-
-		if (empty($php)) {
-			warning("Cannot find PHP [$phpVersion] in the list. Example command [valet use 8.1]");
-			return false;
-		}
 
 		info("Setting the default PHP version to [$phpVersion].");
 
