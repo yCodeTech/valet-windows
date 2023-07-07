@@ -379,10 +379,6 @@ class Site
 
 		$php = $this->config->getPhpByVersion($phpVersion);
 
-		if (empty($php)) {
-			error("Cannot find PHP [$phpVersion] in the list.", true);
-		}
-
 		$this->installSiteConfig($site, $php['version']);
 
 		info('Restarting Nginx...');
@@ -948,10 +944,6 @@ class Site
 		$phpVersion = $phpVersion ? $phpVersion : $this->config->get('default_php');
 
 		$php = $this->config->getPhpByVersion($phpVersion);
-
-		if (empty($php)) {
-			error("Cannot find PHP [$phpVersion] in the list.", true);
-		}
 
 		if ($this->files->exists($this->nginxPath($valetSite))) {
 			$siteConf = $this->files->get($this->nginxPath($valetSite));

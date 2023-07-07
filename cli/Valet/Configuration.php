@@ -226,9 +226,15 @@ class Configuration
 
 		$config = $this->read();
 
-		return collect($config['php'])->filter(function ($item) use ($phpVersion) {
+		$php = collect($config['php'])->filter(function ($item) use ($phpVersion) {
 			return $phpVersion === $item['version'] || $phpVersion === $item['version_alias'];
 		})->first();
+
+		if (empty($php)) {
+			error("Cannot find PHP $phpVersion in the list.\nPlease make sure PHP $phpVersion is added to Valet with `valet php:add`", true);
+		}
+
+		return $php;
 	}
 
 	/**
