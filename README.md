@@ -1,4 +1,4 @@
-<p align="center"><img src="./laravel_valet_windows_3_logo.svg" style="width:500px"></p>
+<p align="center"><img src="./laravel_valet_windows_3_logo.svg" style="width:500px; background: none;"></p>
 
 <p align="center">
 <a href="https://packagist.org/packages/ycodetech/valet-windows"><img src="https://poser.pugx.org/ycodetech/valet-windows/downloads" alt="Total Downloads"></a>
@@ -13,7 +13,7 @@
 
 ### !! The dev release can now be installed via `composer global require ycodetech/valet-windows` !!
 
-<p align="center"><img src="./composer_laravel_valet_windows_3_logo.svg" style="width:400px"></p>
+<p align="center"><img src="./composer_laravel_valet_windows_3_logo.svg" style="width:400px; background: none;"></p>
 
 <br>
 
