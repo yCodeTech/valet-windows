@@ -57,13 +57,13 @@ class PhpCgi
 
 		foreach ($phps as $php) {
 			$phpServiceName = "php{$php['version']}cgiservice";
-			$phpXdebugServiceName = "php{$php['version']}cgixdebugservice";
+			$serviceId = "valet_php{$php['version']}cgi-{$php['port']}";
 
 			$this->phpWinSws[$php['version']] = [
 				'phpServiceName' => $phpServiceName,
-				'phpCgiName' => "valet_php{$php['version']}cgi-{$php['port']}",
+				'phpCgiName' => $serviceId,
 				'php' => $php,
-				'winsw' => $this->winswFactory->make($phpServiceName),
+				'winsw' => $this->winswFactory->make($phpServiceName, $serviceId),
 			];
 		}
 	}
@@ -75,17 +75,21 @@ class PhpCgi
 	 */
 	public function install($phpVersion = null)
 	{
-		$phps = $this->configuration->get('php', []);
-
 		if ($phpVersion) {
+			if ($this->configuration->isPhpAlias($phpVersion)) {
+				$phpVersion = $this->configuration->getPhpFullVersionByAlias($phpVersion);
+			}
+
 			if (!isset($this->phpWinSws[$phpVersion])) {
-				warning("PHP service for version {$phpVersion} not found");
+				error("PHP service for version {$phpVersion} not found", true);
 			}
 
 			$this->installService($phpVersion);
 
 			return;
 		}
+
+		$phps = $this->configuration->get('php', []);
 
 		foreach ($phps as $php) {
 			$this->installService($php['version']);
@@ -114,8 +118,6 @@ class PhpCgi
 			str_replace(array_keys($phpCgiServiceConfigArgs), array_values($phpCgiServiceConfigArgs), $phpCgiServiceConfig ?: '')
 		);
 
-		info("Installing PHP-CGI [{$phpWinSw['phpCgiName']}] service...");
-
 		$phpWinSw['winsw']->install($installConfig ?? [
 			'PHP_PATH' => $phpWinSw['php']['path'],
 			'PHP_PORT' => $phpWinSw['php']['port'],
@@ -132,8 +134,12 @@ class PhpCgi
 	public function uninstall($phpVersion = null)
 	{
 		if ($phpVersion) {
+			if ($this->configuration->isPhpAlias($phpVersion)) {
+				$phpVersion = $this->configuration->getPhpFullVersionByAlias($phpVersion);
+			}
+
 			if (!isset($this->phpWinSws[$phpVersion])) {
-				warning("PHP service for version [{$phpVersion}] not found");
+				error("PHP service for version [{$phpVersion}] not found", true);
 			}
 			$this->uninstallService($phpVersion);
 
@@ -156,9 +162,9 @@ class PhpCgi
 	{
 		$phpWinSw = $this->phpWinSws[$phpVersion];
 
-		info("Uninstalling PHP-CGI [{$phpWinSw['phpCgiName']}] service...");
-
-		$phpWinSw['winsw']->uninstall();
+		if ($phpWinSw['winsw']->installed()) {
+			$phpWinSw['winsw']->uninstall();
+		}
 	}
 
 	/**
@@ -224,7 +230,7 @@ class PhpCgi
 
 	/**
 	 * Get the CGI name
-	 * 
+	 *
 	 * @param string $phpVersion
 	 * @return string
 	 */

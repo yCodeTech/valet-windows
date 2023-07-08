@@ -10,6 +10,11 @@ class WinSW
 	protected $service;
 
 	/**
+	 * @var string
+	 */
+	protected $serviceId;
+
+	/**
 	 * @var CommandLine
 	 */
 	protected $cli;
@@ -26,11 +31,12 @@ class WinSW
 	 * @param  Filesystem  $files
 	 * @return void
 	 */
-	public function __construct(string $service, CommandLine $cli, Filesystem $files)
+	public function __construct(string $service, string $serviceId, CommandLine $cli, Filesystem $files)
 	{
 		$this->cli = $cli;
 		$this->files = $files;
 		$this->service = $service;
+		$this->serviceId = $serviceId;
 	}
 
 	/**
@@ -97,13 +103,7 @@ class WinSW
 	 */
 	public function installed(): bool
 	{
-		$name = 'valet_' . str_replace('service', '', $this->service);
-
-		if ($name === 'valet_phpcgixdebug') {
-			$name = 'valet_phpcgi_xdebug';
-		}
-
-		return $this->cli->powershell("Get-Service -Name \"$name\"")->isSuccessful();
+		return $this->cli->powershell("Get-Service -Name \"$this->serviceId\"")->isSuccessful();
 	}
 
 	/**

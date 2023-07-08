@@ -48,12 +48,19 @@ if (is_dir(VALET_HOME_PATH)) {
 
 /**
  * Add PHP.
+ * @param string $path The php version path
+ * @param bool $xdebug Optionally, install Xdebug
  */
-$app->command('php:add [path]', function ($path) {
+$app->command('php:add path [--xdebug]', function ($path, $xdebug) {
 	info("Adding {$path}...");
 
 	if ($php = Configuration::addPhp($path)) {
 		\PhpCgi::install($php['version']);
+
+		if ($xdebug) {
+			info("Installing Xdebug for {$php['version']}...");
+			\PhpCgiXdebug::install($php['version']);
+		}
 
 		info("PHP {$php['version']} from {$path} has been added. You can make it default by running `valet use` command");
 	}
@@ -85,9 +92,10 @@ $app->command('php:remove [phpVersion] [--path=]', function ($phpVersion, $path)
 	if ($php) {
 		\PhpCgi::uninstall($php['version']);
 
-		// TODO: Change commands to install php xdebug services only when the xbug command is used instead of automatically installing, especially when they're not be used. And only uninstall/restart them if they're added.
-
-		// \PhpCgiXdebug::uninstall($php['version']);
+		if (\PhpCgiXdebug::installed($php['version'])) {
+			info("Uninstalling {$php['version']} Xdebug...");
+			\PhpCgiXdebug::uninstall($php['version']);
+		}
 	}
 
 	if (Configuration::removePhp($php['path'])) {
@@ -162,27 +170,47 @@ $app->command('php:which [site]', function ($site = null) {
 /**
  * Install PHP Xdebug services.
  */
-$app->command('xdebug:install', function () {
-	info('Reinstalling Xdebug services...');
+$app->command('xdebug:install [phpVersion]', function ($input, $output, $phpVersion = null) {
 
-	PhpCgiXdebug::uninstall();
+	if ($phpVersion != null && PhpCgiXdebug::installed($phpVersion)) {
+		info("Xdebug for PHP $phpVersion is already installed.");
 
-	PhpCgiXdebug::install();
-})->descriptions('Reinstall all PHP Xdebug services from <fg=green>valet php:list</>');
+		$helper = $this->getHelperSet()->get('question');
+		$question = new ConfirmationQuestion("<fg=yellow>Do you want to reinstall it? yes/no</>\n", false);
+
+		if (!$helper->ask($input, $output, $question)) {
+			return warning('Install aborted.');
+		}
+	}
+
+	info('Installing Xdebug services...');
+	PhpCgiXdebug::install($phpVersion);
+
+})->descriptions('Install all PHP Xdebug services from <fg=green>valet php:list</>', [
+			"phpVersion" => "Optionally, install a specific PHP version of Xdebug"
+		]);
 
 /**
- * uninstall PHP Xdebug services.
+ * Uninstall PHP Xdebug services.
  */
-$app->command('xdebug:uninstall', function () {
-	info('Uninstalling Xdebug services...');
+$app->command('xdebug:uninstall [phpVersion]', function ($phpVersion = null) {
+	if (!PhpCgiXdebug::installed($phpVersion)) {
+		warning("Xdebug for PHP $phpVersion is not installed.");
+		return;
+	}
 
-	PhpCgiXdebug::uninstall();
+	PhpCgiXdebug::uninstall($phpVersion);
 
-	info('Xdebug services uninstalled. Run xdebug:install to install again');
-})->descriptions('Uninstall all PHP Xdebug services from <fg=green>valet php:list</>');
+	info('Xdebug services uninstalled. Run <bg=gray>xdebug:install [phpVersion]</> to install again');
+
+})->descriptions('Uninstall all PHP Xdebug services from <fg=green>valet php:list</>', [
+			"phpVersion" => "Optionally, uninstall a specific PHP version of Xdebug"
+		]);
 
 /**
- * A sudo-like command to use valet commands with elevated privileges that only require 1 User Account Control popup.
+ * A sudo-like command to use valet commands with elevated privileges
+ * that only require 1 User Account Control popup.
+ *
  * @param array|null $valetCommand The valet command plus arguments and values
  * @param string|null $valetOptions The valet options without the leading `--`. Multiple options must be separated by double slashes `//`.
  * Example: `--valetOptions=isolate//secure` will be ran as `--isolate --secure`.
@@ -213,9 +241,10 @@ $app->command('sudo valetCommand* [--valetOptions=]', function ($valetCommand = 
 /**
  * Install Valet and any required services.
  */
-$app->command('install', function () {
+$app->command('install [--xdebug]', function ($xdebug) {
 
-	$progressBar = progressbar(5, "Installing");
+	$maxItems = PhpCgiXdebug::installed() ? 6 : 5;
+	$progressBar = progressbar($maxItems, "Installing");
 	sleep(1);
 
 	$progressBar->setMessage("Configuration", "placeholder");
@@ -233,7 +262,12 @@ $app->command('install', function () {
 	PhpCgi::install();
 	sleep(1);
 
-	// PhpCgiXdebug::install();
+	if ($xdebug) {
+		$progressBar->setMessage("PHP CGI Xdebug", "placeholder");
+		$progressBar->advance();
+		PhpCgiXdebug::install();
+		sleep(1);
+	}
 
 	$progressBar->setMessage("Acrylic", "placeholder");
 	$progressBar->advance();
@@ -248,7 +282,9 @@ $app->command('install', function () {
 	$progressBar->finish();
 	output(PHP_EOL . '<info>Valet installed and started successfully!</info>');
 
-})->descriptions('Install and start the Valet services');
+})->descriptions('Install and start the Valet services', [
+			"--xdebug" => "Optionally, install Xdebug"
+		]);
 
 /**
  * Most commands are available only if valet is installed.
@@ -279,7 +315,11 @@ if (is_dir(VALET_HOME_PATH)) {
 		Site::reisolateForNewTld($oldTld, $tld);
 
 		PhpCgi::restart();
-		// PhpCgiXdebug::restart();
+
+		if (PhpCgiXdebug::installed()) {
+			PhpCgiXdebug::restart();
+		}
+
 		Nginx::restart();
 
 		info('Your Valet TLD has been updated to [' . $tld . '].');
@@ -622,12 +662,19 @@ if (is_dir(VALET_HOME_PATH)) {
 				Acrylic::restart();
 				sleep(1);
 
-				$progressBar->setMessage('PhpCgi', "placeholder");
+				$progressBar->setMessage('PHP CGI', "placeholder");
 				$progressBar->advance();
 				PhpCgi::restart();
 				sleep(1);
 
-				// PhpCgiXdebug::restart();
+				if (PhpCgiXdebug::installed()) {
+					$progressBar->setMaxSteps(4);
+
+					$progressBar->setMessage('PHP CGI Xdebug', "placeholder");
+					$progressBar->advance();
+					PhpCgiXdebug::restart();
+					sleep(1);
+				}
 
 				$progressBar->setMessage('Nginx', "placeholder");
 				$progressBar->advance();
@@ -668,7 +715,7 @@ if (is_dir(VALET_HOME_PATH)) {
 	$app->command('stop [service]', function ($service) {
 		switch ($service) {
 			case '':
-				$progressBar = progressbar(5, "Stopping");
+				$progressBar = progressbar(3, "Stopping");
 				sleep(1);
 
 				$progressBar->setMessage("Acrylic", "placeholder");
@@ -681,13 +728,19 @@ if (is_dir(VALET_HOME_PATH)) {
 				Nginx::stop();
 				sleep(1);
 
-				$progressBar->setMessage("Nginx", "placeholder");
+				$progressBar->setMessage("PHP CGI", "placeholder");
 				$progressBar->advance();
 				PhpCgi::stop();
 				sleep(1);
 
+				if (PhpCgiXdebug::installed()) {
+					$progressBar->setMaxSteps(4);
 
-				// PhpCgiXdebug::stop();
+					$progressBar->setMessage('PHP CGI Xdebug', "placeholder");
+					$progressBar->advance();
+					PhpCgiXdebug::stop();
+					sleep(1);
+				}
 
 				$progressBar->finish();
 				return info("\nValet services have been stopped.");
@@ -719,15 +772,20 @@ if (is_dir(VALET_HOME_PATH)) {
 	$app->command('uninstall [--force] [--purge-config]', function ($input, $output, $force, $purgeConfig) {
 
 		$helper = $this->getHelperSet()->get('question');
+
 		if (!$force) {
 			warning('YOU ARE ABOUT TO UNINSTALL Nginx, PHP-CGI, Acrylic DNS, Ansicon, and all Valet configs and logs.');
+			usleep(300000); // 0.3s
+
 			$question = new ConfirmationQuestion("Are you sure you want to proceed? yes/no\n", false);
-		}
-		if (!$force && !$helper->ask($input, $output, $question)) {
-			return warning('Uninstall aborted.');
+
+			if (!$helper->ask($input, $output, $question)) {
+				return warning('Uninstall aborted.');
+			}
 		}
 
-		$progressBar = progressbar(5, "Stopping");
+		$maxItems = PhpCgiXdebug::installed() ? 4 : 3;
+		$progressBar = progressbar($maxItems, "Stopping");
 		sleep(1);
 
 		$progressBar->setMessage("Acrylic", "placeholder");
@@ -745,7 +803,12 @@ if (is_dir(VALET_HOME_PATH)) {
 		PhpCgi::stop();
 		sleep(1);
 
-		// PhpCgiXdebug::stop();
+		if (PhpCgiXdebug::installed()) {
+			$progressBar->setMessage('PHP CGI Xdebug', "placeholder");
+			$progressBar->advance();
+			PhpCgiXdebug::stop();
+			sleep(1);
+		}
 
 		$progressBar->finish();
 
@@ -758,7 +821,10 @@ if (is_dir(VALET_HOME_PATH)) {
 			Site::untrustCertificates();
 		}
 		$progressBar->clear();
-		$progressBar = progressbar(5, "Uninstalling");
+
+		// INFO: Uninstallation...
+
+		$progressBar = progressbar($maxItems + 1, "Uninstalling");
 		sleep(1);
 
 		$progressBar->setMessage("Nginx", "placeholder");
@@ -776,7 +842,12 @@ if (is_dir(VALET_HOME_PATH)) {
 		PhpCgi::uninstall();
 		sleep(1);
 
-		// PhpCgiXdebug::uninstall();
+		if (PhpCgiXdebug::installed()) {
+			$progressBar->setMessage('PHP CGI Xdebug', "placeholder");
+			$progressBar->advance();
+			PhpCgiXdebug::uninstall();
+			sleep(1);
+		}
 
 		$progressBar->setMessage("Ansicon", "placeholder");
 		$progressBar->advance();
@@ -797,7 +868,7 @@ if (is_dir(VALET_HOME_PATH)) {
 
 		output(
 			"\n<fg=yellow>NOTE:</>" .
-			"\nRemove composer dependency with: <info>composer global remove ycodetech/valet-windows</info>" .
+			"\nRemove composer dependency with: <bg=magenta>composer global remove ycodetech/valet-windows</>" .
 			($purgeConfig ? '' : "\nDelete the config files from: <info>~/.config/valet</info>") .
 			"\nDelete PHP from: <info>C:/php</info>"
 		);

@@ -48,7 +48,7 @@ class Nginx
 		$this->cli = $cli;
 		$this->site = $site;
 		$this->files = $files;
-		$this->winsw = $winsw->make('nginxservice');
+		$this->winsw = $winsw->make('nginxservice', 'valet_nginx');
 		$this->configuration = $configuration;
 	}
 

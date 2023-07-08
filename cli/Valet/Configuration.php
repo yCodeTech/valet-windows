@@ -238,6 +238,30 @@ class Configuration
 	}
 
 	/**
+	 * Determine if the given PHP version is the alias.
+	 *
+	 * @param string $phpVersion
+	 * @return boolean
+	 */
+	public function isPhpAlias($phpVersion)
+	{
+		$php = $this->getPhpByVersion($phpVersion);
+		return $php["version_alias"] === $phpVersion ? true : false;
+	}
+
+	/**
+	 * Get the full version number of the PHP using the alias.
+	 *
+	 * @param string $phpVersionAlias The alias of the PHP version, eg. alias: 7.4, full: 7.4.33
+	 *
+	 * @return string The full version number, eg. 7.4.33
+	 */
+	public function getPhpFullVersionByAlias($phpVersionAlias)
+	{
+		return $this->getPhpByVersion($phpVersionAlias)["version"];
+	}
+
+	/**
 	 * Add the given php path to the configuration.
 	 *
 	 * @param  string  $phpPath

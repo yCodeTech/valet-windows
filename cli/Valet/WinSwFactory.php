@@ -31,12 +31,14 @@ class WinSwFactory
 	 * Make a new WinSW instance.
 	 *
 	 * @param  string  $service
+	 * @param  string  $serviceId
 	 * @return WinSW
 	 */
-	public function make(string $service)
+	public function make(string $service, string $serviceId)
 	{
 		return new WinSW(
 			$service,
+			$serviceId,
 			$this->cli,
 			$this->files
 		);
