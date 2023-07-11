@@ -172,8 +172,10 @@ $app->command('php:which [site]', function ($site = null) {
  */
 $app->command('xdebug:install [phpVersion]', function ($input, $output, $phpVersion = null) {
 
-	if ($phpVersion != null && PhpCgiXdebug::installed($phpVersion)) {
-		info("Xdebug for PHP $phpVersion is already installed.");
+	$txt = $phpVersion === null ? "" : " for PHP $phpVersion";
+
+	if (PhpCgiXdebug::installed($phpVersion)) {
+		info("Xdebug{$txt} is already installed.");
 
 		$helper = $this->getHelperSet()->get('question');
 		$question = new ConfirmationQuestion("<fg=yellow>Do you want to reinstall it? yes/no</>\n", false);

@@ -72,7 +72,7 @@ class PhpCgiXdebug extends PhpCgi
 	/**
 	 * Determine if the Xdebug is installed.
 	 *
-	 * @param string $phpVersion
+	 * @param string|null $phpVersion
 	 * @return bool
 	 */
 	public function installed($phpVersion = null)
@@ -80,38 +80,22 @@ class PhpCgiXdebug extends PhpCgi
 		if (empty($phpVersion)) {
 			$phps = $this->configuration->get('php', []);
 
+			// Loop through the PHP array until find any version
+			// that Xdebug is installed for.
+			// Ie. Installed returns true if ANY Xdebug is installed at the first occurrence
 			foreach ($phps as $php) {
-				if ($this->isInstalledService($php['version'])) {
+				if ($this->phpWinSws[$php["version"]]['winsw']->installed()) {
 					return true;
 				}
 			}
-			return;
+			return false;
 		}
 
+		// Check if the PHP version supplied is the alias, then get the full version.
 		if ($this->configuration->isPhpAlias($phpVersion)) {
 			$phpVersion = $this->configuration->getPhpFullVersionByAlias($phpVersion);
 		}
 
-		return $this->isInstalledService($phpVersion);
-	}
-
-	/**
-	 *
-	 */
-	private function isInstalledService($phpVersion)
-	{
-		$name = $this->getPhpCgiName($phpVersion);
-		return $this->cli->powershell('Get-Service -Name "' . $name . '"')->isSuccessful();
-	}
-
-	/**
-	 * Get the CGI name
-	 *
-	 * @param string $phpVersion
-	 * @return string
-	 */
-	public function getPhpCgiName($phpVersion)
-	{
-		return $this->phpWinSws[$phpVersion]["phpCgiName"];
+		return $this->phpWinSws[$phpVersion]['winsw']->installed();
 	}
 }
