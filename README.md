@@ -15,6 +15,8 @@
 
 <p align="center"><img src="./composer_laravel_valet_windows_3_logo.svg" style="width:400px; background: none;"></p>
 
+> **Warning** **If you're coming from <a href="https://github.com/cretueusebiu/valet-windows">cretueusebiu/valet-windows</a>, then you need to make sure to fully uninstall it from your computer, deleting all configs, and removing from composer with `composer global remove cretueusebiu/valet-windows`, before installing this 3.0 version.**
+
 <br>
 
 [Introduction](#introduction) | [Documentation](#documentation) | [Commands](#commands) | [Commands Not Supported](#commands-not-supported) | [Known Issues](#known-issues) | [Xdebug](#xdebug) | [Testing](#testing) | [Contributions](#contributions)
