@@ -405,6 +405,16 @@ A new CMD terminal will be launched with the ngrok information, including the pu
 
 ###### Note: If you're already sharing a project, and try to share another project simultaneously, the new cmd window may open for a split second and then close. This is due to ngrok failing silently, and won't output any error messages. To output the errors, pass the `--debug` flag to the command. This will cause ngrok to try to run in the current terminal instead of a new window, thus sending the error messages.
 
+##### Set Ngrok Token
+Before Generate a publicly accessible URL for the specified project. You need to re-setup ngrok auth token. Because in this version we updated `ngrok` config file path.
+```
+valet set-ngrok-token [Ngrok_Auth_Token]
+```
+
+Make sure before running you replcae `Ngrok_Auth_Token` with your own `AuthToken`.
+
+###### Note: If you had previously set the ngrok token using the old configuration location, it is recommended to update it using the new `valet set-ngrok-token` command to ensure compatibility with the latest version of Laravel Valet.
+
 ### Commands not supported
 
 `valet loopback`
