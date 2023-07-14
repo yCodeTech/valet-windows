@@ -503,7 +503,7 @@ For other commands that have not changed, please refer to the official documenta
   >
   > Your Composer dependencies require a PHP version ">= 8.1.0". You are running 7.4.33.
   >
-  > PHP Fatal error: Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.1.0". You are running 7.4.33. in C:\Users\YourName\AppData\Roaming\Composer\vendor\composer\platform_check.php on line 24
+  > PHP Fatal error: Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.1.0". You are running 7.4.33. in C:\Users\Username\AppData\Roaming\Composer\vendor\composer\platform_check.php on line 24
 
   It means that a dependency of Valet's dependencies requires 8.1. You can rectify this error by running `composer global update` while on 7.4, and composer will downgrade any global dependencies to versions that will work on 7.4. See this [Stack Overflow answer](https://stackoverflow.com/a/75080139/2358222).
 

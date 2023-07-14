@@ -62,7 +62,7 @@ Then use: <fg=magenta>valet set-ngrok-token [token]</>');
 		// If host-header is not specified,
 		// then set it into the array with a default value of rewrite.
 		if (!stripos(json_encode($options), 'host-header')) {
-			$options[] .= "host-header=rewrite";
+			array_push($options, "host-header=rewrite");
 		}
 
 		$options = $this->prefixNgrokFlags($options);
@@ -82,9 +82,9 @@ Then use: <fg=magenta>valet set-ngrok-token [token]</>');
 	 *
 	 * Create a new options array with `--` prefixed to each option
 	 * and implode the array into a single space-delimited string.
-	 * 
+	 *
 	 * @param array $options The ngrok options/flags from valet command.
-	 * 
+	 *
 	 * @return string The new prefixed options as a string
 	 */
 	public function prefixNgrokFlags($options)
@@ -105,7 +105,7 @@ Then use: <fg=magenta>valet set-ngrok-token [token]</>');
 	/**
 	 * Get the ngrok configuration
 	 * @return string Returns the ngrok config path as a CLI --flag:
-	 * 
+	 *
 	 * `--config C:/Users/Username/ .config/valet/Ngrok/ngrok.yml`
 	 */
 	public function getNgrokConfig()
@@ -114,7 +114,7 @@ Then use: <fg=magenta>valet set-ngrok-token [token]</>');
 	}
 
 	/**
-	 * Get the current tunnel URL from the Ngrok API.
+	 * Get the current tunnel URL from the ngrok API.
 	 * @param string $site The site
 	 *
 	 * @return string $url The current tunnel URL
@@ -153,7 +153,7 @@ Then use: <fg=magenta>valet set-ngrok-token [token]</>');
 	 */
 	public function findHttpTunnelUrl(array $tunnels, string $domain = null)
 	{
-		// If there are active tunnels on the Ngrok instance we will spin through them and
+		// If there are active tunnels on the ngrok instance we will spin through them and
 		// find the one responding on HTTP. Each tunnel has an HTTP and a HTTPS address
 		// but for local dev purposes we just desire the plain HTTP URL endpoint.
 		foreach ($tunnels as $tunnel) {

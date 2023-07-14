@@ -351,7 +351,7 @@ function user()
 
 /**
  * Get the bin path.
- * @return string `"c:\Users\YourName\AppData\Roaming\Composer\vendor\ycodetech\valet-windows\bin\"`
+ * @return string `"c:\Users\Username\AppData\Roaming\Composer\vendor\ycodetech\valet-windows\bin\"`
  */
 function valetBinPath()
 {

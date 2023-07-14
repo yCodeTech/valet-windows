@@ -655,7 +655,7 @@ if (is_dir(VALET_HOME_PATH)) {
 
 		Ngrok::run("authtoken $token " . Ngrok::getNgrokConfig());
 
-	})->descriptions('Set the Ngrok auth token');
+	})->descriptions('Set the ngrok auth token');
 
 	/**
 	 * Start the daemon services.
