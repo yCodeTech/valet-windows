@@ -384,7 +384,7 @@ Share your local site publically. ngrok will do all the magic for you and give y
 When using the command, a new CMD terminal will be launched with the ngrok information, including the public URL to share.
 
 ###### Note: The URL won't be copied to the clipboard, however, in a separate terminal, you can use the `fetch-share-url` command.
-
+###### [options]
 If you need to use the flags of ngrok's `http` command (which `valet share` uses internally), then you can use `options` argument. This is a space-separated array. Pass the option name without the `--` prefix (so Valet doesn't get confused with it's own options); eg. `domain=example.com`. All options/flags will be prefixed with `--` after Valet has processed the command. As with any option, if there's a space in the value you will need to surround the value in quotes.
 
 ```console
