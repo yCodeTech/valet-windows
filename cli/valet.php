@@ -594,7 +594,15 @@ if (is_dir(VALET_HOME_PATH)) {
 	/**
 	 * Generate a publicly accessible URL for your project.
 	 * @param string $site The site
-	 * @param array $options The options/flags to pass to ngrok
+	 * @param array $options A space-separated array of options/flags to pass to ngrok.
+	 * ---
+	 * Pass the option name without the `--` prefix (so Valet doesn't get confused with it's own options); eg. `domain=example.com`.
+	 * If there's a space in the value you will need to surround the value in quotes.
+	 * All options will be prefixed with `--` after Valet has processed the command.
+	 * If the `host-header` option is not set, Valet will add it with the default of `rewrite`.
+	 * ---
+	 * `valet share mysite domain=example.com region=eu request-header-remove="blah blah"`
+	 *
 	 * @param bool $debug Allow debug error output
 	 */
 	$app->command(
@@ -611,7 +619,8 @@ if (is_dir(VALET_HOME_PATH)) {
 	// and 2 open-source clients like localtunnel (https://github.com/localtunnel/localtunnel)
 
 	/**
-	 * Echo the currently tunneled URL.
+	 * Get the public URL of the site that is currently being shared.
+	 * @param string|null $site The site. If omitted, Valet will use the current working directory.
 	 */
 	$app->command('fetch-share-url [site]', function ($site = null) {
 		$site = $site ?: Site::host(getcwd()) . '.' . Configuration::read()['tld'];
@@ -620,14 +629,15 @@ if (is_dir(VALET_HOME_PATH)) {
 		info("The public URL for $site is: <fg=blue>$url</>");
 		info("It has been copied to your clipboard.");
 
-	})->descriptions('Get the URL to the current Ngrok tunnel');
+	})->descriptions('Get the public URL of the site that is currently being shared.');
 
 	/**
 	 * Run ngrok commands.
 	 *
-	 * @param array $commands The ngrok commands and options/flags (without the `--` prefix),
+	 * @param array $commands The ngrok commands and options/flags (without the `--` prefix and only if it needs a value ie, has `=`),
 	 * eg. `valet ngrok config add-authtoken [token] config=C:/ngrok.yml`
 	 */
+	// TODO: Use 2 arguments, 1 for ngrok commands, and 1 for ngrok options/flags.
 	$app->command('ngrok [commands]*', function ($commands) {
 		Ngrok::run(Ngrok::prefixNgrokFlags($commands));
 	})->descriptions('Run ngrok commands');

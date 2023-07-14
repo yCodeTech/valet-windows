@@ -26,16 +26,18 @@
 <table>
   <tr>
     <th>Commands Section</th>
-    <td><a href="#php-services">PHP Services</a></td>
-    <td><a href="#using-php-versions">Using PHP Versions</a></td>
-    <td><a href="#parked-and-linked">Parked and Linked</a></td>
-    <td><a href="#other-commands">Other Commands</a></td>
+    <td ><a href="#php-services">PHP Services</a></td>
+    <td align="center"><a href="#using-php-versions">Using PHP Versions</a></td>
+    <td align="center"><a href="#parked-and-linked">Parked and Linked</a></td>
+    <td align="center"><a href="#sharing">Sharing</a></td>
+    <td align="center"><a href="#other-commands">Other Commands</a></td>
   </tr>
   <tr>
     <th>Command</th>
     <td><a href="#phpadd">php:add</a></td>
     <td align="center"><a href="#use">use</a></td>
     <td align="center"><a href="#link">link</a></td>
+		<td align="center"><a href="#share">share</a></td>
     <td align="center"><a href="#services">services</a></td>
   </tr>
   <tr>
@@ -43,6 +45,7 @@
     <td><a href="#phpremove">php:remove</a></td>
     <td align="center"><a href="#isolate">isolate</a></td>
     <td align="center"><a href="#unlink">unlink</a></td>
+    <td align="center"><a href="#set-ngrok-token">set-ngrok-token</a></td>
     <td align="center"><a href="#secure">secure</a></td>
   </tr>
   <tr>
@@ -50,14 +53,18 @@
     <td><a href="#phplist">php:list</a></td>
     <td align="center"><a href="#unisolate">unisolate</a></td>
     <td align="center"><a href="#links">links</a></td>
+    <td align="center"><a href="#fetch-share-url">fetch-share-url</a></td>
     <td></td>
+
   </tr>
   <tr>
   <th></th>
     <td><a href="#phpwhich">php:which</a></td>
     <td align="center"><a href="#isolated">isolated</a></td>
     <td align="center"><a href="#parked">parked</a></td>
-    <td></td>
+    <td align="center"><a href="#ngrok">ngrok</a></td>
+		<td></td>
+
   </tr>
   <tr>
   <th></th>
@@ -65,6 +72,8 @@
     <td></td>
     <td></td>
     <td></td>
+		<td></td>
+
   </tr>
   <tr>
   <th></th>
@@ -72,6 +81,8 @@
     <td></td>
     <td></td>
     <td></td>
+		<td></td>
+
   </tr>
 </table>
 
@@ -279,18 +290,18 @@ link   [name]        Register the current working directory as a symbolic link w
 
 ```console
 $ valet link my_site_renamed
-A [my_site_renamed] symbolic link has been created in [C:/Users/Stuart/.config/valet/Sites/my_site_renamed].
+A [my_site_renamed] symbolic link has been created in [C:/Users/Username/.config/valet/Sites/my_site_renamed].
 
 $ valet link cool_site --secure
-A [cool_site] symbolic link has been created in [C:/Users/Stuart/.config/valet/Sites/cool_site].
+A [cool_site] symbolic link has been created in [C:/Users/Username/.config/valet/Sites/cool_site].
 The [cool_site.test] site has been secured with a fresh TLS certificate.
 
 $ valet link cool_Site --isolate=7.4
-A [cool_site] symbolic link has been created in [C:/Users/Stuart/.config/valet/Sites/cool_site].
+A [cool_site] symbolic link has been created in [C:/Users/Username/.config/valet/Sites/cool_site].
 The site [cool_site.test] is now using 7.4.
 
 $ valet link cool_Site --secure --isolate=7.4
-A [cool_site] symbolic link has been created in [C:/Users/Stuart/.config/valet/Sites/cool_site].
+A [cool_site] symbolic link has been created in [C:/Users/Username/.config/valet/Sites/cool_site].
 The [cool_site.test] site has been secured with a fresh TLS certificate.
 The site [cool_site.test] is now using 7.4.
 ```
@@ -352,6 +363,79 @@ $ valet parked
 +-----------------------------------------------+
 ```
 
+### Sharing
+
+###### Note: ngrok ships with Valet internally, there is no need to download it separately.
+
+##### share
+
+```
+share [site]    Generate a publicly accessible URL for the specified project.
+      [options] A space-separated array of options/flags to pass to ngrok.
+      [--debug] Output error messages to the current terminal.
+```
+
+```console
+$ valet share site1
+```
+
+Share your local site publically. ngrok will do all the magic for you and give you a publically accessible URL to share to clients or team members.
+
+When using the command, a new CMD terminal will be launched with the ngrok information, including the public URL to share.
+
+###### Note: The URL won't be copied to the clipboard, however, in a separate terminal, you can use the `fetch-share-url` command.
+
+If you need to use the flags of ngrok's `http` command (which `valet share` uses internally), then you can use `options` argument. This is a space-separated array. Pass the option name without the `--` prefix (so Valet doesn't get confused with it's own options); eg. `domain=example.com`. All options/flags will be prefixed with `--` after Valet has processed the command. As with any option, if there's a space in the value you will need to surround the value in quotes.
+
+```console
+$ valet share site1 domain=example.com region=eu request-header-remove="header to remove"
+```
+
+###### Note: If you're already sharing a project, and try to share another project simultaneously, the new cmd window may open for a split second and then close. This is due to ngrok failing silently, and won't output any error messages. To output the errors, pass the `--debug` flag to the command. This will cause ngrok to try to run in the current terminal instead of a new window, thus sending the error messages.
+
+##### set-ngrok-token
+
+```
+set-ngrok-token [authtoken] Set the ngrok authtoken.
+```
+
+```console
+$ valet set-ngrok-token 123abc
+Authtoken saved to configuration file: C:/Users/Username/.config/valet/ngrok/ngrok.yml
+```
+
+Before sharing a site with ngrok, you must first set the authtoken, which can be accessed in your ngrok account.
+
+##### fetch-share-url
+
+```
+fetch-share-url [site] Get the public URL of the site that is currently being shared.
+```
+
+```console
+$ valet fetch-share-url site1
+The public URL for site1 is [ngrok public URL]
+It has been copied to your clipboard.
+```
+
+Once sharing a site with `valet share`, you can get the public URL using this command in a separate terminal. The URL will be outputted to the terminal and will also be copied to the clipboard for ease of use.
+
+##### ngrok
+
+```
+ngrok [commands] Run ngrok commands.
+```
+
+```
+$ valet ngrok config add-token 123abc config=C:/path/ngrok.yml
+```
+
+Because ngrok CLI has a multitude of commands and options, the `valet ngrok` command is very useful for passing through any and all commands to ngrok.
+
+The `commands` argument is a space-separated array. To use options/flags that need a value just pass the option name without the `--` prefix eg. `config=C:/path/ngrok.yml`. All options/flags that have the `=` will be prefixed with `--` after Valet has processed the command.
+
+###### Note: The options will _only_ work if it has the `=`. Any other options currently won't work.
+
 ### Other commands
 
 ##### services
@@ -387,33 +471,6 @@ The [site1.test] site has been secured with a fresh TLS certificate.
 ```
 
 ###### Note: If you use VS Code integrated terminal, the secure command (or secure option in on other commands) won't work and will need to be ran in a standalone terminal with admin privileges.
-
-##### share
-
-```
-share [domain] Generate a publicly accessible URL for the specified project.
-	  [--debug] Output error messages to the current terminal.
-```
-
-```console
-$ valet share site1
-```
-
-A new CMD terminal will be launched with the ngrok information, including the public URL to share.
-
-###### Note: The URL won't be copied to the clipboard, however, in a separate terminal, you can use the `fetch-share-url` command.
-
-###### Note: If you're already sharing a project, and try to share another project simultaneously, the new cmd window may open for a split second and then close. This is due to ngrok failing silently, and won't output any error messages. To output the errors, pass the `--debug` flag to the command. This will cause ngrok to try to run in the current terminal instead of a new window, thus sending the error messages.
-
-##### Set Ngrok Token
-Before Generate a publicly accessible URL for the specified project. You need to re-setup ngrok auth token. Because in this version we updated `ngrok` config file path.
-```
-valet set-ngrok-token [Ngrok_Auth_Token]
-```
-
-Make sure before running you replcae `Ngrok_Auth_Token` with your own `AuthToken`.
-
-###### Note: If you had previously set the ngrok token using the old configuration location, it is recommended to update it using the new `valet set-ngrok-token` command to ensure compatibility with the latest version of Laravel Valet.
 
 ### Commands not supported
 
