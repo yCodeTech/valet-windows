@@ -56,6 +56,9 @@
 		"spatie/docker": "^1.7",
 		"illuminate/testing": "^8.20|^9.0"
 	},
+	"conflict": {
+		"cretueusebiu/valet-windows": "*"
+	},
 	"bin": [
 		"valet"
 	],
