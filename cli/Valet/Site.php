@@ -198,14 +198,14 @@ class Site
 		$config = $this->config->read();
 
 		return collect($this->files->scandir($path))->filter(function ($value, $key) {
-			return ends_with($value, '.crt');
+			return str_ends_with($value, '.crt');
 		})->map(function ($cert) use ($config) {
 			$certWithoutSuffix = substr($cert, 0, -4);
 			$trimToString = '.';
 
 			// If we have the cert ending in our tld strip that tld specifically
 			// if not then just strip the last segment for  backwards compatibility.
-			if (ends_with($certWithoutSuffix, $config['tld'])) {
+			if (str_ends_with($certWithoutSuffix, $config['tld'])) {
 				$trimToString .= $config['tld'];
 			}
 
@@ -430,7 +430,7 @@ class Site
 
 		$isolated = collect($this->files->scandir($dir))->filter(function ($site, $key) use ($tld) {
 			// keep sites that match our TLD
-			return ends_with($site, ".$tld.conf");
+			return str_ends_with($site, ".$tld.conf");
 		})->map(function ($site, $key) use ($tld) {
 			return [
 				"site" => str_replace(".$tld.conf", '', $site),
@@ -1022,7 +1022,7 @@ class Site
 		}
 
 		$tld = $this->config->read()['tld'];
-		if (!ends_with($url, '.' . $tld)) {
+		if (!str_ends_with($url, '.' . $tld)) {
 			$url .= '.' . $tld;
 		}
 
@@ -1048,7 +1048,7 @@ class Site
 	public function proxyDelete($url)
 	{
 		$tld = $this->config->read()['tld'];
-		if (!ends_with($url, '.' . $tld)) {
+		if (!str_ends_with($url, '.' . $tld)) {
 			$url .= '.' . $tld;
 		}
 
@@ -1077,7 +1077,7 @@ class Site
 		$proxies = collect($this->files->scandir($dir))
 			->filter(function ($site, $key) use ($tld) {
 				// keep sites that match our TLD
-				return ends_with($site, ".$tld.conf");
+				return str_ends_with($site, ".$tld.conf");
 			})->map(function ($site, $key) use ($tld) {
 			// remove the TLD suffix for consistency
 			return str_replace(".$tld.conf", '', $site);
@@ -1138,7 +1138,7 @@ class Site
 	 */
 	public function nginxPath($additionalPath = null)
 	{
-		if ($additionalPath && !ends_with($additionalPath, '.conf')) {
+		if ($additionalPath && !str_ends_with($additionalPath, '.conf')) {
 			$additionalPath = $additionalPath . '.conf';
 		}
 

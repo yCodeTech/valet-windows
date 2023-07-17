@@ -288,15 +288,18 @@ if (!function_exists('tap')) {
 	}
 }
 
-if (!function_exists('ends_with')) {
+if (!function_exists('str_ends_with')) {
 	/**
 	 * Determine if a given string ends with a given substring.
 	 *
+	 * `str_ends_with` function was introduced in PHP 8.
+	 * This is a polyfill for backwards compatibility.
+	 *
 	 * @param  string  $haystack
-	 * @param  string|array  $needles
+	 * @param  string|string[]  $needles
 	 * @return bool
 	 */
-	function ends_with($haystack, $needles)
+	function str_ends_with($haystack, $needles)
 	{
 		foreach ((array) $needles as $needle) {
 			if (substr($haystack, -strlen($needle)) === (string) $needle) {
