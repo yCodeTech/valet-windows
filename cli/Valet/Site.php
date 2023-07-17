@@ -925,10 +925,10 @@ class Site
 
 		$tld = $this->config->get('tld');
 
-		foreach ($secured->pluck('site') as $domain) {
-			$this->cli->run(sprintf('cmd "/C certutil -delstore "CA" "%s""', $domain . '.' . $tld));
+		foreach ($secured->pluck('site') as $site) {
+			$this->cli->run(sprintf('cmd "/C certutil -delstore "CA" "%s""', $site . '.' . $tld));
 
-			$this->cli->run(sprintf('cmd "/C certutil -delstore "Root" "%s""', $domain . '.' . $tld));
+			$this->cli->run(sprintf('cmd "/C certutil -delstore "Root" "%s""', $site . '.' . $tld));
 		}
 	}
 
@@ -1009,9 +1009,9 @@ class Site
 	}
 
 	/**
-	 * Build the Nginx proxy config for the specified domain.
+	 * Build the Nginx proxy config for the specified site.
 	 *
-	 * @param  string  $url  The domain name to serve
+	 * @param  string  $url  The site to serve
 	 * @param  string  $host  The URL to proxy to, eg: http://127.0.0.1:8080
 	 * @return void
 	 */

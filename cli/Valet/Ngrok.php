@@ -151,13 +151,13 @@ Then use: <fg=magenta>valet set-ngrok-token [token]</>');
 	 * @return string|null
 	 * @return void
 	 */
-	public function findHttpTunnelUrl(array $tunnels, string $domain = null)
+	public function findHttpTunnelUrl(array $tunnels, string $site = null)
 	{
 		// If there are active tunnels on the ngrok instance we will spin through them and
 		// find the one responding on HTTP. Each tunnel has an HTTP and a HTTPS address
 		// but for local dev purposes we just desire the plain HTTP URL endpoint.
 		foreach ($tunnels as $tunnel) {
-			if (($tunnel["proto"] === 'http' || $tunnel["proto"] === 'https') && strpos($tunnel["config"]["addr"], $domain)) {
+			if (($tunnel["proto"] === 'http' || $tunnel["proto"] === 'https') && strpos($tunnel["config"]["addr"], $site)) {
 				return $tunnel["public_url"];
 			}
 		}

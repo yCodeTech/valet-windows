@@ -64,7 +64,7 @@ $app->command('php:add path [--xdebug]', function ($path, $xdebug) {
 
 		info("PHP {$php['version']} from {$path} has been added. You can make it default by running `valet use` command");
 	}
-})->descriptions('Add PHP by specifying a path');
+})->descriptions('Add PHP by specifying a path')->addUsage("php:add c:/php/8.1")->addUsage("php:add c:/php/8.1 --xdebug");
 
 /**
  * Remove PHP.
@@ -101,7 +101,7 @@ $app->command('php:remove [phpVersion] [--path=]', function ($phpVersion, $path)
 	if (Configuration::removePhp($php['path'])) {
 		info("PHP {$php['version']} from {$php['path']} has been removed.");
 	}
-})->descriptions('Remove PHP by specifying a path');
+})->descriptions('Remove PHP by specifying a path')->addUsage("php:remove 8.1")->addUsage("php:remove --path=c:/php/8.1");
 
 /**
  * Install PHP services.
@@ -238,7 +238,7 @@ $app->command('sudo valetCommand* [--valetOptions=]', function ($valetCommand = 
 })->descriptions("A sudo-like command to use valet commands with elevated privileges that only require 1 User Account Control popup.", [
 			"valetCommand" => "The valet command and its arguments and values, separated by spaces.",
 			"--valetOptions" => "Specify options without the leading <fg=green>--</>. Multiple options must be separated by double slashes <fg=green>//</>."
-		]);
+		])->addUsage("sudo link mySite --valetOptions=isolate=7.4//secure");
 
 /**
  * Install Valet and any required services.
@@ -439,7 +439,7 @@ if (is_dir(VALET_HOME_PATH)) {
 	})->descriptions('Link the current working directory to Valet with a given name', [
 				'--secure' => 'Optionally secure the site',
 				'--isolate' => 'Isolate the site to a specified PHP version'
-			]);
+			])->addUsage("link mySite")->addUsage("link mySite --isolate=7.4")->addUsage("link mySite --secure")->addUsage("link mySite --secure --isolate=7.4");
 
 	/**
 	 * Display all of the registered symbolic links.
@@ -483,22 +483,22 @@ if (is_dir(VALET_HOME_PATH)) {
 	})->descriptions('Remove the specified Valet symbolic link');
 
 	/**
-	 * Secure the given domain with a trusted TLS certificate.
+	 * Secure the given site with a trusted TLS certificate.
 	 */
-	$app->command('secure [domain]', function ($domain = null) {
-		$url = Site::getSiteURL($domain);
+	$app->command('secure [site]', function ($site = null) {
+		$url = Site::getSiteURL($site);
 
 		Site::secure($url);
 
 		Nginx::restart();
 
 		info('The [' . $url . '] site has been secured with a fresh TLS certificate.');
-	})->descriptions('Secure the given domain with a trusted TLS certificate');
+	})->descriptions('Secure the given site with a trusted TLS certificate');
 
 	/**
-	 * Stop serving the given domain over HTTPS and remove the trusted TLS certificate.
+	 * Stop serving the given site over HTTPS and remove the trusted TLS certificate.
 	 */
-	$app->command('unsecure [domain] [--all]', function ($domain = null, $all = null) {
+	$app->command('unsecure [site] [--all]', function ($site = null, $all = null) {
 		if ($all) {
 			Site::unsecureAll();
 			Nginx::restart();
@@ -506,13 +506,13 @@ if (is_dir(VALET_HOME_PATH)) {
 			return;
 		}
 
-		$url = Site::getSiteURL($domain);
+		$url = Site::getSiteURL($site);
 
 		Site::unsecure($url);
 		Nginx::restart();
 
 		info('The [' . $url . '] site will now serve traffic over HTTP.');
-	})->descriptions('Stop serving the given domain over HTTPS and remove the trusted TLS certificate');
+	})->descriptions('Stop serving the given site over HTTPS and remove the trusted TLS certificate')->addUsage("unsecure mySite")->addUsage("unsecure --all");
 
 	/**
 	 * Display all of the currently secured sites.
@@ -531,18 +531,18 @@ if (is_dir(VALET_HOME_PATH)) {
 	})->descriptions('Display all of the currently secured sites');
 
 	/**
-	 * Create an Nginx proxy config for the specified domain.
+	 * Create an Nginx proxy config for the specified site.
 	 */
-	$app->command('proxy domain host', function ($domain, $host) {
-		Site::proxyCreate($domain, $host);
+	$app->command('proxy site host', function ($site, $host) {
+		Site::proxyCreate($site, $host);
 		Nginx::restart();
 	})->descriptions('Create an Nginx proxy site for the specified host. Useful for docker, mailhog etc.');
 
 	/**
 	 * Delete an Nginx proxy config.
 	 */
-	$app->command('unproxy domain', function ($domain) {
-		Site::proxyDelete($domain);
+	$app->command('unproxy site', function ($site) {
+		Site::proxyDelete($site);
 		Nginx::restart();
 	})->descriptions('Delete an Nginx proxy config.');
 
@@ -586,8 +586,8 @@ if (is_dir(VALET_HOME_PATH)) {
 	/**
 	 * Open the current or given directory in the browser.
 	 */
-	$app->command('open [domain]', function ($domain = null) {
-		$url = 'http://' . ($domain ?: Site::host(getcwd())) . '.' . Configuration::read()['tld'];
+	$app->command('open [site]', function ($site = null) {
+		$url = 'http://' . ($site ?: Site::host(getcwd())) . '.' . Configuration::read()['tld'];
 		CommandLine::passthru("start $url");
 	})->descriptions('Open the site for the current (or specified) directory in your browser');
 
@@ -613,7 +613,7 @@ if (is_dir(VALET_HOME_PATH)) {
 
 			Ngrok::start($url, Site::port($url), $debug, $options);
 		}
-	)->descriptions('Generate a publicly accessible URL for your project');
+	)->descriptions('Generate a publicly accessible URL for your project')->addUsage("share mySite domain=example.com region=eu");
 
 	// TODO: Share-tool for Expose (https://expose.dev/)
 	// and 2 open-source clients like localtunnel (https://github.com/localtunnel/localtunnel)
@@ -640,7 +640,7 @@ if (is_dir(VALET_HOME_PATH)) {
 	// TODO: Use 2 arguments, 1 for ngrok commands, and 1 for ngrok options/flags.
 	$app->command('ngrok [commands]*', function ($commands) {
 		Ngrok::run(Ngrok::prefixNgrokFlags($commands));
-	})->descriptions('Run ngrok commands');
+	})->descriptions('Run ngrok commands')->addUsage("ngrok config add-authtoken [token] config=C:/ngrok.yml");
 
 	/**
 	 * Set the ngrok auth token.
@@ -975,7 +975,7 @@ if (is_dir(VALET_HOME_PATH)) {
 	})->descriptions('Isolate the current working directory or a specified site(s) to a specific PHP version', [
 				'phpVersion' => 'The PHP version you want to use; e.g 7.4',
 				'--site' => 'Specify the site to isolate',
-			]);
+			])->addUsage("isolate 7.4 --site=mySite");
 
 	/**
 	 * Remove [unisolate] an isolated site.
@@ -1005,7 +1005,7 @@ if (is_dir(VALET_HOME_PATH)) {
 	})->descriptions('Remove [unisolate] an isolated site.', [
 				'--site' => 'Specify the site to unisolate',
 				'--all' => 'Optionally remove all isolated sites'
-			]);
+			])->addUsage("unisolate --site=mySite")->addUsage("unisolate --all");
 
 	/**
 	 * List isolated sites.
