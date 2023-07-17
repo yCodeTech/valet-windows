@@ -661,7 +661,7 @@ if (is_dir(VALET_HOME_PATH)) {
 	 * Start the daemon services.
 	 */
 	$app->command('start [service]', function ($service) {
-		CommandLine::passthru('valet restart ' . $service . ' --dev-txt=started');
+		$this->runCommand('restart ' . $service . ' --dev-txt=started');
 	})->descriptions('Start the Valet services');
 
 	/**
