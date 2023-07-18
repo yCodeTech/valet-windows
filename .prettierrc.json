@@ -1,0 +1,19 @@
+{
+	"semi": false,
+	"overrides": [
+		{
+			"files": [
+				"*.html"
+			],
+			"options": {
+				"tabWidth": 4,
+				"bracketSameLine": true,
+				"singleAttributePerLine": false,
+				"vueIndentScriptAndStyle": false,
+				"embeddedLanguageFormatting": "off",
+				"htmlWhitespaceSensitivity": "strict",
+				"printWidth": 100000
+			}
+		}
+	]
+}
