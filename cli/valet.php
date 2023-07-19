@@ -46,6 +46,8 @@ if (is_dir(VALET_HOME_PATH)) {
 	Site::pruneLinks();
 }
 
+// TODO: Check all descriptions and add descriptions for the args and options.
+
 /**
  * Add PHP.
  * @param string $path The php version path
