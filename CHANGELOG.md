@@ -1,124 +1,150 @@
 # Changelog
 
-## 3.0 - 2023-05-16
+All notable changes to this project will be documented in this file.
 
-## 2.5.0 - 2022-02-18
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
--   Update Acrylic DNS Proxy.
--   Update composer dependencies.
+## [Unreleased](https://github.com/yCodeTech/valet-windows/tree/master)
 
-## 2.4.1 - 2021-12-03
+## 3.0.0 - Unreleased
 
--   Fixed `valet share`.
+### Added
 
-## 2.4.0 - 2021-11-24
+- Added support for multiple PHP services, (Feature PR by @iamroi in https://github.com/cretueusebiu/valet-windows/pull/195).
 
--   Added support for PHP 8.1.
+  - Enables the use of the previously disabled `valet use` command, to switch the default PHP version used by Valet.
+  - Adds new commands `php:add`, `php:remove`, `php:install`, `php:uninstall`, `php:list`, `xdebug:install`, `xdebug:uninstall`.
 
-## 2.3.2 - 2021-01-26
+- Added PHP version to the `links` command output (Patch 1 PR by @damsfx in https://github.com/iamroi/valet-windows/pull/1).
 
--   Fixed service installation when user path contains spaces.
+- Added PHP version to the `parked` command output, improvements to the Patch 1 above and a new command `php:which` (Patch 2 by @yCodeTech in https://github.com/yCodeTech/valet-windows/pull/1)
 
-## 2.3.1 - 2021-04-25
+  - Adds `default` or `isolated` to the PHP version output, with the latter being coloured green for emphasis in both `parked` and `links` commands. This acts as a 2 in 1, showing the PHP version, and determines whether the site is isolated.
 
--   Fixed 404 error when sharing upper case folder [#168](https://github.com/cretueusebiu/valet-windows/pull/168)
+  - Adds `Alias` and `Alias URL` to the `parked` command output. If the parked site also has a symbolic link, it's linked name (aka alias) and alias URL will be outputted in the table.
 
-## 2.3.0 - 2021-03-28
+  - Adds new `php:which` command to determine which PHP version the current working directory or a specified site is using.
 
--   Added support for Xdebug [#165](https://github.com/cretueusebiu/valet-windows/pull/165)
+  - Changes the output table to vertical for easier reading, using Symfony's `setVertical` method (only works when Valet is installed on PHP 8.1).
 
-## 2.2.0 - 2021-01-11
+- Added new `isolate` and `unisolate` commands. Isolates the current working directory or a specified site (also specify multiple sites) to a specific PHP version, and removes an isolated site (also unisolate all sites), respectively.
 
--   Sync with [laravel/valet](https://github.com/laravel/valet)
--   Added support for PHP 8.0
--   Update Acrylic DNS Proxy, Nginx, WinSW
--   Added integration tests with Docker
+- Added `version_alias` to the `addPhp` function in the `Configuration.php` file, creating an alias name for the full PHP version, which is then written to the user's Valet `config.json`. A full PHP version of 8.1.8 will have the alias of 8.1, the alias can then be used in commands.
 
-## 2.1.5 - 2021-01-06
+- Added PHP's `krsort` function to the `addPhp` function in the `Configuration.php` file, so that the PHP array in the user's Valet `config.json` is written in a natural decending order that adheres to decimals.
 
--   Fixed ssl redirect [#150](https://github.com/cretueusebiu/valet-windows/pull/150)
--   Fixed certificate keyUsage [#151](https://github.com/cretueusebiu/valet-windows/pull/151)
+  Natural decending order example:
 
-## 2.1.4 - 2020-10-23
+  ```
+  8.1.18
 
--   Lowered the number of php processes
+  8.1.8
 
-## 2.1.3 - 2020-10-21
+  7.4.33
+  ```
 
--   Update Acrylic DNS Proxy
--   Added `PHP_FCGI_CHILDREN=10` [#148](https://github.com/cretueusebiu/valet-windows/issues/148)
--   Fixed illuminate/container conflict [#147](https://github.com/cretueusebiu/valet-windows/issues/147)
+  This means that when two different patch versions of the same SemVer MAJOR.MINOR version of PHP is added like 8.1.8 and 8.1.18; and then the `use` command is ran with the alias version like 8.1, then the default will be set to the most recent version of that alias. In this example, it would be 8.1.18.
 
-## 2.1.1 - 2019-07-26
+- Added `isolated` command to list all the isolated sites.
+- Added `Version Alias` to the table output of `php:list`.
+- Added `--isolate` option to the `link` command to optionally isolate the site whilst making it a symbolic link.
+- Added the ability to unsecure a site when a secured linked site is unlinked before removing the site's conf to ensure it's removed from Windows internal certificate store.
+- Added the ability to unisolate a site when an isolated linked site is unlinked, to ensure it removes it properly.
+- Added `secured` command to list all the secured sites.
+- Added Valet Root CA generation and sign TLS certificates with the CA (PR by @shawkuro in https://github.com/cretueusebiu/valet-windows/pull/179).
+- Added row separators for horizontal tables.
+- Added `sites` command to list all sites in parked, links and proxies.
+- Added `set-ngrok-token` to set ngrok authtoken.
+- Added `--debug` option to the `share` command to prevent the opening of a new CMD window, and allow error messages to be displayed from ngrok for easier debugging. This is needed because ngrok may fail silently by opening a new CMD window and quickly closes it if it encounters an error, so no errors are outputted.
+- Added `sudo` command and [gsudo](https://github.com/gerardog/gsudo) files. The new command is to `passthru` Valet commands to the commandline that need elevated privileges by using gsudo. gsudo is a `sudo` equivalent for Windows, it requires only 1 UAC popup to enable the elevation and then all commands will be executed as the system instead of having multiple UACs opening.
+- Added `valetBinPath` helper function to find the Valet bin path, and updated all the code to use it.
+- Added a check to see if a site is isolated before unisolating it.
+- Added command example usages to display in the console when using `--help`.
+- Added a progressbar UI to `services` function, and `install`, `uninstall`, `restart`, `stop` commands to improve the UX.
+- Added `error` output to the `getPhpByVersion` function to cut down on duplicate `error` code that relates to the function.
+- Added a sleep for 0.3s (300000 microseconds) in between the `uninstall` warning and the question to allow the warning be output before the question is outputted. And simplified the if statements.
 
--   Fixed certificates in non-UTC timezones [#121](https://github.com/cretueusebiu/valet-windows/pull/121)
+### Changed
 
-## 2.1.0 - 2019-04-13
+- Changed package namespace to `yCodeTech`.
+- Changed the output table to vertical for easier reading on those longer columns, with an optional argument to draw the table horizonally.
+- Renamed the `usePhp` function to `isolate` in `Site.php` file to reflect it's command name.
+- Updated ngrok to the latest version of 3.3.1
+- Moved Valet's version variable out and into it's own separate file for ease.
+- Changed various function return types.
+- Changed output tables `SSL` columns to `Secure` for easier understanding.
+- Changed `error` helper function to throw an exception when specified to do so, and add more meaning to the error output by constructing the error message from the PHP `error_get_last` function. This is because sometimes the exception doesn't output the exact error or file names needed in order to debug.
+- Changed the table style to `box` which outputs solid borders instead of using dashes.
+- Changed the name of the `starts_with` and `ends_with` helper functions to `str_starts_with` and `str_ends_with` respectively to reflect the PHP 8+ functions.
+- Updated various output texts.
+- Changed the way the `secure` command was getting the current working directory to use the `getSiteURL` function instead.
+- Changed `name` argument to be required in the `unlink` command.
+- Changed various `warning`s to `error`s.
+- Changed `domain` text and variables to `site` to properly reference the `site`.
+- Changed text to use the proper capitalisation of `Xdebug`.
+- Changed the 404 template to be more visually appealing by adding the Valet 3 logo - the logo also acts as a clarification that if the 404 happens we know it's something to do with Valet and nothing else.
+- Changed Xdebug's installation behaviour to no longer install automatically, without specific flag being present. This is because Xdebug is only a PHP debugging service, so if it's not used, then it's wasting a bit of resources.
 
--   Moved the helper functions into the Valet namespace
--   Renamed `valet domain` command to `valet tld`
--   Moved `~/.valet` to `~/.config/valet`
--   Unlink renamed links
--   Fixed warning on newer `symfony/process` versions
--   Share command now works with secured sites
--   Added PHP 7.3 install script
--   HTTP/2 works now with secured sites
--   Updated `nginx`, `ngrok`, `winsw` and `Acrylic DNS`
--   Other various fixes ported from [laravel/valet](https://github.com/laravel/valet)
+  - Added an `--xdebug` option to the commands `php:add` and `install` to optionally install Xdebug while installing the PHP or installing Valet respectively.
+  - Added an optional `phpVersion` argument to the commands `xdebug:install` and `xdebug:uninstall` to install or uninstall Xdebug for a specfic PHP version. If installing and the version is already installed, ask the user if they want to reinstall it.
+  - Added function to check if a supplied PHP version is the alias or not, and a function to get the full PHP version by the alias. Used in `PhpCgiXdebug` and `PhpCgi` files.
+  - Added a function to check if Xdebug of a specfic PHP version is installed, or if a version isn't supplied then check if any version is installed for the PHP installed in Valet. Used for many of the commands to uninstall if it is installed.
+  - Added the service ID to `WinSwFactory` to allow `WinSW` functions get the and use the full ID in order to fully check if it's installed. Used in `PhpCgiXdebug`, `PhpCgi`, and `Nginx` files.
+  - Changed Xdebug service name.
+  - Changed the powershell cli command of the `installed` function of `WinSW` file to use the newly added service ID instead of the name. And removed the now unnecessary extra code.
+  - Changed various warning outputs to errors.
+  - Removed the `getPhpCgiName` function from `PhpCgiXdebug` class because the function exists in the parent class and should be used instead, thus removing duplicate code.
+  - Fix `xdebug:install`, currently, when no PHP version is passed, the command will reinstall Xdebug even if it's already installed without asking the user. Fixed so that it asks just as it does when a PHP version was passed. Changed the output text accordingly.
+  - Removed the redundant `isInstalledService` function in favour of using the `installed` function of `WinSW`, as it does exactly the same, thus removing duplicate code.
 
-## 2.0.15 - 2018-01-10
+- Changed the path argument of `php:add` to required rather than optional (removed the square brackets).
 
--   Add compatibility with symfony/process v4
+### Removed
 
-## 2.0.14 - 2018-01-06
+- Removed the deprecated PHP PowerShell files.
+- Removed unnecessary/redundant/duplicate code.
+- Removed the `--site` option from the `use` command that was added in https://github.com/cretueusebiu/valet-windows/pull/195, in favour of using the `isolate` command.
+- Removed the deprecated `getLinks` function in the `Site.php` file.
+- Removed the deprecated and unnecessary `publishParkedNginxConf`, `runOrDie`, `should_be_sudo`, `quietly`, `quietlyAsUser` functions.
+- Removed the unsupported `trust` command.
+- Removed the hardcoded ngrok options from the `share` command and added an `options` array argument instead, so you can just pass in any ngrok command and Valet will pass it through to ngrok. See the [docs](https://github.com/yCodeTech/valet-windows/blob/master/README.md#options) for information on how this works.
+- Removed the `echo` from the `trustCa` function that was in the PR code from https://github.com/cretueusebiu/valet-windows/pull/179
+- Removed various outputs to fully streamline the progressbar UI and prevent multiple progressbars in the output because of multiple infos interrupting it.
 
--   Fixed PHP path detection
+### Fixed
 
-## 2.0.13 - 2017-12-08
+- Fixed securing sites with an SSL/TLS certificate, both normally and when proxies are added by adding the localhost IP address to the Nginx conf listen directives. (PR by @RohanSakhale in https://github.com/cretueusebiu/valet-windows/pull/208).
+- Fixed a bug where sometimes the link won't be unlinked under certain conditions. In accordance with [official PHP guidelines of the `unlink()` function](https://www.php.net/manual/en/function.unlink.php), the function `rmdir()` fixes this issue to remove symlink directories.
 
--   Changed default tld from `.dev` to `.test`
--   Fixed `valet share` for linked sites
--   Change FPM port to 9001 ([#51](https://github.com/cretueusebiu/valet-windows/pull/51))
--   Other minor fixes ported from [laravel/valet](https://github.com/laravel/valet)
+  ###### From PHP `unlink()` docs:
 
-## 2.0.12 - 2017-09-27
+  > If the file is a symlink, the symlink will be deleted. On Windows, to delete a symlink to a directory, rmdir() has to be used instead.
 
--   Fixed global composer files ([#49](https://github.com/cretueusebiu/valet-windows/issues/49)).
+- Fixed Nginx `lint` function to properly check the confs for errors.
+- Fixed filesystem `copy` function to use the `@` operator to suppress pr-error messages that occur in PHP internally. And added an inline `error` function if `copy` fails. We do this, so that we can construct proper meaningful error output for debugging.
+- Partial fix for a possible bug where if a site is using a framework that sets a site URL environment variable in a `.env` file such as the `WP_HOME` for Laravel Bedrock, then when trying to request the site and the TLD is different from the one set in Valet, then the site automatically redirects to use the URL from the environment variable. This ends in Valet returning a 404 error, because as far as Valet is concerned it's not valid site. This then results in the response being cached by the browser and keeps requesting the cached version of the site even if the TLD has been changed to match.
 
-## 2.0.11 - 2017-08-04
+  Example: `WP_HOME='http://mySite.test'`, Valet is set to use the `dev` TLD and gets a request to `http://mySite.dev`, the site will auto redirect to `http://mySite.test`. 404 Not Found error appears. The response from `http://mySite.test` is cached by browsers. Valet is changed to use `test` TLD, and gets a request for `http://mySite.test`. The previously cached error response is served.
 
--   Pretty print sites
--   Update some drivers
--   Added wildcard certificates
--   Fixed Nginx upload max size
--   Added `--secure` option for `valet link`
--   Added ability to pass directory to `valet open`
--   Other minor fixes
+  This partial fix adds `no cache` headers to Nginx configuration files to try and prevent the browsers caching sites at all.
 
-## 2.0.10 - 2017-05-23
+- Fixed `services` command to correctly loop through and check all PHP services.
+- Fixed `fetch-share-url` command by:
 
--   Fixed SSL certificate ([#29](https://github.com/cretueusebiu/valet-windows/pull/30)).
+  - Replacing the outdated `nategood/httpful` composer dependency with `guzzlehttp/guzzle` for REST API requests to get the current ngrok tunnel public URL, and copy it to the clipboard.
+  - Changing the `findHttpTunnelUrl` function to use array bracket notation.
+  - Changing the `domain` argument to `site` to properly reference the site without getting confused with the ngrok `--domain`.
+  - `on-latest-version` command to use Guzzle and added a new composer dependency `composer/ca-bundle` to find and use the TLS CA bundle in order to verify the TLS/SSL certificate of the requesting website/API. Otherwise, Guzzle spits out a cURL error. (Thanks to this [StackOverflow Answer](https://stackoverflow.com/a/53823135/2358222).)
 
-## 2.0.9 - 2017-04-03
+- Fixed `ngrok` command to accept options/flags.
+- Fixed `php:remove` command to enable it to remove PHP by specifying it's version; by adding a `phpVersion` argument and changing the `path` argument to an option (`--path`), making `phpVersion` the main way to remove instead.
+- Fixed `start` command by removing the whole functionality and utilise Silly's `runCommand` to run the `restart` command instead, so they're effectively sharing the same function. This is because it was unnecessary duplicated code.
+- Fixed lack of output colouring when using PHP `passthru` function by adding a 3rd party binary, [Ansicon](https://github.com/adoxa/ansicon), along with a new class with `install`/`uninstall` functions and added the function calls to the Valet `install`/`uninstall` commands respectively.
 
--   Fixed issues ([#10](https://github.com/cretueusebiu/valet-windows/issues/10) and [#18](https://github.com/cretueusebiu/valet-windows/issues/18)) related to paths.
+  For whatever reason, the `passthru` function loses the output colourings, therefore the visual meaning is lost. What Ansicon does is injects code into the active and new terminals to ensure ANSI escape sequences (that are interpreted from the HTML-like tags `<fg=red></>`) are correctly rendered.
 
-## 2.0.8 - 2017-01-25
+- Potentially fixed a bug where an unsecured site is fetching a secured site's SSL/TLS certificate and uses https, where browsers declare the site unsafe because of the wrong certificate. Something to do with the PHP code replacing the server port with the php port. Commented out the `preg_replace` of the `replacePhpVersionInSiteConf` function. Further tests needed before removal.
+- Fixed an oversight while changing the TLD by allowing isolated sites TLD to be changed. Previously, if there is an isolated site, changing the TLD wouldn't change the isolated site's conf file, thus leaving it as the old TLD. This fix adds a `reisolateForNewTld` function to unisolate the old TLD site and reisolate the new TLD site. Also works for sites that are both isolated and secured.
 
--   Fixed Nginx configuration for secured sites.
-
-## 2.0.7 - 2017-01-21
-
--   Fix Nginx when parking a directory from other drives than `C:`.
--   Read the domain set in config when reinstalling.
-
-## 2.0.5 - 2017-01-12
-
--   Restart PHP-FPM service on failure.
--   Upgrade [WinSW](https://github.com/kohsuke/winsw).
--   Fix Nginx `server_names_hash_bucket_size` error.
-
-## 2.0.4 - 2017-01-02
-
--   Fix `valet link` command.
--   Configure [Acrylic DNS Proxy](http://mayakron.altervista.org/wikibase/show.php?id=AcrylicWindows10Configuration) automatically.
+## For previous versions prior to this repository, please see [cretueusebiu/valet-windows](https://github.com/cretueusebiu/valet-windows), of which this is an indirect fork of.
