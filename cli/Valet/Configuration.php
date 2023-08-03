@@ -430,6 +430,10 @@ class Configuration
 	 */
 	public function read(): array
 	{
+		// if file not exist then return empty array so valet setup new config.json file with blank array
+		if (!$this->files->exists($this->path())) {
+			return [];
+		}
 		return json_decode($this->files->get($this->path()), true);
 	}
 
