@@ -430,7 +430,7 @@ class Configuration
 	 */
 	public function read(): array
 	{
-		// if file not exist then return empty array so valet setup new config.json file with blank array
+		// If config.json file doesn't exist, then return empty array so valet can setup a new one.
 		if (!$this->files->exists($this->path())) {
 			return [];
 		}

@@ -257,7 +257,7 @@ $app->command('install [--xdebug]', function ($input, $output, $xdebug) {
 		return;
 	}
 
-	$maxItems = PhpCgiXdebug::installed() ? 6 : 5;
+	$maxItems = $xdebug ? 6 : 5;
 	$progressBar = progressbar($maxItems, "Installing");
 	sleep(1);
 
