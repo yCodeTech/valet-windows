@@ -65,7 +65,7 @@ Then use: <fg=magenta>valet set-ngrok-token [token]</>');
 			array_push($options, "host-header=rewrite");
 		}
 
-		$options = $this->prefixNgrokFlags($options);
+		$options = prefixOptions($options);
 
 		$ngrok = realpath(valetBinPath() . 'ngrok.exe');
 
@@ -75,31 +75,6 @@ Then use: <fg=magenta>valet set-ngrok-token [token]</>');
 		$newCMD = ($debug) ? "" : "start $newCMDtitle";
 
 		$this->cli->passthru("$newCMD $ngrokCommand");
-	}
-
-	/**
-	 * #### Prefix ngrok options/flags
-	 *
-	 * Create a new options array with `--` prefixed to each option
-	 * and implode the array into a single space-delimited string.
-	 *
-	 * @param array $options The ngrok options/flags from valet command.
-	 *
-	 * @return string The new prefixed options as a string
-	 */
-	public function prefixNgrokFlags($options)
-	{
-		return (new Collection($options))->map(function ($value) {
-			// If value contains a = then it's an option/flag,
-			// so prefix it with "--".
-			if (stripos($value, "=")) {
-				return "--$value";
-			}
-			// Otherwise, it's just a normal command or value, so just return it.
-			else {
-				return $value;
-			}
-		})->implode(' ');
 	}
 
 	/**

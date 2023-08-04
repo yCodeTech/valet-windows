@@ -636,13 +636,34 @@ if (is_dir(VALET_HOME_PATH)) {
 	/**
 	 * Run ngrok commands.
 	 *
-	 * @param array $commands The ngrok commands and options/flags (without the `--` prefix and only if it needs a value ie, has `=`),
-	 * eg. `valet ngrok config add-authtoken [token] config=C:/ngrok.yml`
+	 * @param array $commands The ngrok commands plus arguments and values.
+	 * eg. `valet ngrok config add-authtoken [token]`
+	 * @param string|null $options The ngrok options/flags without the leading `--`. Multiple options must be separated by double slashes `//`.
+	 *
+	 * The options `=` is optional:
+	 * - `--options=[option]`
+	 * - `--options [option]`
+	 * - `-o [option]`
+	 *
+	 * Example: `--options=config=C:/ngrok.yml//help` will be ran as `--config=C:/ngrok.yml --help`.
+	 *
+	 * @example `valet ngrok config add-authtoken [token] --options config=C:/ngrok.yml//help`
 	 */
-	// TODO: Use 2 arguments, 1 for ngrok commands, and 1 for ngrok options/flags.
-	$app->command('ngrok [commands]*', function ($commands) {
-		Ngrok::run(Ngrok::prefixNgrokFlags($commands));
-	})->descriptions('Run ngrok commands')->addUsage("ngrok config add-authtoken [token] config=C:/ngrok.yml");
+	$app->command('ngrok [commands]* [-o|--options=]', function ($commands, $options = null) {
+
+		if ($options != null) {
+			$options = Valet\prefixOptions(explode("//", $options));
+		}
+
+		$commands = implode(" ", [implode(" ", $commands), $options]);
+
+		Ngrok::run($commands);
+
+	})->descriptions('Run ngrok commands', [
+				"commands" => "The ngrok command and its arguments and values, separated by spaces.",
+				"--options" => "Specify ngrok options/flags without the leading <fg=green>--</>. Multiple options must be separated by double slashes <fg=green>//</>."
+			])->addUsage("ngrok config add-authtoken [token] --options config=C:/ngrok.yml")->addUsage("ngrok config add-authtoken [token] -o config=C:/ngrok.yml");
+
 
 	/**
 	 * Set the ngrok auth token.

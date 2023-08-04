@@ -384,7 +384,9 @@ Share your local site publically. ngrok will do all the magic for you and give y
 When using the command, a new CMD terminal will be launched with the ngrok information, including the public URL to share.
 
 ###### Note: The URL won't be copied to the clipboard, however, in a separate terminal, you can use the `fetch-share-url` command.
-###### [options]
+
+###### [options](#share-options)
+
 If you need to use the flags of ngrok's `http` command (which `valet share` uses internally), then you can use `options` argument. This is a space-separated array. Pass the option name without the `--` prefix (so Valet doesn't get confused with it's own options); eg. `domain=example.com`. All options/flags will be prefixed with `--` after Valet has processed the command. As with any option, if there's a space in the value you will need to surround the value in quotes.
 
 ```console
@@ -423,18 +425,44 @@ Once sharing a site with `valet share`, you can get the public URL using this co
 ##### ngrok
 
 ```
-ngrok [commands] Run ngrok commands.
+ngrok [commands] Run ngrok commands, arguments, and values.
+      [-o|--options] Specify ngrok options/flags.
 ```
 
 ```
-$ valet ngrok config add-token 123abc config=C:/path/ngrok.yml
+$ valet ngrok config add-authtoken 123abc --options=config=C:/path/ngrok.yml
 ```
 
 Because ngrok CLI has a multitude of commands and options, the `valet ngrok` command is very useful for passing through any and all commands to ngrok.
 
-The `commands` argument is a space-separated array. To use options/flags that need a value just pass the option name without the `--` prefix eg. `config=C:/path/ngrok.yml`. All options/flags that have the `=` will be prefixed with `--` after Valet has processed the command.
+###### [commands](#ngrok-commands)
 
-###### Note: The options will _only_ work if it has the `=`. Any other options currently won't work.
+The `commands` argument is a space-separated array of the commands, arguments, and values.
+
+###### [--options](#ngrok-options)
+
+The `--options` (shortcut `-o`) option can be used to pass options/flags to ngrok. Just pass the option name without the `--` prefix eg. `--options=config=C:/path/ngrok.yml`. All options/flags that are passed will be prefixed with `--` after Valet has processed the command. The command option's `=` is optional:
+
+- `--options=[option]`
+- `--options [option]`
+
+###### Note: Inline with Symfony's docs and to comply with command-line standards, the option shortcut cannot have the `=` character, and Valet will send out an error.
+
+###### From [Symfony's docs](https://symfony.com/doc/current/console/input.html#using-command-options):
+
+> ###### Note that to comply with the docopt standard, long options can specify their values after a whitespace or an `=` sign (e.g. `--iterations 5` or `--iterations=5`), but short options can only use whitespaces or no separation at all (e.g. `-i 5` or `-i5`).
+
+Example of the command with the shortcut option:
+
+```
+$ valet ngrok config add-authtoken 123abc -o config=C:/path/ngrok.yml
+```
+
+It is also possible to pass multiple options to ngrok, just separate them with double slashes `//`.
+
+```
+$ valet ngrok config add-authtoken 123abc -o config=C:/path/ngrok.yml//log=false
+```
 
 ### Other commands
 

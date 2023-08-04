@@ -361,6 +361,16 @@ function valetBinPath()
 	return __DIR__ . '/../../bin/';
 }
 
+/**
+ * #### Prefix options/flags
+ *
+ * Create a new options array with `--` prefixed to each option
+ * and implode the array into a single space-delimited string.
+ *
+ * @param array $options The options/flags.
+ *
+ * @return string The new prefixed options as a string.
+ */
 function prefixOptions($options)
 {
 	return (new \Illuminate\Support\Collection($options))->map(function ($value) {
