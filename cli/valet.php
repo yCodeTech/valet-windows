@@ -595,7 +595,7 @@ if (is_dir(VALET_HOME_PATH)) {
 
 	/**
 	 * Generate a publicly accessible URL for your project.
-	 * @param string $site The site
+	 * @param string $site The site [optional] we automatically use current working directory domain
 	 * @param array $options A space-separated array of options/flags to pass to ngrok.
 	 * ---
 	 * Pass the option name without the `--` prefix (so Valet doesn't get confused with it's own options); eg. `domain=example.com`.
@@ -608,7 +608,7 @@ if (is_dir(VALET_HOME_PATH)) {
 	 * @param bool $debug Allow debug error output
 	 */
 	$app->command(
-		'share [site] [options]* [--debug]',
+		'share [-s|--site=] [options]* [--debug]',
 		function ($site = null, $options = [], $debug) {
 
 			$url = ($site ?: strtolower(Site::host(getcwd()))) . '.' . Configuration::read()['tld'];
