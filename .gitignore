@@ -10,3 +10,4 @@ bin/acrylic/AcrylicHosts.txt
 .vscode
 composer.lock
 logo assets
+/.idea
