@@ -370,27 +370,39 @@ $ valet parked
 ##### share
 
 ```
-share [site]    Generate a publicly accessible URL for the specified project.
-      [options] A space-separated array of options/flags to pass to ngrok.
-      [--debug] Output error messages to the current terminal.
+share [site]         Optionally, specify a site. Otherwise the default is the current working directory.
+      [-o|--options] Specify ngrok options/flags.
+      [--debug]      Output error messages to the current terminal.
 ```
 
 ```console
 $ valet share site1
+
+/d/sites/site1
+$ valet share
 ```
 
 Share your local site publically. ngrok will do all the magic for you and give you a publically accessible URL to share to clients or team members.
 
 When using the command, a new CMD terminal will be launched with the ngrok information, including the public URL to share.
 
-###### Note: The URL won't be copied to the clipboard, however, in a separate terminal, you can use the `fetch-share-url` command.
+###### Note: The URL won't be copied to the clipboard, however, in a separate terminal, you can use the [`fetch-share-url` command](#fetch-share-url).
 
-###### [options](#share-options)
+###### [-o | --options](#share-options)
 
-If you need to use the flags of ngrok's `http` command (which `valet share` uses internally), then you can use `options` argument. This is a space-separated array. Pass the option name without the `--` prefix (so Valet doesn't get confused with it's own options); eg. `domain=example.com`. All options/flags will be prefixed with `--` after Valet has processed the command. As with any option, if there's a space in the value you will need to surround the value in quotes.
+If you need to use the flags of ngrok's `http` command (which `valet share` uses internally), then you can use the `--options` option (shortcut `-o`).
+
+Pass the option name without the `--` prefix (so Valet doesn't get confused with it's own options); eg. `--options domain=example.com`. All options/flags will be prefixed with `--` after Valet has processed the command.
+
+As with any option, if there's a space in the value you will need to surround the value in quotes.
+
+It is also possible to pass multiple options to ngrok, just separate them with double slashes `//`.
 
 ```console
-$ valet share site1 domain=example.com region=eu request-header-remove="header to remove"
+$ valet share site1 --options domain=example.com//region=eu//request-header-remove="header to remove"
+
+/d/sites/site1
+$ valet share -o domain=example.com
 ```
 
 ###### Note: If you're already sharing a project, and try to share another project simultaneously, the new cmd window may open for a split second and then close. This is due to ngrok failing silently, and won't output any error messages. To output the errors, pass the `--debug` flag to the command. This will cause ngrok to try to run in the current terminal instead of a new window, thus sending the error messages.
@@ -439,7 +451,7 @@ Because ngrok CLI has a multitude of commands and options, the `valet ngrok` com
 
 The `commands` argument is a space-separated array of the commands, arguments, and values.
 
-###### [--options](#ngrok-options)
+###### [-o | --options](#ngrok-options)
 
 The `--options` (shortcut `-o`) option can be used to pass options/flags to ngrok. Just pass the option name without the `--` prefix eg. `--options=config=C:/path/ngrok.yml`. All options/flags that are passed will be prefixed with `--` after Valet has processed the command. The command option's `=` is optional:
 

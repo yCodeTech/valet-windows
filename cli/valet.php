@@ -21,6 +21,7 @@ use function Valet\output;
 use function Valet\table;
 use function Valet\default_table_headers;
 use function Valet\warning;
+use function Valet\error;
 use function Valet\progressbar;
 
 /**
@@ -594,28 +595,49 @@ if (is_dir(VALET_HOME_PATH)) {
 	})->descriptions('Open the site for the current (or specified) directory in your browser');
 
 	/**
-	 * Generate a publicly accessible URL for your project.
-	 * @param string $site The site
-	 * @param array $options A space-separated array of options/flags to pass to ngrok.
+	 * Share a local site with a publically accessible URL.
+	 *
+	 * @param string $site Optionally, specify a site. Otherwise the default is the current working directory.
+	 *
+	 * @param string|null $options The options/flags of ngrok's `http` command to pass to ngrok.
 	 * ---
-	 * Pass the option name without the `--` prefix (so Valet doesn't get confused with it's own options); eg. `domain=example.com`.
+	 *  Pass the option name without the `--` prefix (so Valet doesn't get confused with it's own options); eg. `--options domain=example.com`.
 	 * If there's a space in the value you will need to surround the value in quotes.
 	 * All options will be prefixed with `--` after Valet has processed the command.
 	 * If the `host-header` option is not set, Valet will add it with the default of `rewrite`.
+	 * Multiple options must be separated by double slashes `//`.
 	 * ---
-	 * `valet share mysite domain=example.com region=eu request-header-remove="blah blah"`
+	 *
+	 * The options `=` is optional:
+	 * - `--options=[option]`
+	 * - `--options [option]`
+	 * - `-o [option]`
+	 * ---
+	 * `valet share mysite --options domain=example.com//region=eu//request-header-remove="blah blah"`
 	 *
 	 * @param bool $debug Allow debug error output
 	 */
 	$app->command(
-		'share [site] [options]* [--debug]',
-		function ($site = null, $options = [], $debug) {
+		'share [site] [-o|--options=] [--debug]',
+		function ($input, $site = null, $options = null, $debug) {
+
+			// Send an error if the option shortcut has a =
+			if (str_contains($input, "-o=")) {
+				return error("Option shortcuts cannot have a <bg=magenta> = </> immediately after them.\nPlease use a space to separate it from the value: <bg=magenta> valet share $site -o " . preg_replace("/=/", "", $options, 1) . " </>");
+			}
 
 			$url = ($site ?: strtolower(Site::host(getcwd()))) . '.' . Configuration::read()['tld'];
 
+			if ($options != null) {
+				$options = explode("//", $options);
+			}
+
 			Ngrok::start($url, Site::port($url), $debug, $options);
 		}
-	)->descriptions('Generate a publicly accessible URL for your project')->addUsage("share mySite domain=example.com region=eu");
+	)->descriptions('Share a local site with a publically accessible URL', [
+				"site" => "Optionally, the site name, otherwise the default is the current working directory.",
+				"--options" => "Specify ngrok options/flags without the leading <fg=green>--</>. Multiple options must be separated by double slashes <fg=green>//</>."
+			])->addUsage("share mysite --options domain=example.com//region=eu")->addUsage("share -o domain=example.com");
 
 	// TODO: Share-tool for Expose (https://expose.dev/)
 	// and 2 open-source clients like localtunnel (https://github.com/localtunnel/localtunnel)
@@ -649,7 +671,12 @@ if (is_dir(VALET_HOME_PATH)) {
 	 *
 	 * @example `valet ngrok config add-authtoken [token] --options config=C:/ngrok.yml//help`
 	 */
-	$app->command('ngrok [commands]* [-o|--options=]', function ($commands, $options = null) {
+	$app->command('ngrok [commands]* [-o|--options=]', function ($input, $commands, $options = null) {
+
+		// Send an error if the option shortcut has a =
+		if (str_contains($input, "-o=")) {
+			return error("Option shortcuts cannot have a <bg=magenta> = </> immediately after them.\nPlease use a space to separate it from the value: <bg=magenta> valet ngrok " . implode(" ", $commands) . " -o " . preg_replace("/=/", "", $options, 1) . " </>");
+		}
 
 		if ($options != null) {
 			$options = Valet\prefixOptions(explode("//", $options));
