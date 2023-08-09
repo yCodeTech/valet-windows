@@ -57,6 +57,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `sites` command to list all sites in parked, links and proxies.
 - Added `set-ngrok-token` to set ngrok authtoken.
 - Added `--debug` option to the `share` command to prevent the opening of a new CMD window, and allow error messages to be displayed from ngrok for easier debugging. This is needed because ngrok may fail silently by opening a new CMD window and quickly closes it if it encounters an error, so no errors are outputted.
+- Added an `--options` option to the `share` command to pass any ngrok options/flags for the ngrok `http` command, which Valet will pass through to ngrok. See the [docs](https://github.com/yCodeTech/valet-windows/blob/master/README.md#share---options) for information on how this works.
 - Added `sudo` command and [gsudo](https://github.com/gerardog/gsudo) files. The new command is to `passthru` Valet commands to the commandline that need elevated privileges by using gsudo. gsudo is a `sudo` equivalent for Windows, it requires only 1 UAC popup to enable the elevation and then all commands will be executed as the system instead of having multiple UACs opening.
 - Added `valetBinPath` helper function to find the Valet bin path, and updated all the code to use it.
 - Added a check to see if a site is isolated before unisolating it.
@@ -108,7 +109,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed the deprecated `getLinks` function in the `Site.php` file.
 - Removed the deprecated and unnecessary `publishParkedNginxConf`, `runOrDie`, `should_be_sudo`, `quietly`, `quietlyAsUser` functions.
 - Removed the unsupported `trust` command.
-- Removed the hardcoded ngrok options from the `share` command and added an `options` array argument instead, so you can just pass in any ngrok command and Valet will pass it through to ngrok. See the [docs](https://github.com/yCodeTech/valet-windows/blob/master/README.md#options) for information on how this works.
+- Removed the hardcoded ngrok options from the `share` command in favour of the new `--options` option.
 - Removed the `echo` from the `trustCa` function that was in the PR code from https://github.com/cretueusebiu/valet-windows/pull/179
 - Removed various outputs to fully streamline the progressbar UI and prevent multiple progressbars in the output because of multiple infos interrupting it.
 
