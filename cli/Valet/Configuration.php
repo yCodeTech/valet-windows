@@ -231,7 +231,7 @@ class Configuration
 		})->first();
 
 		if (empty($php)) {
-			error("Cannot find PHP $phpVersion in the list.\nPlease make sure PHP $phpVersion is added to Valet with `valet php:add`", true);
+			error("Cannot find PHP $phpVersion in the list.\nPlease make sure PHP $phpVersion is added to Valet with <bg=magenta> valet php:add </>", true);
 		}
 
 		return $php;
@@ -284,13 +284,13 @@ class Configuration
 		// don't want to overwrite existing config as there might be phpcgi service running for it
 		// forcing user to run uninstall to stop services and remove entry
 		if (in_array($phpPath, $existingPaths)) {
-			warning("\nPHP path {$phpPath} already added to valet");
+			warning("\nPHP path {$phpPath} already added to Valet");
 
 			return null;
 		}
 
 		if (isset($config['php'][$phpVersion])) {
-			warning("\nPHP version {$phpVersion} already added to valet from this path {$phpPath}");
+			warning("\nPHP version {$phpVersion} already added to Valet from this path {$phpPath}");
 
 			return null;
 		}
@@ -394,7 +394,7 @@ class Configuration
 	public function removePath(string $path)
 	{
 		if ($path == $this->valetHomePath('Sites')) {
-			info("Cannot remove this directory because this is where Valet stores its site definitions.\nRun [valet paths] for a list of parked paths.");
+			info("Cannot remove this directory because this is where Valet stores its site definitions.\nRun <bg=magenta> valet paths </> for a list of parked paths.");
 			exit();
 		}
 
@@ -430,7 +430,7 @@ class Configuration
 	 */
 	public function read(): array
 	{
-		// If config.json file doesn't exist, then return empty array so valet can setup a new one.
+		// If config.json file doesn't exist, then return empty array so Valet can setup a new one.
 		if (!$this->files->exists($this->path())) {
 			return [];
 		}

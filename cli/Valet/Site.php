@@ -401,8 +401,8 @@ class Site
 		}
 
 
-		// If a site has an SSL/TLS certificate, we need to keep its custom config file, but we can
-		// just re-generate it without defining a custom `valet.sock` file
+		// If a site has an SSL/TLS certificate, we need to keep its custom config file,
+		// but we can just re-generate it.
 		if ($this->files->exists($this->certificatesPath($site, 'crt'))) {
 			$siteConf = $this->buildSecureNginxServer($site);
 			$this->files->putAsUser($this->nginxPath($site), $siteConf);
@@ -589,8 +589,9 @@ class Site
 			->where('secured', 'X');
 
 		if ($secured->count() === 0) {
-
-			return info("No sites to unsecure. You may list all servable sites or links by running <comment>valet parked</comment> or <comment>valet links</comment>.");
+			info("No sites to unsecure. You may list all servable sites or links by running <bg=magenta> valet parked </> or <bg=magenta> valet links </>.");
+			// Prevents further scripts from running, but without sending out an error exception.
+			exit();
 		}
 
 		info('Attempting to unsecure the following sites:');

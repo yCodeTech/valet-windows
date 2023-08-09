@@ -388,7 +388,7 @@ When using the command, a new CMD terminal will be launched with the ngrok infor
 
 ###### Note: The URL won't be copied to the clipboard, however, in a separate terminal, you can use the [`fetch-share-url` command](#fetch-share-url).
 
-###### [-o | --options](#share-options)
+###### share --options
 
 If you need to use the flags of ngrok's `http` command (which `valet share` uses internally), then you can use the `--options` option (shortcut `-o`).
 
@@ -537,7 +537,7 @@ For other commands that have not changed, please refer to the official documenta
 - When sharing sites the url will not be copied to the clipboard.
 - ~~You must run the `valet` commands from the drive where Valet is installed, except for park and link. See [#12](https://github.com/cretueusebiu/valet-windows/issues/12#issuecomment-283111834).~~ All commands seem to work fine on all drives.
 - If your machine is not connected to the internet you'll have to manually add the domains in your `hosts` file or you can install the [Microsoft Loopback Adapter](https://docs.microsoft.com/en-us/troubleshoot/windows-server/networking/install-microsoft-loopback-adapter) as this simulates an active local network interface that Valet can bind too.
-- When trying to run valet on PHP 7.4 and you get this error:
+- When trying to run Valet on PHP 7.4 and you get this error:
 
   > Composer detected issues in your platform:
   >
@@ -547,7 +547,7 @@ For other commands that have not changed, please refer to the official documenta
 
   It means that a dependency of Valet's dependencies requires 8.1. You can rectify this error by running `composer global update` while on 7.4, and composer will downgrade any global dependencies to versions that will work on 7.4. See this [Stack Overflow answer](https://stackoverflow.com/a/75080139/2358222).
 
-  NOTE #1: This will of course downgrade all global packages. Depending on the packages, it may break some things. If you just want to downgrade valet dependencies, then you can specify the valet namespace. `composer global update ycodetech/valet-windows`.
+  NOTE #1: This will of course downgrade all global packages. Depending on the packages, it may break some things. If you just want to downgrade valet dependencies, then you can specify the Valet namespace. `composer global update ycodetech/valet-windows`.
 
   NOTE #2: It's recommended to use PHP 8.1 anyway, downgrading will mean some things may break or cause visual glitches in the terminal output. So downgrade at your own risk.
 
