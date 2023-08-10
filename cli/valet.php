@@ -362,7 +362,7 @@ if (is_dir(VALET_HOME_PATH)) {
 	/**
 	 * Remove the current working directory from the paths configuration.
 	 */
-	$app->command('forget [path]', function ($path = null) {
+	$app->command('unpark|forget [path]', function ($path = null) {
 		Configuration::removePath($path ?: getcwd());
 
 		info(($path === null ? 'This' : "The [{$path}]") . " directory has been removed from Valet's paths.");
