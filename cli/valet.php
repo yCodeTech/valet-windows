@@ -721,7 +721,7 @@ if (is_dir(VALET_HOME_PATH)) {
 	 * @param string $token Your personal ngrok authtoken
 	 * @return void
 	 */
-	$app->command('set-ngrok-token [token]', function ($token = null) {
+	$app->command('auth|set-ngrok-token [token]', function ($token = null) {
 		if ($token === null) {
 			warning("Please provide your ngrok authtoken.");
 			return;
@@ -783,7 +783,7 @@ if (is_dir(VALET_HOME_PATH)) {
 	 * Get the public URL of the site that is currently being shared.
 	 * @param string|null $site The site. If omitted, Valet will use the current working directory.
 	 */
-	$app->command('fetch-share-url [site]', function ($site = null) {
+	$app->command('url|fetch-share-url [site]', function ($site = null) {
 		$site = $site ?: Site::host(getcwd()) . '.' . Configuration::read()['tld'];
 
 		$url = Ngrok::currentTunnelUrl($site);
@@ -962,12 +962,12 @@ if (is_dir(VALET_HOME_PATH)) {
 	/**
 	 * Determine if this is the latest release of Valet.
 	 */
-	$app->command('on-latest-version', function () use ($version) {
+	$app->command('latest|on-latest-version', function () use ($version) {
 		if (Valet::onLatestVersion($version)) {
 			info('Yes');
 		} else {
 			warning(sprintf('Your version of Valet Windows (%s) is not the latest version available.', $version));
-			output("You can use <fg=cyan>composer global update</> to update to the latest release.\nPlease read the documentation and the Changelog for information on possible breaking changes.");
+			output("You can use <fg=cyan>composer global update</> to update to the latest release (after uninstalling Valet first).\nPlease read the documentation and the Changelog for information on possible breaking changes.");
 		}
 	})->descriptions('Determine if this is the latest version of Valet');
 

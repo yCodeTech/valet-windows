@@ -410,11 +410,14 @@ $ valet share -o domain=example.com
 ##### set-ngrok-token
 
 ```
-set-ngrok-token [authtoken] Set the ngrok authtoken.
+auth | set-ngrok-token [authtoken] Set the ngrok authtoken.
 ```
+
+<small>`auth` is a command alias.</small>
 
 ```console
 $ valet set-ngrok-token 123abc
+$ valet auth 123abc
 Authtoken saved to configuration file: C:/Users/Username/.config/valet/ngrok/ngrok.yml
 ```
 
@@ -423,11 +426,14 @@ Before sharing a site with ngrok, you must first set the authtoken, which can be
 ##### fetch-share-url
 
 ```
-fetch-share-url [site] Get the public URL of the site that is currently being shared.
+url | fetch-share-url [site] Get the public URL of the site that is currently being shared.
 ```
+
+<small>`url` is a command alias.</small>
 
 ```console
 $ valet fetch-share-url site1
+$ valet url site1
 The public URL for site1 is [ngrok public URL]
 It has been copied to your clipboard.
 ```
@@ -512,6 +518,22 @@ The [site1.test] site has been secured with a fresh TLS certificate.
 
 ###### Note: If you use VS Code integrated terminal, the secure command (or secure option in on other commands) won't work and will need to be ran in a standalone terminal with admin privileges.
 
+##### on-latest-version
+
+```
+latest | on-latest-version
+```
+
+<small>`latest` is a command alias.</small>
+
+```console
+$ valet on-latest-version
+$ valet latest
+Yes
+```
+
+Determine whether the installed version of Valet is the latest.
+
 ### Commands not supported
 
 `valet loopback`
@@ -547,9 +569,11 @@ For other commands that have not changed, please refer to the official documenta
 
   It means that a dependency of Valet's dependencies requires 8.1. You can rectify this error by running `composer global update` while on 7.4, and composer will downgrade any global dependencies to versions that will work on 7.4. See this [Stack Overflow answer](https://stackoverflow.com/a/75080139/2358222).
 
-  NOTE #1: This will of course downgrade all global packages. Depending on the packages, it may break some things. If you just want to downgrade valet dependencies, then you can specify the Valet namespace. `composer global update ycodetech/valet-windows`.
+  ###### NOTE #1: This will of course downgrade all global packages. Depending on the packages, it may break some things. If you just want to downgrade valet dependencies, then you can specify the Valet namespace. `composer global update ycodetech/valet-windows`.
 
-  NOTE #2: It's recommended to use PHP 8.1 anyway, downgrading will mean some things may break or cause visual glitches in the terminal output. So downgrade at your own risk.
+  ###### NOTE #2: It's recommended to use PHP 8.1 anyway, downgrading will mean some things may break or cause visual glitches in the terminal output. So downgrade at your own risk.
+
+  ###### Note #3: Make sure you uninstall Valet before `composer global update`, to make sure all services have been stopped and uninstalled before composer removes and updates them.
 
 - If you're using a framework that uses a .env file and sets the domain name, such as `WP_HOME` for Laravel Bedrock, then make sure the TLD is the same as the one set for Valet. Otherwise, when trying to reach a site, the site will auto redirect to use the TLD in set in the .env.
 
