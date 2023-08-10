@@ -412,7 +412,11 @@ if (is_dir(VALET_HOME_PATH)) {
 	/**
 	 * Unlink a link from the Valet links directory.
 	 */
-	$app->command('unlink name', function ($name) {
+	$app->command('unlink [name]', function ($name) {
+
+		if (!$name) {
+			$name = Site::getLinkNameByCurrentDir();
+		}
 
 		if (Site::isIsolated($name) === true) {
 			Site::unisolate($name);

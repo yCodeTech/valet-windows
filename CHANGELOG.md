@@ -69,6 +69,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Changed package namespace to `yCodeTech`.
+- Changed capitalisation from `valet` to `Valet` in various outputs and code comments where the don't refer to the commands.
 - Changed the output table to vertical for easier reading on those longer columns, with an optional argument to draw the table horizonally.
 - Renamed the `usePhp` function to `isolate` in `Site.php` file to reflect it's command name.
 - Updated ngrok to the latest version of 3.3.1
@@ -80,7 +81,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changed the name of the `starts_with` and `ends_with` helper functions to `str_starts_with` and `str_ends_with` respectively to reflect the PHP 8+ functions.
 - Updated various output texts.
 - Changed the way the `secure` command was getting the current working directory to use the `getSiteURL` function instead.
-- Changed `name` argument to be required in the `unlink` command.
 - Changed various `warning`s to `error`s.
 - Changed `domain` text and variables to `site` to properly reference the `site`.
 - Changed text to use the proper capitalisation of `Xdebug`.
@@ -147,5 +147,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Potentially fixed a bug where an unsecured site is fetching a secured site's SSL/TLS certificate and uses https, where browsers declare the site unsafe because of the wrong certificate. Something to do with the PHP code replacing the server port with the php port. Commented out the `preg_replace` of the `replacePhpVersionInSiteConf` function. Further tests needed before removal.
 - Fixed an oversight while changing the TLD by allowing isolated sites TLD to be changed. Previously, if there is an isolated site, changing the TLD wouldn't change the isolated site's conf file, thus leaving it as the old TLD. This fix adds a `reisolateForNewTld` function to unisolate the old TLD site and reisolate the new TLD site. Also works for sites that are both isolated and secured.
+
+- Fixed `unlink` command to properly get the site from the current working directory if no `name` was supplied, by using the previously `private`, now `public` `getLinkNameByCurrentDir()` function. Also changed the error message in the latter function to include the multiple linked names.
 
 ## For previous versions prior to this repository, please see [cretueusebiu/valet-windows](https://github.com/cretueusebiu/valet-windows), of which this is an indirect fork of.

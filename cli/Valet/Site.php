@@ -51,7 +51,7 @@ class Site
 	 *
 	 * @return null|string
 	 */
-	private function getLinkNameByCurrentDir()
+	public function getLinkNameByCurrentDir()
 	{
 		$count = count($links = $this->links()->where('path', getcwd()));
 
@@ -60,7 +60,7 @@ class Site
 		}
 
 		if ($count > 1) {
-			throw new DomainException("There are {$count} links related to the current directory, please specify the name: valet unlink <name>.");
+			throw new DomainException("There are {$count} links ({$links->implode("site", ", ")}) related to the current working directory, you will need to specify which site to unlink, eg. valet unlink [name].");
 		}
 	}
 
