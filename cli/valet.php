@@ -111,7 +111,7 @@ $app->command('install [--xdebug]', function ($input, $output, $xdebug) {
  * A sudo-like command to use Valet commands with elevated privileges
  * that only require 1 User Account Control popup.
  *
- * @param array|null $valetCommand The Valet command plus arguments and values
+ * @param array|null $valetCommand The Valet command plus the argument values. A string array separated by spaces.
  * @param string|null $valetOptions The Valet options without the leading `--`. Multiple options must be separated by double slashes `//`.
  * Example: `--valetOptions=isolate//secure` will be ran as `--isolate --secure`.
  *
@@ -124,6 +124,10 @@ $app->command('sudo valetCommand* [-o|--valetOptions=]', function ($valetCommand
 	$valetCommand = implode(" ", $valetCommand);
 
 	$valetCommand = str_starts_with($valetCommand, 'valet') ? $valetCommand : "valet $valetCommand";
+
+	if (str_contains($valetCommand, 'sudo')) {
+		return error("You can not sudo the sudo command.");
+	}
 
 	if ($valetOptions != null) {
 		$valetOptions = Valet\prefixOptions(explode("//", $valetOptions));
