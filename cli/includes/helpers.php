@@ -374,6 +374,12 @@ function valetBinPath()
 function prefixOptions($options)
 {
 	return (new \Illuminate\Support\Collection($options))->map(function ($value) {
+		// If value has length of 1, ie. has 1 character, then its a shortcut option,
+		// so apply the single "-".
+		if (strlen($value) === 1) {
+			return "-$value";
+		}
+
 		// Prefix the option with "--".
 		return "--$value";
 	})->implode(' ');
