@@ -47,14 +47,14 @@ if (is_dir(VALET_HOME_PATH)) {
 	Site::pruneLinks();
 }
 
-// TODO: Check all descriptions and add descriptions for the args and options.
+// TODO [$64d587e2bcdbe5000925345e]: Check all descriptions and add descriptions for the args and options.
 
 /**
  * Install Valet and any required services.
  */
 $app->command('install [--xdebug]', function ($input, $output, $xdebug) {
 
-	// TODO: Deprecate this question in version 3.0.3 and remove in 3.0.4
+	// TODO [$64d587e2bcdbe5000925345f]: Deprecate this question in version 3.0.3 and remove in 3.0.4
 	$helper = $this->getHelperSet()->get('question');
 	$question = new ConfirmationQuestion("<fg=red>Have you fully uninstalled the outdated cretueusebiu/valet-windows? yes/no</>\n", false);
 
@@ -780,7 +780,7 @@ if (is_dir(VALET_HOME_PATH)) {
 				"--options" => "Specify ngrok options/flags without the leading <fg=green>--</>. Multiple options must be separated by double slashes <fg=green>//</>."
 			])->addUsage("share mysite --options domain=example.com//region=eu")->addUsage("share -o domain=example.com");
 
-	// TODO: Share-tool for Expose (https://expose.dev/)
+	// TODO [$64d587e2bcdbe50009253460]: Share-tool for Expose (https://expose.dev/)
 	// and 2 open-source clients like localtunnel (https://github.com/localtunnel/localtunnel)
 
 	/**
