@@ -26,63 +26,114 @@
 <table>
   <tr>
     <th>Commands Section</th>
+    <td ><a href="#installinguninstalling--startingstopping">Installing/Uninstalling & Starting/Stopping</a></td>
     <td ><a href="#php-services">PHP Services</a></td>
-    <td align="center"><a href="#using-php-versions">Using PHP Versions</a></td>
-    <td align="center"><a href="#parked-and-linked">Parked and Linked</a></td>
+    <td align="center"><a href="#using-php-versions">Multi-PHP Versions and Securing</a></td>
+    <td align="center"><a href="#parked-and-linked">Parked, Linked, Proxies and Sites</a></td>
     <td align="center"><a href="#sharing">Sharing</a></td>
     <td align="center"><a href="#other-commands">Other Commands</a></td>
   </tr>
   <tr>
     <th>Command</th>
+    <td><a href="#install">install</a></td>
     <td><a href="#phpadd">php:add</a></td>
     <td align="center"><a href="#use">use</a></td>
-    <td align="center"><a href="#link">link</a></td>
+    <td align="center"><a href="#park">park</a></td>
 		<td align="center"><a href="#share">share</a></td>
-    <td align="center"><a href="#services">services</a></td>
+		<td align="center"><a href="#tld">tld</a></td>
   </tr>
+
   <tr>
   <th></th>
+    <td><a href="#sudo">sudo</a></td>
     <td><a href="#phpremove">php:remove</a></td>
     <td align="center"><a href="#isolate">isolate</a></td>
-    <td align="center"><a href="#unlink">unlink</a></td>
-    <td align="center"><a href="#set-ngrok-token">set-ngrok-token</a></td>
-    <td align="center"><a href="#secure">secure</a></td>
-  </tr>
-  <tr>
-  <th></th>
-    <td><a href="#phplist">php:list</a></td>
-    <td align="center"><a href="#unisolate">unisolate</a></td>
-    <td align="center"><a href="#links">links</a></td>
-    <td align="center"><a href="#fetch-share-url">fetch-share-url</a></td>
-    <td></td>
-
-  </tr>
-  <tr>
-  <th></th>
-    <td><a href="#phpwhich">php:which</a></td>
-    <td align="center"><a href="#isolated">isolated</a></td>
     <td align="center"><a href="#parked">parked</a></td>
+    <td align="center"><a href="#authset-ngrok-token">auth|set-ngrok-token</a></td>
+    <td align="center"><a href="#which">which</a></td>
+  </tr>
+
+  <tr>
+  <th></th>
+    <td><a href="#start">start</a></td>
+    <td><a href="#phplist">php:list</a></td>
+    <td align="center"><a href="#isolated">isolated</a></td>
+    <td align="center"><a href="#unparkforget">unpark|forget</a></td>
+    <td align="center"><a href="#urlfetch-share-url">url|fetch-share-url</a></td>
+    <td align="center"><a href="#paths">paths</a></td>
+
+  </tr>
+  <tr>
+  <th></th>
+    <td><a href="#restart">restart</a></td>
+    <td><a href="#phpwhich">php:which</a></td>
+    <td align="center"><a href="#unisolate">unisolate</a></td>
+    <td align="center"><a href="#link">link</a></td>
     <td align="center"><a href="#ngrok">ngrok</a></td>
-		<td></td>
+		<td align="center"><a href="#open">open</a></td>
 
   </tr>
   <tr>
   <th></th>
+    <td><a href="#stop">stop</a></td>
     <td><a href="#phpinstall">php:install</a></td>
+		<td align="center"><a href="#secure">secure</a></td>
+		<td align="center"><a href="#links">links</a></td>
     <td></td>
-    <td></td>
-    <td></td>
-		<td></td>
+		<td align="center"><a href="#lateston-latest-version">latest|on-latest-version</a></td>
 
   </tr>
+
   <tr>
   <th></th>
+    <td><a href="#uninstall">uninstall</a></td>
     <td><a href="#phpuninstall">php:uninstall</a></td>
+		<td align="center"><a href="#secured">secured</a></td>
+		<td align="center"><a href="#unlink">unlink</a></td>
+		<td></td>
+		<td align="center"><a href="#log">log</a></td>
+
+  </tr>
+
+  <tr>
+  <th></th>
+    <td></td>
+    <td><a href="#xdebuginstall">xdebug:install</a></td>
+		<td align="center"><a href="#unsecure">unsecure</a></td>
+		<td align="center"><a href="#proxy">proxy</a></td>
+    <td></td>
+    <td align="center"><a href="#services">services</a></td>
+
+  </tr>
+
+  <tr>
+  <th></th>
+    <td></td>
+    <td><a href="#xdebuguninstall">xdebug:uninstall</a></td>
+    <td></td>
+		<td align="center"><a href="#proxies">proxies</a></td>
+    <td></td>
+		<td align="center"><a href="#directory-listing">directory-listing</a></td>
+  </tr>
+
+  <tr>
+  <th></th>
     <td></td>
     <td></td>
+    <td></td>
+		<td align="center"><a href="#unproxy">unproxy</a></td>
+    <td></td>
+		<td align="center"><a href="#diagnose">diagnose</a></td>
+  </tr>
+
+  <tr>
+  <th></th>
+    <td></td>
+    <td></td>
+    <td></td>
+		<td align="center"><a href="#sites">sites</a></td>
     <td></td>
 		<td></td>
-
   </tr>
 </table>
 
@@ -90,11 +141,17 @@
 
 Valet is a Laravel development environment for Windows. No Vagrant, no `/etc/hosts` file. You can even share your sites publicly using local tunnels. _Yeah, we like it too._
 
-Laravel Valet configures your Windows to always run Nginx in the background when your machine starts. Then, using [Acrylic DNS](http://mayakron.altervista.org/wikibase/show.php?id=AcrylicHome), Valet proxies all requests on the `*.test` domain to point to sites installed on your local machine.
+Laravel Valet configures your Windows to always run Nginx in the background when your machine starts. Then, using [Acrylic DNS](http://mayakron.altervista.org/wikibase/show.php?id=AcrylicHome), Valet proxies all requests on the `*.test` domain (aka tld) to point to sites installed on your local machine.
+
+This is 3.0 of Valet Windows, branded under the name _Laravel Valet Windows 3_, and is a much needed updated fork of <a href="https://github.com/cretueusebiu/valet-windows">cretueusebiu/valet-windows</a>. It introduces lots of improvements, new commands, and hopes to achieve as much parity as possible with the original Mac version.
 
 ## Documentation
 
-Before installation, make sure that no other programs such as Apache or Nginx are binding to your local machine's port 80. <br> Also make sure to open your preferred terminal (Windows Terminal, CMD, Git Bash, PowerShell, etc.) as Administrator. You can use VS Code integrated terminal, but if VS Code isn't opened as Administrator, then a bunch of administrator pop ups will appear in order to give access to Valet.
+Before installation, make sure that no other programs such as Apache or Nginx are binding to your local machine's port 80. If XAMPP or similar is installed make sure they don't have Windows services installed and change their ports.
+
+Also make sure to open your preferred terminal (Windows Terminal, CMD, Git Bash, PowerShell, etc.) as Administrator. You can use VS Code integrated terminal, but if VS Code isn't opened as Administrator, then a bunch of User Account Control (UAC) pop ups will appear in order to give access to Valet. You can also use a non Administrator terminal without the popups, you'll just need to use Valet's [`sudo`](#sudo) command before any other Valet commands.
+
+---
 
 - If you don't have PHP installed, open PowerShell (3.0+) as Administrator and run:
 
@@ -111,17 +168,174 @@ Before installation, make sure that no other programs such as Apache or Nginx ar
 
   This script will download and install PHP for you and add it to your environment path variable. PowerShell is only required for this step.
 
-- If you don't have Composer installed, make sure to [install](https://getcomposer.org/Composer-Setup.exe) it.
+- If you don't have Composer installed, make sure to [install](https://getcomposer.org/doc/00-intro.md#installation-windows) it.
 
 - Install Valet with Composer via `composer global require ycodetech/valet-windows`.
 
-- Run the `valet install` command. This will configure and install Valet and register Valet's daemon to launch when your system starts. Once installed, run `valet start` command to start the daemon.
+  <p align="center"><img src="./composer_laravel_valet_windows_3_logo.svg" style="width:400px; background: none;"></p>
 
-- If you're installing on Windows 10/11, you may need to [manually configure](https://mayakron.altervista.org/support/acrylic/Windows10Configuration.htm) Windows to use the Acrylic DNS proxy.
+  > **Warning** **If you're coming from <a href="https://github.com/cretueusebiu/valet-windows">cretueusebiu/valet-windows</a>, then you need to make sure to fully uninstall it from your computer, deleting all configs, and removing from composer with `composer global remove cretueusebiu/valet-windows`, before installing this 3.0 version.**
+
+- Install Valet by running the `valet install` command, or alternatively `valet sudo install` with administrator elevation. This will configure and install Valet and register Valet's daemon to launch when your system starts. Once installed, Valet will automatically start it's services.
+
+- If you're installing on Windows 10/11, you may need to [manually configure](https://mayakron.altervista.org/support/acrylic/Windows10Configuration.htm) Windows to use the [Acrylic DNS Proxy](https://mayakron.altervista.org/support/acrylic/Home.htm).
 
 Valet will automatically start its daemon each time your machine boots. There is no need to run `valet start` or `valet install` ever again once the initial Valet installation is complete.
 
 ## Commands
+
+### Installing/Uninstalling & Starting/Stopping
+
+##### install
+
+```
+install            Install Valet's services and configs
+        [--xdebug] Optionally, install Xdebug for PHP.
+```
+
+This installs all Valet services:
+
+- Nginx
+- PHP CGI
+- PHP Xdebug CGI [optional]
+- Acrylic DNS
+- Ansicon
+
+And it's configs in `C:\Users\Username\.config\valet`.
+
+Once complete, Valet will automatically start the services.
+
+```console
+$ valet install
+Valet installed and started successfully!
+```
+
+###### Note: If `install` is ran again when it's already installed, Valet will ask if you want to proceed to reinstall.
+
+##### sudo
+
+```
+sudo [valetCommand]      A sudo-like command to use Valet commands with elevated privileges.
+     [-o|--valetOptions] Specify Valet command options/flags.
+```
+
+```console
+$ valet sudo install
+```
+
+`sudo` is a Windows equivalent of the Mac command utilty of the same name, provided by [gsudo](https://github.com/gerardog/gsudo). The command allows you to pass through Valet commands to gsudo, gsudo will then elevate the command to use the highest system administrator privileges, without the need for multiple User Account Control (UAC) popups...
+
+gsudo only requires 1 UAC popup to enable elevation (per usage), and then the passed Valet command, it's arguments, values and options will be executed as the system with no further UACs.
+
+###### valetCommand
+
+`valetCommand` is the Valet command, plus it's arguments values that you wish to run. It is a string array separated by spaces.
+
+```console
+$ valet sudo isolate 7.4
+```
+
+In the example above, `isolate` is the command name and `7.4` is the argument value.
+
+When specifying the Valet command, you can pass the `valet` CLI keyword before the command as you would normally, but this is optional. If it's omitted, Valet will add it automatically. It's preferred to omit the keyword as it's cleaner.
+
+```
+$ valet sudo valet isolate 7.4
+```
+
+###### --valetOptions
+
+`--valetOptions` (shortcut `-o`) [optional] is the Valet options/flags for a Valet command. It is a string, but multiple options can be specified. Please see the [important notes](#notes-for-all---options) about this option.
+
+```console
+$ valet sudo link mysitename -valetOptions=isolate//secure
+$ valet sudo link mysitename -o isolate//secure
+```
+
+##### start
+
+```
+start            Starts Valet's services
+       [service] Optionally, pass a specific service name to start
+```
+
+```console
+$ valet start
+Valet services have been started.
+
+$ valet start nginx
+Nginx has been started.
+```
+
+##### restart
+
+```
+restart            Restarts Valet's services
+         [service] Optionally, pass a specific service name to restart
+```
+
+```console
+$ valet restart
+Valet services have been restarted.
+
+$ valet start nginx
+Nginx has been started.
+```
+
+##### stop
+
+```
+stop            Stops Valet's services
+      [service] Optionally, pass a specific service name to stop
+```
+
+```console
+$ valet stop
+Valet services have been stopped.
+
+$ valet start nginx
+Nginx has been stopped.
+```
+
+##### uninstall
+
+```
+uninstall                   Uninstalls Valet's services
+           [--force]        Force uninstallation without a confirmation question
+		   [-p|--purge-config] Purge and remove all Valet configs
+```
+
+```console
+$ valet uninstall
+Are you sure you want to proceed? yes/no
+$ yes
+Valet has been removed from your system.
+```
+
+This completely stops and uninstalls all of Valet's services.
+
+You will also need to `uninstall` Valet if you are wanting to update Valet via Composer (`composer global update ycodetech/valet-windows`), just to make sure Composer can remove and update relevant files without error.
+
+###### --force
+
+`--force` is to optionally force an uninstallation without Valet asking confirmation.
+
+```console
+$ valet uninstall --force
+Valet has been removed from your system.
+```
+
+###### --purge-config
+
+`--purge-config` (shortcut `-p`) is to optionally purge and remove all Valet's configs. This should be used if Valet is no longer required and it won't be installed again.
+
+```console
+$ valet uninstall --purge-config
+$ valet uninstall -p
+Are you sure you want to proceed? yes/no
+$ yes
+Valet has been uninstalled from your system, and purged all configs.
+```
 
 ### PHP Services
 
@@ -390,18 +604,12 @@ When using the command, a new CMD terminal will be launched with the ngrok infor
 
 ###### share --options
 
-If you need to use the flags of ngrok's `http` command (which `valet share` uses internally), then you can use the `--options` option (shortcut `-o`).
-
-Pass the option name without the `--` prefix (so Valet doesn't get confused with it's own options); eg. `--options domain=example.com`. All options/flags will be prefixed with `--` after Valet has processed the command.
-
-As with any option, if there's a space in the value you will need to surround the value in quotes.
-
-It is also possible to pass multiple options to ngrok, just separate them with double slashes `//`.
+`--options` (shortcut `-o`) [optional] is ngrok's options/flags for it's `http` command (which `valet share` uses internally). It is a string, but multiple options can be specified. Please see the [important notes](#notes-for-all---options) about this option.
 
 ```console
 $ valet share site1 --options domain=example.com//region=eu//request-header-remove="header to remove"
 
-/d/sites/site1
+$ cd /d/sites/site1
 $ valet share -o domain=example.com
 ```
 
@@ -453,32 +661,16 @@ $ valet ngrok config add-authtoken 123abc --options=config=C:/path/ngrok.yml
 
 Because ngrok CLI has a multitude of commands and options, the `valet ngrok` command is very useful for passing through any and all commands to ngrok.
 
-###### [commands](#ngrok-commands)
+###### ngrok commands
 
 The `commands` argument is a space-separated array of the commands, arguments, and values.
 
-###### [-o | --options](#ngrok-options)
+###### ngrok --options
 
-The `--options` (shortcut `-o`) option can be used to pass options/flags to ngrok. Just pass the option name without the `--` prefix eg. `--options=config=C:/path/ngrok.yml`. All options/flags that are passed will be prefixed with `--` after Valet has processed the command. The command option's `=` is optional:
+The `--options` (shortcut `-o`) [optional] can be used to pass options/flags to ngrok. It is a string, but multiple options can be specified. Please see the [important notes](#notes-for-all---options) about this option.
 
-- `--options=[option]`
-- `--options [option]`
-
-###### Note: Inline with Symfony's docs and to comply with command-line standards, the option shortcut cannot have the `=` character, and Valet will send out an error.
-
-###### From [Symfony's docs](https://symfony.com/doc/current/console/input.html#using-command-options):
-
-> ###### Note that to comply with the docopt standard, long options can specify their values after a whitespace or an `=` sign (e.g. `--iterations 5` or `--iterations=5`), but short options can only use whitespaces or no separation at all (e.g. `-i 5` or `-i5`).
-
-Example of the command with the shortcut option:
-
-```
-$ valet ngrok config add-authtoken 123abc -o config=C:/path/ngrok.yml
-```
-
-It is also possible to pass multiple options to ngrok, just separate them with double slashes `//`.
-
-```
+```console
+$ valet ngrok config add-authtoken 123abc --options config=C:/path/ngrok.yml//log=false
 $ valet ngrok config add-authtoken 123abc -o config=C:/path/ngrok.yml//log=false
 ```
 
@@ -533,6 +725,45 @@ Yes
 ```
 
 Determine whether the installed version of Valet is the latest.
+
+### Notes for all `--options`
+
+These are **important notes** for the commands that have the `--options` or `--valetOptions`.
+
+- The `--options`, `--valetOptions` (shortcut `-o`) options can be used to pass options/flags to the service related to that command.
+
+  Just pass the option name without the `--` prefix eg. `--options=config=C:/path/ngrok.yml` (example for the `ngrok` command). This is so that Valet doesn't get confused with it's own options.
+
+  All options/flags that are passed will be prefixed with `--` after Valet has processed the command, unless it's a shortcut of a single character, then it will be prefixed with `-`. The example above will run as `--config=C:/path/ngrok.yml`.
+
+- The `=` immediately after the command option is optional, if it's omitted, you must use a space instead.
+
+  ```
+  --options=option1
+  --options option1
+  --valetOptions=option1
+  --valetOptions option1
+  ```
+
+- The options also have `-o` shortcuts and it cannot have the `=` character, it must use a space for separation.
+
+  ```console
+  -o option1
+  ```
+
+  This falls inline with Symfony's docs and complies with command-line standards.
+
+  ###### From [Symfony's docs](https://symfony.com/doc/current/console/input.html#using-command-options):
+
+  > ###### Note that to comply with the docopt standard, long options can specify their values after a whitespace or an `=` sign (e.g. `--iterations 5` or `--iterations=5`), but short options can only use whitespaces or no separation at all (e.g. `-i 5` or `-i5`).
+
+- The options also allows multiple options to be passed, they just need to be separated with double slashes `//`.
+
+  ```console
+  --valetOptions=option1//option2//option3
+  --options option1//option2//option3
+  -o option1//option2//option3
+  ```
 
 ### Commands not supported
 
