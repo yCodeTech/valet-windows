@@ -55,9 +55,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added Valet Root CA generation and sign TLS certificates with the CA (PR by @shawkuro in https://github.com/cretueusebiu/valet-windows/pull/179).
 - Added row separators for horizontal tables.
 - Added `sites` command to list all sites in parked, links and proxies.
-- Added `set-ngrok-token` to set ngrok authtoken.
+- Added `set-ngrok-token` to set ngrok authtoken and added an command alias for it: `auth`.
 - Added `--debug` option to the `share` command to prevent the opening of a new CMD window, and allow error messages to be displayed from ngrok for easier debugging. This is needed because ngrok may fail silently by opening a new CMD window and quickly closes it if it encounters an error, so no errors are outputted.
-- Added an `--options` option to the `share` command to pass any ngrok options/flags for the ngrok `http` command, which Valet will pass through to ngrok. See the [docs](https://github.com/yCodeTech/valet-windows/blob/master/README.md#share---options) for information on how this works.
+- Added an `--options` option to the `share` command to pass any ngrok options/flags for the ngrok `http` command, which Valet will pass through to ngrok. Also added a shortcut `-o`. See the [docs](https://github.com/yCodeTech/valet-windows/blob/master/README.md#notes-for-all---options) for information on how this works.
 - Added `sudo` command and [gsudo](https://github.com/gerardog/gsudo) files. The new command is to `passthru` Valet commands to the commandline that need elevated privileges by using gsudo. gsudo is a `sudo` equivalent for Windows, it requires only 1 UAC popup to enable the elevation and then all commands will be executed as the system instead of having multiple UACs opening.
 - Added `valetBinPath` helper function to find the Valet bin path, and updated all the code to use it.
 - Added a check to see if a site is isolated before unisolating it.
@@ -65,6 +65,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added a progressbar UI to `services` function, and `install`, `uninstall`, `restart`, `stop` commands to improve the UX.
 - Added `error` output to the `getPhpByVersion` function to cut down on duplicate `error` code that relates to the function.
 - Added a sleep for 0.3s (300000 microseconds) in between the `uninstall` warning and the question to allow the warning be output before the question is outputted. And simplified the if statements.
+- Added a command alias of `unpark` to the `forget` command.
 
 ### Changed
 
@@ -136,9 +137,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Replacing the outdated `nategood/httpful` composer dependency with `guzzlehttp/guzzle` for REST API requests to get the current ngrok tunnel public URL, and copy it to the clipboard.
   - Changing the `findHttpTunnelUrl` function to use array bracket notation.
   - Changing the `domain` argument to `site` to properly reference the site without getting confused with the ngrok `--domain`.
-  - `on-latest-version` command to use Guzzle and added a new composer dependency `composer/ca-bundle` to find and use the TLS CA bundle in order to verify the TLS/SSL certificate of the requesting website/API. Otherwise, Guzzle spits out a cURL error. (Thanks to this [StackOverflow Answer](https://stackoverflow.com/a/53823135/2358222).)
+  - Added a command alias: `url`.
 
-- Fixed `ngrok` command to accept options/flags.
+- Fixed `on-latest-version` command to use Guzzle and added a new composer dependency `composer/ca-bundle` to find and use the TLS CA bundle in order to verify the TLS/SSL certificate of the requesting website/API. Otherwise, Guzzle spits out a cURL error. (Thanks to this [StackOverflow Answer](https://stackoverflow.com/a/53823135/2358222).)
+
+  Also added a command alias: `latest`.
+
+- Fixed `ngrok` command to accept options/flags, using the `--options` option. See the [docs](https://github.com/yCodeTech/valet-windows/blob/master/README.md#notes-for-all---options) for information on how this works.
 - Fixed `php:remove` command to enable it to remove PHP by specifying it's version; by adding a `phpVersion` argument and changing the `path` argument to an option (`--path`), making `phpVersion` the main way to remove instead.
 - Fixed `start` command by removing the whole functionality and utilise Silly's `runCommand` to run the `restart` command instead, so they're effectively sharing the same function. This is because it was unnecessary duplicated code.
 - Fixed lack of output colouring when using PHP `passthru` function by adding a 3rd party binary, [Ansicon](https://github.com/adoxa/ansicon), along with a new class with `install`/`uninstall` functions and added the function calls to the Valet `install`/`uninstall` commands respectively.
@@ -149,5 +154,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed an oversight while changing the TLD by allowing isolated sites TLD to be changed. Previously, if there is an isolated site, changing the TLD wouldn't change the isolated site's conf file, thus leaving it as the old TLD. This fix adds a `reisolateForNewTld` function to unisolate the old TLD site and reisolate the new TLD site. Also works for sites that are both isolated and secured.
 
 - Fixed `unlink` command to properly get the site from the current working directory if no `name` was supplied, by using the previously `private`, now `public` `getLinkNameByCurrentDir()` function. Also changed the error message in the latter function to include the multiple linked names.
+
+- Fixed `stop` function of the `PhpCgi` class to only `stop` the PHP CGI or PHP CGI Xdebug if it's installed.
+
+  This prevents errors occurring when `uninstall`ing Valet. It would try to `stop` Xdebug services for all PHP versions available to Valet, even though all Xdebug services may not be installed.
+
+- Fixed `unsecure --all` to `exit` the script if there are no sites to unsecure, otherwise nginx would still run afterwards, which is not needed.
+
+- Fixed `uninstall` command to only unsecure sites if they are any secured sites. Also prevented the `unsecureAll` function from exiting the script if the call came from `uninstall`. Also added an option shortcut `-p` for `--purge-config`.
+
+- Fixed `install` command to detect if Valet is already installed. Checks the services to see if they are running, if they are, Valet will ask a question whether to reinstall Valet or not. Also changed `services` function (which this fix uses) to disable the progressbar when it's called from `install`.
 
 ## For previous versions prior to this repository, please see [cretueusebiu/valet-windows](https://github.com/cretueusebiu/valet-windows), of which this is an indirect fork of.
