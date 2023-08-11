@@ -1100,7 +1100,10 @@ if (is_dir(VALET_HOME_PATH)) {
 		$helper = $this->getHelperSet()->get('question');
 
 		if (!$force) {
-			warning('YOU ARE ABOUT TO UNINSTALL Nginx, PHP-CGI, Acrylic DNS, Ansicon, and all Valet configs and logs.');
+			$xdebug = !PhpCgiXdebug::installed() ? "" : " PHP CGI Xdebug,";
+			$txt = !$purgeConfig ? "." : ", and all Valet configs and logs.";
+
+			warning("YOU ARE ABOUT TO UNINSTALL Nginx, PHP-CGI,$xdebug Acrylic DNS and Ansicon$txt");
 			usleep(300000); // 0.3s
 
 			$question = new ConfirmationQuestion("Are you sure you want to proceed? yes/no\n", false);
@@ -1140,7 +1143,7 @@ if (is_dir(VALET_HOME_PATH)) {
 
 		if ($purgeConfig) {
 			if (count(Site::secured()) > 0) {
-				info("\nRemoving certificates for all secured sites...");
+				info("\n\nRemoving certificates for all secured sites...");
 				Site::unsecureAll(true);
 				sleep(1);
 			}
@@ -1151,7 +1154,8 @@ if (is_dir(VALET_HOME_PATH)) {
 
 		// INFO: Uninstallation...
 
-		$progressBar = progressbar($maxItems + 1, "Uninstalling");
+		$maxItems = $purgeConfig ? $maxItems + 2 : $maxItems + 1;
+		$progressBar = progressbar($maxItems, "Uninstalling");
 		sleep(1);
 
 		$progressBar->setMessage("Nginx", "placeholder");
@@ -1182,8 +1186,6 @@ if (is_dir(VALET_HOME_PATH)) {
 		sleep(1);
 
 		if ($purgeConfig) {
-			$progressBar->setMaxSteps(6);
-
 			$progressBar->setMessage("Configuration", "placeholder");
 			$progressBar->advance();
 			Configuration::uninstall();
@@ -1191,10 +1193,16 @@ if (is_dir(VALET_HOME_PATH)) {
 		}
 
 		$progressBar->finish();
-		info("\nValet has been removed from your system.");
+
+		$txt = !$purgeConfig ? "." : ", and purged all configs.";
+		info("\n\nValet has been uninstalled from your system$txt");
+
+		if (!$purgeConfig) {
+			info("If you wanted to update Composer, you are now safe to do so: <bg=magenta> composer global update </>");
+			output("\nOr");
+		}
 
 		output(
-			"\n<fg=yellow>NOTE:</>" .
 			"\nRemove composer dependency with: <bg=magenta>composer global remove ycodetech/valet-windows</>" .
 			($purgeConfig ? '' : "\nDelete the config files from: <info>~/.config/valet</info>") .
 			"\nDelete PHP from: <info>C:/php</info>"
