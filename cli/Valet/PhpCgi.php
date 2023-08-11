@@ -187,7 +187,9 @@ class PhpCgi
 	public function stop()
 	{
 		foreach ($this->phpWinSws as $phpWinSw) {
-			$phpWinSw['winsw']->stop();
+			if ($phpWinSw['winsw']->installed()) {
+				$phpWinSw['winsw']->stop();
+			}
 		}
 	}
 
