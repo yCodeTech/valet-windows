@@ -49,9 +49,12 @@ class Valet
 	/**
 	 * Get the installed Valet services.
 	 *
+	 * @param bool $disable Don't show the progressbar.
+	 * Used in `install` command to query if the services are running.
+	 *
 	 * @return array
 	 */
-	public function services(): array
+	public function services($disable = false): array
 	{
 		$phps = \Configuration::get('php', []);
 
@@ -68,13 +71,20 @@ class Valet
 			'nginx' => 'valet_nginx',
 		])->merge($phpCGIs)->merge($phpXdebugCGIs);
 
-		$progressBar = progressbar($services->count(), "Checking");
+		// Set empty variable first, prevents errors when $disable is true.
+		$progressBar = "";
 
-		return $services->map(function ($id, $service) use ($progressBar) {
+		if (!$disable) {
+			$progressBar = progressbar($services->count(), "Checking");
+		}
+
+		return $services->map(function ($id, $service) use ($progressBar, $disable) {
 			$output = $this->cli->run('powershell -command "Get-Service -Name ' . $id . '"');
 
-			$progressBar->setMessage(ucfirst($service), "placeholder");
-			$progressBar->advance();
+			if (!$disable) {
+				$progressBar->setMessage(ucfirst($service), "placeholder");
+				$progressBar->advance();
+			}
 
 			if (strpos($output, 'Running') > -1) {
 				$status = '<fg=green>running</>';

@@ -53,12 +53,34 @@ if (is_dir(VALET_HOME_PATH)) {
  * Install Valet and any required services.
  */
 $app->command('install [--xdebug]', function ($input, $output, $xdebug) {
+	$helper = $this->getHelperSet()->get('question');
+
+	/**
+	 * Check if the Valet is already installed by checking if the services are running.
+	 */
+	$services = Valet::services(true);
+	$alreadyInstalled = false;
+
+	foreach ($services as $key => $value) {
+		if (str_contains($value["status"], "running")) {
+			$alreadyInstalled = true;
+			break;
+		};
+	}
+
+	if ($alreadyInstalled) {
+		$alreadyInstalledQuestion = new ConfirmationQuestion("<fg=red>Valet seems to already be installed. Do you want to reinstall? yes/no</fg=red>\n", false);
+
+		if (!$helper->ask($input, $output, $alreadyInstalledQuestion)) {
+			warning("Reinstall aborted.");
+			return;
+		}
+	}
 
 	// TODO: Deprecate this question in version 3.0.3 and remove in 3.0.4
-	$helper = $this->getHelperSet()->get('question');
 	$question = new ConfirmationQuestion("<fg=red>Have you fully uninstalled the outdated cretueusebiu/valet-windows? yes/no</>\n", false);
 
-	if (!$helper->ask($input, $output, $question)) {
+	if (!$alreadyInstalled && !$helper->ask($input, $output, $question)) {
 		warning("Install aborted. \nPlease fully uninstall Valet from cretueusebiu and purge all configs.");
 		output('<fg=yellow>Remove composer dependency with:</> <bg=magenta>composer global remove cretueusebiu/valet-windows</>');
 		return;
