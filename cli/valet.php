@@ -1095,7 +1095,7 @@ if (is_dir(VALET_HOME_PATH)) {
 	/**
 	 * Uninstall Valet entirely. Requires --force to actually remove; otherwise manual instructions are displayed.
 	 */
-	$app->command('uninstall [--force] [--purge-config]', function ($input, $output, $force, $purgeConfig) {
+	$app->command('uninstall [--force] [-p|--purge-config]', function ($input, $output, $force, $purgeConfig) {
 
 		$helper = $this->getHelperSet()->get('question');
 
@@ -1139,10 +1139,11 @@ if (is_dir(VALET_HOME_PATH)) {
 		$progressBar->finish();
 
 		if ($purgeConfig) {
-			info("\nRemoving certificates for all secured sites...");
-			Site::unsecureAll();
-			sleep(1);
-
+			if (count(Site::secured()) > 0) {
+				info("\nRemoving certificates for all secured sites...");
+				Site::unsecureAll(true);
+				sleep(1);
+			}
 		} else {
 			Site::untrustCertificates();
 		}

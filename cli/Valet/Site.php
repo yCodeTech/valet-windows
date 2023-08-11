@@ -578,8 +578,10 @@ class Site
 
 	/**
 	 * Unsecure all URLs so that they will use HTTP again.
+	 * @param bool $fromUninstall Determine if the function call was from the
+	 * `uninstall` command or not. Default: `false`
 	 */
-	public function unsecureAll()
+	public function unsecureAll($fromUninstall = false)
 	{
 		$tld = $this->config->read()['tld'];
 
@@ -588,7 +590,10 @@ class Site
 			->sort()
 			->where('secured', 'X');
 
-		if ($secured->count() === 0) {
+		// If there are no secured sites AND
+		// the function call didn't come from the `uninstall` command,
+		// then we can send an output and exit the script.
+		if ($secured->count() === 0 && !$fromUninstall) {
 			info("No sites to unsecure. You may list all servable sites or links by running <bg=magenta> valet parked </> or <bg=magenta> valet links </>.");
 			// Prevents further scripts from running, but without sending out an error exception.
 			exit();
