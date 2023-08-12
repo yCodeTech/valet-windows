@@ -226,7 +226,7 @@ $app->command('php:remove [phpVersion] [--path=]', function ($phpVersion, $path)
  * Install PHP services.
  */
 $app->command('php:install', function () {
-	info('Reinstalling services...');
+	info('Reinstalling PHP services...');
 
 	PhpCgi::uninstall();
 
@@ -305,7 +305,10 @@ $app->command('xdebug:install [phpVersion]', function ($input, $output, $phpVers
 	}
 
 	info('Installing Xdebug services...');
-	PhpCgiXdebug::install($phpVersion);
+	$phps = PhpCgiXdebug::install($phpVersion);
+
+	$phpVersion = $phpVersion ?: implode(", ", $phps);
+	info("Installed Xdebug for PHP $phpVersion");
 
 })->descriptions('Install all PHP Xdebug services from <fg=green>valet php:list</>', [
 			"phpVersion" => "Optionally, install a specific PHP version of Xdebug"

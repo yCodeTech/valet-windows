@@ -26,7 +26,8 @@ class PhpCgiXdebug extends PhpCgi
 	/**
 	 * Install and configure PHP CGI service.
 	 *
-	 * @return void
+	 * @param null|string $phpVersion The PHP version
+	 * @return array|void $versionArray
 	 */
 	public function install($phpVersion = null)
 	{
@@ -46,9 +47,15 @@ class PhpCgiXdebug extends PhpCgi
 
 		$phps = $this->configuration->get('php', []);
 
+		// Set an empty array to push the version numbers into
+		// to be able to return it to the command.
+		$versionArray = [];
+
 		foreach ($phps as $php) {
 			$this->installService($php['version']);
+			array_push($versionArray, $php['version']);
 		}
+		return $versionArray;
 	}
 
 	/**
