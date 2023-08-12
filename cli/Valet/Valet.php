@@ -65,7 +65,6 @@ class Valet
 			$phpXdebugCGIs->put("php-xdebug {$php['version']}", \PhpCgiXdebug::getPhpCgiName($php['version']));
 		}
 
-
 		$services = collect([
 			'acrylic' => 'AcrylicDNSProxySvc',
 			'nginx' => 'valet_nginx',
@@ -92,6 +91,10 @@ class Valet
 				$status = '<fg=yellow>stopped</>';
 			} else {
 				$status = '<fg=red>missing</>';
+			}
+
+			if (strpos($status, "missing") && strpos($service, "xdebug")) {
+				$status = '<fg=red>not installed</>';
 			}
 
 			return [
