@@ -175,7 +175,9 @@ class PhpCgi
 	public function restart()
 	{
 		foreach ($this->phpWinSws as $phpWinSw) {
-			$phpWinSw['winsw']->restart();
+			if ($phpWinSw['winsw']->installed()) {
+				$phpWinSw['winsw']->restart();
+			}
 		}
 	}
 
