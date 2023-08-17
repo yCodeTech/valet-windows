@@ -29,7 +29,7 @@
     <td ><a href="#installinguninstalling--startingstopping">Installing/Uninstalling & Starting/Stopping</a></td>
     <td ><a href="#php-services">PHP Services</a></td>
     <td align="center"><a href="#using-php-versions">Multi-PHP Versions and Securing</a></td>
-    <td align="center"><a href="#parked-and-linked">Parked, Linked, Proxies and Sites</a></td>
+    <td align="center"><a href="#parked-linked-proxies-and-sites">Parked, Linked, Proxies and Sites</a></td>
     <td align="center"><a href="#sharing">Sharing</a></td>
     <td align="center"><a href="#other-commands">Other Commands</a></td>
   </tr>
@@ -56,7 +56,7 @@
   <tr>
   <th></th>
     <td><a href="#start">start</a></td>
-    <td><a href="#phplist">php:list</a></td>
+    <td><a href="#phpinstall">php:install</a></td>
     <td align="center"><a href="#isolated">isolated</a></td>
     <td align="center"><a href="#unparkforget">unpark|forget</a></td>
     <td align="center"><a href="#urlfetch-share-url">url|fetch-share-url</a></td>
@@ -66,7 +66,7 @@
   <tr>
   <th></th>
     <td><a href="#restart">restart</a></td>
-    <td><a href="#phpwhich">php:which</a></td>
+    <td><a href="#phpuninstall">php:uninstall</a></td>
     <td align="center"><a href="#unisolate">unisolate</a></td>
     <td align="center"><a href="#link">link</a></td>
     <td align="center"><a href="#ngrok">ngrok</a></td>
@@ -76,7 +76,7 @@
   <tr>
   <th></th>
     <td><a href="#stop">stop</a></td>
-    <td><a href="#phpinstall">php:install</a></td>
+		<td><a href="#phplist">php:list</a></td>
 		<td align="center"><a href="#secure">secure</a></td>
 		<td align="center"><a href="#links">links</a></td>
     <td></td>
@@ -87,7 +87,7 @@
   <tr>
   <th></th>
     <td><a href="#uninstall">uninstall</a></td>
-    <td><a href="#phpuninstall">php:uninstall</a></td>
+		<td><a href="#phpwhich">php:which</a></td>
 		<td align="center"><a href="#secured">secured</a></td>
 		<td align="center"><a href="#unlink">unlink</a></td>
 		<td></td>
@@ -229,7 +229,7 @@ gsudo only requires 1 UAC popup to enable elevation (per usage), and then the pa
 
 ###### valetCommand
 
-`valetCommand` is the Valet command, plus it's arguments values that you wish to run. It is a string array separated by spaces.
+`valetCommand` is the Valet command, plus it's argument's values that you wish to run. It is a string array separated by spaces.
 
 ```console
 $ valet sudo isolate 7.4
@@ -267,6 +267,8 @@ $ valet start nginx
 Nginx has been started.
 ```
 
+<img align="center" src="./The_same_icon.svg" style="width:20px;"> This command is the same as the Mac version.
+
 ##### restart
 
 ```
@@ -281,6 +283,8 @@ Valet services have been restarted.
 $ valet start nginx
 Nginx has been started.
 ```
+
+<img align="center" src="./The_same_icon.svg" style="width:20px;"> This command is the same as the Mac version.
 
 ##### stop
 
@@ -297,11 +301,13 @@ $ valet start nginx
 Nginx has been stopped.
 ```
 
+<img align="center" src="./The_same_icon.svg" style="width:20px;"> This command is the same as the Mac version.
+
 ##### uninstall
 
 ```
-uninstall                   Uninstalls Valet's services
-           [--force]        Force uninstallation without a confirmation question
+uninstall                      Uninstalls Valet's services
+           [--force]           Force uninstallation without a confirmation question
 		   [-p|--purge-config] Purge and remove all Valet configs
 ```
 
@@ -342,48 +348,107 @@ Valet has been uninstalled from your system, and purged all configs.
 ##### php:add
 
 ```
-php:add    [path]   Add PHP by specifying a path
+php:add [path]     Add PHP by specifying a path
+        [--xdebug] Optionally, install Xdebug
 ```
 
 ```console
 $ valet php:add "C:\php\7.4"
+PHP 7.4.33 from C:\php\7.4 has been added.
 ```
 
 ###### **Note:** When adding PHP, the full version number (eg. 7.4.33) will be extracted and an alias (eg. 7.4) will be generated. Either of these can be used in other commands.
 
 ###### Furthermore, the details of the versions will be written to the config in a natural decending order that adheres to decimals. This means that when two minor versions (like 8.1.8 and 8.1.18) of an alias (8.1) are added, and the default PHP is then set to use the alias, then Valet will use the most recent version of the alias, which in this case would be 8.1.18.
 
+###### --xdebug
+
+`--xdebug` is a boolean option to optionally install Xdebug for the PHP being added. If the option is present, it's `true`, otherwise `false`.
+
+```console
+$ valet php:add "C:\php\7.4" --xdebug
+Installing Xdebug for 8.2.5...
+PHP 8.2.5 from C:\php\7.4 has been added.
+
+```
+
 ##### php:remove
 
 ```
-php:remove [path]   Remove PHP by specifying a path
+php:remove [phpVersion] Remove PHP by specifying it's version
+           [--path=]    Optionally specify by path
+```
+
+Both the full version and the alias version works:
+
+```console
+$ valet php:remove 7.4.33
+$ valet php:remove 7.4
+PHP 7.4.33 from c:\php\7.4 has been removed.
+```
+
+###### --path
+
+Instead of using the version number, you can specify the PHP by it's path.
+
+```console
+$ valet php:remove --path="C:\php\7.4"
+PHP 7.4.33 from c:\php\7.4 has been removed.
+```
+
+###### Note: If Xdebug is installed for the PHP being removed, then Valet will also remove Xdebug for that version too.
+
+##### php:install
+
+```
+php:install   Reinstall all PHP services from [valet php:list]
 ```
 
 ```console
-$ valet php:remove "C:\php\7.4"
+$ valet php:install
+Reinstalling PHP services...
 ```
+
+`php:install` Installs the PHP CGI services for the versions listed in Valet with [`php:list`](#phplist). If they are already installed, Valet uninstalls them first and then reinstalls them.
+
+##### php:uninstall
+
+```
+php:uninstall   Uninstall all PHP services from [valet php:list]
+```
+
+```console
+$ valet php:uninstall
+Uninstalling PHP services...
+```
+
+`php:uninstall` Uninstalls the PHP CGI services for the versions listed in Valet with [`php:list`](#phplist).
 
 ##### php:list
 
 ```
-php:list            List all PHP versions and services
+php:list   List all PHP versions and services
 ```
+
+List the PHP versions installed in Valet.
 
 ```console
 $ valet php:list
 Listing PHP services...
-+---------+---------------+------------+------+-------------+---------+
+┌─────────┬───────────────┬────────────┬──────┬─────────────┬─────────┐
 | Version | Version Alias | Path       | Port | xDebug Port | Default |
-+---------+---------------+------------+------+-------------+---------+
+├─────────┼───────────────┼────────────┼──────┼─────────────┼─────────┤
 | 8.1.8   | 8.1           | C:\php\8.1 | 9006 | 9106        | X       |
+├─────────┼───────────────┼────────────┼──────┼─────────────┼─────────┤
 | 7.4.33  | 7.4           | C:\php\7.4 | 9004 | 9104        |         |
-+---------+---------------+------------+------+-------------+---------+
+└─────────┴───────────────┴────────────┴──────┴─────────────┴─────────┘
 ```
 
 ##### php:which
 
 ```
-php:which  [site]   To determine which PHP version the current working directory or a specified site is using
+php:which         Determine which PHP version the current working directory is using
+           [site] Optionally, specify a site
 ```
 
 ```console
@@ -394,24 +459,49 @@ $ valet php:which site2
 The specified site site2 is using PHP 8.1.8 (default)
 ```
 
-##### php:install
+##### xdebug:install
 
 ```
-php:install          Reinstall all PHP services from [valet php:list]
+xdebug:install               Install Xdebug services for all PHP versions from [valet php:list]
+                [phpVersion] Optionally, specify one particular PHP version of Xdebug to install
+```
+
+`xdebug:install` installs an Xdebug service for all PHP versions listed in Valet with [`php:list`](#phplist).
+
+```console
+$ valet xdebug:install
+Installing Xdebug services...
+Installed Xdebug for PHP 7.4.33, 8.1.8
+```
+
+You can optionally install Xdebug for one specific PHP version using the `phpVersion` argument.
+
+```console
+$ valet xdebug:install 7.4
+Installing Xdebug services...
+Installed Xdebug for PHP 7.4.33
+```
+
+###### Note: If Xdebug for the supplied PHP version is already installed, Valet will ask if you want it reinstalling.
+
+##### xdebug:uninstall
+
+```
+xdebug:uninstall               Uninstall all Xdebug services
+                  [phpVersion] Optionally, specify one particular PHP version of Xdebug to uninstall
 ```
 
 ```console
-$ valet php:install
+$ valet xdebug:uninstall
+Xdebug services uninstalled.
 ```
 
-##### php:uninstall
-
-```
-php:uninstall        Uninstall all PHP services from [valet php:list]
-```
+You can optionally uninstall Xdebug for one specific PHP version using the `phpVersion` argument.
 
 ```console
-$ valet php:uninstall
+$ valet xdebug:uninstall 7.4
+Installing Xdebug services...
+Installed Xdebug for PHP 7.4.33
 ```
 
 ### Using PHP versions
@@ -419,7 +509,7 @@ $ valet php:uninstall
 ##### use
 
 ```
-use       [phpVersion]  Set or change the default PHP version used by Valet. Either specify the full version or the alias
+use       [phpVersion]  Change the default PHP version used by Valet. Either specify the full version or the alias
 ```
 
 ```console
@@ -432,6 +522,8 @@ Setting the default PHP version to [8.1.8].
 Valet is now using 8.1.8.
 ```
 
+###### Note: If using the alias, and multiple versions of 8.1 are available eg. 8.1.8 and 8.1.18, then the most latest version will be used eg. 8.1.18.
+
 ##### isolate
 
 ```
@@ -442,6 +534,7 @@ isolate   [phpVersion]  Isolates the current working directory to a specific PHP
 ###### Note: You can isolate 1 or more sites at a time. Just pass the `--site` option for each of the sites you wish to isolate to the same PHP version.
 
 ```console
+$ cd /d/sites/my_site
 $ valet isolate 7.4
 Isolating the current working directory...
 The site [my_site] is now using 7.4.
@@ -453,17 +546,39 @@ $ valet isolate 7.4 --site=site1 --site=site2 --site=site3
 The site [site1] is now using 7.4.
 The site [site2] is now using 7.4.
 The site [site3] is now using 7.4.
+```
+
+<img align="center" src="./The_same_icon.svg" style="width:20px;"> This command is the same as the Mac version.
+
+##### isolated
 
 ```
+isolated  List all isolated sites
+```
+
+```console
+$ valet isolated
+┌──────────┬────────┐
+| Site     | PHP    |
+├──────────┼────────┤
+| site1    | 7.4.33 |
+├──────────┼────────|
+| my_site  | 7.4.33 |
+└──────────┴────────┘
+```
+
+<img align="center" src="./The_same_icon.svg" style="width:20px;"> This command is the same as the Mac version.
 
 ##### unisolate
 
 ```
-unisolate [--site=]     Removes [unisolates] an isolated site
-          [--all]       Optionally removes all isolated sites
+unisolate            Removes [unisolates] the current working directory
+          [--site=]  Optionally specify the site instead of the current working directory
+          [--all]    Optionally removes all isolated sites
 ```
 
 ```console
+$ cd /d/sites/my_site
 $ valet unisolate
 Unisolating the current working directory...
 The site [my_site] is now using the default PHP version.
@@ -476,89 +591,98 @@ The site [my_site] is now using the default PHP version.
 The site [site1] is now using the default PHP version.
 ```
 
-##### isolated
+##### secure
 
 ```
-isolated                List isolated sites
+secure          Secure the current working directory with a trusted TLS certificate
+        [site]  Optionally specify the site instead of the current working directory
+```
+
+Secures a site with a trusted self-signed TLS certificate and serves the site on the `https` protocol.
+
+```console
+$ cd /d/sites/site1
+$ valet secure
+The [site1.test] site has been secured with a fresh TLS certificate and will now be served over HTTPS.
+
+$ valet secure site1
+The [site1.test] site has been secured with a fresh TLS certificate and will now be served over HTTPS.
+```
+
+###### Note: The secure command (or secure option in any other commands) need to be used in an admin privileged/elevated terminal. Either open a terminal as administrator or use the [`sudo`](#sudo) command.
+
+##### secured
+
+```
+secured  List all secured sites
 ```
 
 ```console
-$ valet isolated
-+----------+--------+
-| Site     | PHP    |
-+----------+--------+
-| site1    | 7.4.33 |
-| my_site  | 7.4.33 |
-+----------+--------+
+$ valet secured
+┌──────────────┐
+| Site         |
+├──────────────┤
+| site1.test   |
+├──────────────┤
+| my_site.test |
+└──────────────┘
 ```
 
-### Parked and Linked
+<img align="center" src="./The_same_icon.svg" style="width:20px;"> This command is the same as the Mac version.
 
-##### link
+##### unsecure
 
 ```
-link   [name]        Register the current working directory as a symbolic link with a different name
-       [--secure]    Optionally secure the site
-       [--isolate=]  Optionally isolate the site to a specified PHP version
+unsecure          Unsecure the current working directory
+        [site]  Optionally specify the site instead of the current working directory
+```
+
+Unsecures a site by removing it's TLS certificate and serves the site on the `http` protocol.
+
+```console
+$ cd /d/sites/site1
+$ valet unsecure
+The [site1.test] site has been unsecured and will now be served over HTTP.
+
+$ valet secure site1
+The [site1.test] site has been unsecured and will now be served over HTTP.
+```
+
+### Parked, Linked, Proxies and Sites
+
+##### park
+
+```
+park         Registers the current working directory to automatically serve sub-directories as sites
+      [path] Optionally, specify a path
 ```
 
 ```console
-$ valet link my_site_renamed
-A [my_site_renamed] symbolic link has been created in [C:/Users/Username/.config/valet/Sites/my_site_renamed].
+$ cd /d/sites
+$ valet park
+This directory has been registered to Valet and all sub-directories will be accessible as sites.
 
-$ valet link cool_site --secure
-A [cool_site] symbolic link has been created in [C:/Users/Username/.config/valet/Sites/cool_site].
-The [cool_site.test] site has been secured with a fresh TLS certificate.
-
-$ valet link cool_Site --isolate=7.4
-A [cool_site] symbolic link has been created in [C:/Users/Username/.config/valet/Sites/cool_site].
-The site [cool_site.test] is now using 7.4.
-
-$ valet link cool_Site --secure --isolate=7.4
-A [cool_site] symbolic link has been created in [C:/Users/Username/.config/valet/Sites/cool_site].
-The [cool_site.test] site has been secured with a fresh TLS certificate.
-The site [cool_site.test] is now using 7.4.
+$ valet park d/sites
+The [d/sites] directory has been registered to Valet and all sub-directories will be accessible as sites.
 ```
 
-##### unlink
+`park` registers a directory that contains all your sites to Valet. Once the directory has been _`parked`_, Valet will automatically serve all sub-directories as sites, accessible in the web browser. They serve in the form of `http://<directory-name>.test`
 
-```
-unlink [name]        Unlink a site
-```
+To view all registered directories, use the [`paths`](#paths) command.
 
-```console
-$ valet unlink cool_site
-Unsecuring cool_site...
-The [cool_site] symbolic link has been removed.
-```
-
-##### links
-
-```
-links                Display all registered symbolic links
-```
-
-```console
-$ valet links
-+-----------------+-----+------------------+-----------------------------+---------------------------------------+
-| Site            | SSL | PHP              | URL                         | Path                                  |
-+-----------------+-----+------------------+-----------------------------+---------------------------------------+
-| my_site_renamed |     | 8.1.18 (default) | http://my_site_renamed.code | D:\_Sites\a_completely_different_name |
-| cool_site       | X   | 7.4.33 (isolated)| http://cool_site.code       | D:\_Sites\cool and awesome site       |
-+-----------------+-----+------------------+-----------------------------+---------------------------------------+
-```
+<img align="center" src="./The_same_icon.svg" style="width:20px;"> This command is the same as the Mac version. For more information visit the <a href="https://laravel.com/docs/10.x/valet#the-park-command">Laravel Valet docs</a>.
 
 ##### parked
 
 ```
-parked               Display all current sites within parked paths
+parked  Display all current sites within parked paths
 ```
 
 ###### Note: If there's a parked site that is also a symbolic linked site, then it will also output the linked site name (aka alias) and it's URL (aka alias URL).
 
 ```console
 $ valet parked
-+-----------------------------------------------+
+┌───────────────────────────────────────────────┐
 |      Site: site1                              |
 |     Alias:                                    |
 |       SSL:                                    |
@@ -566,7 +690,7 @@ $ valet parked
 |       URL: http://site1.test                  |
 | Alias URL:                                    |
 |      Path: D:\_Sites\site1                    |
-|-----------------------------------------------|
+├───────────────────────────────────────────────┤
 |      Site: another site                       |
 |     Alias: another_site_renamed               |
 |       SSL:                                    |
@@ -574,7 +698,221 @@ $ valet parked
 |       URL: http://another site.test           |
 | Alias URL: http://another_site_renamed.test   |
 |      Path: D:\_Sites\another site             |
-+-----------------------------------------------+
+└───────────────────────────────────────────────┘
+```
+
+##### unpark|forget
+
+```
+unpark | forget         Remove the current working directory from Valet
+                 [path] Optionally, specify a path
+```
+
+To stop auto-serving sub-directories as sites, run the `forget` command to _`forget`_ the directory.
+
+`unpark` is a command alias.
+
+```console
+$ cd /d/sites
+$ valet forget
+$ valet unpark
+This directory has been removed from Valet.
+
+$ valet forget d/sites
+$ valet unpark d/sites
+The [d/sites] directory has been removed from Valet.
+```
+
+<img align="center" src="./The_same_icon.svg" style="width:20px;"> This command is the same as the Mac version.
+
+##### link
+
+```
+link                Register the current working directory as a symbolic link
+      [name]        Optionally specify a new name to be linked as
+      [--secure]    Optionally secure the site
+      [--isolate=]  Optionally isolate the site to a specified PHP version
+```
+
+`link` is another way to serve directories as sites, except it serves one singular site in a directory rather than the whole directory. It does this by creating a symbolic link inside the `/.config/valet/Sites` directory, of which is a _`parked`_ directory on Valet installation.
+
+Serving the current working directory as a site:
+
+```console
+$ cd /d/sites/site1
+$ valet link
+A [site1] symbolic link has been created in [C:/Users/Username/.config/valet/Sites/site1].
+```
+
+###### name
+
+If you wish to serve the site under a different name to that of the directory, just pass the optional `name` argument. This is most useful if the directory has spaces in the name, Valet doesn't URL encode spaces or any other non-URL safe characters, so the site won't work without changing it.
+
+```console
+$ cd /d/sites/my awesome site
+$ valet link my_site_renamed
+A [my_site_renamed] symbolic link has been created in [C:/Users/Username/.config/valet/Sites/my_site_renamed].
+```
+
+###### --secure
+
+`--secure` option allows you to secure the site. It is boolean, so if it's present it's `true`, otherwise `false`.
+
+```console
+$ valet link cool_site --secure
+A [cool_site] symbolic link has been created in [C:/Users/Username/.config/valet/Sites/cool_site].
+The [cool_site.test] site has been secured with a fresh TLS certificate.
+```
+
+###### --isolate
+
+`--isolate` option allows you to isolate the site to a specific PHP version. Pass it with a value.
+
+```console
+$ valet link cool_Site --isolate=7.4
+A [cool_site] symbolic link has been created in [C:/Users/Username/.config/valet/Sites/cool_site].
+The site [cool_site.test] is now using 7.4.
+```
+
+<img align="center" src="./The_same_icon.svg" style="width:20px;"> This command is the same as the Mac version. For more information, please see the <a href="https://laravel.com/docs/10.x/valet#the-link-command">Laravel Valet docs</a>.
+
+##### links
+
+```
+links  Display all registered symbolic links
+```
+
+```console
+$ valet links
+┌─────────────────┬─────────┬──────────────────┬─────────────────────────────┬───────────────────────────────────────┐
+| Site            | Secured | PHP              | URL                         | Path                                  |
+├─────────────────┼─────────┼──────────────────┼─────────────────────────────┼───────────────────────────────────────┤
+| my_site_renamed |         | 8.1.18 (default) | http://my_site_renamed.code | D:\_Sites\a_completely_different_name |
+├─────────────────┼─────────┼──────────────────┼─────────────────────────────┼───────────────────────────────────────┤
+| cool_site       | X       | 7.4.33 (isolated)| http://cool_site.code       | D:\_Sites\cool and awesome site       |
+└─────────────────┴─────────┴──────────────────┴─────────────────────────────┴───────────────────────────────────────┘
+```
+
+<img align="center" src="./The_same_icon.svg" style="width:20px;"> This command is the same as the Mac version.
+
+##### unlink
+
+```
+unlink          Unlink the current working directory linked site
+        [name]  Optionally specify the linked site name
+```
+
+`unlink` removes the current working directory's (cwd) symbolic linked site. Valet will find the linked site name using the cwd name and delete the symbolic link from the `/.config/valet/Sites/` directory.
+
+```console
+$ cd /d/sites/my site
+$ valet unlink
+The [cool_site] symbolic link has been removed.
+```
+
+###### name
+
+`name` specifies the name of the symbolic link.
+
+```console
+$ valet unlink cool_site
+The [cool_site] symbolic link has been removed.
+```
+
+###### Note: If the linked site is `secured`, Valet will unsecure it before removing.
+
+```console
+$ valet unlink cool_site
+Unsecuring cool_site...
+The [cool_site] symbolic link has been removed.
+```
+
+###### Note: If the linked site is `isolated`, Valet will unisolate it before removing.
+
+```console
+$ valet unlink cool_site
+The site [cool_site] is now using the default PHP version.
+The [cool_site] symbolic link has been removed.
+```
+
+<img align="center" src="./The_same_icon.svg" style="width:20px;"> This command is the same as the Mac version.
+
+##### proxy
+
+```
+proxy [site] [host]  Proxy a specified site to a specified host
+```
+
+`proxy` allows you to _`proxy`_ a Valet site to another service on your machine and send all traffic from the Valet site to the service.
+
+```console
+$ valet proxy site1 https://127.0.0.1:9200
+Valet will now proxy [https://site1.test] traffic to [https://127.0.0.1:9200]
+```
+
+##### proxies
+
+```
+proxies  List all the proxy sites
+```
+
+```console
+$ valet proxies
+┌───────┬─────────┬────────────────────┬────────────────────────┐
+| Site  | Secured | URL                | Host                   |
+├───────┼─────────┼────────────────────┼────────────────────────┤
+| site1 | X       | https://site1.test | https://127.0.0.1:9200 |
+└───────┴─────────┴────────────────────┴────────────────────────┘
+```
+
+<img align="center" src="./The_same_icon.svg" style="width:20px;"> This command is the same as the Mac version.
+
+##### unproxy
+
+```
+unproxy [site]  Remove a proxied site
+```
+
+```console
+$ valet unproxy site1
+Valet will no longer proxy [https://site1.test].
+```
+
+<img align="center" src="./The_same_icon.svg" style="width:20px;"> This command is the same as the Mac version.
+
+##### sites
+
+```
+sites  List all the parked, linked, and proxied sites
+```
+
+```console
+$ valet sites
+┌──────────────┬────────────┬─── Parked ───────────────┬────────────────────────┐
+| Site         | PHP        | URL                      | Path                   |
+├──────────────┼────────────┼──────────────────────────┼────────────────────────┤
+| site1        | 7.4.33     | https://site1.test       | D:\_Sites\site1        |
+|              | (isolated) |                          |                        |
+├──────────────┼────────────┼──────────────────────────┼────────────────────────┤
+| site-test    | 8.1.8      | http://site-test.test    | D:\_Sites\site-test    |
+|              | (default)  |                          |                        |
+├──────────────┼────────────┼──────────────────────────┼────────────────────────┤
+| awesome site | 8.1.8      | http://awesome site.test | D:\_Sites\awesome site |
+|              | (default)  |                          |                        |
+└──────────────┴────────────┴──────────────────────────┴────────────────────────┘
+
+┌──────────────┬────────────┬───────── Linked ─────────┬────────────────────────┐
+| Site         | PHP        | URL                      | Path                   |
+├──────────────┼────────────┼──────────────────────────┼────────────────────────┤
+| awesome_site | 8.1.8      | http://awesome_site.test | D:\_Sites\awesome site |
+|              | (default)  |                          |                        |
+└──────────────┴────────────┴──────────────────────────┴────────────────────────┘
+
+┌─────────┬───────────────── Proxied──┬────────────────────────┐
+| Site    | URL                       | Host                   |
+├─────────┼───────────────────────────┼────────────────────────┤
+| my_site | http://awesome_site.test  | http://127.0.0.1:9200  |
+└─────────┴───────────────────────────┴────────────────────────┘
 ```
 
 ### Sharing
@@ -584,19 +922,22 @@ $ valet parked
 ##### share
 
 ```
-share [site]         Optionally, specify a site. Otherwise the default is the current working directory.
-      [-o|--options] Specify ngrok options/flags.
-      [--debug]      Output error messages to the current terminal.
+share                Share the current working directory site with a publically accessible URL
+      [site]         Optionally, specify a site
+      [-o|--options] Specify ngrok options/flags
+      [--debug]      Output error messages to the current terminal
 ```
 
 ```console
-$ valet share site1
-
-/d/sites/site1
+$ cd /d/sites/site1
 $ valet share
+
+$ valet share site1
 ```
 
 Share your local site publically. ngrok will do all the magic for you and give you a publically accessible URL to share to clients or team members.
+
+Before sharing a site with ngrok, you must first set the authtoken using Valet's [`set-ngrok-token` command](#authset-ngrok-token).
 
 When using the command, a new CMD terminal will be launched with the ngrok information, including the public URL to share.
 
@@ -615,13 +956,13 @@ $ valet share -o domain=example.com
 
 ###### Note: If you're already sharing a project, and try to share another project simultaneously, the new cmd window may open for a split second and then close. This is due to ngrok failing silently, and won't output any error messages. To output the errors, pass the `--debug` flag to the command. This will cause ngrok to try to run in the current terminal instead of a new window, thus sending the error messages.
 
-##### set-ngrok-token
+##### auth|set-ngrok-token
 
 ```
 auth | set-ngrok-token [authtoken] Set the ngrok authtoken.
 ```
 
-<small>`auth` is a command alias.</small>
+`auth` is a command alias.
 
 ```console
 $ valet set-ngrok-token 123abc
@@ -631,39 +972,49 @@ Authtoken saved to configuration file: C:/Users/Username/.config/valet/ngrok/ngr
 
 Before sharing a site with ngrok, you must first set the authtoken, which can be accessed in your ngrok account.
 
-##### fetch-share-url
+<img align="center" src="./The_same_icon.svg" style="width:20px;"> This command is the same as the Mac version.
+
+##### url|fetch-share-url
 
 ```
-url | fetch-share-url [site] Get the public URL of the site that is currently being shared.
+url | fetch-share-url          Get and copy the public URL of the current working directory site that is currently being shared
+                       [site]  Optionally, specify a site
 ```
 
-<small>`url` is a command alias.</small>
+`url` is a command alias.
+
+Once sharing a site with `valet share`, you can get the public URL using this command in a separate terminal. The URL will be outputted to the terminal and will also be copied to the clipboard for ease of use.
 
 ```console
+$ cd /d/sites/site1
+$ valet fetch-share-url
+The public URL for site1 is [ngrok public URL]
+It has been copied to your clipboard.
+
 $ valet fetch-share-url site1
 $ valet url site1
 The public URL for site1 is [ngrok public URL]
 It has been copied to your clipboard.
 ```
 
-Once sharing a site with `valet share`, you can get the public URL using this command in a separate terminal. The URL will be outputted to the terminal and will also be copied to the clipboard for ease of use.
+<img align="center" src="./The_same_icon.svg" style="width:20px;"> This command is the same as the Mac version.
 
 ##### ngrok
 
 ```
-ngrok [commands] Run ngrok commands, arguments, and values.
+ngrok [commands] Run ngrok commands
       [-o|--options] Specify ngrok options/flags.
-```
-
-```
-$ valet ngrok config add-authtoken 123abc --options=config=C:/path/ngrok.yml
 ```
 
 Because ngrok CLI has a multitude of commands and options, the `valet ngrok` command is very useful for passing through any and all commands to ngrok.
 
 ###### ngrok commands
 
-The `commands` argument is a space-separated array of the commands, arguments, and values.
+The `commands` argument is a space-separated array of the commands plus it's argument's values.
+
+```console
+$ valet ngrok config add-authtoken 123abc
+```
 
 ###### ngrok --options
 
@@ -676,47 +1027,94 @@ $ valet ngrok config add-authtoken 123abc -o config=C:/path/ngrok.yml//log=false
 
 ### Other commands
 
-##### services
+##### tld
 
 ```
-services    List the installed Valet services
+tld         Get the TLD currently being used by Valet
+     [tld]  Optionally, set a new TLD
+```
+
+`tld` gets the current Top Level Domain (TLD) that Valet is using.
+
+```console
+$ valet tld
+test
+```
+
+When developing, you may like to use a different TLD. Valet serves sites on the default `.test` TLD, but you can also set a different one with this command, just pass the new TLD as it's argument.
+
+```console
+$ valet tld code
+Your Valet TLD has been updated to [code].
+```
+
+It's important to note, when choosing a TLD, you need to be careful not to use one that could potentially be used on the Web. If your site name and TLD match a real web address, then the browser will resolve the request and redirect it to the real website instead of Valet resolving it to your local project.
+
+Example: Your local Roots Bedrock site on `bedrock.dev` will redirect to the Minecraft Bedrock website.
+
+Generally, the [special-use domains listed on Wikipedia](https://en.wikipedia.org/wiki/List_of_Internet_top-level_domains#Special-Use_Domains), and any unique custom ones like `.code`, are all good to use as they are invalid TLDs.
+
+<img align="center" src="./The_same_icon.svg" style="width:20px;"> This command is the same as the Mac version.
+Note: the Mac version has officially discontinued it's use; whereas Valet Windows 3 won't.
+
+##### which
+
+```
+which  Determine which Valet driver the current working directory is using
 ```
 
 ```console
-$ valet services
-Checking the Valet services...
-+-------------------+--------------------------------+---------+
-| Service           | Windows Name                   | Status  |
-+-------------------+--------------------------------+---------+
-| acrylic           | AcrylicDNSProxySvc             | running |
-| nginx             | valet_nginx                    | running |
-| php 8.1.8         | valet_php8.1.8cgi-9006         | running |
-| php 7.4.33        | valet_php7.4.33cgi-9004        | running |
-| php-xdebug 8.1.8  | valet_php8.1.8cgi_xdebug-9106  | running |
-| php-xdebug 7.4.33 | valet_php7.4.33cgi_xdebug-9104 | running |
-+-------------------+--------------------------------+---------+
+$ cd /d/sites/site1
+$ valet which
+This site is served by [BasicValetDriver].
 ```
 
-##### secure
+<img align="center" src="./The_same_icon.svg" style="width:20px;"> This command is the same as the Mac version.
+
+##### paths
 
 ```
-secure [domain]   Secure the specified domain with a trusted TLS certificate.
+paths  List all of the paths registered with Valet
+```
+
+`paths` allows you to view all registered paths. The default path is `.config/valet/Sites`, any others are added via the [`park`](#park) command.
+
+```console
+$ valet paths
+┌───────────────────────────────────────┐
+│ Paths                                 │
+├───────────────────────────────────────┤
+│ C:/Users/Username/.config/valet/Sites │
+├───────────────────────────────────────┤
+│ D:/Sites                              │
+└───────────────────────────────────────┘
+```
+
+<img align="center" src="./The_same_icon.svg" style="width:20px;"> This command is the same as the Mac version.
+
+##### open
+
+```
+open          Open the current working directory site in the browser
+      [site]  Optionally, specify a site
 ```
 
 ```console
-$ valet secure site1
-The [site1.test] site has been secured with a fresh TLS certificate.
+$ cd /d/sites/site1
+$ valet open
+
+$ valet open site1
 ```
 
-###### Note: If you use VS Code integrated terminal, the secure command (or secure option in on other commands) won't work and will need to be ran in a standalone terminal with admin privileges.
+<img align="center" src="./The_same_icon.svg" style="width:20px;"> This command is the same as the Mac version.
 
-##### on-latest-version
+##### latest|on-latest-version
 
 ```
-latest | on-latest-version
+latest | on-latest-version  Determine if this is the latest version of Valet
 ```
 
-<small>`latest` is a command alias.</small>
+`latest` is a command alias.
 
 ```console
 $ valet on-latest-version
@@ -724,7 +1122,129 @@ $ valet latest
 Yes
 ```
 
-Determine whether the installed version of Valet is the latest.
+`on-latest-version` determines whether the installed version of Valet is the latest. If not, then Valet will prompt you to update.
+
+<img align="center" src="./The_same_icon.svg" style="width:20px;"> This command is the same as the Mac version.
+
+##### log
+
+```
+log                 View and tail a log file
+     [key]          The name of the log
+     [-f|--follow]  Tail real-time streaming output of the changing file
+     [-l|--lines]   The number of lines to view
+```
+
+```console
+$ valet log nginx --follow --lines=3
+$ valet log nginx -f -l 3
+```
+
+`log` allows you to view the logs which are written by Valet's services. To view a list of logs, simply run `valet log`.
+
+```console
+$ valet log
+┌───────────────────────┬───────────────────────────────────────────────────────────────┐
+│ Key                   │ File                                                          │
+├───────────────────────┼───────────────────────────────────────────────────────────────┤
+│ nginx                 │ C:/Users/Username/.config/valet/Log/nginx-error.log           │
+├───────────────────────┼───────────────────────────────────────────────────────────────┤
+│ nginxservice.err      │ C:/Users/Username/.config/valet/Log/nginxservice.err.log      │
+├───────────────────────┼───────────────────────────────────────────────────────────────┤
+│ nginxservice.out      │ C:/Users/Username/.config/valet/Log/nginxservice.out.log      │
+├───────────────────────┼───────────────────────────────────────────────────────────────┤
+│ nginxservice.wrapper  │ C:/Users/Username/.config/valet/Log/nginxservice.wrapper.log  │
+├───────────────────────┼───────────────────────────────────────────────────────────────┤
+│ phpcgiservice.err     │ C:/Users/Username/.config/valet/Log/phpcgiservice.err.log     │
+├───────────────────────┼───────────────────────────────────────────────────────────────┤
+│ phpcgiservice.out     │ C:/Users/Username/.config/valet/Log/phpcgiservice.out.log     │
+├───────────────────────┼───────────────────────────────────────────────────────────────┤
+│ phpcgiservice.wrapper │ C:/Users/Username/.config/valet/Log/phpcgiservice.wrapper.log │
+└───────────────────────┴───────────────────────────────────────────────────────────────┘
+```
+
+The `key` is required in order to view a log. It can be found from the list of logs.
+
+###### --follow
+
+The `--follow` (shortcut `-f`) option can be used to tail real-time streaming output of the changing file.
+
+```console
+$ valet log nginx --follow
+$ valet log nginx -f
+```
+
+###### --lines
+
+The `--lines` (shortcut `-l`) option changes the number of lines to view from the log.
+
+```console
+$ valet log nginx --lines=3
+$ valet log nginx -l 3
+```
+
+###### Note: This command uses the Unix-like Git Bash `tail` command, therefore this command will currently only work in Git Bash.
+
+<img align="center" src="./The_same_icon.svg" style="width:20px;"> This command is the same as the Mac version.
+
+##### services
+
+```
+services  List the installed Valet services
+```
+
+```console
+$ valet services
+Checking the Valet services...
+┌───────────────────┬────────────────────────────────┬───────────────┐
+| Service           | Windows Name                   | Status        |
+├───────────────────┼────────────────────────────────┼───────────────┤
+| acrylic           | AcrylicDNSProxySvc             | running       |
+├───────────────────┼────────────────────────────────┼───────────────┤
+| nginx             | valet_nginx                    | running       |
+├───────────────────┼────────────────────────────────┼───────────────┤
+| php 8.1.8         | valet_php8.1.8cgi-9001         | running       |
+├───────────────────┼────────────────────────────────┼───────────────┤
+| php 7.4.33        | valet_php7.4.33cgi-9002        | running       |
+├───────────────────┼────────────────────────────────┼───────────────┤
+| php-xdebug 8.1.8  | valet_php8.1.8cgi_xdebug-9101  | not installed |
+├───────────────────┼────────────────────────────────┼───────────────┤
+| php-xdebug 7.4.33 | valet_php7.4.33cgi_xdebug-9102 | running       |
+└───────────────────┴────────────────────────────────┴───────────────┘
+```
+
+##### directory-listing
+
+```
+directory-listing            Determine directory-listing behaviour. Default is off, which means a 404 will display
+                   [status]  Switch directory listing "on" or "off"
+```
+
+```console
+$ valet directory-listing
+Directory listing is off
+
+$ valet directory-listing on
+Directory listing setting is now: on
+```
+
+<img align="center" src="./The_same_icon.svg" style="width:20px;"> This command is the same as the Mac version.
+
+##### diagnose
+
+```
+diagnose                Output diagnostics to aid in debugging Valet.
+          [-p|--print]  Print diagnostics output while running
+          [--plain]     Format clipboard output as plain text
+```
+
+```console
+$ valet diagnose
+Running diagnostics...
+[Diagnostics output here]
+```
+
+<img align="center" src="./The_same_icon.svg" style="width:20px;"> This command is the same as the Mac version.
 
 ### Notes for all `--options`
 
@@ -767,21 +1287,21 @@ These are **important notes** for the commands that have the `--options` or `--v
 
 ### Commands not supported
 
-`valet loopback`
+`valet loopback` - N/A
 
-`valet trust`
+`valet trust` - N/A
 
 `valet status` - In favour of the `valet services` command
 
-`valet php` (proxying commands to PHP CLI)
+`valet php` (proxying commands to PHP CLI) - Possible far future feature?
 
-`valet composer` (proxying commands to Composer CLI)
+`valet composer` (proxying commands to Composer CLI) - N/A
 
 `valet which-php` - In favour of the `valet php:which` command
 
-`valet share-tool`
+`valet share-tool` - Upcoming feature
 
-For other commands that have not changed, please refer to the official documentation on the [Laravel website](https://laravel.com/docs/8.x/valet#serving-sites).
+For commands that are referenced as "the same as the Mac version", please refer to the official documentation on the [Laravel website](https://laravel.com/docs/8.x/valet#serving-sites) for more information.
 
 ## Known Issues
 
