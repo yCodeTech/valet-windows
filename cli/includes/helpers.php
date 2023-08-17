@@ -164,7 +164,9 @@ function table(array $headers = [], array $rows = [], $setHorizontal = false, $t
 
 	$table->setHeaders($headers)->setRows($rows);
 
-	changeColumnMaxWidth($table, $headers, ["URL", "Path"], 30);
+	if (count($headers) > 1) {
+		changeColumnMaxWidth($table, $headers, ["URL", "Path"], 30);
+	}
 
 	$table->setStyle('box');
 
