@@ -153,20 +153,11 @@ Also make sure to open your preferred terminal (Windows Terminal, CMD, Git Bash,
 
 ---
 
-- If you don't have PHP installed, open PowerShell (3.0+) as Administrator and run:
+- If you don't have PHP installed, make sure to [install](https://windows.php.net/download) it.
 
-  ```powershell
-  # PHP 8.1
-  Set-ExecutionPolicy RemoteSigned -Scope Process; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri "https://github.com/ycodetech/valet-windows/raw/master/bin/php.ps1" -OutFile $env:temp\php.ps1; .$env:temp\php.ps1 "8.1"
+  Download the Zip file and unzip into `C:/php/`. You may use Thread Safe (TS), but Non-Thread Safe (NTS) is better for using PHP on the FastCGI protocol, which Valet uses.
 
-  # PHP 8.0
-  Set-ExecutionPolicy RemoteSigned -Scope Process; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri "https://github.com/ycodetech/valet-windows/raw/master/bin/php.ps1" -OutFile $env:temp\php.ps1; .$env:temp\php.ps1 "8.0"
-
-  # PHP 7.4
-  Set-ExecutionPolicy RemoteSigned -Scope Process; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri "https://github.com/ycodetech/valet-windows/raw/master/bin/php.ps1" -OutFile $env:temp\php.ps1; .$env:temp\php.ps1 "7.4"
-  ```
-
-  This script will download and install PHP for you and add it to your environment path variable. PowerShell is only required for this step.
+  > For NTS binaries the widespread use case is interaction with a web server through the FastCGI protocol, utilizing no multithreading (but also for example CLI).
 
 - If you don't have Composer installed, make sure to [install](https://getcomposer.org/doc/00-intro.md#installation-windows) it.
 
