@@ -352,7 +352,7 @@ PHP 7.4.33 from C:\php\7.4 has been added.
 
 ###### Furthermore, the details of the versions will be written to the config in a natural decending order that adheres to decimals. This means that when two minor versions (like 8.1.8 and 8.1.18) of an alias (8.1) are added, and the default PHP is then set to use the alias, then Valet will use the most recent version of the alias, which in this case would be 8.1.18.
 
-###### --xdebug
+###### php:add --xdebug
 
 `--xdebug` is a boolean option to optionally install Xdebug for the PHP being added. If the option is present, it's `true`, otherwise `false`.
 
@@ -464,6 +464,8 @@ $ valet xdebug:install
 Installing Xdebug services...
 Installed Xdebug for PHP 7.4.33, 8.1.8
 ```
+
+Valet only installs an Xdebug PHP CGI service on a separate port to work along side the PHP CGI service, it doesn't install Xdebug itself. Please read the [Xdebug Installation](#xdebug-installation) for further information.
 
 You can optionally install Xdebug for one specific PHP version using the `phpVersion` argument.
 
@@ -1323,9 +1325,15 @@ For commands that are referenced as "the same as the Mac version", please refer 
 
   If this still happens after changing the TLD, then it has been cached by the browser, despite NGINX specifying headers not to cache. To rectify try `"Empty cache and hard reload"` option of the page reload button.
 
-## Xdebug
+## Xdebug Installation
 
-To enable a debugging session you can use [Xdebug helper](https://chrome.google.com/webstore/detail/xdebug-helper/eadndfjplgieldjbigjakmdgkmoaaaoc) or set a cookie with the name `XDEBUG_SESSION`.
+Valet only installs a specific Xdebug PHP CGI service on a separate port to work alongside the PHP service. To install Xdebug itself, follow the [official guide](https://xdebug.org/docs/install).
+
+When configuring Xdebug, make sure to set the Xdebug port to the same port that Valet has setup for the Xdebug CGI service. You can find this written in the Valet config, or use the [php:list](#phplist) command.
+
+To enable a debugging session you can use [Xdebug helper](https://chrome.google.com/webstore/detail/xdebug-helper/eadndfjplgieldjbigjakmdgkmoaaaoc), or set a cookie with the name `XDEBUG_SESSION`, or a VScode extension.
+
+###### Dev comment: I'm not entirely sure how Xdebug works. So please refer to online guides for further guidance.
 
 ## Testing
 
