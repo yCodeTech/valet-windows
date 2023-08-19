@@ -19,7 +19,7 @@
 
 <br>
 
-[Introduction](#introduction) | [Documentation](#documentation) | [Commands](#commands) | [Commands Not Supported](#commands-not-supported) | [Known Issues](#known-issues) | [Xdebug](#xdebug) | [Testing](#testing) | [Contributions](#contributions)
+[Introduction](#introduction) | [Documentation](#documentation) | [Commands](#commands) | [Commands Not Supported](#commands-not-supported) | [Known Issues](#known-issues) | [Xdebug Installation](#xdebug-installation) | [Testing](#testing) | [Contributions](#contributions)
 
 ---
 
