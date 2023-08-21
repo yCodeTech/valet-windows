@@ -343,34 +343,6 @@ if (is_dir(VALET_HOME_PATH)) {
 	}
 
 	/**
-	 * Get or set the TLD currently being used by Valet.
-	 */
-	$app->command('tld [tld]', function ($tld = null) {
-		if ($tld === null) {
-			return info(Configuration::read()['tld']);
-		}
-
-		$oldTld = Configuration::read()['tld'];
-
-		Acrylic::updateTld($tld = trim($tld, '.'));
-
-		Configuration::updateKey('tld', $tld);
-
-		Site::resecureForNewTld($oldTld, $tld);
-		Site::reisolateForNewTld($oldTld, $tld);
-
-		PhpCgi::restart();
-
-		if (PhpCgiXdebug::installed()) {
-			PhpCgiXdebug::restart();
-		}
-
-		Nginx::restart();
-
-		info('Your Valet TLD has been updated to [' . $tld . '].');
-	}, ['domain'])->descriptions('Get or set the TLD used for Valet sites.');
-
-	/**
 	 * Add the current working directory to the paths configuration.
 	 */
 	$app->command('park [path]', function ($path = null) {
@@ -706,42 +678,6 @@ if (is_dir(VALET_HOME_PATH)) {
 			])->addUsage("unisolate --site=mySite")->addUsage("unisolate --all");
 
 	/**
-	 * Determine which Valet driver the current directory is using.
-	 */
-	$app->command('which', function () {
-		require __DIR__ . '/drivers/require.php';
-
-		$driver = ValetDriver::assign(getcwd(), basename(getcwd()), '/');
-
-		if ($driver) {
-			info('This site is served by [' . get_class($driver) . '].');
-		} else {
-			warning('Valet could not determine which driver to use for this site.');
-		}
-	})->descriptions('Determine which Valet driver serves the current working directory');
-
-	/**
-	 * Display all of the registered paths.
-	 */
-	$app->command('paths', function () {
-		$paths = Configuration::read()['paths'];
-
-		if (count($paths) > 0) {
-			output(json_encode($paths, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-		} else {
-			info('No paths have been registered.');
-		}
-	})->descriptions('Get all of the paths registered with Valet');
-
-	/**
-	 * Open the current or given directory in the browser.
-	 */
-	$app->command('open [site]', function ($site = null) {
-		$url = 'http://' . ($site ?: Site::host(getcwd())) . '.' . Configuration::read()['tld'];
-		CommandLine::passthru("start $url");
-	})->descriptions('Open the site for the current (or specified) directory in your browser');
-
-	/**
 	 * Sharing - ngrok
 	 */
 
@@ -987,6 +923,75 @@ if (is_dir(VALET_HOME_PATH)) {
 
 		return warning(sprintf('Invalid Valet service name [%s]', $service));
 	})->descriptions('Stop the Valet services');
+
+	/**
+	 * Get or set the TLD currently being used by Valet.
+	 */
+	$app->command('tld [tld]', function ($tld = null) {
+		if ($tld === null) {
+			return info(Configuration::read()['tld']);
+		}
+
+		$oldTld = Configuration::read()['tld'];
+
+		Acrylic::updateTld($tld = trim($tld, '.'));
+
+		Configuration::updateKey('tld', $tld);
+
+		Site::resecureForNewTld($oldTld, $tld);
+		Site::reisolateForNewTld($oldTld, $tld);
+
+		PhpCgi::restart();
+
+		if (PhpCgiXdebug::installed()) {
+			PhpCgiXdebug::restart();
+		}
+
+		Nginx::restart();
+
+		info('Your Valet TLD has been updated to [' . $tld . '].');
+	}, ['domain'])->descriptions('Get or set the TLD used for Valet sites.');
+
+	/**
+	 * Determine which Valet driver serves the current working directory.
+	 */
+	$app->command('which', function () {
+		require __DIR__ . '/drivers/require.php';
+
+		$driver = ValetDriver::assign(getcwd(), basename(getcwd()), '/');
+
+		if ($driver) {
+			info('This site is served by [' . get_class($driver) . '].');
+		} else {
+			warning('Valet could not determine which driver to use for this site.');
+		}
+	})->descriptions('Determine which Valet driver serves the current working directory');
+
+	/**
+	 * List all of the paths registered with Valet.
+	 */
+	$app->command('paths', function () {
+		$paths = Configuration::read()['paths'];
+
+		if (count($paths) > 0) {
+			$newPaths = [];
+			foreach ($paths as $key => $path) {
+				array_push($newPaths, [$path]);
+			}
+
+			table(["Paths"], $newPaths, true);
+		} else {
+			info('No paths have been registered.');
+		}
+	})->descriptions('List all of the paths registered with Valet');
+
+	/**
+	 * Open the site for the current (or specified) directory in your browser.
+	 */
+	$app->command('open [site]', function ($site = null) {
+		$url = 'http://' . ($site ?: Site::host(getcwd())) . '.' . Configuration::read()['tld'];
+		CommandLine::passthru("start $url");
+	})->descriptions('Open the site for the current (or specified) directory in your browser');
 
 	/**
 	 * Determine if this is the latest release of Valet.
