@@ -1,8 +1,0 @@
-{
-    "repositories": [
-        {
-            "type": "path",
-            "url": "/valet"
-        }
-    ]
-}

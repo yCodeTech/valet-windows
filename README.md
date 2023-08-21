@@ -19,7 +19,7 @@
 
 <br>
 
-[Introduction](#introduction) | [Documentation](#documentation) | [Commands](#commands) | [Commands Not Supported](#commands-not-supported) | [Known Issues](#known-issues) | [Xdebug Installation](#xdebug-installation) | [Testing](#testing) | [Contributions](#contributions)
+[Introduction](#introduction) | [Documentation](#documentation) | [Commands](#commands) | [Commands Not Supported](#commands-not-supported) | [Known Issues](#known-issues) | [Xdebug Installation](#xdebug-installation) | [Contributions](#contributions)
 
 ---
 
@@ -1334,26 +1334,6 @@ When configuring Xdebug, make sure to set the Xdebug port to the same port that 
 To enable a debugging session you can use [Xdebug helper](https://chrome.google.com/webstore/detail/xdebug-helper/eadndfjplgieldjbigjakmdgkmoaaaoc), or set a cookie with the name `XDEBUG_SESSION`, or a VScode extension.
 
 ###### Dev comment: I'm not entirely sure how Xdebug works. So please refer to online guides for further guidance.
-
-## Testing
-
-Run the unit tests with:
-
-```bash
-composer test-unit
-```
-
-Before running the integration tests for the first time, you must build the Docker container with:
-
-```bash
-composer build-docker
-```
-
-Next, you can run the integration tests with:
-
-```bash
-composer test-integration
-```
 
 ## Contributions
 
