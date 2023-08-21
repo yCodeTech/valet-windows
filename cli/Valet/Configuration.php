@@ -111,7 +111,7 @@ class Configuration
 	{
 		$this->files->ensureDirExists($path = $this->valetHomePath('Log'), user());
 
-		$this->files->touch($path . DIRECTORY_SEPARATOR . 'nginx-error.log');
+		$this->files->touch($path . '/nginx-error.log');
 	}
 
 	/**
@@ -205,7 +205,7 @@ class Configuration
 	 */
 	public function getPhp($phpPath)
 	{
-		$phpPath = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $phpPath);
+		$phpPath = str_replace('\\', "/", $phpPath);
 
 		$config = $this->read();
 
@@ -222,7 +222,7 @@ class Configuration
 	 */
 	public function getPhpByVersion($phpVersion)
 	{
-		$phpVersion = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $phpVersion);
+		$phpVersion = str_replace('\\', "/", $phpVersion);
 
 		$config = $this->read();
 
@@ -269,7 +269,7 @@ class Configuration
 	 */
 	public function addPhp($phpPath)
 	{
-		$phpPath = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $phpPath);
+		$phpPath = str_replace('\\', "/", $phpPath);
 		//        print_r($phpPath);
 //        exit;
 
@@ -326,7 +326,7 @@ class Configuration
 	 */
 	public function removePhp($phpPath)
 	{
-		$phpPath = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $phpPath);
+		$phpPath = str_replace('\\', "/", $phpPath);
 
 		$config = $this->read();
 		$config['php'] = $config['php'] ?? [];

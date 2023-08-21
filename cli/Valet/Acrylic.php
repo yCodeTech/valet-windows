@@ -210,8 +210,8 @@ class Acrylic
 	 */
 	public function path(string $path = ''): string
 	{
-		$basePath = str_replace(DIRECTORY_SEPARATOR, '/', realpath(valetBinPath() . 'Acrylic'));
+		$basePath = str_replace("\\", '/', realpath(valetBinPath() . 'Acrylic'));
 
-		return $basePath . ($path ? DIRECTORY_SEPARATOR . $path : $path);
+		return $basePath . ($path ? "/$path" : $path);
 	}
 }

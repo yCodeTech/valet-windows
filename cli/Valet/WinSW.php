@@ -166,6 +166,6 @@ class WinSW
 	 */
 	protected function servicesPath(string $path = ''): string
 	{
-		return Valet::homePath('Services' . ($path ? DIRECTORY_SEPARATOR . $path : $path));
+		return Valet::homePath('Services' . ($path ? "/$path" : $path));
 	}
 }

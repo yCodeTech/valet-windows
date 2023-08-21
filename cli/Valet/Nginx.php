@@ -125,7 +125,7 @@ class Nginx
 			$this->files->mkdirAsUser($nginxDirectory);
 		}
 
-		$this->files->putAsUser($nginxDirectory . DIRECTORY_SEPARATOR . '.keep', "\n");
+		$this->files->putAsUser($nginxDirectory . '/.keep', "\n");
 
 		$this->rewriteSecureNginxFiles();
 	}
@@ -221,6 +221,6 @@ class Nginx
 	 */
 	public function path(string $path = ''): string
 	{
-		return realpath(valetBinPath() . 'nginx') . ($path ? DIRECTORY_SEPARATOR . $path : $path);
+		return realpath(valetBinPath() . 'nginx') . ($path ? "/$path" : $path);
 	}
 }

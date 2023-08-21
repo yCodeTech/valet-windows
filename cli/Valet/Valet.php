@@ -41,7 +41,7 @@ class Valet
 				return is_dir($file);
 			})
 			->map(function ($file) use ($path) {
-				return $path . DIRECTORY_SEPARATOR . $file;
+				return "$path/$file";
 			})
 			->values()->all();
 	}
@@ -161,6 +161,6 @@ class Valet
 	 */
 	public static function homePath(string $path = ''): string
 	{
-		return VALET_HOME_PATH . ($path ? DIRECTORY_SEPARATOR . $path : $path);
+		return VALET_HOME_PATH . ($path ? "/$path" : $path);
 	}
 }
