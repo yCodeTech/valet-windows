@@ -366,6 +366,7 @@ class Configuration
 	 */
 	public function addPath(string $path, bool $prepend = false)
 	{
+		$path = str_replace('\\', "/", $path);
 		$this->write(tap($this->read(), function (&$config) use ($path, $prepend) {
 			$method = $prepend ? 'prepend' : 'push';
 
