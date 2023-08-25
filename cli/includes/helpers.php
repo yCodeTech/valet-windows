@@ -23,6 +23,7 @@ define('VALET_HOME_PATH', $_SERVER['HOME'] . '/.config/valet');
 define('VALET_SERVER_PATH', str_replace('\\', '/', realpath(__DIR__ . '/../../server.php')));
 define('VALET_STATIC_PREFIX', '41c270e4-5535-4daa-b23e-c269744c2f45');
 
+// DEPRECATED: Legacy home path. No need for it.
 define('VALET_LEGACY_HOME_PATH', $_SERVER['HOME'] . '/.valet');
 
 /**
@@ -76,13 +77,43 @@ function error(string $output, $exception = false)
 		throw new RuntimeException($output);
 	}
 	if ($exception === true) {
-		$errors = error_get_last();
+		// $errors = error_get_last();
 
-		$outputTxt = getErrorTypeName($errors['type']) . ": "
-			. "$output\n"
-			. $errors['message']
-			. "\n{$errors['file']}:{$errors['line']}";
-		throw new \Exception($outputTxt);
+		// $outputTxt = getErrorTypeName($errors['type']) . ": "
+		// 	. "$output\n"
+		// 	. $errors['message']
+		// 	. "\n{$errors['file']}:{$errors['line']}";
+		// throw new \Exception($outputTxt);
+
+
+		$errors = new \Exception($output);
+
+		$errorCode = $errors->getCode();
+		$errorMsg = $errors->getMessage();
+		$errorTrace = $errors->getTrace();
+
+		$constructTrace = array();
+		$count = 0;
+		foreach ($errorTrace as $key => $value) {
+			$count_num = $count++ . ") ";
+			$class = isset($value["class"]) ? $value["class"] : "";
+			$type = isset($value["type"]) ? $value["type"] : "";
+			$func = isset($value["function"]) ? $value["function"] : "";
+
+			$file_n_line = isset($value["file"]) ?
+				" ------ " . $value["file"] . ":" . $value["line"] : "";
+
+			$constructTrace[] = $count_num . $class . $type . $func . $file_n_line;
+		}
+
+		$output = getErrorTypeName($errorCode) . ": $errorMsg\n\n" . implode("\n", $constructTrace);
+
+		// Wait 1 microsecond, to make sure all output before the error call has reached
+		// the terminal.
+		usleep(1);
+		(new ConsoleOutput)->getErrorOutput()->writeln("\n\n<error>$output</error>");
+
+		exit();
 	} else {
 		(new ConsoleOutput)->getErrorOutput()->writeln("<error>$output</error>");
 	}
