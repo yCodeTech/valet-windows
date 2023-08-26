@@ -173,7 +173,7 @@ $app->command('sudo valetCommand* [-o|--valetOptions=]', function ($valetCommand
 $app->command('php:add path [--xdebug]', function ($path, $xdebug) {
 	info("Adding {$path}...");
 
-	if ($php = Configuration::addPhp($path)) {
+	if ($php = Configuration::addPhp(lcfirst($path))) {
 		\PhpCgi::install($php['version']);
 
 		if ($xdebug) {

@@ -162,7 +162,9 @@ class Configuration
 			$this->updateKey('tld', !empty($config['domain']) ? $config['domain'] : 'test');
 		}
 
-		$this->addDefaultPhp();
+		if (!isset($config['default_php']) || $config['default_php'] === null) {
+			$this->addDefaultPhp();
+		}
 
 		// Add php_port if missing.
 		$this->updateKey('php_port', $config['php_port'] ?? PhpCgi::PORT);
@@ -188,7 +190,7 @@ class Configuration
 	 */
 	public function addDefaultPhp()
 	{
-		$phpPath = $phpPath ?? \PhpCgi::findDefaultPhpPath();
+		$phpPath = lcfirst(\PhpCgi::findDefaultPhpPath());
 
 		$this->addPhp($phpPath);
 
