@@ -152,20 +152,25 @@ class Configuration
 	public function writeBaseConfiguration()
 	{
 		if (!$this->files->exists($this->path())) {
-			$this->write(['tld' => 'test', 'paths' => [], 'php_port' => PhpCgi::PORT, 'php_xdebug_port' => PhpCgiXdebug::PORT]);
+			$baseConfig = [
+				'tld' => 'test',
+				'paths' => [$this->valetHomePath('Sites')],
+				'php_port' => PhpCgi::PORT,
+				'php_xdebug_port' => PhpCgiXdebug::PORT
+			];
+
+			$this->write($baseConfig);
 		}
 
 		$config = $this->read();
 
-		// Migrate old configurations from 'domain' to 'tld'.
-		if (!isset($config['tld'])) {
-			$this->updateKey('tld', !empty($config['domain']) ? $config['domain'] : 'test');
-		}
-
+		// Add default_php if missing or is null.
 		if (!isset($config['default_php']) || $config['default_php'] === null) {
 			$this->addDefaultPhp();
 		}
 
+		// Add tld if missing.
+		$this->updateKey('tld', $config['tld'] ?? 'test');
 		// Add php_port if missing.
 		$this->updateKey('php_port', $config['php_port'] ?? PhpCgi::PORT);
 		$this->updateKey('php_xdebug_port', $config['php_xdebug_port'] ?? PhpCgiXdebug::PORT);
@@ -272,8 +277,6 @@ class Configuration
 	public function addPhp($phpPath)
 	{
 		$phpPath = str_replace('\\', "/", $phpPath);
-		//        print_r($phpPath);
-//        exit;
 
 		$phpVersion = \PhpCgi::findPhpVersion($phpPath);
 
