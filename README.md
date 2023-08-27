@@ -181,7 +181,14 @@ Valet will automatically start its daemon each time your machine boots. There is
 
 ```
 install            Install Valet's services and configs
+Install Valet's services and configs, and auto start Valet.
         [--xdebug] Optionally, install Xdebug for PHP.
+```
+
+```console
+$ valet install
+$ valet install --xdebug
+Valet installed and started successfully!
 ```
 
 This installs all Valet services:
@@ -196,12 +203,11 @@ And it's configs in `C:\Users\Username\.config\valet`.
 
 Once complete, Valet will automatically start the services.
 
-```console
-$ valet install
-Valet installed and started successfully!
-```
-
 ###### Note: If `install` is ran again when it's already installed, Valet will ask if you want to proceed to reinstall.
+
+###### install --xdebug
+
+`--xdebug` is a boolean option to optionally install Xdebug for PHP. If the option is present, it's `true`, otherwise `false`.
 
 ##### sudo
 
@@ -247,7 +253,7 @@ $ valet sudo link mysitename -o isolate//secure
 
 ```
 start            Starts Valet's services
-       [service] Optionally, pass a specific service name to start
+       [service] Optionally, specify a particular service to start [acrylic, nginx, php, xdebug]
 ```
 
 ```console
@@ -264,15 +270,15 @@ Nginx has been started.
 
 ```
 restart            Restarts Valet's services
-         [service] Optionally, pass a specific service name to restart
+         [service] Optionally, specify a particular service to restart [acrylic, nginx, php, xdebug]
 ```
 
 ```console
 $ valet restart
 Valet services have been restarted.
 
-$ valet start nginx
-Nginx has been started.
+$ valet restart nginx
+Nginx has been restarted.
 ```
 
 <img align="center" src="./The_same_icon.svg" style="width:20px;"> This command is the same as the Mac version.
@@ -281,7 +287,7 @@ Nginx has been started.
 
 ```
 stop            Stops Valet's services
-      [service] Optionally, pass a specific service name to stop
+      [service] Optionally, specify a particular service to stop [acrylic, nginx, php, xdebug]
 ```
 
 ```console
@@ -298,8 +304,8 @@ Nginx has been stopped.
 
 ```
 uninstall                      Uninstalls Valet's services
-           [--force]           Force uninstallation without a confirmation question
-		   [-p|--purge-config] Purge and remove all Valet configs
+           [--force]           Optionally force uninstallation without a confirmation question
+           [-p|--purge-config] Optionally purge and remove all Valet configs
 ```
 
 ```console
@@ -358,8 +364,8 @@ PHP 7.4.33 from C:\php\7.4 has been added.
 
 ```console
 $ valet php:add "C:\php\7.4" --xdebug
-Installing Xdebug for 8.2.5...
-PHP 8.2.5 from C:\php\7.4 has been added.
+Installing Xdebug for 7.4.33...
+PHP 7.4.33 from C:\php\7.4 has been added.
 
 ```
 
@@ -502,7 +508,7 @@ Installed Xdebug for PHP 7.4.33
 ##### use
 
 ```
-use       [phpVersion]  Change the default PHP version used by Valet. Either specify the full version or the alias
+use  [phpVersion]  Change the default PHP version used by Valet. Either specify the full version or the alias
 ```
 
 ```console
@@ -578,7 +584,13 @@ The site [my_site] is now using the default PHP version.
 
 $ valet unisolate --site=my_site
 The site [my_site] is now using the default PHP version.
+```
 
+###### unisolate --all
+
+`--all` is a boolean option to optionally unisolate all the currently isolated sites. If the option is present, it's `true`, otherwise `false`.
+
+```console
 $ valet unisolate --all
 The site [my_site] is now using the default PHP version.
 The site [site1] is now using the default PHP version.
@@ -626,8 +638,9 @@ $ valet secured
 ##### unsecure
 
 ```
-unsecure          Unsecure the current working directory
+unsecure        Unsecure the current working directory
         [site]  Optionally specify the site instead of the current working directory
+        [--all] Optionally unsecure all secured sites
 ```
 
 Unsecures a site by removing it's TLS certificate and serves the site on the `http` protocol.
@@ -640,6 +653,17 @@ The [site1.test] site has been unsecured and will now be served over HTTP.
 $ valet secure site1
 The [site1.test] site has been unsecured and will now be served over HTTP.
 ```
+
+###### unsecure --all
+
+`--all` is a boolean option to optionally unsecure all the currently secured sites. If the option is present, it's `true`, otherwise `false`.
+
+```console
+$ valet unsecure --all
+Unsecured all sites.
+```
+
+<img align="center" src="./The_same_icon.svg" style="width:20px;"> This command is the same as the Mac version.
 
 ### Parked, Linked, Proxies and Sites
 
@@ -668,7 +692,7 @@ To view all registered directories, use the [`paths`](#paths) command.
 ##### parked
 
 ```
-parked  Display all current sites within parked paths
+parked  List all the current sites within parked paths
 ```
 
 ###### Note: If there's a parked site that is also a symbolic linked site, then it will also output the linked site name (aka alias) and it's URL (aka alias URL).
@@ -772,7 +796,7 @@ The site [cool_site.test] is now using 7.4.
 ##### links
 
 ```
-links  Display all registered symbolic links
+links  List all registered symbolic links
 ```
 
 ```console
@@ -917,8 +941,8 @@ $ valet sites
 ```
 share                Share the current working directory site with a publically accessible URL
       [site]         Optionally, specify a site
-      [-o|--options] Specify ngrok options/flags
-      [--debug]      Output error messages to the current terminal
+      [-o|--options] Optionally, specify ngrok options/flags
+      [--debug]      Allow error messages to output to the current terminal
 ```
 
 ```console
@@ -1104,7 +1128,7 @@ $ valet open site1
 ##### latest|on-latest-version
 
 ```
-latest | on-latest-version  Determine if this is the latest version of Valet
+latest | on-latest-version  Determine if this is the latest version/release of Valet
 ```
 
 `latest` is a command alias.
@@ -1210,7 +1234,7 @@ Checking the Valet services...
 
 ```
 directory-listing            Determine directory-listing behaviour. Default is off, which means a 404 will display
-                   [status]  Switch directory listing "on" or "off"
+                   [status]  Optionally, switch directory listing [on, off]
 ```
 
 ```console
@@ -1227,8 +1251,8 @@ Directory listing setting is now: on
 
 ```
 diagnose                Output diagnostics to aid in debugging Valet.
-          [-p|--print]  Print diagnostics output while running
-          [--plain]     Format clipboard output as plain text
+          [-p|--print]  Optionally print diagnostics output while running
+          [--plain]     Optionally format clipboard output as plain text
 ```
 
 ```console
