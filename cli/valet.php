@@ -383,14 +383,12 @@ if (is_dir(VALET_HOME_PATH)) {
 	/**
 	 * Remove the current working directory from Valet's list of paths.
 	 * @param string $path Optionally, specify a path
-	 *
-	 * FIX: The command alias doesn't work like this. Swap it for `->setAliases(["unpark"])`
 	 */
-	$app->command('unpark|forget [path]', function ($path = null) {
+	$app->command('forget [path]', function ($path = null) {
 		Configuration::removePath($path ?: getcwd());
 
 		info(($path === null ? 'This' : "The [{$path}]") . " directory has been removed from Valet.");
-	})->descriptions('Remove the current working directory from Valet\'s list of paths', [
+	})->setAliases(["unpark"])->descriptions('Remove the current working directory from Valet\'s list of paths', [
 				"path" => "Optionally, specify a path"
 			]);
 
@@ -739,7 +737,7 @@ if (is_dir(VALET_HOME_PATH)) {
 	 * Set the ngrok authtoken.
 	 * @param string $token Your personal ngrok authtoken
 	 */
-	$app->command('auth|set-ngrok-token [token]', function ($token = null) {
+	$app->command('set-ngrok-token [token]', function ($token = null) {
 		if ($token === null) {
 			warning("Please provide your ngrok authtoken.");
 			return;
@@ -747,7 +745,7 @@ if (is_dir(VALET_HOME_PATH)) {
 
 		Ngrok::run("authtoken $token " . Ngrok::getNgrokConfig());
 
-	})->descriptions('Set the ngrok auth token', [
+	})->setAliases(["auth"])->descriptions('Set the ngrok auth token', [
 				"token" => "Your personal ngrok authtoken"
 			])->addUsage("set-ngrok-token 123abc")->addUsage("auth 123abc");
 
@@ -802,14 +800,14 @@ if (is_dir(VALET_HOME_PATH)) {
 	 * that is currently being shared
 	 * @param string|null $site Optionally, specify a site
 	 */
-	$app->command('url|fetch-share-url [site]', function ($site = null) {
+	$app->command('fetch-share-url [site]', function ($site = null) {
 		$site = $site ?: Site::host(getcwd()) . '.' . Configuration::read()['tld'];
 
 		$url = Ngrok::currentTunnelUrl($site);
 		info("The public URL for $site is: <fg=blue>$url</>");
 		info("It has been copied to your clipboard.");
 
-	})->descriptions('Get and copy the public URL of the current working directory site that is currently being shared', [
+	})->setAliases(["url"])->descriptions('Get and copy the public URL of the current working directory site that is currently being shared', [
 				"site" => "Optionally, specify a site"
 			])->addUsage("fetch-share-url site1")->addUsage("url site1");
 
@@ -1074,14 +1072,14 @@ if (is_dir(VALET_HOME_PATH)) {
 	/**
 	 * Determine if this is the latest version/release of Valet.
 	 */
-	$app->command('latest|on-latest-version', function () use ($version) {
+	$app->command('on-latest-version', function () use ($version) {
 		if (Valet::onLatestVersion($version)) {
 			info('Yes');
 		} else {
 			warning(sprintf('Your version of Valet Windows (%s) is not the latest version available.', $version));
 			output("You can use <fg=cyan>composer global update</> to update to the latest release (after uninstalling Valet first).\nPlease read the documentation and the Changelog for information on possible breaking changes.");
 		}
-	})->descriptions('Determine if this is the latest version/release of Valet');
+	})->setAliases(["latest"])->descriptions('Determine if this is the latest version/release of Valet');
 
 	/**
 	 * View and tail a log file.
