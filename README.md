@@ -151,6 +151,8 @@ Before installation, make sure that no other programs such as Apache or Nginx ar
 
 Also make sure to open your preferred terminal (Windows Terminal, CMD, Git Bash, PowerShell, etc.) as Administrator. You can use VS Code integrated terminal, but if VS Code isn't opened as Administrator, then a bunch of User Account Control (UAC) pop ups will appear in order to give access to Valet. You can also use a non Administrator terminal without the popups, you'll just need to use Valet's [`sudo`](#sudo) command before any other Valet commands.
 
+NOTE: Laravel Valet Windows 3 is **developed and tested to run on Windows 10**. In theory it should run on Windows 11 and up, but there's no guarantee. Testers and contributors are always welcome though.
+
 ---
 
 - If you don't have PHP installed, make sure to [install](https://windows.php.net/download) it.
