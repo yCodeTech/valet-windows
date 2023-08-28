@@ -471,17 +471,19 @@ if (is_dir(VALET_HOME_PATH)) {
 
 	/**
 	 * Proxy a specified site to a specified host
-	 * @param string $site The site to be proxied
+	 * @param string $site The site to be proxied.
+	 * Multiple sites can be proxied at the same time to 1 host. Separated by commas. eg. `site1,site2,site3`
 	 * @param string $host The host to receive the site traffic
+	 * @param boolean $secure Optionally, create a proxy with a trusted TLS certificate
 	 */
-	// TODO: Add --secure option inline with the Mac version.
-	$app->command('proxy site host', function ($site, $host) {
-		Site::proxyCreate($site, $host);
+	$app->command('proxy site host [--secure]', function ($site, $host, $secure) {
+		Site::proxyCreate($site, $host, $secure);
 		Nginx::restart();
 	})->descriptions('Proxy a specified site to a specified host. Useful for docker, mailhog etc.', [
-				"site" => "The site to be proxied",
-				"host" => "The host to receive the site traffic"
-			])->addUsage("proxy site1 https://127.0.0.1:9200");
+				"site" => "The site to be proxied. Multiple sites can be proxied by separating them with a comma.",
+				"host" => "The host to receive the site traffic",
+				"--secure" => "Optionally, secure with a trusted TLS certificate"
+			])->addUsage("proxy site1 https://127.0.0.1:9200")->addUsage("proxy site1 https://127.0.0.1:9200 --secure")->addUsage("proxy site1,site2,site3 https://127.0.0.1:9200");
 
 	/**
 	 * List all the proxy sites.
@@ -1020,7 +1022,7 @@ if (is_dir(VALET_HOME_PATH)) {
 		Nginx::restart();
 
 		info('Your Valet TLD has been updated to [' . $tld . '].');
-	}, ['domain'])->descriptions('Get the TLD currently being used by Valet', [
+	})->descriptions('Get the TLD currently being used by Valet', [
 				"tld" => "Optionally, set a new TLD"
 			])->addUsage("tld code");
 
@@ -1323,7 +1325,7 @@ if (is_dir(VALET_HOME_PATH)) {
 			($purgeConfig ? '' : "\nDelete the config files from: <info>~/.config/valet</info>") .
 			"\nDelete PHP from: <info>C:/php</info>"
 		);
-	})->descriptions(' Uninstalls Valet\'s services', [
+	})->descriptions('Uninstalls Valet\'s services', [
 				'--force' => 'Optionally force an uninstall without confirmation.',
 				"--purge-config" => "Optionally purge and remove all Valet configs."
 			]);

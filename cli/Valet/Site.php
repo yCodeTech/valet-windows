@@ -662,7 +662,7 @@ class Site
 			$newUrl = str_replace('.' . $oldTld, '.' . $tld, $url);
 			$siteConf = $this->getSiteConfigFileContents($url, '.' . $oldTld);
 
-			if (!empty($siteConf) && strpos($siteConf, '# valet stub: proxy.valet.conf') === 0) {
+			if (!empty($siteConf) && strpos($siteConf, '# valet stub: secure.proxy.valet.conf') === 0) {
 				// proxy config
 				$this->unsecure($url);
 				$this->secure($newUrl, $this->replaceOldDomainWithNew($siteConf, $url, $newUrl));
@@ -1017,32 +1017,46 @@ class Site
 	/**
 	 * Build the Nginx proxy config for the specified site.
 	 *
-	 * @param  string  $url  The site to serve
-	 * @param  string  $host  The URL to proxy to, eg: http://127.0.0.1:8080
+	 * @param  string $url The site to serve
+	 * @param  string $host The URL to proxy to, eg: http://127.0.0.1:8080
+	 * @param boolean $secure Is the proxy going to be secured? Default: `false`
 	 * @return void
 	 */
-	public function proxyCreate($url, $host)
+	public function proxyCreate($url, $host, $secure = false)
 	{
 		if (!preg_match('~^https?://.*$~', $host)) {
 			throw new \InvalidArgumentException(sprintf('"%s" is not a valid URL', $host));
 		}
 
 		$tld = $this->config->read()['tld'];
-		if (!str_ends_with($url, '.' . $tld)) {
-			$url .= '.' . $tld;
+
+		foreach (explode(',', $url) as $proxyUrl) {
+			if (!str_ends_with($proxyUrl, '.' . $tld)) {
+				$proxyUrl .= '.' . $tld;
+			}
+
+			$stub = $secure ? 'secure.proxy.valet.conf' : 'proxy.valet.conf';
+			$siteConf = $this->files->get(__DIR__ . '/../stubs/' . $stub);
+
+			$siteConf = str_replace(
+				['VALET_HOME_PATH', 'VALET_SERVER_PATH', 'VALET_STATIC_PREFIX', 'VALET_SITE', 'VALET_PROXY_HOST'],
+				[$this->valetHomePath(), VALET_SERVER_PATH, VALET_STATIC_PREFIX, $proxyUrl, $host],
+				$siteConf
+			);
+
+			if ($secure) {
+				$this->secure($proxyUrl, $siteConf);
+			} else {
+				$this->unsecure($proxyUrl);
+
+				$this->files->ensureDirExists($this->nginxPath(), user());
+				$this->files->putAsUser($this->nginxPath($proxyUrl), $siteConf);
+			}
+
+			$protocol = $secure ? 'https' : 'http';
+
+			info("Valet will now proxy [$protocol://" . $proxyUrl . "] traffic to [" . $host . "].");
 		}
-
-		$siteConf = $this->files->get(__DIR__ . '/../stubs/proxy.valet.conf');
-
-		$siteConf = str_replace(
-			['VALET_HOME_PATH', 'VALET_SERVER_PATH', 'VALET_STATIC_PREFIX', 'VALET_SITE', 'VALET_PROXY_HOST'],
-			[$this->valetHomePath(), VALET_SERVER_PATH, VALET_STATIC_PREFIX, $url, $host],
-			$siteConf
-		);
-
-		$this->secure($url, $siteConf);
-
-		info('Valet will now proxy [https://' . $url . '] traffic to [' . $host . '].');
 	}
 
 	/**
@@ -1054,14 +1068,18 @@ class Site
 	public function proxyDelete($url)
 	{
 		$tld = $this->config->read()['tld'];
-		if (!str_ends_with($url, '.' . $tld)) {
-			$url .= '.' . $tld;
+
+		foreach (explode(',', $url) as $proxyUrl) {
+			if (!str_ends_with($url, '.' . $tld)) {
+				$protocol = $this->isSecured($proxyUrl) ? 'https' : 'http';
+
+				$proxyUrl .= '.' . $tld;
+			}
+
+			$this->unsecure($proxyUrl);
+			$this->files->unlink($this->nginxPath($proxyUrl));
+			info("Valet will no longer proxy [$protocol://" . $proxyUrl . "].");
 		}
-
-		$this->unsecure($url);
-		$this->files->unlink($this->nginxPath($url));
-
-		info('Valet will no longer proxy [https://' . $url . '].');
 	}
 
 	/**

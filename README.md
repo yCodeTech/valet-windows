@@ -860,14 +860,32 @@ The [cool_site] symbolic link has been removed.
 
 ```
 proxy [site] [host]  Proxy a specified site to a specified host
+      [--secure]     Optionally, secure with a trusted TLS certificate
 ```
 
 `proxy` allows you to _`proxy`_ a Valet site to another service on your machine and send all traffic from the Valet site to the service.
+You may also proxy multiple sites to 1 host by separating them with commas.
 
 ```console
-$ valet proxy site1 https://127.0.0.1:9200
+$ valet proxy site1 http://127.0.0.1:9200
+Valet will now proxy [http://site1.test] traffic to [http://127.0.0.1:9200]
+
+$ valet proxy site1,site2,site3 https://127.0.0.1:9200
+Valet will now proxy [http://site1.test] traffic to [http://127.0.0.1:9200]
+Valet will now proxy [http://site2.test] traffic to [http://127.0.0.1:9200]
+Valet will now proxy [http://site3.test] traffic to [http://127.0.0.1:9200]
+```
+
+###### proxy --secure
+
+`--secure` option allows you to secure the proxy site. It is boolean, so if it's present it's `true`, otherwise `false`.
+
+```console
+$ valet proxy site1 https://127.0.0.1:9200 --secure
 Valet will now proxy [https://site1.test] traffic to [https://127.0.0.1:9200]
 ```
+
+<img align="center" src="./The_same_icon.svg" style="width:20px;"> This command is the same as the Mac version.
 
 ##### proxies
 
@@ -892,9 +910,16 @@ $ valet proxies
 unproxy [site]  Remove a proxied site
 ```
 
+Just like the `proxy` command, you may unproxy multiple sites at once by separating them with commas.
+
 ```console
 $ valet unproxy site1
-Valet will no longer proxy [https://site1.test].
+Valet will no longer proxy [http://site1.test].
+
+$ valet unproxy site1,site2,site3
+Valet will no longer proxy [http://site1.test].
+Valet will no longer proxy [http://site2.test].
+Valet will no longer proxy [http://site3.test].
 ```
 
 <img align="center" src="./The_same_icon.svg" style="width:20px;"> This command is the same as the Mac version.
