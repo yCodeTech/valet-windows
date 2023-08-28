@@ -3,6 +3,7 @@
 <p align="center">
 <a href="https://packagist.org/packages/ycodetech/valet-windows"><img src="https://poser.pugx.org/ycodetech/valet-windows/downloads" alt="Total Downloads"></a>
 <a href="https://packagist.org/packages/ycodetech/valet-windows"><img src="https://poser.pugx.org/ycodetech/valet-windows/v" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/ycodetech/valet-windows"><img src="https://poser.pugx.org/ycodetech/valet-windows/v/unstable" alt="Latest Unstable Version"></a>
 <a href="https://packagist.org/packages/ycodetech/valet-windows"><img src="https://poser.pugx.org/ycodetech/valet-windows/license" alt="License"></a>
 </p>
 
