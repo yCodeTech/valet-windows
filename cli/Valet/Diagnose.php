@@ -2,9 +2,6 @@
 
 namespace Valet;
 
-use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Output\ConsoleOutput;
-
 class Diagnose
 {
 	/**
@@ -91,8 +88,8 @@ class Diagnose
 
 		$output = $this->format($results, $plainText);
 
-		if (! $this->print) {
-			output(PHP_EOL.PHP_EOL.$output);
+		if (!$this->print) {
+			output(PHP_EOL . PHP_EOL . $output);
 		}
 
 		// $this->files->put('valet_diagnostics.txt', $output);
@@ -107,10 +104,7 @@ class Diagnose
 		if ($this->print) {
 			return;
 		}
-
-		$this->progressBar = new ProgressBar(new ConsoleOutput, count($this->commands));
-
-		$this->progressBar->start();
+		$this->progressBar = progressbar(count($this->commands), "Diagnosing", "Valet");
 	}
 
 	protected function afterRun()
@@ -132,7 +126,7 @@ class Diagnose
 	protected function beforeCommand($command)
 	{
 		if ($this->print) {
-			info(PHP_EOL."$ $command");
+			info(PHP_EOL . "$ $command");
 		}
 	}
 
@@ -162,8 +156,12 @@ class Diagnose
 
 			return sprintf(
 				'<details>%s<summary>%s</summary>%s<pre>%s</pre>%s</details>',
-				PHP_EOL, $command, PHP_EOL, $output, PHP_EOL
+				PHP_EOL,
+				$command,
+				PHP_EOL,
+				$output,
+				PHP_EOL
 			);
-		})->implode($plainText ? PHP_EOL.str_repeat('-', 20).PHP_EOL : PHP_EOL);
+		})->implode($plainText ? PHP_EOL . str_repeat('-', 20) . PHP_EOL : PHP_EOL);
 	}
 }
