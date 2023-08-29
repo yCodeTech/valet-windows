@@ -20,7 +20,7 @@
 
 <br>
 
-[Introduction](#introduction) | [Documentation](#documentation) | [Commands](#commands) | [Commands Not Supported](#commands-not-supported) | [Known Issues](#known-issues) | [Xdebug Installation](#xdebug-installation) | [Contributions](#contributions)
+[Introduction](#introduction) | [Documentation](#documentation) | [Commands](#commands) | [Command Parity Checker](command-parity-checker) | [Commands Not Supported](#commands-not-supported) | [Known Issues](#known-issues) | [Xdebug Installation](#xdebug-installation) | [Contributions](#contributions)
 
 ---
 
@@ -1329,6 +1329,51 @@ These are **important notes** for the commands that have the `--options` or `--v
   --options option1//option2//option3
   -o option1//option2//option3
   ```
+
+### Command Parity Checker
+
+Commands that have been tested and made parity:
+
+- [ ] composer
+- [ ] diagnose
+- [x] directory-listing
+- [x] fetch-share-url
+- [x] forget
+- [x] install
+- [x] isolate
+- [x] isolated
+- [x] link
+- [x] links 
+- [x] log
+- [ ] loopback
+- [x] on-latest-version
+- [x] open
+- [x] park
+- [x] parked
+- [x] paths
+- [ ] php
+- [x] proxies
+- [x] proxy
+- [x] restart
+- [x] secure
+- [x] secured
+- [x] set-ngrok-token
+- [x] share
+- [ ] share-tool
+- [x] start
+- [x] status - renamed to services
+- [x] stop
+- [x] tld
+- [ ] trust
+- [x] uninstall
+- [x] unisolate
+- [x] unlink
+- [x] unproxy
+- [x] unsecure
+- [x] use
+- [x] which
+- [x] which-php - renamed to php:which
+
 
 ### Commands not supported
 
