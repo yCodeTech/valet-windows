@@ -20,7 +20,7 @@
 
 <br>
 
-[Introduction](#introduction) | [Documentation](#documentation) | [Commands](#commands) | [Command Parity Checker](command-parity-checker) | [Commands Not Supported](#commands-not-supported) | [Known Issues](#known-issues) | [Xdebug Installation](#xdebug-installation) | [Contributions](#contributions)
+[Introduction](#introduction) | [Documentation](#documentation) | [Commands](#commands) | [Command Parity Checker](#command-parity-checker) | [Commands Not Supported](#commands-not-supported) | [Known Issues](#known-issues) | [Xdebug Installation](#xdebug-installation) | [Contributions](#contributions)
 
 ---
 
@@ -1343,7 +1343,7 @@ Commands that have been tested and made parity:
 - [x] isolate
 - [x] isolated
 - [x] link
-- [x] links 
+- [x] links
 - [x] log
 - [ ] loopback
 - [x] on-latest-version
@@ -1373,7 +1373,6 @@ Commands that have been tested and made parity:
 - [x] use
 - [x] which
 - [x] which-php - renamed to php:which
-
 
 ### Commands not supported
 
