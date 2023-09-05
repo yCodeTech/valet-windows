@@ -6,12 +6,12 @@ body:
   - type: markdown
     attributes:
       value: |       
-          **Did you know? Most problems can be resolved by running 3 commands:**
+          **Did you know? Most problems can be resolved by running 2 commands:**
           
           - `composer self-update`
           - `composer global update`
 
-          ... in fact, it's good to run these commands at least once a month!
+          In fact, it's good to run these commands at least once a month!
           
           Alternatively, try to reboot your machine first to see if it solves your current issue.
   - type: textarea
