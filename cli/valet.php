@@ -998,7 +998,6 @@ if (is_dir(VALET_HOME_PATH)) {
 	 * Get the TLD currently being used by Valet.
 	 * @param string $tld Optionally, set a new TLD.
 	 */
-	// TODO: Add progress bar
 	$app->command('tld [tld]', function ($tld = null) {
 		if ($tld === null) {
 			return info(Configuration::read()['tld']);
@@ -1084,12 +1083,12 @@ if (is_dir(VALET_HOME_PATH)) {
 	})->setAliases(["latest"])->descriptions('Determine if this is the latest version/release of Valet');
 
 	/**
-	 * View and tail a log file.
+	 * View and follow a log file.
 	 * @param string $key The name of the log
-	 * @param boolean $follow Tail real-time streaming output of the changing file
 	 * @param string $lines The number of lines to view
+	 * @param boolean $follow Follow real time streaming output of the changing file
 	 */
-	$app->command('log [key] [-f|--follow] [-l|--lines=]', function ($key = null, $follow, $lines) {
+	$app->command('log [key] [-l|--lines=] [-f|--follow]', function ($key = null, $lines, $follow) {
 		$defaultLogs = [
 			'nginx' => VALET_HOME_PATH . '/Log/nginx-error.log',
 			'nginxservice.err' => VALET_HOME_PATH . '/Log/nginxservice.err.log',
@@ -1144,22 +1143,22 @@ if (is_dir(VALET_HOME_PATH)) {
 		}
 
 		$options = [];
-		if ($follow) {
-			$options[] = '-f';
-		}
 		if ((int) $lines) {
-			$options[] = '-n ' . (int) $lines;
+			$options[] = '-Tail ' . (int) $lines;
+		}
+		if ($follow) {
+			$options[] = '-Wait';
 		}
 
-		$command = implode(' ', array_merge(['tail'], $options, [$file]));
+		$options = implode(' ', $options);
 
-		// TODO: Change this to use Powershell variant of `tail`.
-		passthru($command);
-	})->descriptions('View and tail a log file', [
+		CommandLine::powershell("cat -Path $file $options", null, true);
+
+	})->descriptions('View and follow a log file', [
 				"key" => "The name of the log",
-				"--follow" => "Tail real-time streaming output of the changing file",
-				"--lines" => "The number of lines to view"
-			])->addUsage("log nginx --follow --lines=3")->addUsage("log nginx -f -l 3");
+				"--lines" => "The number of lines to view.",
+				"--follow" => "Follow real time streaming output of the changing file"
+			])->addUsage("log nginx --lines=3 --follow")->addUsage("log nginx -l 3 -f");
 
 	/**
 	 * List the installed Valet services.

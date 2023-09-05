@@ -37,11 +37,12 @@ class CommandLine
 	 *
 	 * @param  string  $command
 	 * @param  callable  $onError
+	 * @param boolean $realTimeOutput Set to `true` to get the output in real time as the command is running. Default: `false`
 	 * @return ProcessOutput
 	 */
-	public function run($command, callable $onError = null)
+	public function run($command, callable $onError = null, $realTimeOutput = false)
 	{
-		return $this->runCommand($command, $onError);
+		return $this->runCommand($command, $onError, $realTimeOutput);
 	}
 
 	/**
@@ -49,11 +50,12 @@ class CommandLine
 	 *
 	 * @param  string  $command
 	 * @param  callable  $onError
+	 * @param boolean $realTimeOutput Set to `true` to get the output in real time as the command is running. Default: `false`
 	 * @return ProcessOutput
 	 */
-	public function runAsUser($command, callable $onError = null)
+	public function runAsUser($command, callable $onError = null, $realTimeOutput = false)
 	{
-		return $this->runCommand($command, $onError);
+		return $this->runCommand($command, $onError, $realTimeOutput);
 	}
 
 	/**
@@ -61,11 +63,12 @@ class CommandLine
 	 *
 	 * @param  string  $command
 	 * @param  callable|null  $onError
+	 * @param boolean $realTimeOutput Set to `true` to get the output in real time as the command is running. Default: `false`
 	 * @return ProcessOutput
 	 */
-	public function powershell(string $command, callable $onError = null)
+	public function powershell(string $command, callable $onError = null, $realTimeOutput = false)
 	{
-		return $this->runCommand("powershell -command \"$command\"", $onError);
+		return $this->runCommand("powershell -command \"$command\"", $onError, $realTimeOutput);
 	}
 
 	/**
@@ -73,9 +76,10 @@ class CommandLine
 	 *
 	 * @param  string  $command
 	 * @param  callable  $onError  (int $code, string $output)
+	 * @param boolean $realTimeOutput Set to `true` to get the output in real time as the command is running. Default: `false`
 	 * @return ProcessOutput
 	 */
-	public function runOrExit($command, callable $onError = null)
+	public function runOrExit($command, callable $onError = null, $realTimeOutput = false)
 	{
 		return $this->run($command, function ($code, $output) use ($onError) {
 			if ($onError) {
@@ -83,7 +87,7 @@ class CommandLine
 			}
 
 			exit(1);
-		});
+		}, $realTimeOutput);
 	}
 
 	/**
@@ -91,9 +95,10 @@ class CommandLine
 	 *
 	 * @param  string  $command
 	 * @param  callable  $onError
-	 * @return ProcessOutput
+	 * @param boolean $realTimeOutput Set to `true` to get the output in real time as the command is running. Default: `false`
+	 * @return ProcessOutput Only if the real time is `false`.
 	 */
-	public function runCommand($command, callable $onError = null)
+	public function runCommand($command, callable $onError = null, $realTimeOutput = false)
 	{
 		$onError = $onError ?: function () {
 		};
@@ -108,15 +113,32 @@ class CommandLine
 			$process = new Process($command);
 		}
 
-		$processOutput = '';
-		$process->setTimeout(60)->run(function ($type, $line) use (&$processOutput) {
-			$processOutput .= $line;
-		});
+		/**
+		 * Output in real time
+		 */
+		if ($realTimeOutput) {
+			// Use setTimeout of 0 to allow it to run seemingly forever, until user cancels it.
+			$process->setTimeout(0)->run(function ($type, $line) use ($realTimeOutput) {
+				if (Process::ERR === $type) {
+					echo 'ERROR: ' . $line;
+				} else {
+					echo $line;
+				}
+			});
+		} else {
+			$processOutput = '';
+
+			$process->setTimeout(60)->run(function ($type, $line) use (&$processOutput) {
+				$processOutput .= $line;
+			});
+		}
 
 		if ($process->getExitCode() !== 0) {
 			$onError($process->getExitCode(), $processOutput);
 		}
 
-		return new ProcessOutput($process);
+		if (!$realTimeOutput) {
+			return new ProcessOutput($process);
+		}
 	}
 }

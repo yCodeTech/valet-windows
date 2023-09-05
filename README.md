@@ -1174,15 +1174,15 @@ Yes
 ##### log
 
 ```
-log                 View and tail a log file
+log                 View and follow a log file
      [key]          The name of the log
-     [-f|--follow]  Tail real-time streaming output of the changing file
      [-l|--lines]   The number of lines to view
+     [-f|--follow]  Follow real time streaming output of the changing file
 ```
 
 ```console
-$ valet log nginx --follow --lines=3
-$ valet log nginx -f -l 3
+$ valet log nginx --lines=3 --follow
+$ valet log nginx -l 3 -f
 ```
 
 `log` allows you to view the logs which are written by Valet's services. To view a list of logs, simply run `valet log`.
@@ -1210,15 +1210,6 @@ $ valet log
 
 The `key` is required in order to view a log. It can be found from the list of logs.
 
-###### --follow
-
-The `--follow` (shortcut `-f`) option can be used to tail real-time streaming output of the changing file.
-
-```console
-$ valet log nginx --follow
-$ valet log nginx -f
-```
-
 ###### --lines
 
 The `--lines` (shortcut `-l`) option changes the number of lines to view from the log.
@@ -1228,7 +1219,16 @@ $ valet log nginx --lines=3
 $ valet log nginx -l 3
 ```
 
-###### Note: This command uses the Unix-like Git Bash `tail` command, therefore this command will currently only work in Git Bash.
+###### --follow
+
+The `--follow` (shortcut `-f`) option can be used to follow real time streaming output of the changing file.
+
+```console
+$ valet log nginx --follow
+$ valet log nginx -f
+```
+
+###### Note: `--follow` is set to stream output "forever" (though one can never be too sure if it actually is forever). To stop the output stream, you need to press `ctrl+C`.
 
 <img align="center" src="./The_same_icon.svg" style="width:20px;"> This command is the same as the Mac version.
 
