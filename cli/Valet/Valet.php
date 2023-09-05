@@ -154,6 +154,23 @@ class Valet
 	}
 
 	/**
+	 * Get the path to the home directory of composer global.
+	 *
+	 * While the default is "~/AppData/Roaming/Composer",
+	 * composer does allow the user to change where global packages are installed.
+	 * So we need to essentially ask composer where the home directory is.
+	 *
+	 * This is used to set the `COMPOSER_GLOBAL_PATH` constant, which in turn is used
+	 * by the `Diagnose` class.
+	 *
+	 * @return string The path to the global composer directory.
+	 */
+	public function getComposerGlobalPath()
+	{
+		return $this->cli->runAsUser('composer -n config --global home');
+	}
+
+	/**
 	 * Get the Valet home path (VALET_HOME_PATH = ~/.config/valet).
 	 *
 	 * @param  string  $path

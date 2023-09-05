@@ -22,6 +22,10 @@ $_SERVER['HOME'] = str_replace('\\', '/', $_SERVER['HOME']);
 define('VALET_HOME_PATH', $_SERVER['HOME'] . '/.config/valet');
 define('VALET_SERVER_PATH', str_replace('\\', '/', realpath(__DIR__ . '/../../server.php')));
 define('VALET_STATIC_PREFIX', '41c270e4-5535-4daa-b23e-c269744c2f45');
+/**
+ * Define the composer global path as a constant. For use with `Diagnose` class.
+ */
+define('COMPOSER_GLOBAL_PATH', trim(\Valet::getComposerGlobalPath()));
 
 // DEPRECATED: Legacy home path. No need for it.
 define('VALET_LEGACY_HOME_PATH', $_SERVER['HOME'] . '/.valet');

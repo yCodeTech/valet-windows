@@ -1280,7 +1280,7 @@ Directory listing setting is now: on
 ```
 diagnose                Output diagnostics to aid in debugging Valet.
           [-p|--print]  Optionally print diagnostics output while running
-          [--plain]     Optionally format clipboard output as plain text
+          [--plain]     Optionally print and format output as plain text (aka, pretty print)
 ```
 
 ```console
@@ -1288,6 +1288,8 @@ $ valet diagnose
 Running diagnostics...
 [Diagnostics output here]
 ```
+
+The diagnostics will be copied to the clipboard as formatted HTML for easy issue reporting.
 
 <img align="center" src="./The_same_icon.svg" style="width:20px;"> This command is the same as the Mac version.
 
@@ -1335,7 +1337,7 @@ These are **important notes** for the commands that have the `--options` or `--v
 Commands that have been tested and made parity:
 
 - [ ] composer
-- [ ] diagnose
+- [x] diagnose
 - [x] directory-listing
 - [x] fetch-share-url
 - [x] forget

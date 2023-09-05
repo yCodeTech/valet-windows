@@ -5,50 +5,32 @@ namespace Valet;
 class Diagnose
 {
 	/**
+	 * The commands to run.
+	 *
 	 * @var array
 	 */
 	protected $commands = [
-		'systeminfo | findstr /B /C:"OS Name" /C:"OS Version"',
+		'systeminfo',
 		'valet --version',
 		'cat ~/.config/valet/config.json',
-		// 'cat ~/.composer/composer.json',
-		'composer global diagnose',
-		'composer global outdated',
-		// 'ls -al /etc/sudoers.d/',
-		// 'brew update > /dev/null 2>&1',
-		// 'brew config',
-		// 'brew services list',
-		// 'brew list --formula --versions | grep -E "(php|nginx|dnsmasq|mariadb|mysql|mailhog|openssl)(@\d\..*)?\s"',
-		// 'brew outdated',
-		// 'brew tap',
+		__DIR__ . '\..\..\bin\nginx\nginx.exe -v 2>&1',
+		__DIR__ . '\..\..\bin\nginx\nginx.exe -c ' . __DIR__ . '\..\..\bin\nginx\conf\nginx.conf -t -p ' . __DIR__ . '\..\..\bin\nginx 2>&1',
+		'foreach ($file in get-ChildItem -Path "' . __DIR__ . '\..\..\bin\nginx\conf\nginx.conf", "' . __DIR__ . '\..\..\bin\nginx\valet\valet.conf", "' . VALET_HOME_PATH . '/Nginx/*.conf"){echo $file.fullname --------------------`n; Get-Content -Path $file; echo `n;}',
+		__DIR__ . '\..\..\bin\ngrok.exe version',
 		'php -v',
-		'which -a php',
+		'cmd /C "where /f php"',
 		'php --ini',
-		// __DIR__.'/../../bin/nginx/nginx.exe -v',
-		// 'curl --version',
+		'php --info',
 		'php --ri curl',
-		// __DIR__.'/../../bin/ngrok.exe version',
-		'ls -al ~/.ngrok2',
-		// 'brew info nginx',
-		// 'brew info php',
-		// 'brew info openssl',
-		// 'openssl version -a',
-		// 'openssl ciphers',
-		// 'sudo nginx -t',
-		// 'which -a php-fpm',
-		// BREW_PREFIX.'/opt/php/sbin/php-fpm -v',
-		// 'sudo '.BREW_PREFIX.'/opt/php/sbin/php-fpm -y '.PHP_SYSCONFDIR.'/php-fpm.conf --test',
-		// 'ls -al ~/Library/LaunchAgents | grep homebrew',
-		// 'ls -al /Library/LaunchAgents | grep homebrew',
-		// 'ls -al /Library/LaunchDaemons | grep homebrew',
-		// 'ls -aln /etc/resolv.conf',
-		// 'cat /etc/resolv.conf',
+		'cmd /C curl --version',
+		'cat ' . COMPOSER_GLOBAL_PATH . '/composer.json',
+		'composer global diagnose --no-ansi 1> composer.txt',
+		'composer global outdated --format json',
 	];
 
 	protected $cli;
 	protected $files;
 	protected $print;
-	protected $progressBar;
 
 	/**
 	 * Create a new Diagnose instance.
@@ -65,6 +47,9 @@ class Diagnose
 
 	/**
 	 * Run diagnostics.
+	 *
+	 * @param boolean $print Print the output as the commands are running.
+	 * @param boolean $plain Print and format the output as plain text (aka pretty print).
 	 */
 	public function run($print, $plainText)
 	{
@@ -73,13 +58,16 @@ class Diagnose
 		$this->beforeRun();
 
 		$results = collect($this->commands)->map(function ($command) {
+
 			$this->beforeCommand($command);
 
-			$output = $this->runCommand($command);
+			$output = $this->cli->powershell($command);
 
 			if ($this->ignoreOutput($command)) {
 				return;
 			}
+
+			$output = $this->edit_output($command, $output);
 
 			$this->afterCommand($command, $output);
 
@@ -88,41 +76,51 @@ class Diagnose
 
 		$output = $this->format($results, $plainText);
 
+		if ($plainText) {
+			$formatted_for_copy = $output[1];
+			$output = $output[0];
+		}
+
+
 		if (!$this->print) {
 			output(PHP_EOL . PHP_EOL . $output);
 		}
 
-		// $this->files->put('valet_diagnostics.txt', $output);
-		// $this->cli->run('type valet_diagnostics.txt | clip');
-		// $this->files->unlink('valet_diagnostics.txt');
+		$this->copy_to_clipboard($plainText ? $formatted_for_copy : $output);
 
 		$this->afterRun();
 	}
 
+	/**
+	 * Before running the diagnostics.
+	 */
 	protected function beforeRun()
 	{
 		if ($this->print) {
 			return;
 		}
+		$this->commands = str_replace("\\", "/", $this->commands);
+
 		$this->progressBar = progressbar(count($this->commands), "Diagnosing", "Valet");
 	}
 
+	/**
+	 * After running the diagnostics.
+	 */
 	protected function afterRun()
 	{
-		if ($this->progressBar) {
+		if (!$this->print && $this->progressBar) {
 			$this->progressBar->finish();
 		}
 
 		output('');
 	}
 
-	protected function runCommand($command)
-	{
-		return strpos($command, 'sudo ') === 0
-			? $this->cli->run($command)
-			: $this->cli->runAsUser($command);
-	}
-
+	/**
+	 * Before each command.
+	 *
+	 * @param string $command
+	 */
 	protected function beforeCommand($command)
 	{
 		if ($this->print) {
@@ -130,38 +128,296 @@ class Diagnose
 		}
 	}
 
+	/**
+	 * After each command.
+	 *
+	 * @param string $command
+	 * @param string $output
+	 */
 	protected function afterCommand($command, $output)
 	{
 		if ($this->print) {
+
 			output(trim($output));
+
 		} else {
 			$this->progressBar->advance();
 		}
 	}
 
+	/**
+	 * Determines if Valet should ignore the output of a command.
+	 *
+	 * @param string $command
+	 * @return boolean
+	 */
 	protected function ignoreOutput($command)
 	{
 		return strpos($command, '> /dev/null 2>&1') !== false;
 	}
 
+	/**
+	 * Edit the output of a specific command, to improve
+	 * the human readability of the diagnostics, and/or
+	 * if the raw output isn't sufficient enough.
+	 *
+	 * @param string $command
+	 * @param string $output
+	 * @return string $output The edited output.
+	 */
+	protected function edit_output($command, $output)
+	{
+		// Extract the OS Name and OS Version, lines 2 and 3.
+		if (str_contains($command, "systeminfo")) {
+			$output = explode("\n", $output);
+			$output = implode("\n", [$output[2], $output[3]]);
+		}
+
+		if (str_contains($command, "nginx.exe")) {
+			$output = $output->__toString();
+
+			if (str_contains($output, "nginx version")) {
+				$version = explode("version:", $output);
+				$version = preg_split("/[\s,]+/", $version[1]);
+
+				$output = "nginx version: {$version[1]}";
+
+			} elseif (str_contains($output, "syntax is ok") && str_contains($output, "successful")) {
+				$configFile = explode("file", $output, 2)[1];
+				$configFile = trim(explode(".conf", $configFile)[0] . ".conf");
+
+				$output = "The syntax is ok in the configuration file:\n{$configFile}\n<fg=green>The test is successful</>";
+			}
+		}
+
+		if (str_contains($command, "composer global diagnose")) {
+			$output = $this->cli->powershell('cat composer.txt');
+			$this->files->unlink('composer.txt');
+		}
+
+		if (str_contains($command, "composer global outdated")) {
+			$output = json_decode($output, true);
+			$output = $output["installed"];
+
+			foreach ($output as $key => $item) {
+				if (!$item["homepage"]) {
+					unset($output[$key]["homepage"]);
+				}
+
+				if ($item["latest-status"] === "semver-safe-update") {
+					$output[$key]["latest-status"] = "A patch or minor release available. Update is recommended.";
+				} elseif ($item["latest-status"] === "update-possible") {
+					$output[$key]["latest-status"] = "A major release available. Update is possible.";
+				} else {
+					$output[$key]["latest-status"] = "Up to date.";
+				}
+
+				$output[$key]["direct-dependency"] = var_export($item["direct-dependency"], true);
+				$output[$key]["abandoned"] = var_export($item["abandoned"], true);
+			}
+
+			$output = json_encode($output, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+		}
+
+		return $output;
+	}
+
+	/**
+	 * Format the output for the terminal.
+	 *
+	 * @param \Illuminate\Support\Collection $results A collection of the outputs.
+	 * @param boolean $plainText
+	 * @return array|string The formatted output as a `string`,
+	 * or if `plainText` is `true`, then an `array` of the formatted plain output
+	 * as a `string` for the terminal
+	 * AND a formatted HTML output as a `string` to copy to the clipboard.
+	 */
 	protected function format($results, $plainText)
 	{
-		return $results->map(function ($result) use ($plainText) {
+		$results = $this->combine_with_headings($results);
+
+		$formatted_for_copy = collect();
+
+		$formatted = $results->map(function ($result, $key) use ($plainText, $formatted_for_copy) {
 			$command = $result['command'];
+			$command = "$ {$command}";
+			$heading_underline = str_repeat('=', strlen($key));
+			$heading = PHP_EOL . $key . PHP_EOL . $heading_underline . PHP_EOL;
 			$output = trim($result['output']);
 
 			if ($plainText) {
-				return implode(PHP_EOL, ["$ {$command}", $output]);
+				// Push the format for copy output into the separate collection.
+				$formatted_for_copy->push($this->format_for_copy($command, $output, str_replace($heading_underline, "", $heading)));
+
+				if (str_contains($command, "composer global outdated")) {
+					$output = json_decode($output, true);
+
+					foreach ($output as $key => $item) {
+
+						$output[$key]["name"] = "Name: " . $item["name"];
+						$output[$key]["direct-dependency"] = "Direct Dependency: " . $item["direct-dependency"];
+
+						if (isset($item["homepage"])) {
+							$output[$key]["homepage"] = "Homepage: " . $item["homepage"];
+						}
+
+						$output[$key]["source"] = "Source: " . $item["source"];
+						$output[$key]["version"] = "Installed Version: " . $item["version"];
+						$output[$key]["latest"] = "Latest: " . $item["latest"];
+						$output[$key]["latest-status"] = "Status: " . $item["latest-status"];
+						$output[$key]["description"] = "Description: " . $item["description"];
+						$output[$key]["abandoned"] = "Abandoned: " . $item["abandoned"];
+					}
+
+
+					$output = implode("\n\n\n----\n\n\n", array_map(function ($a) {
+						return implode("\n\n", $a);
+					}, $output));
+				}
+
+				// Join the command and heading together.
+				$output = implode(PHP_EOL, ["<info>$command</info>" . PHP_EOL, $output]);
+				// Join the heading and the new output together.
+				$output = implode(PHP_EOL, [$heading, $output]);
+
+				return $output;
+			}
+
+			return $this->format_for_copy($command, $output, str_replace($heading_underline, "", $heading));
+		});
+
+		if ($plainText) {
+			return [
+				$formatted->implode(PHP_EOL . PHP_EOL . str_repeat('-', 50) . PHP_EOL),
+				$formatted_for_copy->implode(PHP_EOL . PHP_EOL)
+			];
+		} else {
+			return $formatted->implode($plainText ? PHP_EOL . PHP_EOL . str_repeat('-', 50) . PHP_EOL : PHP_EOL);
+		}
+	}
+
+	/**
+	 * Format the output as HTML to copy to the clipboard,
+	 * usually for reporting issues on Github.
+	 *
+	 * @param string $command
+	 * @param string $output
+	 * @param string $heading The heading to output before the command name.
+	 */
+	protected function format_for_copy($command, $output, $heading)
+	{
+		if (str_contains($command, "composer global outdated")) {
+
+			$table = sprintf(
+				'<tr>%s<th>%s</th>%s<th>%s</th>%s<th>%s</th>%s<th>%s</th>%s<th>%s</th>%s<th>%s</th>%s</tr>',
+				PHP_EOL,
+				"Name",
+				PHP_EOL,
+				"Installed Version",
+				PHP_EOL,
+				"Latest",
+				PHP_EOL,
+				"Status",
+				PHP_EOL,
+				"Description",
+				PHP_EOL,
+				"Abandoned",
+				PHP_EOL
+			);
+
+			foreach (json_decode($output, true) as $key => $item) {
+				$table .= sprintf(
+					'<tr>%s<td><a href="%s">%s</a></td>%s<td>%s</td>%s<td>%s</td>%s<td>%s</td>%s<td>%s</td>%s<td>%s</td>%s</tr>',
+					PHP_EOL,
+					$item['source'],
+					$item["name"],
+					PHP_EOL,
+					$item["version"],
+					PHP_EOL,
+					$item["latest"],
+					PHP_EOL,
+					$item["latest-status"],
+					PHP_EOL,
+					$item["description"],
+					PHP_EOL,
+					$item["abandoned"],
+					PHP_EOL
+				);
 			}
 
 			return sprintf(
-				'<details>%s<summary>%s</summary>%s<pre>%s</pre>%s</details>',
+				'<details>%s<summary>%s</summary>%s<p>%s</p>%s<table>%s</table>%s</details>',
+				PHP_EOL,
+				$heading,
 				PHP_EOL,
 				$command,
 				PHP_EOL,
-				$output,
+				$table,
 				PHP_EOL
 			);
-		})->implode($plainText ? PHP_EOL . str_repeat('-', 20) . PHP_EOL : PHP_EOL);
+		}
+
+		return sprintf(
+			'<details>%s<summary>%s</summary>%s<p>%s</p>%s<pre>%s</pre>%s</details>',
+			PHP_EOL,
+			$heading,
+			PHP_EOL,
+			$command,
+			PHP_EOL,
+			$output,
+			PHP_EOL
+		);
 	}
+
+	/**
+	 * Copy output to the clipboard.
+	 *
+	 * @param string $output The formatted output
+	 */
+	protected function copy_to_clipboard($output)
+	{
+		// Remove the crazy ANSI escape characters like:
+		// [32m
+		// ]8;;
+		// [39m
+		// 
+		// that are leftover from the colourings and makes a complete mess
+		// of the output to clipboard.
+		// Code based on https://stackoverflow.com/a/40731340/2358222
+		$output = preg_replace('/(\e)|([[]|[]])[A-Za-z0-9];*[0-9]*m?/', '', $output);
+
+		$this->files->put('valet_diagnostics.txt', $output);
+		$this->cli->run('type valet_diagnostics.txt | clip');
+		$this->files->unlink('valet_diagnostics.txt');
+	}
+
+	/**
+	 * Combine the defined command headings with the output results,
+	 * creating a new collection with the headings as the keys.
+	 *
+	 * @param \Illuminate\Support\Collection $results A collection of the outputs.
+	 * @return \Illuminate\Support\Collection The new combined collection
+	 */
+	protected function combine_with_headings($results)
+	{
+		return collect([
+			"System Version",
+			"Valet Version",
+			"Valet Config",
+			"nginx Version",
+			"nginx Config Check",
+			"nginx Config Files",
+			"ngrok Version",
+			"PHP Version",
+			"PHP Location",
+			"PHP Ini Location",
+			"PHP Information",
+			"PHP cURL Information",
+			"Windows libcurl Version",
+			"composer.json Global File",
+			"Composer Diagnostics",
+			"Outdated Composer Packages"
+		])->combine($results);
+	}
+
 }

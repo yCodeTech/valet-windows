@@ -1205,9 +1205,12 @@ if (is_dir(VALET_HOME_PATH)) {
 		info('Running diagnostics... (this may take a while)');
 
 		Diagnose::run($print, $plain);
+
+		info("The diagnostics have been copied to your clipboard.");
+
 	})->descriptions('Output diagnostics to aid in debugging Valet.', [
 				'--print' => 'Print diagnostics output while running',
-				'--plain' => 'Format clipboard output as plain text',
+				'--plain' => 'Print and format output as plain text (aka, pretty print)',
 			]);
 
 	/**
