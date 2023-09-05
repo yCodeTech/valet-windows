@@ -49,15 +49,8 @@ class Configuration
 	 */
 	public function createConfigurationDirectory()
 	{
+		// The preg_replace gets "C:/Users/Username/.config"
 		$this->files->ensureDirExists(preg_replace('~/valet$~', '', $this->valetHomePath()), user());
-
-		$oldPath = $_SERVER['HOME'] . '/.valet';
-
-		if ($this->files->isDir($oldPath)) {
-			rename($oldPath, $this->valetHomePath());
-			$this->prependPath($this->valetHomePath('Sites'));
-		}
-
 		$this->files->ensureDirExists($this->valetHomePath(), user());
 	}
 

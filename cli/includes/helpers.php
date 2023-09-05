@@ -27,9 +27,6 @@ define('VALET_STATIC_PREFIX', '41c270e4-5535-4daa-b23e-c269744c2f45');
  */
 define('COMPOSER_GLOBAL_PATH', trim(\Valet::getComposerGlobalPath()));
 
-// DEPRECATED: Legacy home path. No need for it.
-define('VALET_LEGACY_HOME_PATH', $_SERVER['HOME'] . '/.valet');
-
 /**
  * Output the given text to the console.
  *

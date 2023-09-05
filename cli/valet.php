@@ -25,13 +25,6 @@ use function Valet\error;
 use function Valet\progressbar;
 
 /**
- * Relocate config dir to ~/.config/valet/ if found in old location.
- */
-if (is_dir(VALET_LEGACY_HOME_PATH) && !is_dir(VALET_HOME_PATH)) {
-	Configuration::createConfigurationDirectory();
-}
-
-/**
  * Create the application.
  */
 Container::setInstance(new Container);
