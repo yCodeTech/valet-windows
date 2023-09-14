@@ -4,16 +4,14 @@ namespace Valet;
 
 use Symfony\Component\Process\Process;
 
-class CommandLine
-{
+class CommandLine {
 	/**
 	 * Pass the command to the command line and display the output.
 	 *
 	 * @param  string  $command
 	 * @return void
 	 */
-	public function passthru($command)
-	{
+	public function passthru($command) {
 		passthru($command);
 	}
 
@@ -26,8 +24,7 @@ class CommandLine
 	 *
 	 * @param string $valetCommand The Valet command to run.
 	 */
-	public function sudo($valetCommand)
-	{
+	public function sudo($valetCommand) {
 		$gsudo = realpath(valetBinPath() . 'gsudo/gsudo.exe') . " --system -d ";
 		$this->passthru($gsudo . "$valetCommand");
 	}
@@ -40,8 +37,7 @@ class CommandLine
 	 * @param boolean $realTimeOutput Set to `true` to get the output in real time as the command is running. Default: `false`
 	 * @return ProcessOutput
 	 */
-	public function run($command, callable $onError = null, $realTimeOutput = false)
-	{
+	public function run($command, callable $onError = null, $realTimeOutput = false) {
 		return $this->runCommand($command, $onError, $realTimeOutput);
 	}
 
@@ -53,8 +49,7 @@ class CommandLine
 	 * @param boolean $realTimeOutput Set to `true` to get the output in real time as the command is running. Default: `false`
 	 * @return ProcessOutput
 	 */
-	public function runAsUser($command, callable $onError = null, $realTimeOutput = false)
-	{
+	public function runAsUser($command, callable $onError = null, $realTimeOutput = false) {
 		return $this->runCommand($command, $onError, $realTimeOutput);
 	}
 
@@ -66,8 +61,7 @@ class CommandLine
 	 * @param boolean $realTimeOutput Set to `true` to get the output in real time as the command is running. Default: `false`
 	 * @return ProcessOutput
 	 */
-	public function powershell(string $command, callable $onError = null, $realTimeOutput = false)
-	{
+	public function powershell(string $command, callable $onError = null, $realTimeOutput = false) {
 		return $this->runCommand("powershell -command \"$command\"", $onError, $realTimeOutput);
 	}
 
@@ -79,8 +73,7 @@ class CommandLine
 	 * @param boolean $realTimeOutput Set to `true` to get the output in real time as the command is running. Default: `false`
 	 * @return ProcessOutput
 	 */
-	public function runOrExit($command, callable $onError = null, $realTimeOutput = false)
-	{
+	public function runOrExit($command, callable $onError = null, $realTimeOutput = false) {
 		return $this->run($command, function ($code, $output) use ($onError) {
 			if ($onError) {
 				$onError($code, $output);
@@ -96,10 +89,9 @@ class CommandLine
 	 * @param  string  $command
 	 * @param  callable  $onError
 	 * @param boolean $realTimeOutput Set to `true` to get the output in real time as the command is running. Default: `false`
-	 * @return ProcessOutput Only if the real time is `false`.
+	 * @return ProcessOutput|void Returns a ProcessOutput only if the real time is `false`, otherwise it doesn't return anything (void) as it's echoing out in real time.
 	 */
-	public function runCommand($command, callable $onError = null, $realTimeOutput = false)
-	{
+	public function runCommand($command, callable $onError = null, $realTimeOutput = false) {
 		$onError = $onError ?: function () {
 		};
 
@@ -109,7 +101,8 @@ class CommandLine
 		// For more information, see: https://github.com/laravel/valet/pull/761
 		if (method_exists(Process::class, 'fromShellCommandline')) {
 			$process = Process::fromShellCommandline($command);
-		} else {
+		}
+		else {
 			$process = new Process($command);
 		}
 
@@ -118,14 +111,16 @@ class CommandLine
 		 */
 		if ($realTimeOutput) {
 			// Use setTimeout of 0 to allow it to run seemingly forever, until user cancels it.
-			$process->setTimeout(0)->run(function ($type, $line) use ($realTimeOutput) {
+			$process->setTimeout(0)->run(function ($type, $line) {
 				if (Process::ERR === $type) {
 					echo 'ERROR: ' . $line;
-				} else {
+				}
+				else {
 					echo $line;
 				}
 			});
-		} else {
+		}
+		else {
 			$processOutput = '';
 
 			$process->setTimeout(60)->run(function ($type, $line) use (&$processOutput) {

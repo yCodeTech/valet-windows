@@ -1,18 +1,16 @@
 <?php
 
-class WordPressValetDriver extends BasicValetDriver
-{
+class WordPressValetDriver extends BasicValetDriver {
 	/**
 	 * Determine if the driver serves the request.
 	 *
 	 * @param  string  $sitePath
 	 * @param  string  $siteName
 	 * @param  string  $uri
-	 * @return bool
+	 * @return boolean
 	 */
-	public function serves($sitePath, $siteName, $uri)
-	{
-		return file_exists($sitePath.'/wp-config.php') || file_exists($sitePath.'/wp-config-sample.php');
+	public function serves($sitePath, $siteName, $uri) {
+		return file_exists($sitePath . '/wp-config.php') || file_exists($sitePath . '/wp-config-sample.php');
 	}
 
 	/**
@@ -23,14 +21,15 @@ class WordPressValetDriver extends BasicValetDriver
 	 * @param  string  $uri
 	 * @return string
 	 */
-	public function frontControllerPath($sitePath, $siteName, $uri)
-	{
+	public function frontControllerPath($sitePath, $siteName, $uri) {
 		$_SERVER['PHP_SELF'] = $uri;
 		$_SERVER['SERVER_ADDR'] = '127.0.0.1';
 		$_SERVER['SERVER_NAME'] = $_SERVER['HTTP_HOST'];
 
 		return parent::frontControllerPath(
-			$sitePath, $siteName, $this->forceTrailingSlash($uri)
+			$sitePath,
+			$siteName,
+			$this->forceTrailingSlash($uri)
 		);
 	}
 
@@ -40,10 +39,9 @@ class WordPressValetDriver extends BasicValetDriver
 	 * @param  string  $uri
 	 * @return string
 	 */
-	private function forceTrailingSlash($uri)
-	{
+	private function forceTrailingSlash($uri) {
 		if (substr($uri, -1 * strlen('/wp-admin')) == '/wp-admin') {
-			header('Location: '.$uri.'/');
+			header('Location: ' . $uri . '/');
 			exit;
 		}
 

@@ -21,6 +21,12 @@
 	<!-- Show sniff codes in all reports -->
 	<arg value="ns"/>
 
+	<!-- Allow multiple classes in a single file ONLY for facades.php files,
+	ie. exclude the file from the sniff. -->
+	<rule ref="PSR1.Classes.ClassDeclaration.MultipleClasses">
+		<exclude-pattern>*facades.php</exclude-pattern>
+	</rule>
+
 	<!-- Use PSR-2 as a base -->
 	<rule ref="PSR2">
 		<!-- Allow tab indent -->
@@ -37,16 +43,29 @@
 		<exclude name="Squiz.ControlStructures.ControlSignature.SpaceAfterCloseBrace" />
 		<exclude name="PSR1.Classes.ClassDeclaration.MissingNamespace" />
 		<exclude name="PEAR.Functions.ValidDefaultValue.NotAtEnd" />
-		
+		<!-- Allow same-line function call arguments, ie. prevent 1 argument per line. -->
+		<exclude name="PEAR.Functions.FunctionCallSignature.MultipleArguments" />
+		<!-- Allow content after a function opening bracket,
+		ie. allow arguments on same line as the opening bracket. -->
+		<exclude name="PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket" />
+		<!-- Prevent function closing bracket from being on it's own line. -->
+		<exclude name="PEAR.Functions.FunctionCallSignature.CloseBracketLine" />
+		<exclude name="Generic.Files.LineLength.TooLong" />
+		<exclude name="PSR2.Methods.FunctionClosingBrace.SpacingBeforeClose" />
+		<exclude name="PSR2.Methods.FunctionCallSignature.ContentAfterOpenBracket" />
 	</rule>
-	<!-- Allow same line starting brackets for classes -->
+	<!-- Allow same line opening brackets for functions -->
 	<rule ref="Generic.Functions.OpeningFunctionBraceKernighanRitchie" />
+	<!-- Allow same line opening brackets for classes -->
+	<rule ref="Generic.Classes.OpeningBraceSameLine"/>
 	<!-- Disallow space indent -->
 	<rule ref="Generic.WhiteSpace.DisallowSpaceIndent"/>
+	<!-- Allow tab indents -->
 	<rule ref="Generic.WhiteSpace.ScopeIndent">
 		<properties>
 			<property name="indent" value="4"/>
-			<property name="tabIndent" value="true"/>
+			<property name="tabIndent" value="false"/>
+			<property name="exact" value="true"/>
 		</properties>
 	</rule>
 	<!-- Disallow spaces after opening and closing braces -->
@@ -56,5 +75,12 @@
 			<property name="requiredSpacesBeforeClose" value="0" />
 			<property name="allowMultipleArguments" value="false"/>
 		</properties>
+	</rule>
+	<!-- External standard. https://github.com/JParkinson1991/phpcodesniffer-standards/blob/master/docs/Standards/JPSR12/JPSR12.md -->
+	<!-- Exclude certain sniffs. -->
+	<rule ref="JPSR12">
+		<exclude name="JPSR12.Files" />
+		<exclude name="JPSR12.Operators.OperatorSpacing" />
+		<exclude name="JPSR12.Types.DeclareStrictTypes" />
 	</rule>
 </ruleset>

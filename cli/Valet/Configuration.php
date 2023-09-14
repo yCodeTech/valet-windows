@@ -4,8 +4,7 @@ namespace Valet;
 
 use Illuminate\Support\Arr;
 
-class Configuration
-{
+class Configuration {
 	/**
 	 * @var Filesystem
 	 */
@@ -17,8 +16,7 @@ class Configuration
 	 * @param  Filesystem  $filesystem
 	 * @return void
 	 */
-	public function __construct(Filesystem $files)
-	{
+	public function __construct(Filesystem $files) {
 		$this->files = $files;
 	}
 
@@ -27,8 +25,7 @@ class Configuration
 	 *
 	 * @return void
 	 */
-	public function install()
-	{
+	public function install() {
 		$this->createConfigurationDirectory();
 		$this->createDriversDirectory();
 		$this->createSitesDirectory();
@@ -47,8 +44,7 @@ class Configuration
 	 *
 	 * @return void
 	 */
-	public function createConfigurationDirectory()
-	{
+	public function createConfigurationDirectory() {
 		// The preg_replace gets "C:/Users/Username/.config"
 		$this->files->ensureDirExists(preg_replace('~/valet$~', '', $this->valetHomePath()), user());
 		$this->files->ensureDirExists($this->valetHomePath(), user());
@@ -59,8 +55,7 @@ class Configuration
 	 *
 	 * @return void
 	 */
-	public function createDriversDirectory()
-	{
+	public function createDriversDirectory() {
 		$driversPath = $this->valetHomePath('Drivers');
 
 		if ($this->files->isDir($driversPath)) {
@@ -80,8 +75,7 @@ class Configuration
 	 *
 	 * @return void
 	 */
-	public function createSitesDirectory()
-	{
+	public function createSitesDirectory() {
 		$this->files->ensureDirExists($this->valetHomePath('Sites'), user());
 	}
 
@@ -90,8 +84,7 @@ class Configuration
 	 *
 	 * @return void
 	 */
-	public function createExtensionsDirectory()
-	{
+	public function createExtensionsDirectory() {
 		$this->files->ensureDirExists(Valet::homePath('Extensions'), user());
 	}
 
@@ -100,8 +93,7 @@ class Configuration
 	 *
 	 * @return void
 	 */
-	public function createLogDirectory()
-	{
+	public function createLogDirectory() {
 		$this->files->ensureDirExists($path = $this->valetHomePath('Log'), user());
 
 		$this->files->touch($path . '/nginx-error.log');
@@ -112,8 +104,7 @@ class Configuration
 	 *
 	 * @return void
 	 */
-	public function createCertificatesDirectory()
-	{
+	public function createCertificatesDirectory() {
 		$this->files->ensureDirExists($this->valetHomePath('Certificates'), user());
 	}
 
@@ -122,8 +113,7 @@ class Configuration
 	 *
 	 * @return void
 	 */
-	public function createServicesDirectory()
-	{
+	public function createServicesDirectory() {
 		$this->files->ensureDirExists($this->valetHomePath('Services'), user());
 	}
 
@@ -132,8 +122,7 @@ class Configuration
 	 *
 	 * @return void
 	 */
-	public function createXdebugDirectory()
-	{
+	public function createXdebugDirectory() {
 		$this->files->ensureDirExists($this->valetHomePath('Xdebug'), user());
 	}
 
@@ -142,8 +131,7 @@ class Configuration
 	 *
 	 * @return void
 	 */
-	public function writeBaseConfiguration()
-	{
+	public function writeBaseConfiguration() {
 		if (!$this->files->exists($this->path())) {
 			$baseConfig = [
 				'tld' => 'test',
@@ -174,8 +162,7 @@ class Configuration
 	 *
 	 * @return void
 	 */
-	public function uninstall()
-	{
+	public function uninstall() {
 		$this->files->unlink($this->valetHomePath());
 	}
 
@@ -186,8 +173,7 @@ class Configuration
 	 * @param  bool  $prepend
 	 * @return void
 	 */
-	public function addDefaultPhp()
-	{
+	public function addDefaultPhp() {
 		$phpPath = lcfirst(\PhpCgi::findDefaultPhpPath());
 
 		$this->addPhp($phpPath);
@@ -203,8 +189,7 @@ class Configuration
 	 * @param  string  $phpPath
 	 * @return mixed
 	 */
-	public function getPhp($phpPath)
-	{
+	public function getPhp($phpPath) {
 		$phpPath = str_replace('\\', "/", $phpPath);
 
 		$config = $this->read();
@@ -220,8 +205,7 @@ class Configuration
 	 * @param  string  $phpVersion
 	 * @return mixed
 	 */
-	public function getPhpByVersion($phpVersion)
-	{
+	public function getPhpByVersion($phpVersion) {
 		$phpVersion = str_replace('\\', "/", $phpVersion);
 
 		$config = $this->read();
@@ -243,8 +227,7 @@ class Configuration
 	 * @param string $phpVersion
 	 * @return boolean
 	 */
-	public function isPhpAlias($phpVersion)
-	{
+	public function isPhpAlias($phpVersion) {
 		$php = $this->getPhpByVersion($phpVersion);
 		return $php["version_alias"] === $phpVersion ? true : false;
 	}
@@ -256,8 +239,7 @@ class Configuration
 	 *
 	 * @return string The full version number, eg. 7.4.33
 	 */
-	public function getPhpFullVersionByAlias($phpVersionAlias)
-	{
+	public function getPhpFullVersionByAlias($phpVersionAlias) {
 		return $this->getPhpByVersion($phpVersionAlias)["version"];
 	}
 
@@ -267,8 +249,7 @@ class Configuration
 	 * @param  string  $phpPath
 	 * @return mixed
 	 */
-	public function addPhp($phpPath)
-	{
+	public function addPhp($phpPath) {
 		$phpPath = str_replace('\\', "/", $phpPath);
 
 		$phpVersion = \PhpCgi::findPhpVersion($phpPath);
@@ -305,7 +286,7 @@ class Configuration
 			'version_alias' => number_format((float) $phpVersion, 1, '.', ''),
 			'path' => $phpPath,
 			'port' => $phpPort,
-			'xdebug_port' => $phpXdebugPort,
+			'xdebug_port' => $phpXdebugPort
 		];
 
 		// Sort the PHP array by version number in descending order. Ie. 8.1.18, 8.1.8, 7.4.33
@@ -322,8 +303,7 @@ class Configuration
 	 * @param  string  $phpPath
 	 * @return mixed
 	 */
-	public function removePhp($phpPath)
-	{
+	public function removePhp($phpPath) {
 		$phpPath = str_replace('\\', "/", $phpPath);
 
 		$config = $this->read();
@@ -362,8 +342,7 @@ class Configuration
 	 * @param  bool  $prepend
 	 * @return void
 	 */
-	public function addPath(string $path, bool $prepend = false)
-	{
+	public function addPath(string $path, bool $prepend = false) {
 		$path = str_replace('\\', "/", $path);
 		$this->write(tap($this->read(), function (&$config) use ($path, $prepend) {
 			$method = $prepend ? 'prepend' : 'push';
@@ -378,8 +357,7 @@ class Configuration
 	 * @param  string  $path
 	 * @return void
 	 */
-	public function prependPath(string $path)
-	{
+	public function prependPath(string $path) {
 		$this->addPath($path, true);
 	}
 
@@ -390,8 +368,7 @@ class Configuration
 	 * @param  string  $path
 	 * @return void
 	 */
-	public function removePath(string $path)
-	{
+	public function removePath(string $path) {
 		if ($path == $this->valetHomePath('Sites')) {
 			info("Cannot remove this directory because this is where Valet stores its site definitions.\nRun <bg=magenta> valet paths </> for a list of parked paths.");
 			exit();
@@ -409,8 +386,7 @@ class Configuration
 	 *
 	 * @return void
 	 */
-	public function prune()
-	{
+	public function prune() {
 		if (!$this->files->exists($this->path())) {
 			return;
 		}
@@ -427,8 +403,7 @@ class Configuration
 	 *
 	 * @return array
 	 */
-	public function read(): array
-	{
+	public function read(): array {
 		// If config.json file doesn't exist, then return empty array so Valet can setup a new one.
 		if (!$this->files->exists($this->path())) {
 			return [];
@@ -443,8 +418,7 @@ class Configuration
 	 * @param  mixed  $default
 	 * @return mixed
 	 */
-	public function get($key, $default = null)
-	{
+	public function get($key, $default = null) {
 		return Arr::get($this->read(), $key, $default);
 	}
 
@@ -455,8 +429,7 @@ class Configuration
 	 * @param  mixed  $value
 	 * @return array
 	 */
-	public function updateKey(string $key, $value): array
-	{
+	public function updateKey(string $key, $value): array {
 		return tap($this->read(), function (&$config) use ($key, $value) {
 			$config[$key] = $value;
 
@@ -470,8 +443,7 @@ class Configuration
 	 * @param  array  $config
 	 * @return void
 	 */
-	public function write(array $config)
-	{
+	public function write(array $config) {
 		$this->files->putAsUser($this->path(), json_encode(
 			$config,
 			JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
@@ -483,8 +455,7 @@ class Configuration
 	 *
 	 * @return string
 	 */
-	public function path(): string
-	{
+	public function path(): string {
 		return $this->valetHomePath('config.json');
 	}
 
@@ -494,8 +465,7 @@ class Configuration
 	 * @param  string  $path
 	 * @return string
 	 */
-	protected function valetHomePath(string $path = ''): string
-	{
+	protected function valetHomePath(string $path = ''): string {
 		return Valet::homePath($path);
 	}
 }

@@ -1,17 +1,15 @@
 <?php
 
-class SampleValetDriver extends ValetDriver
-{
+class SampleValetDriver extends ValetDriver {
 	/**
 	 * Determine if the driver serves the request.
 	 *
 	 * @param  string  $sitePath
 	 * @param  string  $siteName
 	 * @param  string  $uri
-	 * @return bool
+	 * @return boolean
 	 */
-	public function serves($sitePath, $siteName, $uri)
-	{
+	public function serves($sitePath, $siteName, $uri) {
 		// if (file_exists($sitePath.'/file-that-identifies-my-framework')) {
 		//     return true;
 		// }
@@ -27,8 +25,7 @@ class SampleValetDriver extends ValetDriver
 	 * @param  string  $uri
 	 * @return string|false
 	 */
-	public function isStaticFile($sitePath, $siteName, $uri)
-	{
+	public function isStaticFile($sitePath, $siteName, $uri) {
 		if (file_exists($staticFilePath = $sitePath.'/public/'.$uri)) {
 			return $staticFilePath;
 		}
@@ -44,8 +41,7 @@ class SampleValetDriver extends ValetDriver
 	 * @param  string  $uri
 	 * @return string
 	 */
-	public function frontControllerPath($sitePath, $siteName, $uri)
-	{
+	public function frontControllerPath($sitePath, $siteName, $uri) {
 		return $sitePath.'/public/index.php';
 	}
 }

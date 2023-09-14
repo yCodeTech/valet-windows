@@ -4,8 +4,7 @@ namespace Valet;
 
 use Symfony\Component\Process\PhpExecutableFinder;
 
-class PhpCgi
-{
+class PhpCgi {
 	const PORT = 9001;
 
 	/**
@@ -46,8 +45,7 @@ class PhpCgi
 	 * @param  Configuration  $configuration
 	 * @return void
 	 */
-	public function __construct(CommandLine $cli, Filesystem $files, WinSwFactory $winswFactory, Configuration $configuration)
-	{
+	public function __construct(CommandLine $cli, Filesystem $files, WinSwFactory $winswFactory, Configuration $configuration) {
 		$this->cli = $cli;
 		$this->files = $files;
 		$this->winswFactory = $winswFactory;
@@ -63,7 +61,7 @@ class PhpCgi
 				'phpServiceName' => $phpServiceName,
 				'phpCgiName' => $serviceId,
 				'php' => $php,
-				'winsw' => $this->winswFactory->make($phpServiceName, $serviceId),
+				'winsw' => $this->winswFactory->make($phpServiceName, $serviceId)
 			];
 		}
 	}
@@ -73,8 +71,7 @@ class PhpCgi
 	 *
 	 * @return void
 	 */
-	public function install($phpVersion = null)
-	{
+	public function install($phpVersion = null) {
 		if ($phpVersion) {
 			if ($this->configuration->isPhpAlias($phpVersion)) {
 				$phpVersion = $this->configuration->getPhpFullVersionByAlias($phpVersion);
@@ -101,8 +98,7 @@ class PhpCgi
 	 *
 	 * @return void
 	 */
-	public function installService($phpVersion, $phpCgiServiceConfig = null, $installConfig = null)
-	{
+	public function installService($phpVersion, $phpCgiServiceConfig = null, $installConfig = null) {
 		$phpWinSw = $this->phpWinSws[$phpVersion];
 
 		if ($phpWinSw['winsw']->installed()) {
@@ -120,7 +116,7 @@ class PhpCgi
 
 		$phpWinSw['winsw']->install($installConfig ?? [
 			'PHP_PATH' => $phpWinSw['php']['path'],
-			'PHP_PORT' => $phpWinSw['php']['port'],
+			'PHP_PORT' => $phpWinSw['php']['port']
 		]);
 
 		$phpWinSw['winsw']->restart();
@@ -131,8 +127,7 @@ class PhpCgi
 	 *
 	 * @return void
 	 */
-	public function uninstall($phpVersion = null)
-	{
+	public function uninstall($phpVersion = null) {
 		if ($phpVersion) {
 			if ($this->configuration->isPhpAlias($phpVersion)) {
 				$phpVersion = $this->configuration->getPhpFullVersionByAlias($phpVersion);
@@ -158,8 +153,7 @@ class PhpCgi
 	 *
 	 * @return void
 	 */
-	public function uninstallService($phpVersion)
-	{
+	public function uninstallService($phpVersion) {
 		$phpWinSw = $this->phpWinSws[$phpVersion];
 
 		if ($phpWinSw['winsw']->installed()) {
@@ -172,8 +166,7 @@ class PhpCgi
 	 *
 	 * @return void
 	 */
-	public function restart()
-	{
+	public function restart() {
 		foreach ($this->phpWinSws as $phpWinSw) {
 			if ($phpWinSw['winsw']->installed()) {
 				$phpWinSw['winsw']->restart();
@@ -186,8 +179,7 @@ class PhpCgi
 	 *
 	 * @return void
 	 */
-	public function stop()
-	{
+	public function stop() {
 		foreach ($this->phpWinSws as $phpWinSw) {
 			if ($phpWinSw['winsw']->installed()) {
 				$phpWinSw['winsw']->stop();
@@ -200,9 +192,8 @@ class PhpCgi
 	 *
 	 * @return string
 	 */
-	public function findDefaultPhpPath(): string
-	{
-		if (!$php = (new PhpExecutableFinder)->find()) {
+	public function findDefaultPhpPath(): string {
+		if (!$php = (new PhpExecutableFinder())->find()) {
 			$php = $this->cli->runOrExit('where php', function () {
 				error('Failed to find PHP. Make sure it\'s added to the path environment variables.');
 			});
@@ -216,8 +207,7 @@ class PhpCgi
 	 *
 	 * @return mixed
 	 */
-	public function findPhpVersion($phpPath)
-	{
+	public function findPhpVersion($phpPath) {
 		$phpExecPath = "{$phpPath}\php.exe";
 		if (!file_exists($phpExecPath)) {
 			error("Failed to find the PHP executable in {$phpPath}");
@@ -225,9 +215,11 @@ class PhpCgi
 			return null;
 		}
 
-		$phpVersion = $this->cli->runOrExit("{$phpExecPath} -r \"echo PHP_VERSION;\"", function ($code, $output) use ($phpPath) {
-			error("Failed to find the PHP version for {$phpPath}");
-		});
+		$phpVersion = $this->cli->runOrExit("{$phpExecPath} -r \"echo PHP_VERSION;\"",
+			function ($code, $output) use ($phpPath) {
+				error("Failed to find the PHP version for {$phpPath}");
+			}
+		);
 
 		return $phpVersion->getOutput();
 	}
@@ -238,8 +230,7 @@ class PhpCgi
 	 * @param string $phpVersion
 	 * @return string
 	 */
-	public function getPhpCgiName($phpVersion)
-	{
+	public function getPhpCgiName($phpVersion) {
 		return $this->phpWinSws[$phpVersion]["phpCgiName"];
 	}
 }

@@ -2,8 +2,7 @@
 
 namespace Valet;
 
-class Ansicon
-{
+class Ansicon {
 	/**
 	 * @var CommandLine
 	 */
@@ -15,8 +14,7 @@ class Ansicon
 	 * @param  CommandLine  $cli
 	 * @return void
 	 */
-	public function __construct(CommandLine $cli)
-	{
+	public function __construct(CommandLine $cli) {
 		$this->cli = $cli;
 	}
 
@@ -25,11 +23,13 @@ class Ansicon
 	 *
 	 * @return void
 	 */
-	public function install()
-	{
-		$this->cli->runOrExit(valetBinPath() . "ansicon/ansicon.exe -i", function ($code, $output) {
-			warning("Failed to install ansicon.\n$output");
-		});
+	public function install() {
+		$this->cli->runOrExit(
+			valetBinPath() . "ansicon/ansicon.exe -i",
+			function ($code, $output) {
+				warning("Failed to install ansicon.\n$output");
+			}
+		);
 	}
 
 	/**
@@ -37,10 +37,12 @@ class Ansicon
 	 *
 	 * @return void
 	 */
-	public function uninstall()
-	{
-		$this->cli->runOrExit(valetBinPath() . "ansicon/ansicon.exe -pu -u", function ($code, $output) {
-			warning("Failed to uninstall ansicon.\n$output");
-		});
+	public function uninstall() {
+		$this->cli->runOrExit(
+			valetBinPath() . "ansicon/ansicon.exe -pu -u",
+			function ($code, $output) {
+				warning("Failed to uninstall ansicon.\n$output");
+			}
+		);
 	}
 }

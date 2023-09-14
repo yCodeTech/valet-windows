@@ -4,8 +4,7 @@ namespace Valet;
 
 use Symfony\Component\Process\Process;
 
-class ProcessOutput
-{
+class ProcessOutput {
 	/**
 	 * @var \Symfony\Component\Process\Process
 	 */
@@ -17,24 +16,21 @@ class ProcessOutput
 	 * @param  \Symfony\Component\Process\Process  $process
 	 * @return void
 	 */
-	public function __construct(Process $process)
-	{
+	public function __construct(Process $process) {
 		$this->process = $process;
 	}
 
 	/**
 	 * @return bool
 	 */
-	public function isSuccessful(): bool
-	{
+	public function isSuccessful(): bool {
 		return $this->process->isSuccessful();
 	}
 
 	/**
 	 * @return string
 	 */
-	public function getOutput(): string
-	{
+	public function getOutput(): string {
 		if ($this->process->isSuccessful()) {
 			return $this->process->getOutput();
 		}
@@ -45,8 +41,7 @@ class ProcessOutput
 	/**
 	 * @return string
 	 */
-	public function __toString()
-	{
+	public function __toString() {
 		return $this->getOutput();
 	}
 
@@ -57,8 +52,7 @@ class ProcessOutput
 	 * @param  array  $args
 	 * @return mixed
 	 */
-	public function __call($method, $args)
-	{
+	public function __call($method, $args) {
 		return $this->process->{$method}(...$args);
 	}
 }

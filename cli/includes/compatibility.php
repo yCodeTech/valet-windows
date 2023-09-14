@@ -1,12 +1,12 @@
 <?php
-
 /**
  * Check the system's compatibility with Valet.
  */
+
 $inTestingEnvironment = strpos($_SERVER['SCRIPT_NAME'], 'phpunit') !== false;
 
-if (PHP_OS !== 'WINNT' && ! $inTestingEnvironment) {
-	echo 'Valet for Windows only supports the Windows operating system.'.PHP_EOL;
+if (PHP_OS !== 'WINNT' && !$inTestingEnvironment) {
+	echo 'Valet for Windows only supports the Windows operating system.' . PHP_EOL;
 
 	exit(1);
 }

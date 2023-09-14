@@ -2,8 +2,7 @@
 
 namespace Valet;
 
-class WinSW
-{
+class WinSW {
 	/**
 	 * @var string
 	 */
@@ -31,8 +30,7 @@ class WinSW
 	 * @param  Filesystem  $files
 	 * @return void
 	 */
-	public function __construct(string $service, string $serviceId, CommandLine $cli, Filesystem $files)
-	{
+	public function __construct(string $service, string $serviceId, CommandLine $cli, Filesystem $files) {
 		$this->cli = $cli;
 		$this->files = $files;
 		$this->service = $service;
@@ -45,8 +43,7 @@ class WinSW
 	 * @param  array  $args
 	 * @return void
 	 */
-	public function install(array $args = [])
-	{
+	public function install(array $args = []) {
 		$this->createConfiguration($args);
 
 		$command = 'cmd "/C cd ' . $this->servicesPath() . ' && "' . $this->servicesPath($this->service) . '" install"';
@@ -62,8 +59,7 @@ class WinSW
 	 * @param  array  $args
 	 * @return void
 	 */
-	protected function createConfiguration(array $args = [])
-	{
+	protected function createConfiguration(array $args = []) {
 		$args['VALET_HOME_PATH'] = Valet::homePath();
 
 		$this->files->copy(
@@ -84,8 +80,7 @@ class WinSW
 	 *
 	 * @return void
 	 */
-	public function uninstall()
-	{
+	public function uninstall() {
 		$this->stop($this->service);
 
 		$this->cli->run('cmd "/C cd ' . $this->servicesPath() . ' && "' . $this->servicesPath($this->service) . '" uninstall"');
@@ -101,8 +96,7 @@ class WinSW
 	 *
 	 * @return bool
 	 */
-	public function installed(): bool
-	{
+	public function installed(): bool {
 		return $this->cli->powershell("Get-Service -Name \"$this->serviceId\"")->isSuccessful();
 	}
 
@@ -111,8 +105,7 @@ class WinSW
 	 *
 	 * @return void
 	 */
-	public function restart()
-	{
+	public function restart() {
 		$command = 'cmd "/C cd ' . $this->servicesPath() . ' && "' . $this->servicesPath($this->service) . '" restart"';
 
 		$this->cli->run($command, function () use ($command) {
@@ -129,8 +122,7 @@ class WinSW
 	 *
 	 * @return void
 	 */
-	public function stop()
-	{
+	public function stop() {
 		$command = 'cmd "/C cd ' . $this->servicesPath() . ' && "' . $this->servicesPath($this->service) . '" stop"';
 
 		$this->cli->run($command, function ($code, $output) {
@@ -143,8 +135,7 @@ class WinSW
 	 *
 	 * @return string
 	 */
-	protected function configPath(): string
-	{
+	protected function configPath(): string {
 		return $this->servicesPath("$this->service.xml");
 	}
 
@@ -153,8 +144,7 @@ class WinSW
 	 *
 	 * @return string
 	 */
-	protected function binaryPath(): string
-	{
+	protected function binaryPath(): string {
 		return $this->servicesPath("$this->service.exe");
 	}
 
@@ -164,8 +154,7 @@ class WinSW
 	 * @param  string  $path
 	 * @return string
 	 */
-	protected function servicesPath(string $path = ''): string
-	{
+	protected function servicesPath(string $path = ''): string {
 		return Valet::homePath('Services' . ($path ? "/$path" : $path));
 	}
 }

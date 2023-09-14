@@ -33,8 +33,7 @@ define('COMPOSER_GLOBAL_PATH', trim(\Valet::getComposerGlobalPath()));
  * @param  string  $output
  * @return void
  */
-function info($output)
-{
+function info($output) {
 	output('<info>' . $output . '</info>');
 }
 
@@ -45,8 +44,7 @@ function info($output)
  * @param  string  $output
  * @return void
  */
-function info_dump($output)
-{
+function info_dump($output) {
 	output('<info>' . var_dump($output) . '</info>');
 }
 
@@ -56,8 +54,7 @@ function info_dump($output)
  * @param  string  $output
  * @return void
  */
-function warning($output)
-{
+function warning($output) {
 	if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'testing') {
 		throw new RuntimeException($output);
 	}
@@ -72,8 +69,7 @@ function warning($output)
  * @param  boolean $exception
  * @return void
  */
-function error(string $output, $exception = false)
-{
+function error(string $output, $exception = false) {
 	if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'testing') {
 		throw new RuntimeException($output);
 	}
@@ -87,13 +83,13 @@ function error(string $output, $exception = false)
 		// throw new \Exception($outputTxt);
 
 
-		$errors = new \Exception($output);
+		$errors = new Exception($output);
 
 		$errorCode = $errors->getCode();
 		$errorMsg = $errors->getMessage();
 		$errorTrace = $errors->getTrace();
 
-		$constructTrace = array();
+		$constructTrace = [];
 		$count = 0;
 		foreach ($errorTrace as $key => $value) {
 			$count_num = $count++ . ") ";
@@ -102,7 +98,7 @@ function error(string $output, $exception = false)
 			$func = isset($value["function"]) ? $value["function"] : "";
 
 			$file_n_line = isset($value["file"]) ?
-				" ------ " . $value["file"] . ":" . $value["line"] : "";
+			" ------ " . $value["file"] . ":" . $value["line"] : "";
 
 			$constructTrace[] = $count_num . $class . $type . $func . $file_n_line;
 		}
@@ -112,11 +108,12 @@ function error(string $output, $exception = false)
 		// Wait 1 microsecond, to make sure all output before the error call has reached
 		// the terminal.
 		usleep(1);
-		(new ConsoleOutput)->getErrorOutput()->writeln("\n\n<error>$output</error>");
+		(new ConsoleOutput())->getErrorOutput()->writeln("\n\n<error>$output</error>");
 
 		exit();
-	} else {
-		(new ConsoleOutput)->getErrorOutput()->writeln("<error>$output</error>");
+	}
+	else {
+		(new ConsoleOutput())->getErrorOutput()->writeln("<error>$output</error>");
 	}
 }
 
@@ -127,8 +124,7 @@ function error(string $output, $exception = false)
  * @param mixed $code The numeric error type/code
  * @return string The error type name
  */
-function getErrorTypeName($code)
-{
+function getErrorTypeName($code) {
 	return $code == 0 ? "FATAL" : array_search($code, get_defined_constants(true)['Core']);
 }
 
@@ -138,8 +134,7 @@ function getErrorTypeName($code)
  * @param  string  $output
  * @return void
  */
-function output($output)
-{
+function output($output) {
 	if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'testing') {
 		return;
 	}
@@ -159,8 +154,7 @@ if (!function_exists('array_is_list')) {
 	 *
 	 * @return bool Returns `true` if `array` is a list, `false` otherwise.
 	 */
-	function array_is_list(array $array)
-	{
+	function array_is_list(array $array) {
 		if ($array === []) {
 			return true;
 		}
@@ -175,8 +169,7 @@ if (!function_exists('array_is_list')) {
  * @param  array  $rows
  * @return void
  */
-function table(array $headers = [], array $rows = [], $setHorizontal = false, $title = null)
-{
+function table(array $headers = [], array $rows = [], $setHorizontal = false, $title = null) {
 	$table = new Table(new ConsoleOutput());
 
 	// Symfony Console component from 6.1 added support for a vertical table.
@@ -210,8 +203,7 @@ function table(array $headers = [], array $rows = [], $setHorizontal = false, $t
  *
  * @return array ['Site', 'Alias', 'Secured', 'PHP', 'URL', 'Alias URL', 'Path']
  */
-function default_table_headers()
-{
+function default_table_headers() {
 	return ['Site', 'Alias', 'Secured', 'PHP', 'URL', 'Alias URL', 'Path'];
 }
 
@@ -223,8 +215,7 @@ function default_table_headers()
  * @param array $columns The column names to change the width of
  * @param int $maxWidth The maximum width of the columns
  */
-function changeColumnMaxWidth($table, $headers, $columns, $maxWidth)
-{
+function changeColumnMaxWidth($table, $headers, $columns, $maxWidth) {
 	foreach ($columns as $column) {
 		$index = array_search($column, $headers);
 		// (column, width) - column is zero based.
@@ -237,8 +228,7 @@ function changeColumnMaxWidth($table, $headers, $columns, $maxWidth)
  *
  * @param array $rows The array of rows
  */
-function addTableSeparator($rows)
-{
+function addTableSeparator($rows) {
 	/**
 	 * Create a new laravel collection and add the table separator
 	 * inbetween all the rows.
@@ -258,8 +248,7 @@ if (!function_exists('resolve')) {
 	 * @param  string  $class
 	 * @return mixed
 	 */
-	function resolve($class)
-	{
+	function resolve($class) {
 		return Container::getInstance()->make($class);
 	}
 }
@@ -271,8 +260,7 @@ if (!function_exists('resolve')) {
  * @param  mixed  $instance
  * @return void
  */
-function swap($class, $instance)
-{
+function swap($class, $instance) {
 	Container::getInstance()->instance($class, $instance);
 }
 
@@ -285,12 +273,12 @@ if (!function_exists('retry')) {
 	 * @param  int  $sleep
 	 * @return mixed
 	 */
-	function retry($retries, $fn, $sleep = 0)
-	{
+	function retry($retries, $fn, $sleep = 0) {
 		beginning:
 		try {
 			return $fn();
-		} catch (Exception $e) {
+		}
+		catch (Exception $e) {
 			if (!$retries) {
 				throw $e;
 			}
@@ -314,8 +302,7 @@ if (!function_exists('tap')) {
 	 * @param  callable  $callback
 	 * @return mixed
 	 */
-	function tap($value, callable $callback)
-	{
+	function tap($value, callable $callback) {
 		$callback($value);
 
 		return $value;
@@ -333,8 +320,7 @@ if (!function_exists('str_ends_with')) {
 	 * @param  string|string[]  $needles
 	 * @return bool
 	 */
-	function str_ends_with($haystack, $needles)
-	{
+	function str_ends_with($haystack, $needles) {
 		foreach ((array) $needles as $needle) {
 			if (substr($haystack, -strlen($needle)) === (string) $needle) {
 				return true;
@@ -356,8 +342,7 @@ if (!function_exists('str_starts_with')) {
 	 * @param  string|string[]  $needles
 	 * @return bool
 	 */
-	function str_starts_with($haystack, $needles)
-	{
+	function str_starts_with($haystack, $needles) {
 		foreach ((array) $needles as $needle) {
 			if ((string) $needle !== '' && strncmp($haystack, $needle, strlen($needle)) === 0) {
 				return true;
@@ -373,8 +358,7 @@ if (!function_exists('str_starts_with')) {
  *
  * @return string
  */
-function user()
-{
+function user() {
 	if (!isset($_SERVER['SUDO_USER'])) {
 		if (!isset($_SERVER['USER'])) {
 			return $_SERVER['USERNAME'];
@@ -390,8 +374,7 @@ function user()
  * Get the bin path.
  * @return string `"c:\Users\Username\AppData\Roaming\Composer\vendor\ycodetech\valet-windows\bin\"`
  */
-function valetBinPath()
-{
+function valetBinPath() {
 	return __DIR__ . '/../../bin/';
 }
 
@@ -405,8 +388,7 @@ function valetBinPath()
  *
  * @return string The new prefixed options as a string.
  */
-function prefixOptions($options)
-{
+function prefixOptions($options) {
 	return (new \Illuminate\Support\Collection($options))->map(function ($value) {
 		// If value has length of 1, ie. has 1 character, then its a shortcut option,
 		// so apply the single "-".
@@ -431,8 +413,7 @@ function prefixOptions($options)
  * - `setMessage($string, $placeholderName)` To set the message of the `%placeholder%` during progress.
  * - `advance([$num])` To advance the progress by 1 (if option omitted), optionally specify a number to progress by.
  */
-function progressbar($maxItems, $message, $startingTxt = "services")
-{
+function progressbar($maxItems, $message, $startingTxt = "services") {
 	ProgressBar::setFormatDefinition('custom', " %current%/%max% %bar% %percent%% %message% %placeholder%...");
 
 	$progressBar = new ProgressBar(new ConsoleOutput(), $maxItems);
@@ -450,5 +431,4 @@ function progressbar($maxItems, $message, $startingTxt = "services")
 	$progressBar->start();
 
 	return $progressBar;
-
 }

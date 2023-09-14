@@ -1,16 +1,14 @@
 <?php
 
-class JigsawValetDriver extends BasicValetDriver
-{
+class JigsawValetDriver extends BasicValetDriver {
 	/**
 	 * Mutate the incoming URI.
 	 *
 	 * @param  string  $uri
 	 * @return string
 	 */
-	public function mutateUri($uri)
-	{
-		return rtrim('/build_local'.$uri, '/');
+	public function mutateUri($uri) {
+		return rtrim('/build_local' . $uri, '/');
 	}
 
 	/**
@@ -19,10 +17,9 @@ class JigsawValetDriver extends BasicValetDriver
 	 * @param  string  $sitePath
 	 * @param  string  $siteName
 	 * @param  string  $uri
-	 * @return void
+	 * @return boolean
 	 */
-	public function serves($sitePath, $siteName, $uri)
-	{
-		return is_dir($sitePath.'/build_local');
+	public function serves($sitePath, $siteName, $uri) {
+		return is_dir($sitePath . '/build_local');
 	}
 }

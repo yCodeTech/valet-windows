@@ -1,18 +1,16 @@
 <?php
 
-class NeosValetDriver extends ValetDriver
-{
+class NeosValetDriver extends ValetDriver {
 	/**
 	 * Determine if the driver serves the request.
 	 *
 	 * @param  string  $sitePath
 	 * @param  string  $siteName
 	 * @param  string  $uri
-	 * @return bool
+	 * @return boolean
 	 */
-	public function serves($sitePath, $siteName, $uri)
-	{
-		return file_exists($sitePath.'/flow') && is_dir($sitePath.'/Web');
+	public function serves($sitePath, $siteName, $uri) {
+		return file_exists($sitePath . '/flow') && is_dir($sitePath . '/Web');
 	}
 
 	/**
@@ -23,9 +21,8 @@ class NeosValetDriver extends ValetDriver
 	 * @param  string  $uri
 	 * @return string|false
 	 */
-	public function isStaticFile($sitePath, $siteName, $uri)
-	{
-		if ($this->isActualFile($staticFilePath = $sitePath.'/Web'.$uri)) {
+	public function isStaticFile($sitePath, $siteName, $uri) {
+		if ($this->isActualFile($staticFilePath = $sitePath . '/Web' . $uri)) {
 			return $staticFilePath;
 		}
 
@@ -40,13 +37,12 @@ class NeosValetDriver extends ValetDriver
 	 * @param  string  $uri
 	 * @return string
 	 */
-	public function frontControllerPath($sitePath, $siteName, $uri)
-	{
+	public function frontControllerPath($sitePath, $siteName, $uri) {
 		putenv('FLOW_CONTEXT=Development');
 		putenv('FLOW_REWRITEURLS=1');
-		$_SERVER['SCRIPT_FILENAME'] = $sitePath.'/Web/index.php';
+		$_SERVER['SCRIPT_FILENAME'] = $sitePath . '/Web/index.php';
 		$_SERVER['SCRIPT_NAME'] = '/index.php';
 
-		return $sitePath.'/Web/index.php';
+		return $sitePath . '/Web/index.php';
 	}
 }

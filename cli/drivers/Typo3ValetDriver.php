@@ -5,8 +5,7 @@
  * finds the characteristic typo3/ folder in the document root, serves both
  * frontend and backend scripts and prevents access to private resources.
  */
-class Typo3ValetDriver extends ValetDriver
-{
+class Typo3ValetDriver extends ValetDriver {
 	/*
 	|--------------------------------------------------------------------------
 	| Document Root Subdirectory
@@ -34,7 +33,7 @@ class Typo3ValetDriver extends ValetDriver
 		'^/(typo3conf/ext|typo3/sysext|typo3/ext)/[^/]+/(Resources/Private|Tests)/',
 		'^/typo3/.+\.map$',
 		'^/typo3temp/var/',
-		'\.(htaccess|gitkeep|gitignore)$',
+		'\.(htaccess|gitkeep|gitignore)$'
 	];
 
 	/**
@@ -44,11 +43,10 @@ class Typo3ValetDriver extends ValetDriver
 	 * @param  string  $sitePath
 	 * @param  string  $siteName
 	 * @param  string  $uri
-	 * @return bool
+	 * @return boolean
 	 */
-	public function serves($sitePath, $siteName, $uri)
-	{
-		$typo3Dir = $sitePath.$this->documentRoot.'/typo3';
+	public function serves($sitePath, $siteName, $uri) {
+		$typo3Dir = $sitePath . $this->documentRoot . '/typo3';
 
 		return file_exists($typo3Dir) && is_dir($typo3Dir);
 	}
@@ -63,19 +61,18 @@ class Typo3ValetDriver extends ValetDriver
 	 * @param  string  $uri
 	 * @return string|false
 	 */
-	public function isStaticFile($sitePath, $siteName, $uri)
-	{
+	public function isStaticFile($sitePath, $siteName, $uri) {
 		// May the file contains a cache busting version string like filename.12345678.css
 		// If that is the case, the file cannot be found on disk, so remove the version
 		// identifier before retrying below.
-		if (! $this->isActualFile($filePath = $sitePath.$this->documentRoot.$uri)) {
+		if (!$this->isActualFile($filePath = $sitePath . $this->documentRoot . $uri)) {
 			$uri = preg_replace("@^(.+)\.(\d+)\.(js|css|png|jpg|gif|gzip)$@", '$1.$3', $uri);
 		}
 
 		// Now that any possible version string is cleared from the filename, the resulting
-		// URI should be a valid file on disc. So assemble the absolut file name with the
+		// URI should be a valid file on disc. So assemble the absolute file name with the
 		// same schema as above and if it exists, authorize access and return its path.
-		if ($this->isActualFile($filePath = $sitePath.$this->documentRoot.$uri)) {
+		if ($this->isActualFile($filePath = $sitePath . $this->documentRoot . $uri)) {
 			return $this->isAccessAuthorized($uri) ? $filePath : false;
 		}
 
@@ -89,8 +86,7 @@ class Typo3ValetDriver extends ValetDriver
 	 * @param  string  $uri
 	 * @return bool
 	 */
-	private function isAccessAuthorized($uri)
-	{
+	private function isAccessAuthorized($uri) {
 		foreach ($this->forbiddenUriPatterns as $forbiddenUriPattern) {
 			if (preg_match("@$forbiddenUriPattern@", $uri)) {
 				return false;
@@ -110,8 +106,7 @@ class Typo3ValetDriver extends ValetDriver
 	 * @param  string  $uri
 	 * @return string
 	 */
-	public function frontControllerPath($sitePath, $siteName, $uri)
-	{
+	public function frontControllerPath($sitePath, $siteName, $uri) {
 		// without modifying the URI, redirect if necessary
 		$this->handleRedirectBackendShorthandUris($uri);
 
@@ -119,18 +114,19 @@ class Typo3ValetDriver extends ValetDriver
 		$uri = rtrim($uri, '/');
 
 		// try to find the responsible script file for the requested folder / script URI
-		if (file_exists($absoluteFilePath = $sitePath.$this->documentRoot.$uri)) {
+		if (file_exists($absoluteFilePath = $sitePath . $this->documentRoot . $uri)) {
 			if (is_dir($absoluteFilePath)) {
-				if (file_exists($absoluteFilePath.'/index.php')) {
+				if (file_exists($absoluteFilePath . '/index.php')) {
 					// this folder can be served by index.php
-					return $this->serveScript($sitePath, $siteName, $uri.'/index.php');
+					return $this->serveScript($sitePath, $siteName, $uri . '/index.php');
 				}
 
-				if (file_exists($absoluteFilePath.'/index.html')) {
+				if (file_exists($absoluteFilePath . '/index.html')) {
 					// this folder can be served by index.html
-					return $absoluteFilePath.'/index.html';
+					return $absoluteFilePath . '/index.html';
 				}
-			} elseif (pathinfo($absoluteFilePath, PATHINFO_EXTENSION) === 'php') {
+			}
+			elseif (pathinfo($absoluteFilePath, PATHINFO_EXTENSION) === 'php') {
 				// this file can be served directly
 				return $this->serveScript($sitePath, $siteName, $uri);
 			}
@@ -147,8 +143,7 @@ class Typo3ValetDriver extends ValetDriver
 	 *
 	 * @param  string  $uri
 	 */
-	private function handleRedirectBackendShorthandUris($uri)
-	{
+	private function handleRedirectBackendShorthandUris($uri) {
 		if (rtrim($uri, '/') === '/typo3/install') {
 			header('Location: /typo3/sysext/install/Start/Install.php');
 			exit();
@@ -170,12 +165,11 @@ class Typo3ValetDriver extends ValetDriver
 	 * @param  string  $script
 	 * @return string
 	 */
-	private function serveScript($sitePath, $siteName, $uri)
-	{
-		$docroot = $sitePath.$this->documentRoot;
-		$abspath = $docroot.$uri;
+	private function serveScript($sitePath, $siteName, $uri) {
+		$docroot = $sitePath . $this->documentRoot;
+		$abspath = $docroot . $uri;
 
-		$_SERVER['SERVER_NAME'] = $siteName.'.dev';
+		$_SERVER['SERVER_NAME'] = $siteName . '.dev';
 		$_SERVER['DOCUMENT_ROOT'] = $docroot;
 		$_SERVER['DOCUMENT_URI'] = $uri;
 		$_SERVER['SCRIPT_FILENAME'] = $abspath;

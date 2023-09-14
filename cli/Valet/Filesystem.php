@@ -2,16 +2,14 @@
 
 namespace Valet;
 
-class Filesystem
-{
+class Filesystem {
 	/**
 	 * Determine if the given path is a directory.
 	 *
 	 * @param  string  $path
 	 * @return bool
 	 */
-	public function isDir($path)
-	{
+	public function isDir($path) {
 		return is_dir($path);
 	}
 
@@ -23,8 +21,7 @@ class Filesystem
 	 * @param  int  $mode
 	 * @return void
 	 */
-	public function mkdir($path, $owner = null, $mode = 0755)
-	{
+	public function mkdir($path, $owner = null, $mode = 0755) {
 		mkdir($path, $mode, true);
 
 		if ($owner) {
@@ -40,8 +37,7 @@ class Filesystem
 	 * @param  int  $mode
 	 * @return void
 	 */
-	public function ensureDirExists($path, $owner = null, $mode = 0755)
-	{
+	public function ensureDirExists($path, $owner = null, $mode = 0755) {
 		if (!$this->isDir($path)) {
 			$this->mkdir($path, $owner, $mode);
 		}
@@ -54,8 +50,7 @@ class Filesystem
 	 * @param  int  $mode
 	 * @return void
 	 */
-	public function mkdirAsUser($path, $mode = 0755)
-	{
+	public function mkdirAsUser($path, $mode = 0755) {
 		$this->mkdir($path, user(), $mode);
 	}
 
@@ -66,8 +61,7 @@ class Filesystem
 	 * @param  string|null  $owner
 	 * @return string
 	 */
-	public function touch($path, $owner = null)
-	{
+	public function touch($path, $owner = null) {
 		touch($path);
 
 		if ($owner) {
@@ -81,10 +75,9 @@ class Filesystem
 	 * Touch the given path as the non-root user.
 	 *
 	 * @param  string  $path
-	 * @return void
+	 * @return string
 	 */
-	public function touchAsUser($path)
-	{
+	public function touchAsUser($path) {
 		return $this->touch($path, user());
 	}
 
@@ -94,8 +87,7 @@ class Filesystem
 	 * @param  string  $path
 	 * @return bool
 	 */
-	public function exists($path)
-	{
+	public function exists($path) {
 		return file_exists($path);
 	}
 
@@ -105,8 +97,7 @@ class Filesystem
 	 * @param  string  $path
 	 * @return string
 	 */
-	public function get($path)
-	{
+	public function get($path) {
 		return file_get_contents($path);
 	}
 
@@ -118,8 +109,7 @@ class Filesystem
 	 * @param  string|null  $owner
 	 * @return void
 	 */
-	public function put($path, $contents, $owner = null)
-	{
+	public function put($path, $contents, $owner = null) {
 		file_put_contents($path, $contents);
 
 		if ($owner) {
@@ -134,8 +124,7 @@ class Filesystem
 	 * @param  string  $contents
 	 * @return void
 	 */
-	public function putAsUser($path, $contents)
-	{
+	public function putAsUser($path, $contents) {
 		$this->put($path, $contents, user());
 	}
 
@@ -147,8 +136,7 @@ class Filesystem
 	 * @param  string|null  $owner
 	 * @return void
 	 */
-	public function append($path, $contents, $owner = null)
-	{
+	public function append($path, $contents, $owner = null) {
 		file_put_contents($path, $contents, FILE_APPEND);
 
 		if ($owner) {
@@ -163,8 +151,7 @@ class Filesystem
 	 * @param  string  $contents
 	 * @return void
 	 */
-	public function appendAsUser($path, $contents)
-	{
+	public function appendAsUser($path, $contents) {
 		$this->append($path, $contents, user());
 	}
 
@@ -175,8 +162,7 @@ class Filesystem
 	 * @param  string  $to
 	 * @return void
 	 */
-	public function copy($from, $to)
-	{
+	public function copy($from, $to) {
 		// The @ operator suppresses pre-error messages that occur in PHP internally.
 		// We need to surpress the messages in order to properly handle them.
 		@copy($from, $to) or error("Failed to copy", true);
@@ -189,8 +175,7 @@ class Filesystem
 	 * @param  string  $to
 	 * @return void
 	 */
-	public function copyAsUser($from, $to)
-	{
+	public function copyAsUser($from, $to) {
 		copy($from, $to);
 
 		$this->chown($to, user());
@@ -203,8 +188,7 @@ class Filesystem
 	 * @param  string  $link
 	 * @return void
 	 */
-	public function symlink($target, $link)
-	{
+	public function symlink($target, $link) {
 		if ($this->exists($link)) {
 			$this->unlink($link);
 		}
@@ -221,8 +205,7 @@ class Filesystem
 	 * @param  string  $link
 	 * @return void
 	 */
-	public function symlinkAsUser($target, $link)
-	{
+	public function symlinkAsUser($target, $link) {
 		if ($this->exists($link)) {
 			$this->unlink($link);
 		}
@@ -238,21 +221,23 @@ class Filesystem
 	 * @param  string  $path
 	 * @return void
 	 */
-	public function unlink($path)
-	{
+	public function unlink($path) {
 		if ($this->isLink($path)) {
 			$dir = pathinfo($path, PATHINFO_DIRNAME);
 			$link = pathinfo($path, PATHINFO_BASENAME);
 
 			if (is_dir($path)) {
 				exec("cd \"{$dir}\" && rmdir {$link}");
-			} else {
+			}
+			else {
 				@unlink($path);
 				@rmdir($path);
 			}
-		} elseif ($this->isDir($path)) {
+		}
+		elseif ($this->isDir($path)) {
 			exec('cmd /C rmdir /s /q "' . $path . '"');
-		} elseif (file_exists($path)) {
+		}
+		elseif (file_exists($path)) {
 			@unlink($path);
 			@rmdir($path);
 		}
@@ -265,8 +250,7 @@ class Filesystem
 	 * @param  string  $user
 	 * @return void
 	 */
-	public function chown($path, $user)
-	{
+	public function chown($path, $user) {
 		chown($path, $user);
 	}
 
@@ -277,8 +261,7 @@ class Filesystem
 	 * @param  string  $group
 	 * @return void
 	 */
-	public function chgrp($path, $group)
-	{
+	public function chgrp($path, $group) {
 		chgrp($path, $group);
 	}
 
@@ -288,8 +271,7 @@ class Filesystem
 	 * @param  string  $path
 	 * @return string
 	 */
-	public function realpath($path)
-	{
+	public function realpath($path) {
 		return realpath($path);
 	}
 
@@ -299,8 +281,7 @@ class Filesystem
 	 * @param  string  $path
 	 * @return bool
 	 */
-	public function isLink($path)
-	{
+	public function isLink($path) {
 		if (is_link($path)) {
 			return true;
 		}
@@ -314,8 +295,7 @@ class Filesystem
 	 * @param  string  $path
 	 * @return string
 	 */
-	public function readLink($path)
-	{
+	public function readLink($path) {
 		return readlink($path);
 	}
 
@@ -325,15 +305,12 @@ class Filesystem
 	 * @param  string  $path
 	 * @return void
 	 */
-	public function removeBrokenLinksAt($path)
-	{
-		collect($this->scandir($path))
-			->filter(function ($file) use ($path) {
-				return $this->isBrokenLink($path . '/' . $file);
-			})
-			->each(function ($file) use ($path) {
-				$this->unlink($path . '/' . $file);
-			});
+	public function removeBrokenLinksAt($path) {
+		collect($this->scandir($path))->filter(function ($file) use ($path) {
+			return $this->isBrokenLink($path . '/' . $file);
+		})->each(function ($file) use ($path) {
+			$this->unlink($path . '/' . $file);
+		});
 	}
 
 	/**
@@ -342,8 +319,7 @@ class Filesystem
 	 * @param  string  $path
 	 * @return bool
 	 */
-	public function isBrokenLink($path)
-	{
+	public function isBrokenLink($path) {
 		return is_link($path) || @readlink($path) === false;
 	}
 
@@ -353,11 +329,9 @@ class Filesystem
 	 * @param  string  $path
 	 * @return array
 	 */
-	public function scandir($path)
-	{
-		return collect(scandir($path))
-			->reject(function ($file) {
-				return in_array($file, ['.', '..']);
-			})->values()->all();
+	public function scandir($path) {
+		return collect(scandir($path))->reject(function ($file) {
+			return in_array($file, ['.', '..']);
+		})->values()->all();
 	}
 }

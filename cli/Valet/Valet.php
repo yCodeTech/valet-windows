@@ -5,8 +5,7 @@ namespace Valet;
 use GuzzleHttp\Client;
 use Composer\CaBundle\CaBundle;
 
-class Valet
-{
+class Valet {
 	protected $cli;
 	protected $files;
 
@@ -17,8 +16,7 @@ class Valet
 	 * @param  Filesystem  $files
 	 * @return void
 	 */
-	public function __construct(CommandLine $cli, Filesystem $files)
-	{
+	public function __construct(CommandLine $cli, Filesystem $files) {
 		$this->cli = $cli;
 		$this->files = $files;
 	}
@@ -28,22 +26,18 @@ class Valet
 	 *
 	 * @return array
 	 */
-	public function extensions(): array
-	{
+	public function extensions(): array {
 		$path = static::homePath('Extensions');
 
 		if (!$this->files->isDir($path)) {
 			return [];
 		}
 
-		return collect($this->files->scandir($path))
-			->reject(function ($file) {
-				return is_dir($file);
-			})
-			->map(function ($file) use ($path) {
-				return "$path/$file";
-			})
-			->values()->all();
+		return collect($this->files->scandir($path))->reject(function ($file) {
+			return is_dir($file);
+		})->map(function ($file) use ($path) {
+			return "$path/$file";
+		})->values()->all();
 	}
 
 	/**
@@ -54,8 +48,7 @@ class Valet
 	 *
 	 * @return array
 	 */
-	public function services($disable = false): array
-	{
+	public function services($disable = false): array {
 		$phps = \Configuration::get('php', []);
 
 		$phpCGIs = collect([]);
@@ -67,7 +60,7 @@ class Valet
 
 		$services = collect([
 			'acrylic' => 'AcrylicDNSProxySvc',
-			'nginx' => 'valet_nginx',
+			'nginx' => 'valet_nginx'
 		])->merge($phpCGIs)->merge($phpXdebugCGIs);
 
 		// Set empty variable first, prevents errors when $disable is true.
@@ -87,9 +80,11 @@ class Valet
 
 			if (strpos($output, 'Running') > -1) {
 				$status = '<fg=green>running</>';
-			} elseif (strpos($output, 'Stopped') > -1) {
+			}
+			elseif (strpos($output, 'Stopped') > -1) {
 				$status = '<fg=yellow>stopped</>';
-			} else {
+			}
+			else {
 				$status = '<fg=red>missing</>';
 			}
 
@@ -100,7 +95,7 @@ class Valet
 			return [
 				'service' => $service,
 				'winname' => $id,
-				'status' => $status,
+				'status' => $status
 			];
 		})->values()->all();
 	}
@@ -111,10 +106,9 @@ class Valet
 	 * @param  string  $currentVersion
 	 * @return bool
 	 *
-	 * @throws \GuzzleHttp\Exception
+	 * @throws \GuzzleHttp\Exception\GuzzleException
 	 */
-	public function onLatestVersion($currentVersion): bool
-	{
+	public function onLatestVersion($currentVersion): bool {
 		/**
 		 * Set a new GuzzleHttp client and use the Composer\CaBundle package
 		 * to find and use the TLS CA bundle in order to verify the TLS/SSL
@@ -140,16 +134,14 @@ class Valet
 	/**
 	 * Run composer global diagnose.
 	 */
-	public function composerGlobalDiagnose()
-	{
+	public function composerGlobalDiagnose() {
 		$this->cli->runAsUser('composer global diagnose');
 	}
 
 	/**
 	 * Run composer global update.
 	 */
-	public function composerGlobalUpdate()
-	{
+	public function composerGlobalUpdate() {
 		$this->cli->runAsUser('composer global update');
 	}
 
@@ -165,8 +157,7 @@ class Valet
 	 *
 	 * @return string The path to the global composer directory.
 	 */
-	public function getComposerGlobalPath()
-	{
+	public function getComposerGlobalPath() {
 		return $this->cli->runAsUser('composer -n config --global home');
 	}
 
@@ -176,8 +167,7 @@ class Valet
 	 * @param  string  $path
 	 * @return string
 	 */
-	public static function homePath(string $path = ''): string
-	{
+	public static function homePath(string $path = ''): string {
 		return VALET_HOME_PATH . ($path ? "/$path" : $path);
 	}
 }

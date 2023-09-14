@@ -2,8 +2,7 @@
 
 namespace Valet;
 
-class WinSwFactory
-{
+class WinSwFactory {
 	/**
 	 * @var CommandLine
 	 */
@@ -21,8 +20,7 @@ class WinSwFactory
 	 * @param  Filesystem  $files
 	 * @return void
 	 */
-	public function __construct(CommandLine $cli, Filesystem $files)
-	{
+	public function __construct(CommandLine $cli, Filesystem $files) {
 		$this->cli = $cli;
 		$this->files = $files;
 	}
@@ -34,8 +32,7 @@ class WinSwFactory
 	 * @param  string  $serviceId
 	 * @return WinSW
 	 */
-	public function make(string $service, string $serviceId)
-	{
+	public function make(string $service, string $serviceId) {
 		return new WinSW(
 			$service,
 			$serviceId,

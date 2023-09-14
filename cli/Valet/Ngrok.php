@@ -6,8 +6,7 @@ use DomainException;
 use GuzzleHttp\Client;
 use Illuminate\Support\Collection;
 
-class Ngrok
-{
+class Ngrok {
 	/**
 	 * @var CommandLine
 	 */
@@ -18,7 +17,7 @@ class Ngrok
 	 */
 	protected $tunnelsEndpoints = [
 		'http://127.0.0.1:4040/api/tunnels',
-		'http://127.0.0.1:4041/api/tunnels',
+		'http://127.0.0.1:4041/api/tunnels'
 	];
 
 	/**
@@ -27,8 +26,7 @@ class Ngrok
 	 * @param  CommandLine  $cli
 	 * @return void
 	 */
-	public function __construct(CommandLine $cli)
-	{
+	public function __construct(CommandLine $cli) {
 		$this->cli = $cli;
 	}
 
@@ -36,8 +34,7 @@ class Ngrok
 	 * @param  string  $command
 	 * @return void
 	 */
-	public function run(string $command)
-	{
+	public function run(string $command) {
 		$ngrok = realpath(valetBinPath() . 'ngrok.exe');
 
 		$this->cli->passthru("\"$ngrok\" $command");
@@ -50,8 +47,7 @@ class Ngrok
 	 * @param  array  $options Options/flags to pass to ngrok
 	 * @return void
 	 */
-	public function start(string $site, int $port, $debug = false, array $options = [])
-	{
+	public function start(string $site, int $port, $debug = false, array $options = []) {
 		if ($port === 443 && !$this->hasAuthToken()) {
 			output('Forwarding to local port 443 or a local https:// URL is only available after you sign up.
 Sign up at: <fg=blue>https://ngrok.com/signup</>
@@ -83,8 +79,7 @@ Then use: <fg=magenta>valet set-ngrok-token [token]</>');
 	 *
 	 * `--config C:/Users/Username/ .config/valet/Ngrok/ngrok.yml`
 	 */
-	public function getNgrokConfig()
-	{
+	public function getNgrokConfig() {
 		return "--config " . Valet::homePath() . "/Ngrok/ngrok.yml";
 	}
 
@@ -94,8 +89,7 @@ Then use: <fg=magenta>valet set-ngrok-token [token]</>');
 	 *
 	 * @return string $url The current tunnel URL
 	 */
-	public function currentTunnelUrl(string $site)
-	{
+	public function currentTunnelUrl(string $site) {
 		// Set a new GuzzleHttp client.
 		$client = new Client();
 
@@ -124,10 +118,9 @@ Then use: <fg=magenta>valet set-ngrok-token [token]</>');
 	 *
 	 * @param  array  $tunnels
 	 * @return string|null
-	 * @return void
+	 * @return void|string
 	 */
-	public function findHttpTunnelUrl(array $tunnels, string $site = null)
-	{
+	public function findHttpTunnelUrl(array $tunnels, string $site = null) {
 		// If there are active tunnels on the ngrok instance we will spin through them and
 		// find the one responding on HTTP. Each tunnel has an HTTP and a HTTPS address
 		// but for local dev purposes we just desire the plain HTTP URL endpoint.
@@ -141,8 +134,7 @@ Then use: <fg=magenta>valet set-ngrok-token [token]</>');
 	/**
 	 * @return bool
 	 */
-	protected function hasAuthToken(): bool
-	{
+	protected function hasAuthToken(): bool {
 		return file_exists(Valet::homePath() . '/Ngrok/ngrok.yml');
 	}
 }

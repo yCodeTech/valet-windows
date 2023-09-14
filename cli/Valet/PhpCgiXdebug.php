@@ -2,15 +2,13 @@
 
 namespace Valet;
 
-class PhpCgiXdebug extends PhpCgi
-{
+class PhpCgiXdebug extends PhpCgi {
 	const PORT = 9100;
 
 	/**
 	 * @inheritDoc
 	 */
-	public function __construct(CommandLine $cli, Filesystem $files, WinSwFactory $winswFactory, Configuration $configuration)
-	{
+	public function __construct(CommandLine $cli, Filesystem $files, WinSwFactory $winswFactory, Configuration $configuration) {
 		parent::__construct($cli, $files, $winswFactory, $configuration);
 
 		foreach ($this->phpWinSws as $phpVersion => $phpWinSw) {
@@ -29,8 +27,7 @@ class PhpCgiXdebug extends PhpCgi
 	 * @param null|string $phpVersion The PHP version
 	 * @return array|void $versionArray
 	 */
-	public function install($phpVersion = null)
-	{
+	public function install($phpVersion = null) {
 		if ($phpVersion) {
 			if ($this->configuration->isPhpAlias($phpVersion)) {
 				$phpVersion = $this->configuration->getPhpFullVersionByAlias($phpVersion);
@@ -63,14 +60,13 @@ class PhpCgiXdebug extends PhpCgi
 	 *
 	 * @return void
 	 */
-	public function installService($phpVersion, $phpCgiServiceConfig = null, $installConfig = null)
-	{
+	public function installService($phpVersion, $phpCgiServiceConfig = null, $installConfig = null) {
 		$phpWinSw = $this->phpWinSws[$phpVersion];
 
 		$phpCgiServiceConfig = $phpCgiServiceConfig ?? file_get_contents(__DIR__ . '/../stubs/phpcgixdebugservice.xml');
 		$installConfig = $installConfig ?? [
 			'PHP_PATH' => $phpWinSw['php']['path'],
-			'PHP_XDEBUG_PORT' => $phpWinSw['php']['xdebug_port'],
+			'PHP_XDEBUG_PORT' => $phpWinSw['php']['xdebug_port']
 		];
 
 		parent::installService($phpVersion, $phpCgiServiceConfig, $installConfig);
@@ -82,8 +78,7 @@ class PhpCgiXdebug extends PhpCgi
 	 * @param string|null $phpVersion
 	 * @return bool
 	 */
-	public function installed($phpVersion = null)
-	{
+	public function installed($phpVersion = null) {
 		if (empty($phpVersion)) {
 			$phps = $this->configuration->get('php', []);
 

@@ -2,8 +2,7 @@
 
 namespace Valet;
 
-class Diagnose
-{
+class Diagnose {
 	/**
 	 * The commands to run.
 	 *
@@ -25,7 +24,7 @@ class Diagnose
 		'cmd /C curl --version',
 		'cat ' . COMPOSER_GLOBAL_PATH . '/composer.json',
 		'composer global diagnose --no-ansi 1> composer.txt',
-		'composer global outdated --format json',
+		'composer global outdated --format json'
 	];
 
 	protected $cli;
@@ -39,8 +38,7 @@ class Diagnose
 	 * @param  Filesystem  $files
 	 * @return void
 	 */
-	public function __construct(CommandLine $cli, Filesystem $files)
-	{
+	public function __construct(CommandLine $cli, Filesystem $files) {
 		$this->cli = $cli;
 		$this->files = $files;
 	}
@@ -51,8 +49,7 @@ class Diagnose
 	 * @param boolean $print Print the output as the commands are running.
 	 * @param boolean $plain Print and format the output as plain text (aka pretty print).
 	 */
-	public function run($print, $plainText)
-	{
+	public function run($print, $plainText) {
 		$this->print = $print;
 
 		$this->beforeRun();
@@ -67,11 +64,12 @@ class Diagnose
 				return;
 			}
 
-			$output = $this->edit_output($command, $output);
+			$output = $this->editOutput($command, $output);
 
 			$this->afterCommand($command, $output);
 
 			return compact('command', 'output');
+
 		})->filter()->values();
 
 		$output = $this->format($results, $plainText);
@@ -86,7 +84,7 @@ class Diagnose
 			output(PHP_EOL . PHP_EOL . $output);
 		}
 
-		$this->copy_to_clipboard($plainText ? $formatted_for_copy : $output);
+		$this->copyToClipboard($plainText ? $formatted_for_copy : $output);
 
 		$this->afterRun();
 	}
@@ -94,8 +92,7 @@ class Diagnose
 	/**
 	 * Before running the diagnostics.
 	 */
-	protected function beforeRun()
-	{
+	protected function beforeRun() {
 		if ($this->print) {
 			return;
 		}
@@ -107,8 +104,7 @@ class Diagnose
 	/**
 	 * After running the diagnostics.
 	 */
-	protected function afterRun()
-	{
+	protected function afterRun() {
 		if (!$this->print && $this->progressBar) {
 			$this->progressBar->finish();
 		}
@@ -121,8 +117,7 @@ class Diagnose
 	 *
 	 * @param string $command
 	 */
-	protected function beforeCommand($command)
-	{
+	protected function beforeCommand($command) {
 		if ($this->print) {
 			info(PHP_EOL . "$ $command");
 		}
@@ -134,13 +129,11 @@ class Diagnose
 	 * @param string $command
 	 * @param string $output
 	 */
-	protected function afterCommand($command, $output)
-	{
+	protected function afterCommand($command, $output) {
 		if ($this->print) {
-
 			output(trim($output));
-
-		} else {
+		}
+		else {
 			$this->progressBar->advance();
 		}
 	}
@@ -151,8 +144,7 @@ class Diagnose
 	 * @param string $command
 	 * @return boolean
 	 */
-	protected function ignoreOutput($command)
-	{
+	protected function ignoreOutput($command) {
 		return strpos($command, '> /dev/null 2>&1') !== false;
 	}
 
@@ -165,8 +157,7 @@ class Diagnose
 	 * @param string $output
 	 * @return string $output The edited output.
 	 */
-	protected function edit_output($command, $output)
-	{
+	protected function editOutput($command, $output) {
 		// Extract the OS Name and OS Version, lines 2 and 3.
 		if (str_contains($command, "systeminfo")) {
 			$output = explode("\n", $output);
@@ -181,8 +172,8 @@ class Diagnose
 				$version = preg_split("/[\s,]+/", $version[1]);
 
 				$output = "nginx version: {$version[1]}";
-
-			} elseif (str_contains($output, "syntax is ok") && str_contains($output, "successful")) {
+			}
+			elseif (str_contains($output, "syntax is ok") && str_contains($output, "successful")) {
 				$configFile = explode("file", $output, 2)[1];
 				$configFile = trim(explode(".conf", $configFile)[0] . ".conf");
 
@@ -206,9 +197,11 @@ class Diagnose
 
 				if ($item["latest-status"] === "semver-safe-update") {
 					$output[$key]["latest-status"] = "A patch or minor release available. Update is recommended.";
-				} elseif ($item["latest-status"] === "update-possible") {
+				}
+				elseif ($item["latest-status"] === "update-possible") {
 					$output[$key]["latest-status"] = "A major release available. Update is possible.";
-				} else {
+				}
+				else {
 					$output[$key]["latest-status"] = "Up to date.";
 				}
 
@@ -232,9 +225,8 @@ class Diagnose
 	 * as a `string` for the terminal
 	 * AND a formatted HTML output as a `string` to copy to the clipboard.
 	 */
-	protected function format($results, $plainText)
-	{
-		$results = $this->combine_with_headings($results);
+	protected function format($results, $plainText) {
+		$results = $this->combineWithHeadings($results);
 
 		$formatted_for_copy = collect();
 
@@ -247,13 +239,12 @@ class Diagnose
 
 			if ($plainText) {
 				// Push the format for copy output into the separate collection.
-				$formatted_for_copy->push($this->format_for_copy($command, $output, str_replace($heading_underline, "", $heading)));
+				$formatted_for_copy->push($this->formatForCopy($command, $output, str_replace($heading_underline, "", $heading)));
 
 				if (str_contains($command, "composer global outdated")) {
 					$output = json_decode($output, true);
 
 					foreach ($output as $key => $item) {
-
 						$output[$key]["name"] = "Name: " . $item["name"];
 						$output[$key]["direct-dependency"] = "Direct Dependency: " . $item["direct-dependency"];
 
@@ -283,7 +274,7 @@ class Diagnose
 				return $output;
 			}
 
-			return $this->format_for_copy($command, $output, str_replace($heading_underline, "", $heading));
+			return $this->formatForCopy($command, $output, str_replace($heading_underline, "", $heading));
 		});
 
 		if ($plainText) {
@@ -291,7 +282,8 @@ class Diagnose
 				$formatted->implode(PHP_EOL . PHP_EOL . str_repeat('-', 50) . PHP_EOL),
 				$formatted_for_copy->implode(PHP_EOL . PHP_EOL)
 			];
-		} else {
+		}
+		else {
 			return $formatted->implode($plainText ? PHP_EOL . PHP_EOL . str_repeat('-', 50) . PHP_EOL : PHP_EOL);
 		}
 	}
@@ -304,10 +296,8 @@ class Diagnose
 	 * @param string $output
 	 * @param string $heading The heading to output before the command name.
 	 */
-	protected function format_for_copy($command, $output, $heading)
-	{
+	protected function formatForCopy($command, $output, $heading) {
 		if (str_contains($command, "composer global outdated")) {
-
 			$table = sprintf(
 				'<tr>%s<th>%s</th>%s<th>%s</th>%s<th>%s</th>%s<th>%s</th>%s<th>%s</th>%s<th>%s</th>%s</tr>',
 				PHP_EOL,
@@ -374,8 +364,7 @@ class Diagnose
 	 *
 	 * @param string $output The formatted output
 	 */
-	protected function copy_to_clipboard($output)
-	{
+	protected function copyToClipboard($output) {
 		// Remove the crazy ANSI escape characters like:
 		// [32m
 		// ]8;;
@@ -398,8 +387,7 @@ class Diagnose
 	 * @param \Illuminate\Support\Collection $results A collection of the outputs.
 	 * @return \Illuminate\Support\Collection The new combined collection
 	 */
-	protected function combine_with_headings($results)
-	{
+	protected function combineWithHeadings($results) {
 		return collect([
 			"System Version",
 			"Valet Version",
@@ -419,5 +407,4 @@ class Diagnose
 			"Outdated Composer Packages"
 		])->combine($results);
 	}
-
 }

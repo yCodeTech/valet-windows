@@ -4,8 +4,7 @@ namespace Valet;
 
 use DomainException;
 
-class Nginx
-{
+class Nginx {
 	/**
 	 * @var CommandLine
 	 */
@@ -38,13 +37,10 @@ class Nginx
 	 * @param  Filesystem  $files
 	 * @param  Configuration  $configuration
 	 * @param  Site  $site
-	 * @param  WinSW  $winsw
+	 * @param  WinSwFactory  $winsw
 	 * @return void
 	 */
-	public function __construct(
-		CommandLine $cli, Filesystem $files,
-		Configuration $configuration, Site $site, WinSwFactory $winsw
-	) {
+	public function __construct(CommandLine $cli, Filesystem $files, Configuration $configuration, Site $site, WinSwFactory $winsw) {
 		$this->cli = $cli;
 		$this->site = $site;
 		$this->files = $files;
@@ -57,8 +53,7 @@ class Nginx
 	 *
 	 * @return void
 	 */
-	public function install()
-	{
+	public function install() {
 		$this->installConfiguration();
 		$this->installServer();
 		$this->installNginxDirectory();
@@ -70,8 +65,7 @@ class Nginx
 	 *
 	 * @return void
 	 */
-	public function installConfiguration()
-	{
+	public function installConfiguration() {
 		$defaultPhpVersion = $this->configuration->get('default_php');
 		$defaultPhp = $this->configuration->getPhpByVersion($defaultPhpVersion);
 
@@ -90,8 +84,7 @@ class Nginx
 	 *
 	 * @return void
 	 */
-	public function installServer()
-	{
+	public function installServer() {
 		$defaultPhpVersion = $this->configuration->get('default_php');
 		$defaultPhp = $this->configuration->getPhpByVersion($defaultPhpVersion);
 
@@ -119,8 +112,7 @@ class Nginx
 	 *
 	 * @return void
 	 */
-	public function installNginxDirectory()
-	{
+	public function installNginxDirectory() {
 		if (!$this->files->isDir($nginxDirectory = Valet::homePath('Nginx'))) {
 			$this->files->mkdirAsUser($nginxDirectory);
 		}
@@ -133,8 +125,7 @@ class Nginx
 	/**
 	 * Check nginx.conf for errors.
 	 */
-	private function lint()
-	{
+	private function lint() {
 		$this->cli->run(
 			$this->path('nginx.exe') . ' -c ' . $this->path('conf/nginx.conf') . ' -t -q -p ' . $this->path(),
 			function ($exitCode, $outputMessage) {
@@ -150,8 +141,7 @@ class Nginx
 	 *
 	 * @return void
 	 */
-	public function rewriteSecureNginxFiles()
-	{
+	public function rewriteSecureNginxFiles() {
 		$tld = $this->configuration->read()['tld'];
 
 		$this->site->resecureForNewTld($tld, $tld);
@@ -162,14 +152,13 @@ class Nginx
 	 *
 	 * @return void
 	 */
-	public function installService()
-	{
+	public function installService() {
 		if ($this->winsw->installed()) {
 			$this->uninstall();
 		}
 
 		$this->winsw->install([
-			'NGINX_PATH' => $this->path(),
+			'NGINX_PATH' => $this->path()
 		]);
 
 		$this->winsw->restart();
@@ -180,8 +169,7 @@ class Nginx
 	 *
 	 * @return void
 	 */
-	public function restart()
-	{
+	public function restart() {
 		$this->cli->run('cmd "/C taskkill /IM nginx.exe /F"');
 
 		$this->lint();
@@ -194,8 +182,7 @@ class Nginx
 	 *
 	 * @return void
 	 */
-	public function stop()
-	{
+	public function stop() {
 		$this->cli->run('cmd "/C taskkill /IM nginx.exe /F"');
 
 		$this->winsw->stop();
@@ -206,8 +193,7 @@ class Nginx
 	 *
 	 * @return void
 	 */
-	public function uninstall()
-	{
+	public function uninstall() {
 		$this->cli->run('cmd "/C taskkill /IM nginx.exe /F"');
 
 		$this->winsw->uninstall();
@@ -219,8 +205,7 @@ class Nginx
 	 * @param  string  $path
 	 * @return string
 	 */
-	public function path(string $path = ''): string
-	{
+	public function path(string $path = ''): string {
 		return realpath(valetBinPath() . 'nginx') . ($path ? "/$path" : $path);
 	}
 }

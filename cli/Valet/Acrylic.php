@@ -2,8 +2,7 @@
 
 namespace Valet;
 
-class Acrylic
-{
+class Acrylic {
 	/**
 	 * @var CommandLine
 	 */
@@ -21,8 +20,7 @@ class Acrylic
 	 * @param  Filesystem  $files
 	 * @return void
 	 */
-	public function __construct(CommandLine $cli, Filesystem $files)
-	{
+	public function __construct(CommandLine $cli, Filesystem $files) {
 		$this->cli = $cli;
 		$this->files = $files;
 	}
@@ -33,8 +31,7 @@ class Acrylic
 	 * @param  string  $tld
 	 * @return void
 	 */
-	public function install(string $tld = 'test')
-	{
+	public function install(string $tld = 'test') {
 		$this->createHostsFile($tld);
 		$this->installService();
 	}
@@ -45,8 +42,7 @@ class Acrylic
 	 * @param  string  $tld
 	 * @return void
 	 */
-	protected function createHostsFile(string $tld)
-	{
+	protected function createHostsFile(string $tld) {
 		$contents = $this->files->get(__DIR__ . '/../stubs/AcrylicHosts.txt');
 
 		$this->files->put(
@@ -64,15 +60,17 @@ class Acrylic
 	 *
 	 * @return void
 	 */
-	protected function installService()
-	{
+	protected function installService() {
 		$this->uninstall();
 
 		$this->configureNetworkDNS();
 
-		$this->cli->runOrExit('cmd /C "' . $this->path('AcrylicUI.exe') . '" InstallAcrylicService', function ($code, $output) {
-			error("Failed to install Acrylic DNS: $output");
-		});
+		$this->cli->runOrExit(
+			'cmd /C "' . $this->path('AcrylicUI.exe') . '" InstallAcrylicService',
+			function ($code, $output) {
+				error("Failed to install Acrylic DNS: $output");
+			}
+		);
 
 		$this->flushdns();
 	}
@@ -82,12 +80,13 @@ class Acrylic
 	 *
 	 * @return void
 	 */
-	protected function configureNetworkDNS()
-	{
-		$this->cli->powershell(implode(';', [
+	protected function configureNetworkDNS() {
+		$array = [
 			'(Get-NetIPAddress -AddressFamily IPv4).InterfaceIndex | ForEach-Object {Set-DnsClientServerAddress -InterfaceIndex $_ -ServerAddresses (\"127.0.0.1\", \"8.8.8.8\")}',
-			'(Get-NetIPAddress -AddressFamily IPv6).InterfaceIndex | ForEach-Object {Set-DnsClientServerAddress -InterfaceIndex $_ -ServerAddresses (\"::1\", \"2001:4860:4860::8888\")}',
-		]));
+			'(Get-NetIPAddress -AddressFamily IPv6).InterfaceIndex | ForEach-Object {Set-DnsClientServerAddress -InterfaceIndex $_ -ServerAddresses (\"::1\", \"2001:4860:4860::8888\")}'
+		];
+
+		$this->cli->powershell(implode(';', $array));
 	}
 
 	/**
@@ -96,8 +95,7 @@ class Acrylic
 	 * @param  string  $tld
 	 * @return void
 	 */
-	public function updateTld(string $tld)
-	{
+	public function updateTld(string $tld) {
 		$this->stop();
 
 		$this->createHostsFile($tld);
@@ -110,17 +108,19 @@ class Acrylic
 	 *
 	 * @return void
 	 */
-	public function uninstall()
-	{
+	public function uninstall() {
 		if (!$this->installed()) {
 			return;
 		}
 
 		$this->stop();
 
-		$this->cli->run('cmd /C "' . $this->path('AcrylicUI.exe') . '" UninstallAcrylicService', function ($code, $output) {
-			warning("Failed to uninstall Acrylic DNS: $output");
-		});
+		$this->cli->run(
+			'cmd /C "' . $this->path('AcrylicUI.exe') . '" UninstallAcrylicService',
+			function ($code, $output) {
+				warning("Failed to uninstall Acrylic DNS: $output");
+			}
+		);
 
 		$this->removeNetworkDNS();
 
@@ -132,8 +132,7 @@ class Acrylic
 	 *
 	 * @return bool
 	 */
-	protected function installed(): bool
-	{
+	protected function installed(): bool {
 		return $this->cli->powershell('Get-Service -Name "AcrylicDNSProxySvc"')->isSuccessful();
 	}
 
@@ -142,12 +141,13 @@ class Acrylic
 	 *
 	 * @return void
 	 */
-	protected function removeNetworkDNS()
-	{
-		$this->cli->powershell(implode(';', [
+	protected function removeNetworkDNS() {
+		$array = [
 			'(Get-NetIPAddress -AddressFamily IPv4).InterfaceIndex | ForEach-Object {Set-DnsClientServerAddress -InterfaceIndex $_ -ResetServerAddresses}',
-			'(Get-NetIPAddress -AddressFamily IPv6).InterfaceIndex | ForEach-Object {Set-DnsClientServerAddress -InterfaceIndex $_ -ResetServerAddresses}',
-		]));
+			'(Get-NetIPAddress -AddressFamily IPv6).InterfaceIndex | ForEach-Object {Set-DnsClientServerAddress -InterfaceIndex $_ -ResetServerAddresses}'
+		];
+
+		$this->cli->powershell(implode(';', $array));
 	}
 
 	/**
@@ -155,11 +155,13 @@ class Acrylic
 	 *
 	 * @return void
 	 */
-	public function start()
-	{
-		$this->cli->runOrExit('cmd /C "' . $this->path('AcrylicUI.exe') . '" StartAcrylicService', function ($code, $output) {
-			error("Failed to start Acrylic DNS: $output");
-		});
+	public function start() {
+		$this->cli->runOrExit(
+			'cmd /C "' . $this->path('AcrylicUI.exe') . '" StartAcrylicService',
+			function ($code, $output) {
+				error("Failed to start Acrylic DNS: $output");
+			}
+		);
 
 		$this->flushdns();
 	}
@@ -169,11 +171,13 @@ class Acrylic
 	 *
 	 * @return void
 	 */
-	public function stop()
-	{
-		$this->cli->run('cmd /C "' . $this->path('AcrylicUI.exe') . '" StopAcrylicService', function ($code, $output) {
-			warning("Failed to stop Acrylic DNS: $output");
-		});
+	public function stop() {
+		$this->cli->run(
+			'cmd /C "' . $this->path('AcrylicUI.exe') . '" StopAcrylicService',
+			function ($code, $output) {
+				warning("Failed to stop Acrylic DNS: $output");
+			}
+		);
 
 		$this->flushdns();
 	}
@@ -183,11 +187,13 @@ class Acrylic
 	 *
 	 * @return void
 	 */
-	public function restart()
-	{
-		$this->cli->run('cmd /C "' . $this->path('AcrylicUI.exe') . '" RestartAcrylicService', function ($code, $output) {
-			warning("Failed to restart Acrylic DNS: $output");
-		});
+	public function restart() {
+		$this->cli->run(
+			'cmd /C "' . $this->path('AcrylicUI.exe') . '" RestartAcrylicService',
+			function ($code, $output) {
+				warning("Failed to restart Acrylic DNS: $output");
+			}
+		);
 
 		$this->flushdns();
 	}
@@ -197,8 +203,7 @@ class Acrylic
 	 *
 	 * @return void
 	 */
-	public function flushdns()
-	{
+	public function flushdns() {
 		$this->cli->run('cmd "/C ipconfig /flushdns"');
 	}
 
@@ -208,8 +213,7 @@ class Acrylic
 	 * @param  string  $path
 	 * @return string
 	 */
-	public function path(string $path = ''): string
-	{
+	public function path(string $path = ''): string {
 		$basePath = str_replace("\\", '/', realpath(valetBinPath() . 'Acrylic'));
 
 		return $basePath . ($path ? "/$path" : $path);

@@ -5,7 +5,8 @@
  */
 if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
 	require_once __DIR__ . '/../vendor/autoload.php';
-} else {
+}
+else {
 	require_once __DIR__ . '/../../../autoload.php';
 }
 
@@ -27,7 +28,7 @@ use function Valet\progressbar;
 /**
  * Create the application.
  */
-Container::setInstance(new Container);
+Container::setInstance(new Container());
 
 $app = new Application('Laravel Valet Windows', $version);
 
@@ -119,8 +120,8 @@ $app->command('install [--xdebug]', function ($input, $output, $xdebug) {
 	output(PHP_EOL . '<info>Valet installed and started successfully!</info>');
 
 })->descriptions("Install Valet's services and configs, and auto start Valet.", [
-			"--xdebug" => "Optionally, install Xdebug for PHP"
-		])->addUsage("install --xdebug");
+	"--xdebug" => "Optionally, install Xdebug for PHP"
+])->addUsage("install --xdebug");
 
 /**
  * A sudo-like command to use Valet commands with elevated privileges
@@ -153,9 +154,9 @@ $app->command('sudo valetCommand* [-o|--valetOptions=]', function ($valetCommand
 	CommandLine::sudo($valetCommand);
 
 })->descriptions("A sudo-like command to use Valet commands with elevated privileges that only require 1 User Account Control popup.", [
-			"valetCommand" => "The Valet command plus it's argument's values, separated by spaces.",
-			"--valetOptions" => "The Valet options without the leading <fg=green>--</>. Multiple options must be separated by double slashes <fg=green>//</>."
-		])->addUsage("sudo link mySite --valetOptions=isolate=7.4//secure")->addUsage("sudo link mySite -o isolate=7.4//secure");
+	"valetCommand" => "The Valet command plus it's argument's values, separated by spaces.",
+	"--valetOptions" => "The Valet options without the leading <fg=green>--</>. Multiple options must be separated by double slashes <fg=green>//</>."
+])->addUsage("sudo link mySite --valetOptions=isolate=7.4//secure")->addUsage("sudo link mySite -o isolate=7.4//secure");
 
 
 /**
@@ -177,9 +178,9 @@ $app->command('php:add path [--xdebug]', function ($path, $xdebug) {
 		info("PHP {$php['version']} from {$path} has been added. You can make it default by running <bg=magenta> valet use </> command");
 	}
 })->descriptions('Add PHP by specifying a path', [
-			"path" => "The path to the PHP",
-			"--xdebug" => "Optionally, install Xdebug"
-		])->addUsage("php:add c:/php/8.1")->addUsage("php:add c:/php/8.1 --xdebug");
+	"path" => "The path to the PHP",
+	"--xdebug" => "Optionally, install Xdebug"
+])->addUsage("php:add c:/php/8.1")->addUsage("php:add c:/php/8.1 --xdebug");
 
 /**
  * Remove PHP by specifying it's version.
@@ -219,9 +220,9 @@ $app->command('php:remove [phpVersion] [--path=]', function ($phpVersion, $path)
 		info("PHP {$php['version']} from {$php['path']} has been removed.");
 	}
 })->descriptions('Remove PHP by specifying the version', [
-			"phpVersion" => "The PHP version",
-			"--path" => "Optionally, specify the path to the PHP, instead of using the <fg=green>phpVersion</>"
-		])->addUsage("php:remove 8.1")->addUsage("php:remove 8.1.8")->addUsage("php:remove --path=c:/php/8.1");
+	"phpVersion" => "The PHP version",
+	"--path" => "Optionally, specify the path to the PHP, instead of using the <fg=green>phpVersion</>"
+])->addUsage("php:remove 8.1")->addUsage("php:remove 8.1.8")->addUsage("php:remove --path=c:/php/8.1");
 
 /**
  * Reinstall all PHP services that are specified in `valet php:list`
@@ -286,8 +287,8 @@ $app->command('php:which [site]', function ($site = null) {
 	info("{$txt} {$which['site']} is using PHP {$which['php']}");
 
 })->descriptions('Determine which PHP version the current working directory is using', [
-			"site" => "Optionally, specify a site"
-		])->addUsage("php:which site2");
+	"site" => "Optionally, specify a site"
+])->addUsage("php:which site2");
 
 /**
  * Install Xdebug services for all PHP versions that are specified in `valet php:list`.
@@ -315,8 +316,8 @@ $app->command('xdebug:install [phpVersion]', function ($input, $output, $phpVers
 	info("Installed Xdebug for PHP $phpVersion");
 
 })->descriptions('Install all PHP Xdebug services from <fg=green>valet php:list</>', [
-			"phpVersion" => "Optionally, install a specific PHP version of Xdebug"
-		])->addUsage("xdebug:install 7.4");
+	"phpVersion" => "Optionally, install a specific PHP version of Xdebug"
+])->addUsage("xdebug:install 7.4");
 
 /**
  * Uninstall all Xdebug services.
@@ -333,8 +334,8 @@ $app->command('xdebug:uninstall [phpVersion]', function ($phpVersion = null) {
 	info('Xdebug services uninstalled. Run <bg=gray>xdebug:install [phpVersion]</> to install again');
 
 })->descriptions('Uninstall all PHP Xdebug services from <fg=green>valet php:list</>', [
-			"phpVersion" => "Optionally, uninstall a specific PHP version of Xdebug"
-		]);
+	"phpVersion" => "Optionally, uninstall a specific PHP version of Xdebug"
+]);
 
 /**
  * Most commands are available only if Valet is installed.
@@ -357,8 +358,8 @@ if (is_dir(VALET_HOME_PATH)) {
 
 		info(($path === null ? 'This' : "The [{$path}]") . " directory has been registered to Valet and all sub-directories will be accessible as sites. To list the sites use <bg=magenta> valet parked </>");
 	})->descriptions('Registers the current working directory to automatically serve sub-directories as sites', [
-				"path" => "Optionally, specify a path"
-			])->addUsage("park D:/sites");
+		"path" => "Optionally, specify a path"
+	])->addUsage("park D:/sites");
 
 	/**
 	 * List all the current sites within parked paths.
@@ -382,8 +383,8 @@ if (is_dir(VALET_HOME_PATH)) {
 
 		info(($path === null ? 'This' : "The [{$path}]") . " directory has been removed from Valet.");
 	})->setAliases(["unpark"])->descriptions('Remove the current working directory from Valet\'s list of paths', [
-				"path" => "Optionally, specify a path"
-			]);
+		"path" => "Optionally, specify a path"
+	]);
 
 	/**
 	 * Register the current working directory as a symbolic link.
@@ -405,10 +406,10 @@ if (is_dir(VALET_HOME_PATH)) {
 			Site::isolate($isolate, $name);
 		}
 	})->descriptions('Register the current working directory as a symbolic link', [
-				'name' => 'Optionally specify a new name to be linked as',
-				'--secure' => 'Optionally secure the site',
-				'--isolate' => 'Optionally isolate the site to a specified PHP version'
-			])->addUsage("link my_site_renamed")->addUsage("link my_site_renamed --isolate=7.4")->addUsage("link my_site_renamed --secure")->addUsage("link my_site_renamed --secure --isolate=7.4");
+		'name' => 'Optionally specify a new name to be linked as',
+		'--secure' => 'Optionally secure the site',
+		'--isolate' => 'Optionally isolate the site to a specified PHP version'
+	])->addUsage("link my_site_renamed")->addUsage("link my_site_renamed --isolate=7.4")->addUsage("link my_site_renamed --secure")->addUsage("link my_site_renamed --secure --isolate=7.4");
 
 	/**
 	 * List all of the registered symbolic links.
@@ -459,8 +460,8 @@ if (is_dir(VALET_HOME_PATH)) {
 		info('The [' . $name . '] symbolic link has been removed.');
 
 	})->descriptions('Unlink the current working directory linked site', [
-				"name" => "Optionally specify the linked site name"
-			])->addUsage("unlink my_site_renamed");
+		"name" => "Optionally specify the linked site name"
+	])->addUsage("unlink my_site_renamed");
 
 	/**
 	 * Proxy a specified site to a specified host
@@ -473,10 +474,10 @@ if (is_dir(VALET_HOME_PATH)) {
 		Site::proxyCreate($site, $host, $secure);
 		Nginx::restart();
 	})->descriptions('Proxy a specified site to a specified host. Useful for docker, mailhog etc.', [
-				"site" => "The site to be proxied. Multiple sites can be proxied by separating them with a comma.",
-				"host" => "The host to receive the site traffic",
-				"--secure" => "Optionally, secure with a trusted TLS certificate"
-			])->addUsage("proxy site1 https://127.0.0.1:9200")->addUsage("proxy site1 https://127.0.0.1:9200 --secure")->addUsage("proxy site1,site2,site3 https://127.0.0.1:9200");
+		"site" => "The site to be proxied. Multiple sites can be proxied by separating them with a comma.",
+		"host" => "The host to receive the site traffic",
+		"--secure" => "Optionally, secure with a trusted TLS certificate"
+	])->addUsage("proxy site1 https://127.0.0.1:9200")->addUsage("proxy site1 https://127.0.0.1:9200 --secure")->addUsage("proxy site1,site2,site3 https://127.0.0.1:9200");
 
 	/**
 	 * List all the proxy sites.
@@ -489,6 +490,7 @@ if (is_dir(VALET_HOME_PATH)) {
 		}
 
 		table(['Site', 'Secured', 'URL', 'Host'], $proxies->all(), true);
+
 	})->descriptions('List all the proxy sites');
 
 	/**
@@ -526,10 +528,11 @@ if (is_dir(VALET_HOME_PATH)) {
 				$php[1] = str_replace("</info>", "", $php[1]);
 
 				$value['php'] = "<info>{$php[0]}</info>" . "\n" . "<info>{$php[1]}</info>";
-			} else {
+			}
+			else {
 				$value['php'] = $php[0] . "\n" . $php[1];
 			}
-			return $value;
+				return $value;
 		});
 
 		$links = $links->map(function ($value, $key) {
@@ -552,7 +555,6 @@ if (is_dir(VALET_HOME_PATH)) {
 		if (count($proxies) > 0) {
 			table(['Site', 'URL', 'Host'], $proxies->all(), true, "Proxied");
 		}
-
 	})->descriptions('List all the parked, linked, and proxied sites');
 
 	/**
@@ -567,9 +569,10 @@ if (is_dir(VALET_HOME_PATH)) {
 		Nginx::restart();
 
 		info('The [' . $url . '] site has been secured with a fresh TLS certificate and will now be served over HTTPS.');
+
 	})->descriptions('Secure the current working directory with a trusted TLS certificate', [
-				"site" => "Optionally specify the site"
-			])->addUsage("secure site1");
+		"site" => "Optionally specify the site"
+	])->addUsage("secure site1");
 
 	/**
 	 * List all secured sites.
@@ -585,6 +588,7 @@ if (is_dir(VALET_HOME_PATH)) {
 		}
 
 		table(['Site'], $sites->all(), true);
+
 	})->descriptions('List all secured sites');
 
 	/**
@@ -606,15 +610,16 @@ if (is_dir(VALET_HOME_PATH)) {
 		Nginx::restart();
 
 		info('The [' . $url . '] site has been unsecured and will now be served over HTTP.');
+
 	})->descriptions('Unsecure the current working directory', [
-				"site" => "Optionally specify the site.",
-				"--all" => "Optionally unsecure all secured sites"
-			])->addUsage("unsecure mySite")->addUsage("unsecure --all");
+		"site" => "Optionally specify the site.",
+		"--all" => "Optionally unsecure all secured sites"
+	])->addUsage("unsecure mySite")->addUsage("unsecure --all");
 
 	/**
 	 * Change the default PHP version used by Valet.
 	 *
-	 *  @param string $phpVersion The PHP version eg. 8.1.8, or an alias eg. 8.1 to be set as the default
+	 * @param string $phpVersion The PHP version eg. 8.1.8, or an alias eg. 8.1 to be set as the default
 	 *
 	 * ###### Note: If using the alias, and multiple versions of 8.1 are available eg. 8.1.8 and 8.1.18; then the most latest version will be used, eg. 8.1.18.
 	 */
@@ -644,8 +649,8 @@ if (is_dir(VALET_HOME_PATH)) {
 		info('Note that you might need to run <comment>composer global update</comment> if your PHP version change affects the dependencies of global packages required by Composer.');
 
 	})->descriptions('Change the default PHP version used by Valet.', [
-				'phpVersion' => 'The PHP version you want to use, e.g 8.1, 8.1.8',
-			])->addUsage("use 8.1")->addUsage("use 8.1.8");
+		'phpVersion' => 'The PHP version you want to use, e.g 8.1, 8.1.8'
+	])->addUsage("use 8.1")->addUsage("use 8.1.8");
 
 	/**
 	 * Isolate the current working directory to specific PHP version.
@@ -655,7 +660,7 @@ if (is_dir(VALET_HOME_PATH)) {
 	 * To specify multiple sites, you use it like:
 	 * `--site=my-project --site=another-site`
 	 */
-	$app->command('isolate [phpVersion] [--site=]*', function ($phpVersion, $site = array()) {
+	$app->command('isolate [phpVersion] [--site=]*', function ($phpVersion, $site = []) {
 		if (empty($phpVersion)) {
 			warning('Please enter a PHP version. Example command <bg=magenta> valet isolate 7.4 </>');
 
@@ -674,11 +679,10 @@ if (is_dir(VALET_HOME_PATH)) {
 		foreach ($site as $sitename) {
 			Site::isolate($phpVersion, $sitename);
 		}
-
 	})->descriptions('Isolate the current working directory to a specific PHP version', [
-				'phpVersion' => 'The PHP version you want to use; e.g 7.4, 7.4.33',
-				'--site' => 'Optionally specify the site.',
-			])->addUsage("isolate 7.4")->addUsage("isolate 7.4 --site=mySite")->addUsage("isolate 7.4.33 --site=mySite --site=site2");
+		'phpVersion' => 'The PHP version you want to use; e.g 7.4, 7.4.33',
+		'--site' => 'Optionally specify the site.'
+	])->addUsage("isolate 7.4")->addUsage("isolate 7.4 --site=mySite")->addUsage("isolate 7.4.33 --site=mySite --site=site2");
 
 	/**
 	 * List all isolated sites.
@@ -720,9 +724,9 @@ if (is_dir(VALET_HOME_PATH)) {
 		Site::unisolate($site);
 
 	})->descriptions('Remove [unisolate] the current working directory\'s site', [
-				'--site' => 'Optionally specify the site',
-				'--all' => 'Optionally remove all isolated sites'
-			])->addUsage("unisolate --site=mySite")->addUsage("unisolate --all");
+		'--site' => 'Optionally specify the site',
+		'--all' => 'Optionally remove all isolated sites'
+	])->addUsage("unisolate --site=mySite")->addUsage("unisolate --all");
 
 	/**
 	 * Sharing - ngrok
@@ -741,8 +745,8 @@ if (is_dir(VALET_HOME_PATH)) {
 		Ngrok::run("authtoken $token " . Ngrok::getNgrokConfig());
 
 	})->setAliases(["auth"])->descriptions('Set the ngrok auth token', [
-				"token" => "Your personal ngrok authtoken"
-			])->addUsage("set-ngrok-token 123abc")->addUsage("auth 123abc");
+		"token" => "Your personal ngrok authtoken"
+	])->addUsage("set-ngrok-token 123abc")->addUsage("auth 123abc");
 
 	/**
 	 * Share the current working directory site with a publically accessible URL.
@@ -767,25 +771,23 @@ if (is_dir(VALET_HOME_PATH)) {
 	 *
 	 * @param bool $debug Allow error messages to output to the current terminal
 	 */
-	$app->command(
-		'share [site] [-o|--options=] [--debug]',
-		function ($input, $site = null, $options = null, $debug) {
+	$app->command('share [site] [-o|--options=] [--debug]', function ($input, $site = null, $options = null, $debug) {
 
-			// Send an error if the option shortcut has a =
-			if (str_contains($input, "-o=")) {
-				return error("Option shortcuts cannot have a <bg=magenta> = </> immediately after them.\nPlease use a space to separate it from the value: <bg=magenta> valet share $site -o " . preg_replace("/=/", "", $options, 1) . " </>");
-			}
-
-			$url = ($site ?: strtolower(Site::host(getcwd()))) . '.' . Configuration::read()['tld'];
-
-			$options = $options != null ? explode("//", $options) : [];
-
-			Ngrok::start($url, Site::port($url), $debug, $options);
+		// Send an error if the option shortcut has a =
+		if (str_contains($input, "-o=")) {
+			return error("Option shortcuts cannot have a <bg=magenta> = </> immediately after them.\nPlease use a space to separate it from the value: <bg=magenta> valet share $site -o " . preg_replace("/=/", "", $options, 1) . " </>");
 		}
-	)->descriptions('Share the current working directory site with a publically accessible URL', [
-				"site" => "Optionally, the site name",
-				"--options" => "Optionally, specify ngrok options/flags of its `http` command to pass to ngrok, without the leading <fg=green>--</>. Multiple options must be separated by double slashes <fg=green>//</>."
-			])->addUsage("share mysite")->addUsage("share mysite --options domain=example.com//region=eu")->addUsage("share -o domain=example.com");
+
+		$url = ($site ?: strtolower(Site::host(getcwd()))) . '.' . Configuration::read()['tld'];
+
+		$options = $options != null ? explode("//", $options) : [];
+
+		Ngrok::start($url, Site::port($url), $debug, $options);
+
+	})->descriptions('Share the current working directory site with a publically accessible URL', [
+		"site" => "Optionally, the site name",
+		"--options" => "Optionally, specify ngrok options/flags of its `http` command to pass to ngrok, without the leading <fg=green>--</>. Multiple options must be separated by double slashes <fg=green>//</>."
+	])->addUsage("share mysite")->addUsage("share mysite --options domain=example.com//region=eu")->addUsage("share -o domain=example.com");
 
 	// TODO: Share-tool for Expose (https://expose.dev/)
 	// and 2 open-source clients like localtunnel (https://github.com/localtunnel/localtunnel)
@@ -803,8 +805,8 @@ if (is_dir(VALET_HOME_PATH)) {
 		info("It has been copied to your clipboard.");
 
 	})->setAliases(["url"])->descriptions('Get and copy the public URL of the current working directory site that is currently being shared', [
-				"site" => "Optionally, specify a site"
-			])->addUsage("fetch-share-url site1")->addUsage("url site1");
+		"site" => "Optionally, specify a site"
+	])->addUsage("fetch-share-url site1")->addUsage("url site1");
 
 	/**
 	 * Run ngrok commands.
@@ -838,9 +840,9 @@ if (is_dir(VALET_HOME_PATH)) {
 		Ngrok::run($commands);
 
 	})->descriptions('Run ngrok commands', [
-				"commands" => "The ngrok command and its argument's values, separated by spaces.",
-				"--options" => "Specify ngrok options/flags without the leading <fg=green>--</>. Multiple options must be separated by double slashes <fg=green>//</>."
-			])->addUsage("ngrok config add-authtoken [token] --options config=C:/ngrok.yml")->addUsage("ngrok config add-authtoken [token] -o config=C:/ngrok.yml");
+		"commands" => "The ngrok command and its argument's values, separated by spaces.",
+		"--options" => "Specify ngrok options/flags without the leading <fg=green>--</>. Multiple options must be separated by double slashes <fg=green>//</>."
+	])->addUsage("ngrok config add-authtoken [token] --options config=C:/ngrok.yml")->addUsage("ngrok config add-authtoken [token] -o config=C:/ngrok.yml");
 
 	/**
 	 * Starts Valet's services
@@ -853,8 +855,8 @@ if (is_dir(VALET_HOME_PATH)) {
 	$app->command('start [service]', function ($service) {
 		$this->runCommand('restart ' . $service . ' --dev-txt=started');
 	})->descriptions('Starts Valet\'s services', [
-				"service" => "Optionally, specify a particular service to start [acrylic, nginx, php, xdebug]"
-			])->addUsage("start acrylic")->addUsage("start nginx")->addUsage("start php")->addUsage("start xdebug");
+		"service" => "Optionally, specify a particular service to start [acrylic, nginx, php, xdebug]"
+	])->addUsage("start acrylic")->addUsage("start nginx")->addUsage("start php")->addUsage("start xdebug");
 
 	/**
 	 * Restarts Valet's services
@@ -905,14 +907,17 @@ if (is_dir(VALET_HOME_PATH)) {
 				Acrylic::restart();
 
 				return info("Acrylic DNS has been $devTxt.");
+
 			case 'nginx':
 				Nginx::restart();
 
 				return info("Nginx has been $devTxt.");
+
 			case 'php':
 				PhpCgi::restart();
 
 				return info("PHP has been $devTxt.");
+
 			case 'xdebug':
 				PhpCgiXdebug::restart();
 
@@ -922,9 +927,9 @@ if (is_dir(VALET_HOME_PATH)) {
 		return warning(sprintf('Invalid Valet service name [%s]', $service));
 
 	})->descriptions('Restarts Valet\'s services', [
-				"service" => "Optionally, specify a particular service to restart [acrylic, nginx, php, xdebug]",
-				"--dev-txt" => "INTERNAL USE ONLY"
-			])->addUsage("restart acrylic")->addUsage("restart nginx")->addUsage("restart php")->addUsage("restart xdebug");
+		"service" => "Optionally, specify a particular service to restart [acrylic, nginx, php, xdebug]",
+		"--dev-txt" => "INTERNAL USE ONLY"
+	])->addUsage("restart acrylic")->addUsage("restart nginx")->addUsage("restart php")->addUsage("restart xdebug");
 
 	/**
 	 * Stops Valet's services
@@ -968,14 +973,17 @@ if (is_dir(VALET_HOME_PATH)) {
 				Acrylic::stop();
 
 				return info('Acrylic DNS has been stopped.');
+
 			case 'nginx':
 				Nginx::stop();
 
 				return info('Nginx has been stopped.');
+
 			case 'php':
 				PhpCgi::stop();
 
 				return info('PHP has been stopped.');
+
 			case 'php-xdebug':
 				PhpCgiXdebug::stop();
 
@@ -983,9 +991,10 @@ if (is_dir(VALET_HOME_PATH)) {
 		}
 
 		return warning(sprintf('Invalid Valet service name [%s]', $service));
+
 	})->descriptions('Stops Valet\'s services', [
-				"service" => "Optionally, specify a particular service to stop [acrylic, nginx, php, xdebug]"
-			])->addUsage("stop acrylic")->addUsage("stop nginx")->addUsage("stop php")->addUsage("stop xdebug");
+		"service" => "Optionally, specify a particular service to stop [acrylic, nginx, php, xdebug]"
+	])->addUsage("stop acrylic")->addUsage("stop nginx")->addUsage("stop php")->addUsage("stop xdebug");
 
 	/**
 	 * Get the TLD currently being used by Valet.
@@ -1014,9 +1023,10 @@ if (is_dir(VALET_HOME_PATH)) {
 		Nginx::restart();
 
 		info('Your Valet TLD has been updated to [' . $tld . '].');
+
 	})->descriptions('Get the TLD currently being used by Valet', [
-				"tld" => "Optionally, set a new TLD"
-			])->addUsage("tld code");
+		"tld" => "Optionally, set a new TLD"
+	])->addUsage("tld code");
 
 	/**
 	 * Determine which Valet driver the current working directory is using
@@ -1028,7 +1038,8 @@ if (is_dir(VALET_HOME_PATH)) {
 
 		if ($driver) {
 			info('This site is served by [' . get_class($driver) . '].');
-		} else {
+		}
+		else {
 			warning('Valet could not determine which driver to use for this site.');
 		}
 	})->descriptions('Determine which Valet driver the current working directory is using');
@@ -1040,14 +1051,14 @@ if (is_dir(VALET_HOME_PATH)) {
 		$paths = Configuration::read()['paths'];
 
 		if (count($paths) > 0) {
-
 			$newPaths = [];
-			foreach ($paths as $key => $path) {
+			foreach ($paths as $path) {
 				array_push($newPaths, [$path]);
 			}
 
 			table(["Paths"], $newPaths, true);
-		} else {
+		}
+		else {
 			info('No paths have been registered.');
 		}
 	})->descriptions('List all of the paths registered with Valet');
@@ -1059,9 +1070,10 @@ if (is_dir(VALET_HOME_PATH)) {
 	$app->command('open [site]', function ($site = null) {
 		$url = 'http://' . ($site ?: Site::host(getcwd())) . '.' . Configuration::read()['tld'];
 		CommandLine::passthru("start $url");
+
 	})->descriptions('Open the current working directory site in the browser', [
-				"site" => "Optionally, specify a site"
-			])->addUsage("open site1");
+		"site" => "Optionally, specify a site"
+	])->addUsage("open site1");
 
 	/**
 	 * Determine if this is the latest version/release of Valet.
@@ -1069,7 +1081,8 @@ if (is_dir(VALET_HOME_PATH)) {
 	$app->command('on-latest-version', function () use ($version) {
 		if (Valet::onLatestVersion($version)) {
 			info('Yes');
-		} else {
+		}
+		else {
 			warning(sprintf('Your version of Valet Windows (%s) is not the latest version available.', $version));
 			output("You can use <fg=cyan>composer global update</> to update to the latest release (after uninstalling Valet first).\nPlease read the documentation and the Changelog for information on possible breaking changes.");
 		}
@@ -1089,7 +1102,7 @@ if (is_dir(VALET_HOME_PATH)) {
 			'nginxservice.wrapper' => VALET_HOME_PATH . '/Log/nginxservice.wrapper.log',
 			'phpcgiservice.err' => VALET_HOME_PATH . '/Log/phpcgiservice.err.log',
 			'phpcgiservice.out' => VALET_HOME_PATH . '/Log/phpcgiservice.out.log',
-			'phpcgiservice.wrapper' => VALET_HOME_PATH . '/Log/phpcgiservice.wrapper.log',
+			'phpcgiservice.wrapper' => VALET_HOME_PATH . '/Log/phpcgiservice.wrapper.log'
 		];
 
 		$configLogs = data_get(Configuration::read(), 'logs');
@@ -1108,7 +1121,7 @@ if (is_dir(VALET_HOME_PATH)) {
 				'For example: <bg=magenta> valet log nginx -f --lines=3 </>',
 				null,
 				'Here are the logs you might be interested in.',
-				null,
+				null
 			]));
 
 			$logs = collect($logs)->map(function ($file, $key) {
@@ -1120,7 +1133,7 @@ if (is_dir(VALET_HOME_PATH)) {
 			info(implode(PHP_EOL, [
 				null,
 				'Tip: Set custom logs by adding a "logs" key/file object',
-				'to your "' . Configuration::path() . '" file.',
+				'to your "' . Configuration::path() . '" file.'
 			]));
 
 			exit;
@@ -1148,10 +1161,10 @@ if (is_dir(VALET_HOME_PATH)) {
 		CommandLine::powershell("cat -Path $file $options", null, true);
 
 	})->descriptions('View and follow a log file', [
-				"key" => "The name of the log",
-				"--lines" => "The number of lines to view.",
-				"--follow" => "Follow real time streaming output of the changing file"
-			])->addUsage("log nginx --lines=3 --follow")->addUsage("log nginx -l 3 -f");
+		"key" => "The name of the log",
+		"--lines" => "The number of lines to view.",
+		"--follow" => "Follow real time streaming output of the changing file"
+	])->addUsage("log nginx --lines=3 --follow")->addUsage("log nginx -l 3 -f");
 
 	/**
 	 * List the installed Valet services.
@@ -1164,7 +1177,6 @@ if (is_dir(VALET_HOME_PATH)) {
 
 		table(['Service', 'Windows Name', 'Status'], $services, true);
 		info('Use <bg=magenta> start </> <bg=magenta> stop </> or <bg=magenta> restart </> commands to change the status, eg. <bg=magenta> valet restart nginx </>');
-
 	})->descriptions('List the installed Valet services.');
 
 	/**
@@ -1184,9 +1196,10 @@ if (is_dir(VALET_HOME_PATH)) {
 
 		$current = isset($config[$key]) ? $config[$key] : 'off';
 		output('Directory listing is ' . $current);
+
 	})->descriptions('Determine directory-listing behaviour. Default is off, which means a 404 will display.', [
-				'status' => "<fg=green>[off = default]</> will show a 404 page \n <fg=green>[on]</> will display a listing if project folder exists but requested URI not found",
-			]);
+		'status' => "<fg=green>[off = default]</> will show a 404 page \n <fg=green>[on]</> will display a listing if project folder exists but requested URI not found"
+	]);
 
 	/**
 	 * Output diagnostics to aid in debugging Valet.
@@ -1199,11 +1212,10 @@ if (is_dir(VALET_HOME_PATH)) {
 		Diagnose::run($print, $plain);
 
 		info("The diagnostics have been copied to your clipboard.");
-
 	})->descriptions('Output diagnostics to aid in debugging Valet.', [
-				'--print' => 'Print diagnostics output while running',
-				'--plain' => 'Print and format output as plain text (aka, pretty print)',
-			]);
+		'--print' => 'Print diagnostics output while running',
+		'--plain' => 'Print and format output as plain text (aka, pretty print)'
+	]);
 
 	/**
 	 *  Uninstalls Valet's services
@@ -1261,7 +1273,8 @@ if (is_dir(VALET_HOME_PATH)) {
 				Site::unsecureAll(true);
 				sleep(1);
 			}
-		} else {
+		}
+		else {
 			Site::untrustCertificates();
 		}
 		$progressBar->clear();
@@ -1321,9 +1334,9 @@ if (is_dir(VALET_HOME_PATH)) {
 			"\nDelete PHP from: <info>C:/php</info>"
 		);
 	})->descriptions('Uninstalls Valet\'s services', [
-				'--force' => 'Optionally force an uninstall without confirmation.',
-				"--purge-config" => "Optionally purge and remove all Valet configs."
-			]);
+		'--force' => 'Optionally force an uninstall without confirmation.',
+		"--purge-config" => "Optionally purge and remove all Valet configs."
+	]);
 }
 
 /**

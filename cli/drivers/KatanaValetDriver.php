@@ -1,16 +1,14 @@
 <?php
 
-class KatanaValetDriver extends BasicValetDriver
-{
+class KatanaValetDriver extends BasicValetDriver {
 	/**
 	 * Mutate the incoming URI.
 	 *
 	 * @param  string  $uri
 	 * @return string
 	 */
-	public function mutateUri($uri)
-	{
-		return rtrim('/public'.$uri, '/');
+	public function mutateUri($uri) {
+		return rtrim('/public' . $uri, '/');
 	}
 
 	/**
@@ -19,10 +17,9 @@ class KatanaValetDriver extends BasicValetDriver
 	 * @param  string  $sitePath
 	 * @param  string  $siteName
 	 * @param  string  $uri
-	 * @return void
+	 * @return boolean
 	 */
-	public function serves($sitePath, $siteName, $uri)
-	{
-		return file_exists($sitePath.'/katana');
+	public function serves($sitePath, $siteName, $uri) {
+		return file_exists($sitePath . '/katana');
 	}
 }
