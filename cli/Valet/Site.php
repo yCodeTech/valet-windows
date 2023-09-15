@@ -475,10 +475,6 @@ class Site {
 		// or if directory is null,
 		// then find and use the current working directory site.
 		if ($directory == '.' || $directory == './' || $directory == null) {
-			// TODO: If the cwd is not the top level directory of the site, we need to traverse up the directory tree to find the top level directory.
-			// eg. cd sites/mysite/web/includes
-			// We should be able to find the mysite directory.
-
 			$directory = $this->host(getcwd());
 			$txt = "The current working directory";
 		}
