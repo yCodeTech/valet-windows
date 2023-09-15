@@ -208,4 +208,16 @@ class Nginx {
 	public function path(string $path = ''): string {
 		return realpath(valetBinPath() . 'nginx') . ($path ? "/$path" : $path);
 	}
+
+	/**
+	 * Check if the nginx service is installed.
+	 *
+	 * For use in valet.php to check if Valet is installed
+	 * to enable most of the commands.
+	 *
+	 * @return boolean
+	 */
+	public function isInstalled() {
+		return $this->winsw->installed();
+	}
 }

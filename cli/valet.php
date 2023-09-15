@@ -340,7 +340,7 @@ $app->command('xdebug:uninstall [phpVersion]', function ($phpVersion = null) {
 /**
  * Most commands are available only if Valet is installed.
  */
-if (is_dir(VALET_HOME_PATH)) {
+if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 	/**
 	 * Upgrade helper: ensure the tld config exists.
 	 */
