@@ -1,5 +1,7 @@
 # Changelog
 
+// TODO: Update CHANGELOG
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
@@ -55,10 +57,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added Valet Root CA generation and sign TLS certificates with the CA (PR by @shawkuro in https://github.com/cretueusebiu/valet-windows/pull/179).
 - Added row separators for horizontal tables.
 - Added `sites` command to list all sites in parked, links and proxies.
-- Added `set-ngrok-token` to set ngrok authtoken and added an command alias for it: `auth`.
+- Added `set-ngrok-token` to set ngrok authtoken and added a command alias for it: `auth`.
 - Added `--debug` option to the `share` command to prevent the opening of a new CMD window, and allow error messages to be displayed from ngrok for easier debugging. This is needed because ngrok may fail silently by opening a new CMD window and quickly closes it if it encounters an error, so no errors are outputted.
 - Added an `--options` option to the `share` command to pass any ngrok options/flags for the ngrok `http` command, which Valet will pass through to ngrok. Also added a shortcut `-o`. See the [docs](https://github.com/yCodeTech/valet-windows/blob/master/README.md#notes-for-all---options) for information on how this works.
 - Added `sudo` command and [gsudo](https://github.com/gerardog/gsudo) files. The new command is to `passthru` Valet commands to the commandline that need elevated privileges by using gsudo. gsudo is a `sudo` equivalent for Windows, it requires only 1 UAC popup to enable the elevation and then all commands will be executed as the system instead of having multiple UACs opening.
+
+  Also added an error message for if `valet sudo sudo` is ran, because you can't sudo the sudo command.
+
 - Added `valetBinPath` helper function to find the Valet bin path, and updated all the code to use it.
 - Added a check to see if a site is isolated before unisolating it.
 - Added command example usages to display in the console when using `--help`.
@@ -66,6 +71,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `error` output to the `getPhpByVersion` function to cut down on duplicate `error` code that relates to the function.
 - Added a sleep for 0.3s (300000 microseconds) in between the `uninstall` warning and the question to allow the warning be output before the question is outputted. And simplified the if statements.
 - Added a command alias of `unpark` to the `forget` command.
+- Added a composer conflict for the old unmaintained cretueusebiu/valet-windows version, just so composer can't install this 3.0 version alongside it.
+- Added parity related additions for proxying.
+  - Added `--secure` option to `proxy` command.
+  - Updated the proxy stub to be the unsecure proxy stub as default.
+  - Changed the `proxyCreate` in `Site` class to accommodate for the new `--secure` option.
+  - Added new `secure.proxy.valet.conf` stub for the secure proxy.
+  - Changed `resecureForNewTld` to check for the new `secure.proxy` stub to ensure it keeps it secured when reinstalling Valet.
+  - Added support for proxying multiple sites at once by separating them with commas, in both `proxy` and `unproxy` commands.
 
 ### Changed
 
@@ -77,7 +90,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Moved Valet's version variable out and into it's own separate file for ease.
 - Changed various function return types.
 - Changed output tables `SSL` columns to `Secure` for easier understanding.
-- Changed `error` helper function to throw an exception when specified to do so, and add more meaning to the error output by constructing the error message from the PHP `error_get_last` function. This is because sometimes the exception doesn't output the exact error or file names needed in order to debug.
+- Changed `error` helper function to throw an exception when specified to do so, and add more meaning to the error output by constructing the error message from the `Exception` class. This is because sometimes the exception doesn't output the exact error or file names needed in order to debug. So reconstructing the error from the class methods should fix it.
+
 - Changed the table style to `box` which outputs solid borders instead of using dashes.
 - Changed the name of the `starts_with` and `ends_with` helper functions to `str_starts_with` and `str_ends_with` respectively to reflect the PHP 8+ functions.
 - Updated various output texts.
@@ -97,10 +111,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Changed the powershell cli command of the `installed` function of `WinSW` file to use the newly added service ID instead of the name. And removed the now unnecessary extra code.
   - Changed various warning outputs to errors.
   - Removed the `getPhpCgiName` function from `PhpCgiXdebug` class because the function exists in the parent class and should be used instead, thus removing duplicate code.
-  - Fix `xdebug:install`, currently, when no PHP version is passed, the command will reinstall Xdebug even if it's already installed without asking the user. Fixed so that it asks just as it does when a PHP version was passed. Changed the output text accordingly.
+  - Fixed `xdebug:install`, previously, when no PHP version is passed, the command will reinstall Xdebug even if it's already installed without asking the user. Fixed so that it asks just as it does when a PHP version was passed. Changed the output text accordingly.
   - Removed the redundant `isInstalledService` function in favour of using the `installed` function of `WinSW`, as it does exactly the same, thus removing duplicate code.
 
 - Changed the path argument of `php:add` to required rather than optional (removed the square brackets).
+- Changed the `services` function in the `Valet.php` file to output `not installed` instead of `missing` for the Xdebug services, because it's not essential for Valet to run, so it shouldn't be labelled as missing.
+- Replaced the `DIRECTORY_SEPARATORs` and `\\` for `/` in all paths and using `str_replace` to replace `\\` into `/`, so there isn't any weird paths like `C:\\sites/mysite`.
+- Overhauled the `diagnose` command.
+
+  - Changed `Diagnose` class to use the `progressbar` helper function instead of initiating Symfony's `ProgressBar` class separately.
+
+  - Removed commands not applicable for Windows.
+
+  - Added various other commands that will be necessary to debug.
+
+  - Added a `COMPOSER_GLOBAL_PATH` constant to the helpers and a `getComposerGlobalPath` function to the `Valet` class to be able to get and use the global path of composer in the commands.
+
+  - Fixed the output for `composer global diagnose`, where it would only output 1 line of an info and no diagnostics. Fixed by outputting it to a file first and then reading the file before removing it.
+
+  - Fixed the output for `composer global outdated` to format as a HTML table in the output for copy. Additionally, made the terminal output more human readable depending on the command option used.
+
+  - Removed the unnecessary `runCommand` function, and used the `powershell` function of the `CommandLine` class instead. Powershell is used because it has native support for the `cat` function, which is the alias of `Get-Content` for getting file contents.
+
+  - Fixed the ability to copy to clipboard.
+
+  - Various changes to output for human readability or because the raw output wasn't good enough or had quirks.
+
+- Changed `log` command to use `cat` alias of the Powershell's `Get-Content` command instead of the `tail` command which only works in Git Bash.
+
+  - Also changed the options to that of Powershell's variants `-Tail` for how many lines and `-Wait` for following real time output.
+
+  - Swapped around the Valet command's options, and changed various descriptions.
+
+  - Changed the `runCommand` `CommandLine` function to allow real time output. The `setTimeout` is set to 0 to allow it to run for what should be "forever". Though this can't be tested for obvious reasons.
+
+  - Added a boolean param to all the other commandline functions that utilise the aforementioned function, so they can pass along and use the real time output if/when needed.
 
 ### Removed
 
@@ -113,6 +158,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed the hardcoded ngrok options from the `share` command in favour of the new `--options` option.
 - Removed the `echo` from the `trustCa` function that was in the PR code from https://github.com/cretueusebiu/valet-windows/pull/179
 - Removed various outputs to fully streamline the progressbar UI and prevent multiple progressbars in the output because of multiple infos interrupting it.
+- Removed the ability to download PHP via an internal PowerShell script (`php.ps1`), because keeping it updated with the current versions of PHP and deprecating it's ancestor versions is impractical. Deleted the file and all related PHP `.ini`s.
+- Removed and deleted the unused and outdated tests, `.dockerignore`, `phpunit.xml` config files, and the related composer dependencies and scripts.
+- Removed the deprecated and unused legacy home path code, inline with the Mac version.
 
 ### Fixed
 
@@ -143,7 +191,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
   Also added a command alias: `latest`.
 
-- Fixed `ngrok` command to accept options/flags, using the `--options` option. See the [docs](https://github.com/yCodeTech/valet-windows/blob/master/README.md#notes-for-all---options) for information on how this works.
+- Fixed `ngrok` command to accept options/flags, using the new `--options` option. See the [docs](https://github.com/yCodeTech/valet-windows/blob/master/README.md#notes-for-all---options) for information on how this works.
 - Fixed `php:remove` command to enable it to remove PHP by specifying it's version; by adding a `phpVersion` argument and changing the `path` argument to an option (`--path`), making `phpVersion` the main way to remove instead.
 - Fixed `start` command by removing the whole functionality and utilise Silly's `runCommand` to run the `restart` command instead, so they're effectively sharing the same function. This is because it was unnecessary duplicated code.
 - Fixed lack of output colouring when using PHP `passthru` function by adding a 3rd party binary, [Ansicon](https://github.com/adoxa/ansicon), along with a new class with `install`/`uninstall` functions and added the function calls to the Valet `install`/`uninstall` commands respectively.
@@ -164,5 +212,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed `uninstall` command to only unsecure sites if they are any secured sites. Also prevented the `unsecureAll` function from exiting the script if the call came from `uninstall`. Also added an option shortcut `-p` for `--purge-config`.
 
 - Fixed `install` command to detect if Valet is already installed. Checks the services to see if they are running, if they are, Valet will ask a question whether to reinstall Valet or not. Also changed `services` function (which this fix uses) to disable the progressbar when it's called from `install`.
+
+- Fixed the Xdebug `failed to restart` error in the `restart` function of the `PhpCgi` class (of which `PhpCgiXdebug` class shares) by adding a check to see if the Xdebug service is installed, it will only restart the service if it's installed.
+
+  This is because previously, if there is a version of Xdebug installed and other versions of PHP didn't have their corresponding Xdebug installed, and the `restart` function is ran, Valet would then spit out an error in complaint of the Xdebug PHP version failing to restart, because it's not installed.
+
+- Fixed the `default` PHP configuration on `install`, by allowing Valet to only set the default PHP if they key doesn't exist or if it's `null`.
+
+  This is because previously, upon installing Valet, if the config file already exists with a default PHP set, Valet will always reset the default no matter what, even if Valet is set to use a version other than the version it finds from the `where php` CMD command, which gets it from Windows PATH (eg. default in config: 7.4.33, Valet finds: 8.1.8; Valet resets the default back to 8.1.8).
+
+  - Also fixed a bug in relation to this flaw... When adding the default PHP, Valet would sometimes fail to get the PHP path because of the inconsistent capitalisation of the drive letter in the PHP path. If the path's drive letter is a lowercase, it would fail because of the strict comparison between the former and Valet's retrieval of the uppercase letter from `where php` (eg. config: c:/php/8.1; Valet retrieves: C:/php/8.1).
+
+  Therefore, the comparison returns `null` and sets the default as `null`. Then further installation scripts would stop because of the `Cannot find PHP [null] in the list` error.
+
+  Valet will now convert the drive letter to a lowercase via the native `lcfirst` PHP function in both `addDefaultPhp` function of `Configuration` class and in the `php:add` command. So now the default PHP should never be `null`.
+
+- Removed the obsolete `domain` alias for `tld` command.
 
 ## For previous versions prior to this repository, please see [cretueusebiu/valet-windows](https://github.com/cretueusebiu/valet-windows), of which this is an indirect fork of.
