@@ -8,19 +8,19 @@
 </p>
 
 <p align="center">This is a Windows port of the popular Mac development environment <a href="https://github.com/laravel/valet">Laravel Valet</a>.</p>
-<p align="center">Laravel Valet <i>Windows</i> 3 is a much needed updated fork of <a href="https://github.com/cretueusebiu/valet-windows">cretueusebiu/valet-windows</a>, with lots of improvements and new commands. This version hopes to achieve as much parity as possible with the Mac version.</p>
-
-## !! This is in active development, official release coming soon !!
-
-### !! The dev release can now be installed via `composer global require ycodetech/valet-windows` !!
+<p align="center">Laravel Valet <i>Windows</i> 3 is a much needed updated fork of <a href="https://github.com/cretueusebiu/valet-windows">cretueusebiu/valet-windows</a>, with lots of improvements and new commands. This version hopes to achieve as much parity as possible with the Mac version. For command parity, please refer to the <a href="#command-parity-checker">parity checker</a>.</p>
 
 <p align="center"><img src="./composer_laravel_valet_windows_3_logo.svg" style="width:400px; background: none;"></p>
+
+```sh
+composer global require ycodetech/valet-windows
+```
 
 > **Warning** **If you're coming from <a href="https://github.com/cretueusebiu/valet-windows">cretueusebiu/valet-windows</a>, then you need to make sure to fully uninstall it from your computer, deleting all configs, and removing from composer with `composer global remove cretueusebiu/valet-windows`, before installing this 3.0 version.**
 
 <br>
 
-[Introduction](#introduction) | [Documentation](#documentation) | [Commands](#commands) | [Command Parity Checker](#command-parity-checker) | [Commands Not Supported](#commands-not-supported) | [Known Issues](#known-issues) | [Xdebug Installation](#xdebug-installation) | [Contributions](#contributions)
+[Introduction](#introduction) | [Installation](#installation) | [Commands](#commands) | [Command Parity Checker](#command-parity-checker) | [Commands Not Supported](#commands-not-supported) | [Known Issues](#known-issues) | [Xdebug Installation](#xdebug-installation) | [Contributions](#contributions)
 
 ---
 
@@ -146,7 +146,7 @@ Laravel Valet configures your Windows to always run Nginx in the background when
 
 This is 3.0 of Valet Windows, branded under the name _Laravel Valet Windows 3_, and is a much needed updated fork of <a href="https://github.com/cretueusebiu/valet-windows">cretueusebiu/valet-windows</a>. It introduces lots of improvements, new commands, and hopes to achieve as much parity as possible with the original Mac version.
 
-## Documentation
+## Installation
 
 Before installation, make sure that no other programs such as Apache or Nginx are binding to your local machine's port 80. If XAMPP or similar is installed make sure they don't have Windows services installed and change their ports.
 
@@ -177,6 +177,8 @@ NOTE: Laravel Valet Windows 3 is **developed and tested to run on Windows 10**. 
 Valet will automatically start its daemon each time your machine boots. There is no need to run `valet start` or `valet install` ever again once the initial Valet installation is complete.
 
 ## Commands
+
+For commands that are referenced as "the same as the Mac version", please refer to the official documentation on the [Laravel website](https://laravel.com/docs/8.x/valet#serving-sites) for more information.
 
 ### Installing/Uninstalling & Starting/Stopping
 
@@ -1336,7 +1338,7 @@ These are **important notes** for the commands that have the `--options` or `--v
 
 Commands that have been tested and made parity:
 
-- [ ] composer
+- [ ] composer - not applicable
 - [x] diagnose
 - [x] directory-listing
 - [x] fetch-share-url
@@ -1347,13 +1349,13 @@ Commands that have been tested and made parity:
 - [x] link
 - [x] links
 - [x] log
-- [ ] loopback
+- [ ] loopback - not applicable
 - [x] on-latest-version
 - [x] open
 - [x] park
 - [x] parked
 - [x] paths
-- [ ] php
+- [ ] php (proxying commands to PHP CLI) - Possible far future feature?
 - [x] proxies
 - [x] proxy
 - [x] restart
@@ -1361,12 +1363,12 @@ Commands that have been tested and made parity:
 - [x] secured
 - [x] set-ngrok-token
 - [x] share
-- [ ] share-tool
+- [ ] share-tool - Next feature drop
 - [x] start
-- [x] status - renamed to services
+- [x] status - renamed to `services`
 - [x] stop
 - [x] tld
-- [ ] trust
+- [ ] trust - not applicable
 - [x] uninstall
 - [x] unisolate
 - [x] unlink
@@ -1374,25 +1376,7 @@ Commands that have been tested and made parity:
 - [x] unsecure
 - [x] use
 - [x] which
-- [x] which-php - renamed to php:which
-
-### Commands not supported
-
-`valet loopback` - N/A
-
-`valet trust` - N/A
-
-`valet status` - In favour of the `valet services` command
-
-`valet php` (proxying commands to PHP CLI) - Possible far future feature?
-
-`valet composer` (proxying commands to Composer CLI) - N/A
-
-`valet which-php` - In favour of the `valet php:which` command
-
-`valet share-tool` - Upcoming feature
-
-For commands that are referenced as "the same as the Mac version", please refer to the official documentation on the [Laravel website](https://laravel.com/docs/8.x/valet#serving-sites) for more information.
+- [x] which-php - renamed to `php:which`
 
 ## Known Issues
 
