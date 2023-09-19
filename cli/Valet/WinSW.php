@@ -81,7 +81,9 @@ class WinSW {
 	 * @return void
 	 */
 	public function uninstall() {
-		$this->stop($this->service);
+		if ($this->isRunning()) {
+			$this->stop();
+		}
 
 		$this->cli->run('cmd "/C cd ' . $this->servicesPath() . ' && "' . $this->servicesPath($this->service) . '" uninstall"');
 
@@ -128,6 +130,20 @@ class WinSW {
 		$this->cli->run($command, function ($code, $output) {
 			warning("Failed to stop service [$this->service].\n$output");
 		});
+	}
+
+	/**
+	 * Is a service running?
+	 *
+	 * @return boolean
+	 */
+	public function isRunning() {
+		$output = $this->cli->powershell('Get-Service -Name ' . $this->serviceId)->__toString();
+
+		if (str_contains($output, "Running")) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
