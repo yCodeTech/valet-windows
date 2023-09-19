@@ -1407,6 +1407,20 @@ Commands that have been tested and made parity:
 
   If this still happens after changing the TLD, then it has been cached by the browser, despite NGINX specifying headers not to cache. To rectify try `"Empty cache and hard reload"` option of the page reload button.
 
+- On rare occasions, you may encounter a WMI error:
+
+  > FATAL - WMI Operation failure: InvalidServiceControl
+  > <br>WMI.WmiException: InvalidServiceControl
+  > <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;at WMI.WmiRoot.BaseHandler.CheckError(ManagementBaseObject result)
+  > <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;at WMI.WmiRoot.InstanceHandler.Invoke(Object proxy, MethodInfo method, Object[] arguments)
+  > <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;at WinSW.Program.&lt;Run>g**Stop|2_3(<>c**DisplayClass2_0& )
+  > <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;at WinSW.Program.Run(String[] argsArray, IWinSWConfiguration descriptor)
+  > <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;at WinSW.Program.Main(String[] args)
+
+  While using `valet use`, the error may have been caused by Valet trying to stop the nginx service twice, of which this commit https://github.com/yCodeTech/valet-windows/commit/afcafffbc9e58c00ee54b59c6929f62f2cffa8a3 tries to fix. Though it's difficult to debug an error that only occurs 1% of the time, with it being useless in terms of information when it does.
+
+  If the WMI error does occur, try running the command again. If different WMI errors occur, please submit an issue with all relevant details.
+
 ## Xdebug Installation
 
 Valet only installs a specific Xdebug PHP CGI service on a separate port to work alongside the PHP service. To install Xdebug itself, follow the [official guide](https://xdebug.org/docs/install).
