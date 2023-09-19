@@ -170,7 +170,7 @@ class Nginx {
 	 * @return void
 	 */
 	public function restart() {
-		$this->cli->run('cmd "/C taskkill /IM nginx.exe /F"');
+		$this->killProcess();
 
 		$this->lint();
 
