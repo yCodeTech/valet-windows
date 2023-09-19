@@ -183,7 +183,7 @@ class Nginx {
 	 * @return void
 	 */
 	public function stop() {
-		$this->cli->run('cmd "/C taskkill /IM nginx.exe /F"');
+		$this->killProcess();
 
 		$this->winsw->stop();
 	}
@@ -194,9 +194,16 @@ class Nginx {
 	 * @return void
 	 */
 	public function uninstall() {
-		$this->cli->run('cmd "/C taskkill /IM nginx.exe /F"');
+		$this->killProcess();
 
 		$this->winsw->uninstall();
+	}
+
+	/**
+	 * Kill all the nginx processes.
+	 */
+	public function killProcess() {
+		$this->cli->run('cmd "/C taskkill /IM nginx.exe /F"');
 	}
 
 	/**
