@@ -1417,7 +1417,7 @@ Commands that have been tested and made parity:
   > <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;at WinSW.Program.Run(String[] argsArray, IWinSWConfiguration descriptor)
   > <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;at WinSW.Program.Main(String[] args)
 
-  While using `valet use`, the error may have been caused by Valet trying to stop the nginx service twice, of which this commit https://github.com/yCodeTech/valet-windows/commit/afcafffbc9e58c00ee54b59c6929f62f2cffa8a3 tries to fix. Though it's difficult to debug an error that only occurs 1% of the time, with it being useless in terms of information when it does.
+  While using `valet use`, the error may have been caused by Valet trying to stop the nginx service twice, of which [this commit](https://github.com/yCodeTech/valet-windows/commit/afcafffbc9e58c00ee54b59c6929f62f2cffa8a3) tries to fix. Though it's difficult to debug an error that only occurs 1% of the time, with it being useless in terms of information when it does.
 
   If the WMI error does occur, try running the command again. If different WMI errors occur, please submit an issue with all relevant details.
 
