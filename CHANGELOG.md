@@ -196,7 +196,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
   For whatever reason, the `passthru` function loses the output colourings, therefore the visual meaning is lost. What Ansicon does is injects code into the active and new terminals to ensure ANSI escape sequences (that are interpreted from the HTML-like tags `<fg=red></>`) are correctly rendered.
 
-- Potentially fixed a bug where an unsecured site is fetching a secured site's SSL/TLS certificate and uses https, where browsers declare the site unsafe because of the wrong certificate. Something to do with the PHP code replacing the server port with the php port. Commented out the `preg_replace` of the `replacePhpVersionInSiteConf` function. Further tests needed before removal.
+- Fixed a bug where a non-secured isolated site's server port was being replaced with the PHP port and was being served with the default server instead of the isolated server.
+
+  So instead of the usual port 80: `127.0.0.1:80` in the site's isolated config file, nginx was actually listening for the site on port 9002: `127.0.0.1:9002`, which is the port where PHP 7.4 was configured to be hosted. This confused nginx because it couldn't find port 80 in the site's config file, so it used the default server instead, in which the default PHP version was set as 8.1 on the port 9001, and thus serving the site under the wrong PHP version.
+
+  Fixed by removing the `preg_replace` in the `replacePhpVersionInSiteConf` function of the `Site` class. (This doesn't affect the PHP isolation and still works as intended.)
+
 - Fixed an oversight while changing the TLD by allowing isolated sites TLD to be changed. Previously, if there is an isolated site, changing the TLD wouldn't change the isolated site's conf file, thus leaving it as the old TLD. This fix adds a `reisolateForNewTld` function to unisolate the old TLD site and reisolate the new TLD site. Also works for sites that are both isolated and secured.
 
 - Fixed `unlink` command to properly get the site from the current working directory if no `name` was supplied, by using the previously `private`, now `public` `getLinkNameByCurrentDir()` function. Also changed the error message in the latter function to include the multiple linked names.
