@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/yCodeTech/valet-windows/tree/master)
 
-## 3.0.0 - Unreleased
+## [3.0.0](https://github.com/yCodeTech/valet-windows/tree/v3.0.0) - 2023-09-21
 
 ### Added
 
