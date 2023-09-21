@@ -159,6 +159,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed the ability to download PHP via an internal PowerShell script (`php.ps1`), because keeping it updated with the current versions of PHP and deprecating it's ancestor versions is impractical. Deleted the file and all related PHP `.ini`s.
 - Removed and deleted the unused and outdated tests, `.dockerignore`, `phpunit.xml` config files, and the related composer dependencies and scripts.
 - Removed the deprecated and unused legacy home path code, inline with the Mac version.
+- Removed the obsolete `domain` alias for `tld` command.
 
 ### Fixed
 
@@ -230,6 +231,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
   Valet will now convert the drive letter to a lowercase via the native `lcfirst` PHP function in both `addDefaultPhp` function of `Configuration` class and in the `php:add` command. So now the default PHP should never be `null`.
 
-- Removed the obsolete `domain` alias for `tld` command.
+- Fixed https://github.com/yCodeTech/valet-windows/issues/3 where upon a fresh installation of Valet with no config.json, it would try to read the config even if it's not yet created and spits out an "Failed to open stream: No such file" error. Fixed by adding a check to see if the file exists in the `read` function of the `Configuration` class (fix PR by @hemant-kr-meena in https://github.com/yCodeTech/valet-windows/pull/4).
 
 ## For previous versions prior to this repository, please see [cretueusebiu/valet-windows](https://github.com/cretueusebiu/valet-windows), of which this is an indirect fork of.
