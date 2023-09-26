@@ -132,6 +132,108 @@ class Valet {
 	}
 
 	/**
+	 * Get a calculation of the percentage of parity completion against Laravel Valet for macOS
+	 * @param string $url The URL to the raw code in Github of `app.php` of Laravel Valet on a released version.
+	 * eg. https://raw.githubusercontent.com/laravel/valet/v4.3.0/cli/app.php
+	 * @return void
+	 */
+	public function parity($url) {
+
+		// Get the contents of the URL.
+		$contents = $this->files->get($url);
+
+		// Split the string by the strings "$app->" and "function" and collect them.
+		$collection = collect(preg_split('/(\$app->|, function)+/', $contents));
+
+		// Filter the collection to get only the commands in the form of command(command-name.
+		$macOScommands = $collection->filter(function ($item, $key) {
+			if (str_contains($item, "command(")) {
+				return $item;
+			}
+			// Then rearrange the values into a new collection with their indexes reset.
+			// Then split the items by the strings "'" and whitespace to get the command name only,
+			// and remap them to a new collection and output as an array.
+		})->values()->map(function ($item, $key) {
+			$item = preg_split("/('|\s)/", $item);
+			return $item[1];
+		})->toArray();
+
+		// Define commands in the macOS version that will not be available to make parity.
+		$commandsNotApplicableForParity = [
+			"composer",
+			"loopback",
+			"trust"
+		];
+
+		// Define Valet 3.0 commands that are new only to this Windows version.
+		$newValetCommands = [
+			"ngrok",
+			"parity",
+			"php:add",
+			"php:install",
+			"php:remove",
+			"php:uninstall",
+			"php:list",
+			"sudo",
+			"sites",
+			"xdebug:install",
+			"xdebug:uninstall"
+		];
+
+		// Run symfony's `valet list --raw` command and collect the un-styled raw output
+		// of all commands.
+		$valetCommands = collect(explode("\n", $this->cli->run("valet list --raw")->__toString()));
+
+		/**
+		 * Find the commands that have been made parity.
+		 */
+
+		// Remap and split at the point of multiple whitespace and return the first item.
+		// This will strip out the descriptions of the commands, therefore only returning the
+		// command name.
+		$valetCommands = $valetCommands->map(function ($item, $key) {
+			$item = preg_split("/\s\s\s/", $item);
+			return $item[0];
+			// Filter the collection and discard any commands that symfony adds automatically,
+			// and also discard any new Valet 3.0 only commands.
+		})->filter(function ($item, $key) use ($newValetCommands) {
+
+			// Define symfony commands to discard.
+			$discardElements = [
+				"completion",
+				"help",
+				"list"
+			];
+
+			if (!in_array($item, $discardElements) && !in_array($item, $newValetCommands)) {
+				return $item;
+			}
+		})->values()->all();
+
+		// Total mac commands.
+		$total_Commands = count($macOScommands);
+		// Total commands that can be made parity.
+		$total_CommandsForParity = $total_Commands - count($commandsNotApplicableForParity);
+		// Total commands parity complete.
+		$total_CommandsCompleted = count($valetCommands);
+		// Total Valet 3.0 only commands.
+		$total_NewValetCommands = count($newValetCommands);
+
+		// Calculate the parity percentage.
+		$parityPercentage = round($total_CommandsCompleted / $total_Commands * 100);
+		// Calculate the total percentage it is possible to make parity.
+		$total_PossibleParityPercentage = round($total_CommandsForParity / $total_Commands * 100);
+
+		info("Out of a total $total_Commands commands, $total_CommandsForParity are possible for parity, with $total_CommandsCompleted complete, and $total_NewValetCommands brand new commands.");
+
+		// Find the version from the URL.
+		preg_match("/v[0-9]\.[0-9]\.[0-9]+/", $url, $macVersion);
+		$macVersion = implode("", $macVersion);
+
+		info("Parity at $parityPercentage% out of a total $total_PossibleParityPercentage% possible parity with the Laravel Valet (macOS) $macVersion");
+	}
+
+	/**
 	 * Run composer global diagnose.
 	 */
 	public function composerGlobalDiagnose() {

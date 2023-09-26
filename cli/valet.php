@@ -338,6 +338,18 @@ $app->command('xdebug:uninstall [phpVersion]', function ($phpVersion = null) {
 ]);
 
 /**
+ * Get a calculation of the percentage of parity completion.
+ */
+$app->command('parity', function () {
+
+	// Only get the released version instead of master, to make sure no commands
+	// are added or removed to the macOS version to ensure this version of Valet 3.0
+	// always has parity against the version in the URL. (ie. master can change.)
+	Valet::parity("https://raw.githubusercontent.com/laravel/valet/v4.3.0/cli/app.php");
+
+})->descriptions("Get a calculation of the percentage of parity completion.");
+
+/**
  * Most commands are available only if Valet is installed.
  */
 if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
