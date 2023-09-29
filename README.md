@@ -20,7 +20,7 @@ composer global require ycodetech/valet-windows
 
 <br>
 
-[Introduction](#introduction) | [Installation](#installation) | [Commands](#commands) | [Command Parity Checker](#command-parity-checker) | [Commands Not Supported](#commands-not-supported) | [Known Issues](#known-issues) | [Xdebug Installation](#xdebug-installation) | [Contributions](#contributions)
+[Introduction](#introduction) | [Installation](#installation) | [Commands](#commands) | [Command Parity Checker](#command-parity-checker) | [Known Issues](#known-issues) | [Xdebug Installation](#xdebug-installation) | [Contributions](#contributions)
 
 ---
 
