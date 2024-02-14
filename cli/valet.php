@@ -783,7 +783,7 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 	 *
 	 * @param bool $debug Allow error messages to output to the current terminal
 	 */
-	$app->command('share [site] [-o|--options=] [--debug]', function ($input, $site = null, $options = null, $debug) {
+	$app->command('share [site] [-o|--options=] [--debug]', function ($input, ?string $site, ?string $options, $debug) {
 
 		// Send an error if the option shortcut has a =
 		if (str_contains($input, "-o=")) {
@@ -1106,7 +1106,7 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 	 * @param string $lines The number of lines to view
 	 * @param boolean $follow Follow real time streaming output of the changing file
 	 */
-	$app->command('log [key] [-l|--lines=] [-f|--follow]', function ($key = null, $lines, $follow) {
+	$app->command('log [key] [-l|--lines=] [-f|--follow]', function (?string $key, $lines, $follow) {
 		$defaultLogs = [
 			'nginx' => VALET_HOME_PATH . '/Log/nginx-error.log',
 			'nginxservice.err' => VALET_HOME_PATH . '/Log/nginxservice.err.log',
