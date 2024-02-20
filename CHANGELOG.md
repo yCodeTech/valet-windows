@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added new `parity` command to get a calculation of the percentage of parity completion against Laravel Valet for macOS.
 
+### Changed
+
+- Updated dependencies for Laravel installer, (PR by @hemant-kr-meena in https://github.com/yCodeTech/valet-windows/pull/8).
+
 ## [3.0.0](https://github.com/yCodeTech/valet-windows/tree/v3.0.0) - 2023-09-21
 
 ### Added
