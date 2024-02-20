@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Updated dependencies for Laravel installer, (PR by @hemant-kr-meena in https://github.com/yCodeTech/valet-windows/pull/8).
+- Updated dependencies for Laravel installer to add support for Laravel 10, (PR by @hemant-kr-meena in https://github.com/yCodeTech/valet-windows/pull/8).
 
 ## [3.0.0](https://github.com/yCodeTech/valet-windows/tree/v3.0.0) - 2023-09-21
 
