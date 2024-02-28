@@ -29,6 +29,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
   - Removing the default `null` value from the `$key` parameter of the optional `key` argument of the `log` command. Because the key is used to specify the name of a specific log and omitting the argument will make valet list all the log file names, it doesn't need to have a default value.
 
+### Deprecated
+
+- The `install` confirmation question of outdated cretueusebiu package. Doesn't affect valet functionality.
+
 ## [3.0.0](https://github.com/yCodeTech/valet-windows/tree/v3.0.0) - 2023-09-21
 
 ### Added
