@@ -134,7 +134,7 @@ composer global require ycodetech/valet-windows
     <td></td>
 		<td align="center"><a href="#sites">sites</a></td>
     <td></td>
-		<td></td>
+		<td align="center"><a href="#parity">parity</a></td>
   </tr>
 </table>
 
@@ -1295,6 +1295,22 @@ The diagnostics will be copied to the clipboard as formatted HTML for easy issue
 
 <img align="center" src="./The_same_icon.svg" style="width:20px;"> This command is the same as the Mac version.
 
+##### parity
+
+```
+parity  Output the calculation of the percentage of parity completion against Laravel Valet (macOS) of a specific version.
+```
+
+```console
+$ valet parity
+Out of a total 39 commands, 36 are possible for parity, with 34 complete, and 11 brand new commands.
+Parity at 87% out of a total 92% possible parity with the Laravel Valet (macOS) v4.3.0
+```
+
+This command is a way to determine how much parity has been achieved.
+
+---
+
 ### Notes for all `--options`
 
 These are **important notes** for the commands that have the `--options` or `--valetOptions`.
@@ -1378,6 +1394,8 @@ Commands that have been tested and made parity:
 - [x] which
 - [x] which-php - renamed to `php:which`
 
+To see a calculation of how much parity has been achieved, see the [parity command](#parity).
+
 ## Known Issues
 
 - WSL2 distros fail because of Acrylic DNS Proxy ([microsoft/wsl#4929](https://github.com/microsoft/WSL/issues/4929)). Use `valet stop`, start WSL2 then `valet start`.
@@ -1442,6 +1460,8 @@ Iamroi - [Valet Windows: Feature PR for multiple PHP support](https://github.com
 Damsfx - [Valet Windows: Patch 1 PR on Iamroi's repo to add PHP versions to `links` command](https://github.com/iamroi/valet-windows/pull/1)
 
 yCodeTech - [Laravel Valet Windows 3](https://github.com/yCodeTech/valet-windows)
+
+Hemant-kr-meena - [various PRs](https://github.com/yCodeTech/valet-windows/pulls?q=is%3Apr+author%3Ahemant-kr-meena)
 
 ## Changelog
 
