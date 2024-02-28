@@ -71,7 +71,7 @@ $app->command('install [--xdebug]', function ($input, $output, $xdebug) {
 		}
 	}
 
-	// TODO: Deprecate this question in version 3.0.3 and remove in 3.0.4
+	/** @deprecated This confirmation question is deprecated since version 3.1.0 */
 	$question = new ConfirmationQuestion("<fg=red>Have you fully uninstalled the outdated cretueusebiu/valet-windows? yes/no</>\n", false);
 
 	if (!$alreadyInstalled && !$helper->ask($input, $output, $question)) {
@@ -803,6 +803,9 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 
 	// TODO: Share-tool for Expose (https://expose.dev/)
 	// and 2 open-source clients like localtunnel (https://github.com/localtunnel/localtunnel)
+	// https://boringproxy.io/
+	// https://github.com/anderspitman/awesome-tunneling
+	// https://github.com/robbie-cahill/tunnelmole-client
 
 	/**
 	 * Get and copy the public URL of the current working directory site

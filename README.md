@@ -20,7 +20,7 @@ composer global require ycodetech/valet-windows
 
 <br>
 
-[Introduction](#introduction) | [Installation](#installation) | [Commands](#commands) | [Command Parity Checker](#command-parity-checker) | [Known Issues](#known-issues) | [Xdebug Installation](#xdebug-installation) | [Contributions](#contributions)
+[Introduction](#introduction) | [Installation](#installation) | [Commands](#commands) | [Command Parity Checker](#command-parity-checker) | [Deprecations and Removals](#deprecations-and-removals) | [Known Issues](#known-issues) | [Xdebug Installation](#xdebug-installation) | [Contributions](#contributions)
 
 ---
 
@@ -1395,6 +1395,32 @@ Commands that have been tested and made parity:
 - [x] which-php - renamed to `php:which`
 
 To see a calculation of how much parity has been achieved, see the [parity command](#parity).
+
+## Deprecations and Removals
+
+<table>
+  <tr>
+    <th>Deprecated</th>
+    <th>Since Version</th>
+    <th>Will be Removed in Version</th>
+    <th>Removed?</th>
+  </tr>
+    <td>
+
+The `install` command confirmation question about uninstalling the outdated cretueusebiu package.
+
+Doesn't affect valet functionality.
+
+</td>
+    <td>3.1.0</td>
+    <td>3.2.0</td>
+    <td>&#x2717;</td>
+  </tr>
+<table>
+<!--
+   - tick = &#x2713;
+   - cross = &#x2717;
+-->
 
 ## Known Issues
 
