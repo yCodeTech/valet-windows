@@ -15,6 +15,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Updated dependencies for Laravel installer to add support for Laravel 10, (PR by @hemant-kr-meena in https://github.com/yCodeTech/valet-windows/pull/8).
 
+### Fixed
+
+- Fixed https://github.com/yCodeTech/valet-windows/issues/6 PHP 8+ deprecation notice for required parameters declared after optional parameters.
+
+  The notice would only show when the PHP ini `error_reporting` setting wasn't ignoring deprecation notices, and all reports are enabled, ie. `E_ALL`. This notice would then be displayed in the terminal on every `valet` command. Though it doesn't impact valet's functionality, it could potentially be broken in future PHP versions.
+
+  Fixed by:
+
+  - Adding a default `null` value to the `$debug` parameter for the optional `--debug` option of the `share` command.
+
+  - Removing the default `null` value from the `$key` parameter of the optional `key` argument of the `log` command. Because the key is used to specify the name of a specific log and omitting the argument will make valet list all the log file names, it doesn't need to have a default value.
+
 ## [3.0.0](https://github.com/yCodeTech/valet-windows/tree/v3.0.0) - 2023-09-21
 
 ### Added
