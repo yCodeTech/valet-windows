@@ -14,7 +14,7 @@ require_once __DIR__ . '/version.php';
 
 
 use Illuminate\Container\Container;
-use Silly\Application;
+use Valet\Application;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use function Valet\info;
 use function Valet\info_dump;
