@@ -1489,6 +1489,8 @@ yCodeTech - [Laravel Valet Windows 3](https://github.com/yCodeTech/valet-windows
 
 Hemant-kr-meena - [various PRs](https://github.com/yCodeTech/valet-windows/pulls?q=is%3Apr+author%3Ahemant-kr-meena)
 
+Onecentlin - [Update Laravel Installer requirements PR](https://github.com/yCodeTech/valet-windows/pull/10)
+
 ## Changelog
 
 Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.

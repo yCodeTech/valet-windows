@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/yCodeTech/valet-windows/tree/master)
 
+## [3.1.1](https://github.com/yCodeTech/valet-windows/tree/v3.1.1) - 2024-03-25
+
+### Added
+
+- **Aesthetic only** - Added the logo as an ASCII art to the namespace command `valet`; and the `valet list` command, via extending Silly's Application class.
+
+### Changed
+
+- Updated dependencies for Laravel installer to add support for Laravel 11, (PR by @
+  onecentlin in https://github.com/yCodeTech/valet-windows/pull/10).
+
 ## [3.1.0](https://github.com/yCodeTech/valet-windows/tree/v3.1.0) - 2024-02-28
 
 ### Added
