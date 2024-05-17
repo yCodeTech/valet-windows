@@ -158,6 +158,21 @@ $app->command('sudo valetCommand* [-o|--valetOptions=]', function ($valetCommand
 	"--valetOptions" => "The Valet options without the leading <fg=green>--</>. Multiple options must be separated by double slashes <fg=green>//</>."
 ])->addUsage("sudo link mySite --valetOptions=isolate=7.4//secure")->addUsage("sudo link mySite -o isolate=7.4//secure");
 
+/**
+ * Output diagnostics to aid in debugging Valet.
+ * @param boolean $print Optionally print diagnostics output while running
+ * @param boolean $plain Optionally format clipboard output as plain text
+ */
+$app->command('diagnose [-p|--print] [--plain]', function ($print, $plain) {
+	info('Running diagnostics... (this may take a while)');
+
+	Diagnose::run($print, $plain);
+
+	info("The diagnostics have been copied to your clipboard.");
+})->descriptions('Output diagnostics to aid in debugging Valet.', [
+	'--print' => 'Print diagnostics output while running',
+	'--plain' => 'Print and format output as plain text (aka, pretty print)'
+]);
 
 /**
  * Add PHP by specifying a path.
@@ -1214,22 +1229,6 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 
 	})->descriptions('Determine directory-listing behaviour. Default is off, which means a 404 will display.', [
 		'status' => "<fg=green>[off = default]</> will show a 404 page \n <fg=green>[on]</> will display a listing if project folder exists but requested URI not found"
-	]);
-
-	/**
-	 * Output diagnostics to aid in debugging Valet.
-	 * @param boolean $print Optionally print diagnostics output while running
-	 * @param boolean $plain Optionally format clipboard output as plain text
-	 */
-	$app->command('diagnose [-p|--print] [--plain]', function ($print, $plain) {
-		info('Running diagnostics... (this may take a while)');
-
-		Diagnose::run($print, $plain);
-
-		info("The diagnostics have been copied to your clipboard.");
-	})->descriptions('Output diagnostics to aid in debugging Valet.', [
-		'--print' => 'Print diagnostics output while running',
-		'--plain' => 'Print and format output as plain text (aka, pretty print)'
 	]);
 
 	/**
