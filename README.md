@@ -158,7 +158,9 @@ NOTE: Laravel Valet Windows 3 is **developed and tested to run on Windows 10**. 
 
 - If you don't have PHP installed, make sure to [install](https://windows.php.net/download) it.
 
-  Download the Zip file and unzip into `C:/php/`. You may use Thread Safe (TS), but Non-Thread Safe (NTS) is better for using PHP on the FastCGI protocol, which Valet uses.
+  Download the Zip file and unzip into a directory of your choosing. The recommended directory is: `C:/php/`.
+
+  You may use Thread Safe (TS), but Non-Thread Safe (NTS) is better for using PHP on the FastCGI protocol, which Valet uses.
 
   > For NTS binaries the widespread use case is interaction with a web server through the FastCGI protocol, utilizing no multithreading (but also for example CLI).
 
@@ -362,6 +364,8 @@ PHP 7.4.33 from C:\php\7.4 has been added.
 ###### **Note:** When adding PHP, the full version number (eg. 7.4.33) will be extracted and an alias (eg. 7.4) will be generated. Either of these can be used in other commands.
 
 ###### Furthermore, the details of the versions will be written to the config in a natural decending order that adheres to decimals. This means that when two minor versions (like 8.1.8 and 8.1.18) of an alias (8.1) are added, and the default PHP is then set to use the alias, then Valet will use the most recent version of the alias, which in this case would be 8.1.18.
+
+###### Note: You may specify the path without quotes, but if the directory has spaces in like `C:/Program Files/php/7.4` then it _must_ be surrounded in quotes. Otherwise valet will encounter an error.
 
 ###### php:add --xdebug
 

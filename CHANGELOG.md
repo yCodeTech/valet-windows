@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/yCodeTech/valet-windows/tree/master)
 
+## [3.1.2](https://github.com/yCodeTech/valet-windows/tree/v3.1.2) - 2024-05-17
+
+### Fixed
+
+- Fixed https://github.com/yCodeTech/valet-windows/issues/11 bug that couldn't find the PHP executable when trying to add the default when installing valet. It would fail to get the PHP when there is a space in the path like `c:/Program Files/php/`. Wrapping the path in quotes in the underlying cmd command fixes this.
+
+- Fixed an issue with the `diagnose` command which was brought up in https://github.com/yCodeTech/valet-windows/issues/11. The command wasn't available if valet wasn't installed, and could never be installed because of the PHP bug above. Fixed this by always having `diagnose` command available whether valet is installed or not.
+
 ## [3.1.1](https://github.com/yCodeTech/valet-windows/tree/v3.1.1) - 2024-03-25
 
 ### Added
