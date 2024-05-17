@@ -215,7 +215,7 @@ class PhpCgi {
 			return null;
 		}
 
-		$phpVersion = $this->cli->runOrExit("{$phpExecPath} -r \"echo PHP_VERSION;\"",
+		$phpVersion = $this->cli->runOrExit("\"$phpExecPath\" -r \"echo PHP_VERSION;\"",
 			function ($code, $output) use ($phpPath) {
 				error("Failed to find the PHP version for {$phpPath}");
 			}
