@@ -375,7 +375,29 @@ function user() {
  * @return string `"c:\Users\Username\AppData\Roaming\Composer\vendor\ycodetech\valet-windows\bin\"`
  */
 function valetBinPath() {
-	return __DIR__ . '/../../bin/';
+	$DIR = pathFilter(__DIR__);
+	return $DIR . '/../../bin/';
+}
+
+/**
+ * Alternative Naming Convention for Directories or Paths containing spaces
+ * 
+ * Renames directories with spaces to the alternative shortend name 
+ * such as `John Doe` to `JOHNDO~1`.
+ * This is to prevent errors when installing Valet Components like 'Ansicon'
+ */
+function pathFilter($path){
+	$path = explode(DIRECTORY_SEPARATOR, $path);
+	foreach ($path as $key => $value) {
+		if (strpos($value, ' ')) {
+			$value = strtoupper(substr(str_replace(' ', '', $value), 0, 6)) . "~1";
+			$path[$key] = $value;
+		}
+	}
+
+	$path = implode(DIRECTORY_SEPARATOR, $path);
+
+	return $path;
 }
 
 /**
