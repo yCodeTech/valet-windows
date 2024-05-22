@@ -8,24 +8,7 @@ class Diagnose {
 	 *
 	 * @var array
 	 */
-	protected $commands = [
-		'systeminfo',
-		'valet --version',
-		'cat ~/.config/valet/config.json',
-		__DIR__ . '\..\..\bin\nginx\nginx.exe -v 2>&1',
-		__DIR__ . '\..\..\bin\nginx\nginx.exe -c ' . __DIR__ . '\..\..\bin\nginx\conf\nginx.conf -t -p ' . __DIR__ . '\..\..\bin\nginx 2>&1',
-		'foreach ($file in get-ChildItem -Path "' . __DIR__ . '\..\..\bin\nginx\conf\nginx.conf", "' . __DIR__ . '\..\..\bin\nginx\valet\valet.conf", "' . VALET_HOME_PATH . '/Nginx/*.conf"){echo $file.fullname --------------------`n; Get-Content -Path $file; echo `n;}',
-		__DIR__ . '\..\..\bin\ngrok.exe version',
-		'php -v',
-		'cmd /C "where /f php"',
-		'php --ini',
-		'php --info',
-		'php --ri curl',
-		'cmd /C curl --version',
-		'cat ' . COMPOSER_GLOBAL_PATH . '/composer.json',
-		'composer global diagnose --no-ansi 1> composer.txt',
-		'composer global outdated --format json'
-	];
+	protected $commands;
 
 	protected $cli;
 	protected $files;
@@ -41,6 +24,24 @@ class Diagnose {
 	public function __construct(CommandLine $cli, Filesystem $files) {
 		$this->cli = $cli;
 		$this->files = $files;
+		$this->commands = [
+			'systeminfo',
+			'valet --version',
+			'cat ~/.config/valet/config.json',
+			valetBinPath() . 'nginx\nginx.exe -v 2>&1',
+			valetBinPath() . 'nginx\nginx.exe -c ' . valetBinPath() . 'nginx\conf\nginx.conf -t -p ' . valetBinPath() . 'nginx 2>&1',
+			'foreach ($file in get-ChildItem -Path "' . valetBinPath() . 'nginx\conf\nginx.conf", "' . valetBinPath() . 'nginx\valet\valet.conf", "' . VALET_HOME_PATH . '/Nginx/*.conf"){echo $file.fullname --------------------`n; Get-Content -Path $file; echo `n;}',
+			valetBinPath() . 'ngrok.exe version',
+			'php -v',
+			'cmd /C "where /f php"',
+			'php --ini',
+			'php --info',
+			'php --ri curl',
+			'cmd /C curl --version',
+			'cat "' . pathFilter(COMPOSER_GLOBAL_PATH) . '/composer.json"',
+			'composer global diagnose --no-ansi 1> composer.txt',
+			'composer global outdated --format json'
+		];
 	}
 
 	/**

@@ -381,12 +381,19 @@ function valetBinPath() {
 
 /**
  * Alternative Naming Convention for Directories or Paths containing spaces
- * 
- * Renames directories with spaces to the alternative shortend name 
+ *
+ * Renames directories with spaces to the alternative Windows shortened name
  * such as `John Doe` to `JOHNDO~1`.
- * This is to prevent errors when installing Valet Components like 'Ansicon'
+ * This is to prevent errors when installing Valet components like 'Ansicon' and commands like `diagnose`.
+ *
+ * @param string $path The path
+ *
+ * @return string `"c:\Users\Userna~1\......"`
  */
-function pathFilter($path){
+function pathFilter($path) {
+
+	$path = str_replace('/', DIRECTORY_SEPARATOR, $path);
+
 	$path = explode(DIRECTORY_SEPARATOR, $path);
 	foreach ($path as $key => $value) {
 		if (strpos($value, ' ')) {

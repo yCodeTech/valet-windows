@@ -127,7 +127,7 @@ class Nginx {
 	 */
 	private function lint() {
 		$this->cli->run(
-			$this->path('nginx.exe') . ' -c ' . $this->path('conf/nginx.conf') . ' -t -q -p ' . $this->path(),
+			'"' . $this->path('nginx.exe') . '" -c "' . $this->path('conf/nginx.conf') . '" -t -q -p "' . $this->path() . '"',
 			function ($exitCode, $outputMessage) {
 				$outputMessage = preg_replace("/\r\n|\n|\r/", "\r\n\r\n", $outputMessage);
 

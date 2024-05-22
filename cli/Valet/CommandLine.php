@@ -25,7 +25,7 @@ class CommandLine {
 	 * @param string $valetCommand The Valet command to run.
 	 */
 	public function sudo($valetCommand) {
-		$gsudo = realpath(valetBinPath() . 'gsudo/gsudo.exe') . " --system -d ";
+		$gsudo = '"' . realpath(valetBinPath() . 'gsudo/gsudo.exe') . '" --system -d ';
 		$this->passthru($gsudo . "$valetCommand");
 	}
 

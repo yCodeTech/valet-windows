@@ -25,7 +25,7 @@ class Ansicon {
 	 */
 	public function install() {
 		$this->cli->runOrExit(
-			valetBinPath() . "ansicon/ansicon.exe -i",
+			'"' . valetBinPath() . 'ansicon/ansicon.exe" -i',
 			function ($code, $output) {
 				warning("Failed to install ansicon.\n$output");
 			}
@@ -39,7 +39,7 @@ class Ansicon {
 	 */
 	public function uninstall() {
 		$this->cli->runOrExit(
-			valetBinPath() . "ansicon/ansicon.exe -pu -u",
+			'"' . valetBinPath() . 'ansicon/ansicon.exe" -pu -u',
 			function ($code, $output) {
 				warning("Failed to uninstall ansicon.\n$output");
 			}
