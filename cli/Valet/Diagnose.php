@@ -39,7 +39,7 @@ class Diagnose {
 			'php --ri curl',
 			'cmd /C curl --version',
 			'cat "' . pathFilter(COMPOSER_GLOBAL_PATH) . '/composer.json"',
-			'composer global diagnose --no-ansi 1> composer.txt',
+			'composer global diagnose --no-ansi 1>' . VALET_HOME_PATH . '/composer.txt',
 			'composer global outdated --format json'
 		];
 	}
@@ -183,8 +183,8 @@ class Diagnose {
 		}
 
 		if (str_contains($command, "composer global diagnose")) {
-			$output = $this->cli->powershell('cat composer.txt');
-			$this->files->unlink('composer.txt');
+			$output = $this->cli->powershell('cat '. VALET_HOME_PATH .'/composer.txt');
+			$this->files->unlink(VALET_HOME_PATH .'/composer.txt');
 		}
 
 		if (str_contains($command, "composer global outdated")) {
