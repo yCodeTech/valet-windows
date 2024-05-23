@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/yCodeTech/valet-windows/tree/master)
 
+## [3.1.3](https://github.com/yCodeTech/valet-windows/tree/v3.1.3) - 2024-05-23
+
+### Fixed
+
+- Fixed Valet install failure, particularly with Ansicon due to spaces in the user directory name (Fix PR by @shahriarrahat in https://github.com/yCodeTech/valet-windows/pull/12).
+
+  - Adds a `pathFilter` function to replace the directory name with it's Windows shortname equivalent. e.g. from `John Doe` to `JOHNDO~1`. For use with the `valetBinPath` function that is used in the Ansicon installation.
+
+- Fixed multiple cmd or powershell commands for spaces by wrapping them in double quotes.
+
+- Fixed errors where composer diagnostics and the valet diagnostics output file couldn't be written because it was trying to write to the terminal's current working directory, which could be a protected directory like `Program Files`. Added `VALET_HOME_PATH` to the commands, so that they get saved to `~/.config/valet`.
+
+- Fixed the copying of the diagnostics output to clipboard that just stopped working for unknown reasons. Fixed by changing `cli->run` to `cli->powershell` to ensure that the copy command `clip` is available.
+
+- Fixed the nginx config check command in `diagnose`, where it errors out because it couldn't find the file due to:
+
+  - the path after the `-c` option couldn't be the shortened username via the `valetBinPath()`. Changed it back to use `__DIR__` . And added an escaped double quotes (`\"`) around it.
+
+  - the replacing of all backslashes in the command. This meant that with the new escaped double quotes it changed the backslash to forward slash. So instead of `-c \"C:/Users/...` it was changed to `-c /"C:/Users/...` and the system interpreted it as `"C:/C:/Users/...`
+
+    Fixed by changing the replace function to use a regex that only replaces single backslashes and disregards the escaped quotes.
+
+### Changed
+
+- Changed `pathFilter` function from https://github.com/yCodeTech/valet-windows/pull/12 to replace forward slashes with backslashes to prevent errors within the function where paths aren't exploded because the `/`s. But replaced the backslashes back to forwardslashes once the function was complete and fix further errors that occurred.
+
+- Moved the `diagnose` commands array into the `__construct` function so that we can use the global `valetBinPath` function and allow the paths to also be changed to the short username if needed.
+
+- Changed various `diagnose` array commands to use the `valetBinPath` function and the command that has the `COMPOSER_GLOBAL_PATH` to use the `filterPath` function.
+
 ## [3.1.2](https://github.com/yCodeTech/valet-windows/tree/v3.1.2) - 2024-05-17
 
 ### Fixed

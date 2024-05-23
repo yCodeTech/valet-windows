@@ -388,7 +388,7 @@ function valetBinPath() {
  *
  * @param string $path The path
  *
- * @return string `"c:\Users\Userna~1\......"`
+ * @return string `"c:\Users\USERNA~1\......"`
  */
 function pathFilter($path) {
 
