@@ -28,9 +28,9 @@ class Diagnose {
 			'systeminfo',
 			'valet --version',
 			'cat ~/.config/valet/config.json',
-			valetBinPath() . 'nginx\nginx.exe -v 2>&1',
-			valetBinPath() . 'nginx\nginx.exe -c ' . valetBinPath() . 'nginx\conf\nginx.conf -t -p ' . valetBinPath() . 'nginx 2>&1',
-			'foreach ($file in get-ChildItem -Path "' . valetBinPath() . 'nginx\conf\nginx.conf", "' . valetBinPath() . 'nginx\valet\valet.conf", "' . VALET_HOME_PATH . '/Nginx/*.conf"){echo $file.fullname --------------------`n; Get-Content -Path $file; echo `n;}',
+			valetBinPath() . 'nginx/nginx.exe -v 2>&1',
+			valetBinPath() . 'nginx/nginx.exe -c \"' . __DIR__ . '/../../bin/nginx/conf/nginx.conf\" -t -p ' . valetBinPath() . 'nginx 2>&1',
+			'foreach ($file in get-ChildItem -Path "' . valetBinPath() . 'nginx/conf/nginx.conf", "' . valetBinPath() . 'nginx/valet/valet.conf", "' . VALET_HOME_PATH . '/Nginx/*.conf"){echo $file.fullname --------------------`n; Get-Content -Path $file; echo `n;}',
 			valetBinPath() . 'ngrok.exe version',
 			'php -v',
 			'cmd /C "where /f php"',
@@ -97,7 +97,11 @@ class Diagnose {
 		if ($this->print) {
 			return;
 		}
-		$this->commands = str_replace("\\", "/", $this->commands);
+
+		// Replace only single backslashes (\) within paths to forward slashes (/), ie. does not replace the backslashes
+		// before a double quote. So the double quote is still escaped.
+		// e.g. \"\..\path\" --> \"/../path\"
+		$this->commands = preg_replace('/\\\(?![\\"])/', "/", $this->commands);
 
 		$this->progressBar = progressbar(count($this->commands), "Diagnosing", "Valet");
 	}
