@@ -376,9 +376,9 @@ class Diagnose {
 		// Code based on https://stackoverflow.com/a/40731340/2358222
 		$output = preg_replace('/(\e)|([[]|[]])[A-Za-z0-9];*[0-9]*m?/', '', $output);
 
-		$this->files->put('valet_diagnostics.txt', $output);
-		$this->cli->run('type valet_diagnostics.txt | clip');
-		$this->files->unlink('valet_diagnostics.txt');
+		$this->files->put(VALET_HOME_PATH . '/valet_diagnostics.txt', $output);
+		$this->cli->powershell('type ' . VALET_HOME_PATH . '/valet_diagnostics.txt | clip');
+		$this->files->unlink(VALET_HOME_PATH . '/valet_diagnostics.txt');
 	}
 
 	/**
