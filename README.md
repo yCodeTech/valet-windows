@@ -1495,6 +1495,8 @@ Hemant-kr-meena - [various PRs](https://github.com/yCodeTech/valet-windows/pulls
 
 Onecentlin - [Update Laravel Installer requirements PR](https://github.com/yCodeTech/valet-windows/pull/10)
 
+Jerrens - [Changed AcrylicDNS binding address PR](https://github.com/yCodeTech/valet-windows/pull/15)
+
 ## Changelog
 
 Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.

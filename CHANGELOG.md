@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/yCodeTech/valet-windows/tree/master)
 
+## [3.1.4](https://github.com/yCodeTech/valet-windows/tree/v3.1.4) - 2024-08/06
+
+### Fixed
+
+- Fixed a bug with AcrylicDNS when Valet is installed on Linux on Windows via WSL2, WSL2 wouldn't launch on system reboot (Fix PR by @jerrens in https://github.com/yCodeTech/valet-windows/pull/15).
+  - Changed the binding address to `127.0.0.1` instead of `0.0.0.0`. Fixes https://github.com/yCodeTech/valet-windows/issues/14
+
 ## [3.1.3](https://github.com/yCodeTech/valet-windows/tree/v3.1.3) - 2024-05-23
 
 ### Fixed
