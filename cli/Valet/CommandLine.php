@@ -37,7 +37,7 @@ class CommandLine {
 	 * @param boolean $realTimeOutput Set to `true` to get the output in real time as the command is running. Default: `false`
 	 * @return ProcessOutput
 	 */
-	public function run($command, callable $onError = null, $realTimeOutput = false) {
+	public function run($command, callable|null $onError = null, $realTimeOutput = false){
 		return $this->runCommand($command, $onError, $realTimeOutput);
 	}
 
@@ -49,7 +49,7 @@ class CommandLine {
 	 * @param boolean $realTimeOutput Set to `true` to get the output in real time as the command is running. Default: `false`
 	 * @return ProcessOutput
 	 */
-	public function runAsUser($command, callable $onError = null, $realTimeOutput = false) {
+	public function runAsUser($command, callable|null $onError = null, $realTimeOutput = false) {
 		return $this->runCommand($command, $onError, $realTimeOutput);
 	}
 
@@ -61,7 +61,7 @@ class CommandLine {
 	 * @param boolean $realTimeOutput Set to `true` to get the output in real time as the command is running. Default: `false`
 	 * @return ProcessOutput
 	 */
-	public function powershell(string $command, callable $onError = null, $realTimeOutput = false) {
+	public function powershell(string $command, callable|null $onError = null, $realTimeOutput = false) {
 		return $this->runCommand("powershell -command \"$command\"", $onError, $realTimeOutput);
 	}
 
@@ -73,7 +73,7 @@ class CommandLine {
 	 * @param boolean $realTimeOutput Set to `true` to get the output in real time as the command is running. Default: `false`
 	 * @return ProcessOutput
 	 */
-	public function runOrExit($command, callable $onError = null, $realTimeOutput = false) {
+	public function runOrExit($command, callable|null $onError = null, $realTimeOutput = false) {
 		return $this->run($command, function ($code, $output) use ($onError) {
 			if ($onError) {
 				$onError($code, $output);
@@ -91,7 +91,7 @@ class CommandLine {
 	 * @param boolean $realTimeOutput Set to `true` to get the output in real time as the command is running. Default: `false`
 	 * @return ProcessOutput|void Returns a ProcessOutput only if the real time is `false`, otherwise it doesn't return anything (void) as it's echoing out in real time.
 	 */
-	public function runCommand($command, callable $onError = null, $realTimeOutput = false) {
+	public function runCommand($command, callable|null $onError = null, $realTimeOutput = false) {
 		$onError = $onError ?: function () {
 		};
 
