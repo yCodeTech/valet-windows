@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/yCodeTech/valet-windows/tree/master)
 
+
+## [3.1.5](https://github.com/yCodeTech/valet-windows/tree/v3.1.4) - 2025-03-03
+
+### Fixed
+
+- Fixed a deprecation notice in PHP 8.4:
+
+  > Valet\CommandLine::run(): Implicitly marking parameter $onError as nullable is deprecated, the explicit nullable type must be used instead.
+
+  When an optional function argument is typed eg. `callable $onError = null`, it is implicitly casted to `null` via it's default value, this is now deprecated in 8.4. Usually we can just use a union type `callable|null`, this is explicitly tells PHP it is either `callable` **or** `null`. However, union types were only introduced in 8.0. 
+	To keep backward compatibility for PHP 7, we can use the nullable type operator (`?`) instead. 
+
+	Using the nullable type operator fixes the deprecation notice in 8.4 and is backwards compatible for PHP 7 and 8.
+
 ## [3.1.4](https://github.com/yCodeTech/valet-windows/tree/v3.1.4) - 2024-08/06
 
 ### Fixed
