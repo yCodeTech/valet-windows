@@ -8,7 +8,7 @@ class CommandLine {
 	/**
 	 * Pass the command to the command line and display the output.
 	 *
-	 * @param  string  $command
+	 * @param string $command
 	 * @return void
 	 */
 	public function passthru($command) {
@@ -32,8 +32,8 @@ class CommandLine {
 	/**
 	 * Run the given command as the non-root user.
 	 *
-	 * @param  string  $command
-	 * @param  callable  $onError
+	 * @param string $command
+	 * @param callable|null $onError
 	 * @param boolean $realTimeOutput Set to `true` to get the output in real time as the command is running. Default: `false`
 	 * @return ProcessOutput
 	 */
@@ -44,8 +44,8 @@ class CommandLine {
 	/**
 	 * Run the given command.
 	 *
-	 * @param  string  $command
-	 * @param  callable  $onError
+	 * @param string $command
+	 * @param callable|null $onError
 	 * @param boolean $realTimeOutput Set to `true` to get the output in real time as the command is running. Default: `false`
 	 * @return ProcessOutput
 	 */
@@ -56,8 +56,8 @@ class CommandLine {
 	/**
 	 * Run the given command with PowerShell.
 	 *
-	 * @param  string  $command
-	 * @param  callable|null  $onError
+	 * @param string $command
+	 * @param callable|null $onError
 	 * @param boolean $realTimeOutput Set to `true` to get the output in real time as the command is running. Default: `false`
 	 * @return ProcessOutput
 	 */
@@ -68,12 +68,16 @@ class CommandLine {
 	/**
 	 * Run the given command and exit if fails.
 	 *
-	 * @param  string  $command
-	 * @param  callable  $onError  (int $code, string $output)
+	 * @param string $command
+	 * @param callable|null $onError
 	 * @param boolean $realTimeOutput Set to `true` to get the output in real time as the command is running. Default: `false`
 	 * @return ProcessOutput
 	 */
 	public function runOrExit($command, ?callable $onError = null, $realTimeOutput = false) {
+		/**
+		 * @param int $code Error code
+		 * @param string $output Error output
+		 */
 		return $this->run($command, function ($code, $output) use ($onError) {
 			if ($onError) {
 				$onError($code, $output);
@@ -86,8 +90,8 @@ class CommandLine {
 	/**
 	 * Run the given command.
 	 *
-	 * @param  string  $command
-	 * @param  callable  $onError
+	 * @param string $command
+	 * @param callable|null $onError
 	 * @param boolean $realTimeOutput Set to `true` to get the output in real time as the command is running. Default: `false`
 	 * @return ProcessOutput|void Returns a ProcessOutput only if the real time is `false`, otherwise it doesn't return anything (void) as it's echoing out in real time.
 	 */
