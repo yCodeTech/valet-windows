@@ -16,7 +16,9 @@
 composer global require ycodetech/valet-windows
 ```
 
-> **Warning** **If you're coming from <a href="https://github.com/cretueusebiu/valet-windows">cretueusebiu/valet-windows</a>, then you need to make sure to fully uninstall it from your computer, deleting all configs, and removing from composer with `composer global remove cretueusebiu/valet-windows`, before installing this 3.0 version.**
+> [!WARNING]
+>
+> **If you're coming from <a href="https://github.com/cretueusebiu/valet-windows">cretueusebiu/valet-windows</a>, then you need to make sure to fully uninstall it from your computer, deleting all configs, and removing from composer with `composer global remove cretueusebiu/valet-windows`, before installing this 3.0 version.**
 
 <br>
 
@@ -152,29 +154,33 @@ Before installation, make sure that no other programs such as Apache or Nginx ar
 
 Also make sure to open your preferred terminal (Windows Terminal, CMD, Git Bash, PowerShell, etc.) as Administrator. You can use VS Code integrated terminal, but if VS Code isn't opened as Administrator, then a bunch of User Account Control (UAC) pop ups will appear in order to give access to Valet. You can also use a non Administrator terminal without the popups, you'll just need to use Valet's [`sudo`](#sudo) command before any other Valet commands.
 
-NOTE: Laravel Valet Windows 3 is **developed and tested to run on Windows 10**. In theory it should run on Windows 11 and up, but there's no guarantee. Testers and contributors are always welcome though.
+> [!NOTE]
+>
+> Laravel Valet <em>Windows</em> 3 is **developed and tested to run on Windows 10**. In theory it should run on Windows 11 and up, but there's no guarantee. Testers and contributors are always welcome though.
 
 ---
 
-- If you don't have PHP installed, make sure to [install](https://windows.php.net/download) it.
+-   If you don't have PHP installed, make sure to [install](https://windows.php.net/download) it.
 
-  Download the Zip file and unzip into a directory of your choosing. The recommended directory is: `C:/php/`.
+    Download the Zip file and unzip into a directory of your choosing. The recommended directory is: `C:/php/`.
 
-  You may use Thread Safe (TS), but Non-Thread Safe (NTS) is better for using PHP on the FastCGI protocol, which Valet uses.
+    You may use Thread Safe (TS), but Non-Thread Safe (NTS) is better for using PHP on the FastCGI protocol, which Valet uses.
 
-  > For NTS binaries the widespread use case is interaction with a web server through the FastCGI protocol, utilizing no multithreading (but also for example CLI).
+    > For NTS binaries the widespread use case is interaction with a web server through the FastCGI protocol, utilizing no multithreading (but also for example CLI).
 
-- If you don't have Composer installed, make sure to [install](https://getcomposer.org/doc/00-intro.md#installation-windows) it.
+-   If you don't have Composer installed, make sure to [install](https://getcomposer.org/doc/00-intro.md#installation-windows) it.
 
-- Install Valet with Composer via `composer global require ycodetech/valet-windows`.
+-   Install Valet with Composer via `composer global require ycodetech/valet-windows`.
 
-  <p align="center"><img src="./composer_laravel_valet_windows_3_logo.svg" style="width:400px; background: none;"></p>
+    <p align="center"><img src="./composer_laravel_valet_windows_3_logo.svg" style="width:400px; background: none;"></p>
 
-  > **Warning** **If you're coming from <a href="https://github.com/cretueusebiu/valet-windows">cretueusebiu/valet-windows</a>, then you need to make sure to fully uninstall it from your computer, deleting all configs, and removing from composer with `composer global remove cretueusebiu/valet-windows`, before installing this 3.0 version.**
+    > [!WARNING]
+    >
+    > **If you're coming from <a href="https://github.com/cretueusebiu/valet-windows">cretueusebiu/valet-windows</a>, then you need to make sure to fully uninstall it from your computer, deleting all configs, and removing from composer with `composer global remove cretueusebiu/valet-windows`, before installing this 3.0 version.**
 
-- Install Valet by running the `valet install` command, or alternatively `valet sudo install` with administrator elevation. This will configure and install Valet and register Valet's daemon to launch when your system starts. Once installed, Valet will automatically start it's services.
+-   Install Valet by running the `valet install` command, or alternatively `valet sudo install` with administrator elevation. This will configure and install Valet and register Valet's daemon to launch when your system starts. Once installed, Valet will automatically start it's services.
 
-- If you're installing on Windows 10/11, you may need to [manually configure](https://mayakron.altervista.org/support/acrylic/Windows10Configuration.htm) Windows to use the [Acrylic DNS Proxy](https://mayakron.altervista.org/support/acrylic/Home.htm).
+-   If you're installing on Windows 10/11, you may need to [manually configure](https://mayakron.altervista.org/support/acrylic/Windows10Configuration.htm) Windows to use the [Acrylic DNS Proxy](https://mayakron.altervista.org/support/acrylic/Home.htm).
 
 Valet will automatically start its daemon each time your machine boots. There is no need to run `valet start` or `valet install` ever again once the initial Valet installation is complete.
 
@@ -200,17 +206,19 @@ Valet installed and started successfully!
 
 This installs all Valet services:
 
-- Nginx
-- PHP CGI
-- PHP Xdebug CGI [optional]
-- Acrylic DNS
-- Ansicon
+-   Nginx
+-   PHP CGI
+-   PHP Xdebug CGI [optional]
+-   Acrylic DNS
+-   Ansicon
 
 And it's configs in `C:\Users\Username\.config\valet`.
 
 Once complete, Valet will automatically start the services.
 
-###### Note: If `install` is ran again when it's already installed, Valet will ask if you want to proceed to reinstall.
+> [!NOTE]
+>
+> If `install` is ran again when it's already installed, Valet will ask if you want to proceed to reinstall.
 
 ###### install --xdebug
 
@@ -361,11 +369,15 @@ $ valet php:add "C:\php\7.4"
 PHP 7.4.33 from C:\php\7.4 has been added.
 ```
 
-###### **Note:** When adding PHP, the full version number (eg. 7.4.33) will be extracted and an alias (eg. 7.4) will be generated. Either of these can be used in other commands.
+> [!NOTE]
+>
+> When adding PHP, the full version number (eg. 7.4.33) will be extracted and an alias (eg. 7.4) will be generated. Either of these can be used in other commands.
+>
+> Furthermore, the details of the versions will be written to the config in a natural decending order that adheres to decimals. This means that when two minor versions (like 8.1.8 and 8.1.18) of an alias (8.1) are added, and the default PHP is then set to use the alias, then Valet will use the most recent version of the alias, which in this case would be 8.1.18.
 
-###### Furthermore, the details of the versions will be written to the config in a natural decending order that adheres to decimals. This means that when two minor versions (like 8.1.8 and 8.1.18) of an alias (8.1) are added, and the default PHP is then set to use the alias, then Valet will use the most recent version of the alias, which in this case would be 8.1.18.
-
-###### Note: You may specify the path without quotes, but if the directory has spaces in like `C:/Program Files/php/7.4` then it _must_ be surrounded in quotes. Otherwise valet will encounter an error.
+> [!TIP]
+>
+> You may specify the path without quotes, but if the directory has spaces in like `C:/Program Files/php/7.4` then it _must_ be surrounded in quotes. Otherwise valet will encounter an error.
 
 ###### php:add --xdebug
 
@@ -402,7 +414,9 @@ $ valet php:remove --path="C:\php\7.4"
 PHP 7.4.33 from c:\php\7.4 has been removed.
 ```
 
-###### Note: If Xdebug is installed for the PHP being removed, then Valet will also remove Xdebug for that version too.
+> [!NOTE]
+>
+> If Xdebug is installed for the PHP being removed, then Valet will also remove Xdebug for that version too.
 
 ##### php:install
 
@@ -490,7 +504,9 @@ Installing Xdebug services...
 Installed Xdebug for PHP 7.4.33
 ```
 
-###### Note: If Xdebug for the supplied PHP version is already installed, Valet will ask if you want it reinstalling.
+> [!NOTE]
+>
+> If Xdebug for the supplied PHP version is already installed, Valet will ask if you want it reinstalling.
 
 ##### xdebug:uninstall
 
@@ -530,7 +546,9 @@ Setting the default PHP version to [8.1.8].
 Valet is now using 8.1.8.
 ```
 
-###### Note: If using the alias, and multiple versions of 8.1 are available eg. 8.1.8 and 8.1.18, then the most latest version will be used eg. 8.1.18.
+> [!NOTE]
+>
+> If using the alias, and multiple versions of 8.1 are available eg. 8.1.8 and 8.1.18, then the most latest version will be used eg. 8.1.18.
 
 ##### isolate
 
@@ -539,7 +557,9 @@ isolate   [phpVersion]  Isolates the current working directory to a specific PHP
           [--site=]     Optionally specify the site instead of the current working directory
 ```
 
-###### Note: You can isolate 1 or more sites at a time. Just pass the `--site` option for each of the sites you wish to isolate to the same PHP version.
+> [!TIP]
+>
+> You can isolate 1 or more sites at a time. Just pass the `--site` option for each of the sites you wish to isolate to the same PHP version.
 
 ```console
 $ cd /d/sites/my_site
@@ -623,7 +643,9 @@ $ valet secure site1
 The [site1.test] site has been secured with a fresh TLS certificate and will now be served over HTTPS.
 ```
 
-###### Note: The secure command (or secure option in any other commands) need to be used in an admin privileged/elevated terminal. Either open a terminal as administrator or use the [`sudo`](#sudo) command.
+> [!TIP]
+>
+> The secure command (or secure option in any other commands) need to be used in an admin privileged/elevated terminal. Either open a terminal as administrator or use the [`sudo`](#sudo) command.
 
 ##### secured
 
@@ -704,7 +726,9 @@ To view all registered directories, use the [`paths`](#paths) command.
 parked  List all the current sites within parked paths
 ```
 
-###### Note: If there's a parked site that is also a symbolic linked site, then it will also output the linked site name (aka alias) and it's URL (aka alias URL).
+> [!NOTE]
+>
+> If there's a parked site that is also a symbolic linked site, then it will also output the linked site name (aka alias) and it's URL (aka alias URL).
 
 ```console
 $ valet parked
@@ -845,7 +869,9 @@ $ valet unlink cool_site
 The [cool_site] symbolic link has been removed.
 ```
 
-###### Note: If the linked site is `secured`, Valet will unsecure it before removing.
+> [!NOTE]
+>
+> If the linked site is `secured`, Valet will unsecure it before removing.
 
 ```console
 $ valet unlink cool_site
@@ -853,7 +879,9 @@ Unsecuring cool_site...
 The [cool_site] symbolic link has been removed.
 ```
 
-###### Note: If the linked site is `isolated`, Valet will unisolate it before removing.
+> [!NOTE]
+>
+> If the linked site is `isolated`, Valet will unisolate it before removing.
 
 ```console
 $ valet unlink cool_site
@@ -968,7 +996,9 @@ $ valet sites
 
 ### Sharing
 
-###### Note: ngrok ships with Valet internally, there is no need to download it separately.
+> [!NOTE]
+>
+> ngrok ships with Valet internally, there is no need to download it separately.
 
 ##### share
 
@@ -992,7 +1022,9 @@ Before sharing a site with ngrok, you must first set the authtoken using Valet's
 
 When using the command, a new CMD terminal will be launched with the ngrok information, including the public URL to share.
 
-###### Note: The URL won't be copied to the clipboard, however, in a separate terminal, you can use the [`fetch-share-url` command](#fetch-share-url).
+> [!NOTE]
+>
+> The URL won't be copied to the clipboard, however, in a separate terminal, you can use the [`fetch-share-url` command](#fetch-share-url).
 
 ###### share --options
 
@@ -1005,7 +1037,9 @@ $ cd /d/sites/site1
 $ valet share -o domain=example.com
 ```
 
-###### Note: If you're already sharing a project, and try to share another project simultaneously, the new cmd window may open for a split second and then close. This is due to ngrok failing silently, and won't output any error messages. To output the errors, pass the `--debug` flag to the command. This will cause ngrok to try to run in the current terminal instead of a new window, thus sending the error messages.
+> [!NOTE]
+>
+> If you're already sharing a project, and try to share another project simultaneously, the new cmd window may open for a split second and then close. This is due to ngrok failing silently, and won't output any error messages. To output the errors, pass the `--debug` flag to the command. This will cause ngrok to try to run in the current terminal instead of a new window, thus sending the error messages.
 
 ##### auth|set-ngrok-token
 
@@ -1099,11 +1133,13 @@ $ valet tld code
 Your Valet TLD has been updated to [code].
 ```
 
-It's important to note, when choosing a TLD, you need to be careful not to use one that could potentially be used on the Web. If your site name and TLD match a real web address, then the browser will resolve the request and redirect it to the real website instead of Valet resolving it to your local project.
-
-Example: Your local Roots Bedrock site on `bedrock.dev` will redirect to the Minecraft Bedrock website.
-
-Generally, the [special-use domains listed on Wikipedia](https://en.wikipedia.org/wiki/List_of_Internet_top-level_domains#Special-Use_Domains), and any unique custom ones like `.code`, are all good to use as they are invalid TLDs.
+> [!CAUTION]
+>
+> When choosing a TLD, you need to be careful not to use one that could potentially be used on the Web. If your site name and TLD match a real web address, then the browser will resolve the request and redirect it to the real website instead of Valet resolving it to your local project.
+>
+> Example: Your local Roots Bedrock site on `bedrock.dev` will redirect to the Minecraft Bedrock website.
+>
+> Generally, the [special-use domains listed on Wikipedia](https://en.wikipedia.org/wiki/List_of_Internet_top-level_domains#Special-Use_Domains), and any unique custom ones like `.code`, are all good to use as they are invalid TLDs.
 
 <img align="center" src="./The_same_icon.svg" style="width:20px;"> This command is the same as the Mac version.
 Note: the Mac version has officially discontinued it's use; whereas Valet Windows 3 won't.
@@ -1234,7 +1270,9 @@ $ valet log nginx --follow
 $ valet log nginx -f
 ```
 
-###### Note: `--follow` is set to stream output "forever" (though one can never be too sure if it actually is forever). To stop the output stream, you need to press `ctrl+C`.
+> [!TIP]
+>
+> `--follow` is set to stream output "forever" (though one can never be too sure if it actually is forever). To stop the output stream, you need to press `ctrl+C`.
 
 <img align="center" src="./The_same_icon.svg" style="width:20px;"> This command is the same as the Mac version.
 
@@ -1319,84 +1357,84 @@ This command is a way to determine how much parity has been achieved.
 
 These are **important notes** for the commands that have the `--options` or `--valetOptions`.
 
-- The `--options`, `--valetOptions` (shortcut `-o`) options can be used to pass options/flags to the service related to that command.
+-   The `--options`, `--valetOptions` (shortcut `-o`) options can be used to pass options/flags to the service related to that command.
 
-  Just pass the option name without the `--` prefix eg. `--options=config=C:/path/ngrok.yml` (example for the `ngrok` command). This is so that Valet doesn't get confused with it's own options.
+    Just pass the option name without the `--` prefix eg. `--options=config=C:/path/ngrok.yml` (example for the `ngrok` command). This is so that Valet doesn't get confused with it's own options.
 
-  All options/flags that are passed will be prefixed with `--` after Valet has processed the command, unless it's a shortcut of a single character, then it will be prefixed with `-`. The example above will run as `--config=C:/path/ngrok.yml`.
+    All options/flags that are passed will be prefixed with `--` after Valet has processed the command, unless it's a shortcut of a single character, then it will be prefixed with `-`. The example above will run as `--config=C:/path/ngrok.yml`.
 
-- The `=` immediately after the command option is optional, if it's omitted, you must use a space instead.
+-   The `=` immediately after the command option is optional, if it's omitted, you must use a space instead.
 
-  ```
-  --options=option1
-  --options option1
-  --valetOptions=option1
-  --valetOptions option1
-  ```
+    ```
+    --options=option1
+    --options option1
+    --valetOptions=option1
+    --valetOptions option1
+    ```
 
-- The options also have `-o` shortcuts and it cannot have the `=` character, it must use a space for separation.
+-   The options also have `-o` shortcuts and it cannot have the `=` character, it must use a space for separation.
 
-  ```console
-  -o option1
-  ```
+    ```console
+    -o option1
+    ```
 
-  This falls inline with Symfony's docs and complies with command-line standards.
+    This falls inline with Symfony's docs and complies with command-line standards.
 
-  ###### From [Symfony's docs](https://symfony.com/doc/current/console/input.html#using-command-options):
+    ###### From [Symfony's docs](https://symfony.com/doc/current/console/input.html#using-command-options):
 
-  > ###### Note that to comply with the docopt standard, long options can specify their values after a whitespace or an `=` sign (e.g. `--iterations 5` or `--iterations=5`), but short options can only use whitespaces or no separation at all (e.g. `-i 5` or `-i5`).
+    > ###### Note that to comply with the docopt standard, long options can specify their values after a whitespace or an `=` sign (e.g. `--iterations 5` or `--iterations=5`), but short options can only use whitespaces or no separation at all (e.g. `-i 5` or `-i5`).
 
-- The options also allows multiple options to be passed, they just need to be separated with double slashes `//`.
+-   The options also allows multiple options to be passed, they just need to be separated with double slashes `//`.
 
-  ```console
-  --valetOptions=option1//option2//option3
-  --options option1//option2//option3
-  -o option1//option2//option3
-  ```
+    ```console
+    --valetOptions=option1//option2//option3
+    --options option1//option2//option3
+    -o option1//option2//option3
+    ```
 
 ### Command Parity Checker
 
 Commands that have been tested and made parity:
 
-- [ ] composer - not applicable
-- [x] diagnose
-- [x] directory-listing
-- [x] fetch-share-url
-- [x] forget
-- [x] install
-- [x] isolate
-- [x] isolated
-- [x] link
-- [x] links
-- [x] log
-- [ ] loopback - not applicable
-- [x] on-latest-version
-- [x] open
-- [x] park
-- [x] parked
-- [x] paths
-- [ ] php (proxying commands to PHP CLI) - Possible far future feature?
-- [x] proxies
-- [x] proxy
-- [x] restart
-- [x] secure
-- [x] secured
-- [x] set-ngrok-token
-- [x] share
-- [ ] share-tool - Next feature drop
-- [x] start
-- [x] status - renamed to `services`
-- [x] stop
-- [x] tld
-- [ ] trust - not applicable
-- [x] uninstall
-- [x] unisolate
-- [x] unlink
-- [x] unproxy
-- [x] unsecure
-- [x] use
-- [x] which
-- [x] which-php - renamed to `php:which`
+-   [ ] composer - not applicable
+-   [x] diagnose
+-   [x] directory-listing
+-   [x] fetch-share-url
+-   [x] forget
+-   [x] install
+-   [x] isolate
+-   [x] isolated
+-   [x] link
+-   [x] links
+-   [x] log
+-   [ ] loopback - not applicable
+-   [x] on-latest-version
+-   [x] open
+-   [x] park
+-   [x] parked
+-   [x] paths
+-   [ ] php (proxying commands to PHP CLI) - Possible far future feature?
+-   [x] proxies
+-   [x] proxy
+-   [x] restart
+-   [x] secure
+-   [x] secured
+-   [x] set-ngrok-token
+-   [x] share
+-   [ ] share-tool - Next feature drop
+-   [x] start
+-   [x] status - renamed to `services`
+-   [x] stop
+-   [x] tld
+-   [ ] trust - not applicable
+-   [x] uninstall
+-   [x] unisolate
+-   [x] unlink
+-   [x] unproxy
+-   [x] unsecure
+-   [x] use
+-   [x] which
+-   [x] which-php - renamed to `php:which`
 
 To see a calculation of how much parity has been achieved, see the [parity command](#parity).
 
@@ -1428,46 +1466,52 @@ Doesn't affect valet functionality.
 
 ## Known Issues
 
-- WSL2 distros fail because of Acrylic DNS Proxy ([microsoft/wsl#4929](https://github.com/microsoft/WSL/issues/4929)). Use `valet stop`, start WSL2 then `valet start`.
-- The PHP-CGI process uses port 9001. If it's already used change it in `~/.config/valet/config.json` and run `valet install` again.
-- When sharing sites the url will not be copied to the clipboard.
-- ~~You must run the `valet` commands from the drive where Valet is installed, except for park and link. See [#12](https://github.com/cretueusebiu/valet-windows/issues/12#issuecomment-283111834).~~ All commands seem to work fine on all drives.
-- If your machine is not connected to the internet you'll have to manually add the domains in your `hosts` file or you can install the [Microsoft Loopback Adapter](https://docs.microsoft.com/en-us/troubleshoot/windows-server/networking/install-microsoft-loopback-adapter) as this simulates an active local network interface that Valet can bind too.
-- When trying to run Valet on PHP 7.4 and you get this error:
+-   WSL2 distros fail because of Acrylic DNS Proxy ([microsoft/wsl#4929](https://github.com/microsoft/WSL/issues/4929)). Use `valet stop`, start WSL2 then `valet start`.
+-   The PHP-CGI process uses port 9001. If it's already used change it in `~/.config/valet/config.json` and run `valet install` again.
+-   When sharing sites the url will not be copied to the clipboard.
+-   ~~You must run the `valet` commands from the drive where Valet is installed, except for park and link. See [#12](https://github.com/cretueusebiu/valet-windows/issues/12#issuecomment-283111834).~~ All commands seem to work fine on all drives.
+-   If your machine is not connected to the internet you'll have to manually add the domains in your `hosts` file or you can install the [Microsoft Loopback Adapter](https://docs.microsoft.com/en-us/troubleshoot/windows-server/networking/install-microsoft-loopback-adapter) as this simulates an active local network interface that Valet can bind too.
+-   When trying to run Valet on PHP 7.4 and you get this error:
 
-  > Composer detected issues in your platform:
-  >
-  > Your Composer dependencies require a PHP version ">= 8.1.0". You are running 7.4.33.
-  >
-  > PHP Fatal error: Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.1.0". You are running 7.4.33. in C:\Users\Username\AppData\Roaming\Composer\vendor\composer\platform_check.php on line 24
+    > Composer detected issues in your platform:
+    >
+    > Your Composer dependencies require a PHP version ">= 8.1.0". You are running 7.4.33.
+    >
+    > PHP Fatal error: Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.1.0". You are running 7.4.33. in C:\Users\Username\AppData\Roaming\Composer\vendor\composer\platform_check.php on line 24
 
-  It means that a dependency of Valet's dependencies requires 8.1. You can rectify this error by running `composer global update` while on 7.4, and composer will downgrade any global dependencies to versions that will work on 7.4. See this [Stack Overflow answer](https://stackoverflow.com/a/75080139/2358222).
+    It means that a dependency of Valet's dependencies requires 8.1. You can rectify this error by running `composer global update` while on 7.4, and composer will downgrade any global dependencies to versions that will work on 7.4. See this [Stack Overflow answer](https://stackoverflow.com/a/75080139/2358222).
 
-  ###### NOTE #1: This will of course downgrade all global packages. Depending on the packages, it may break some things. If you just want to downgrade valet dependencies, then you can specify the Valet namespace. `composer global update ycodetech/valet-windows`.
+    > [!NOTE]
+    >
+    > This will of course downgrade all global packages. Depending on the packages, it may break some things. If you just want to downgrade valet dependencies, then you can specify the Valet namespace. `composer global update ycodetech/valet-windows`.
 
-  ###### NOTE #2: It's recommended to use PHP 8.1 anyway, downgrading will mean some things may break or cause visual glitches in the terminal output. So downgrade at your own risk.
+    > [!WARNING]
+    >
+    > It's recommended to use PHP 8.1 anyway, downgrading will mean some things may break or cause visual glitches in the terminal output. So downgrade at your own risk.
 
-  ###### Note #3: Make sure you uninstall Valet before `composer global update`, to make sure all services have been stopped and uninstalled before composer removes and updates them.
+    > [!NOTE]
+    >
+    > Make sure you uninstall Valet before `composer global update`, to make sure all services have been stopped and uninstalled before composer removes and updates them.
 
-- If you're using a framework that uses a .env file and sets the domain name, such as `WP_HOME` for Laravel Bedrock, then make sure the TLD is the same as the one set for Valet. Otherwise, when trying to reach a site, the site will auto redirect to use the TLD in set in the .env.
+-   If you're using a framework that uses a .env file and sets the domain name, such as `WP_HOME` for Laravel Bedrock, then make sure the TLD is the same as the one set for Valet. Otherwise, when trying to reach a site, the site will auto redirect to use the TLD in set in the .env.
 
-  Example: `WP_HOME='http://mySite.test'`, Valet gets a request to `http://mySite.dev`, the site will auto redirect to `http://mySite.test`.
+    Example: `WP_HOME='http://mySite.test'`, Valet gets a request to `http://mySite.dev`, the site will auto redirect to `http://mySite.test`.
 
-  If this still happens after changing the TLD, then it has been cached by the browser, despite NGINX specifying headers not to cache. To rectify try `"Empty cache and hard reload"` option of the page reload button.
+    If this still happens after changing the TLD, then it has been cached by the browser, despite NGINX specifying headers not to cache. To rectify try `"Empty cache and hard reload"` option of the page reload button.
 
-- On rare occasions, you may encounter a WMI error:
+-   On rare occasions, you may encounter a WMI error:
 
-  > FATAL - WMI Operation failure: InvalidServiceControl
-  > <br>WMI.WmiException: InvalidServiceControl
-  > <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;at WMI.WmiRoot.BaseHandler.CheckError(ManagementBaseObject result)
-  > <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;at WMI.WmiRoot.InstanceHandler.Invoke(Object proxy, MethodInfo method, Object[] arguments)
-  > <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;at WinSW.Program.&lt;Run>g**Stop|2_3(<>c**DisplayClass2_0& )
-  > <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;at WinSW.Program.Run(String[] argsArray, IWinSWConfiguration descriptor)
-  > <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;at WinSW.Program.Main(String[] args)
+    > FATAL - WMI Operation failure: InvalidServiceControl
+    > <br>WMI.WmiException: InvalidServiceControl
+    > <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;at WMI.WmiRoot.BaseHandler.CheckError(ManagementBaseObject result)
+    > <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;at WMI.WmiRoot.InstanceHandler.Invoke(Object proxy, MethodInfo method, Object[] arguments)
+    > <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;at WinSW.Program.&lt;Run>g**Stop|2_3(<>c**DisplayClass2_0& )
+    > <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;at WinSW.Program.Run(String[] argsArray, IWinSWConfiguration descriptor)
+    > <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;at WinSW.Program.Main(String[] args)
 
-  While using `valet use`, the error may have been caused by Valet trying to stop the nginx service twice, of which [this commit](https://github.com/yCodeTech/valet-windows/commit/afcafffbc9e58c00ee54b59c6929f62f2cffa8a3) tries to fix. Though it's difficult to debug an error that only occurs 1% of the time, with it being useless in terms of information when it does.
+    While using `valet use`, the error may have been caused by Valet trying to stop the nginx service twice, of which [this commit](https://github.com/yCodeTech/valet-windows/commit/afcafffbc9e58c00ee54b59c6929f62f2cffa8a3) tries to fix. Though it's difficult to debug an error that only occurs 1% of the time, with it being useless in terms of information when it does.
 
-  If the WMI error does occur, try running the command again. If different WMI errors occur, please submit an issue with all relevant details.
+    If the WMI error does occur, try running the command again. If different WMI errors occur, please submit an issue with all relevant details.
 
 ## Xdebug Installation
 
