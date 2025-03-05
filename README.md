@@ -22,7 +22,7 @@ composer global require ycodetech/valet-windows
 
 <br>
 
-[Introduction](#introduction) | [Installation](#installation) | [Commands](#commands) | [Command Parity Checker](#command-parity-checker) | [Deprecations and Removals](#deprecations-and-removals) | [Known Issues](#known-issues) | [Xdebug Installation](#xdebug-installation) | [Contributions](#contributions)
+[Introduction](#introduction) | [Installation](#installation) | [Commands](#commands) | [Command Parity Checker](#command-parity-checker) | [Deprecations and Removals](#deprecations-and-removals) | [Emergency Stop and Uninstall Services](#emergency-stop-and-uninstall-services) | [Known Issues](#known-issues) | [Xdebug Installation](#xdebug-installation) | [Contributions](#contributions)
 
 ---
 
@@ -333,6 +333,12 @@ Valet has been removed from your system.
 This completely stops and uninstalls all of Valet's services.
 
 You will also need to `uninstall` Valet if you are wanting to update Valet via Composer (`composer global update ycodetech/valet-windows`), just to make sure Composer can remove and update relevant files without error.
+
+> [!CAUTION]
+>
+> If `composer global update` is ran before valet is uninstalled, then several running services may prevent composer from removing the files and updating valet.
+>
+> If this happens you can use the `emergency_uninstall_services.bat` file to stop and uninstall the services. See [Emergency Stop and Uninstall Services](#emergency-stop-and-uninstall-services) section.
 
 ###### --force
 
@@ -1464,6 +1470,20 @@ Doesn't affect valet functionality.
    - cross = &#x2717;
 -->
 
+## Emergency Stop and Uninstall Services
+
+As of v3.1.6, Valet has an emergency stop and uninstall services script. This script is copied to the `/.config/valet` directory for safe keeping.
+
+So if `composer global update` is ran before valet is uninstalled, and several running services prevent composer from removing the files and updating valet, then you can run the `emergency_uninstall_services.bat` file to stop and uninstall the services.
+
+To run, open a CMD terminal with Admin privileges and run this:
+
+```sh
+> %UserProfile%\.config\valet\emergency_uninstall_services.bat
+```
+
+All services will have been stopped and you can then be able to run `composer global update`.
+
 ## Known Issues
 
 -   WSL2 distros fail because of Acrylic DNS Proxy ([microsoft/wsl#4929](https://github.com/microsoft/WSL/issues/4929)). Use `valet stop`, start WSL2 then `valet start`.
@@ -1491,7 +1511,7 @@ Doesn't affect valet functionality.
 
     > [!NOTE]
     >
-    > Make sure you uninstall Valet before `composer global update`, to make sure all services have been stopped and uninstalled before composer removes and updates them.
+    > Make sure you uninstall Valet before `composer global update`, to make sure all services have been stopped and uninstalled before composer removes and updates them. Otherwise errors occur and composer can't update in-use files. If this does happen please refer to the [Emergency Stop and Uninstall Services](#emergency-stop-and-uninstall-services) section.
 
 -   If you're using a framework that uses a .env file and sets the domain name, such as `WP_HOME` for Laravel Bedrock, then make sure the TLD is the same as the one set for Valet. Otherwise, when trying to reach a site, the site will auto redirect to use the TLD in set in the .env.
 

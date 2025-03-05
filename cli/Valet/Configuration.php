@@ -36,6 +36,13 @@ class Configuration {
 		$this->createXdebugDirectory();
 		$this->writeBaseConfiguration();
 
+		// Copy the emergency stop and uninstall services script to the Valet home
+		// directory for safe keeping.
+		$this->files->copy(
+			realpath(__DIR__ . '/../../emergency_uninstall_services.bat'),
+			$this->valetHomePath("emergency_uninstall_services.bat")
+		);
+
 		$this->files->chown($this->path(), user());
 	}
 
