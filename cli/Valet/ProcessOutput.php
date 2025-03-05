@@ -13,7 +13,7 @@ class ProcessOutput {
 	/**
 	 * Create a new test process instance.
 	 *
-	 * @param  \Symfony\Component\Process\Process  $process
+	 * @param \Symfony\Component\Process\Process $process
 	 * @return void
 	 */
 	public function __construct(Process $process) {
@@ -48,8 +48,8 @@ class ProcessOutput {
 	/**
 	 * Handle dynamic calls into macros or pass missing methods to the base process.
 	 *
-	 * @param  string  $method
-	 * @param  array  $args
+	 * @param string $method
+	 * @param array $args
 	 * @return mixed
 	 */
 	public function __call($method, $args) {

@@ -23,7 +23,7 @@ class Ngrok {
 	/**
 	 * Create a new Nginx instance.
 	 *
-	 * @param  CommandLine  $cli
+	 * @param CommandLine $cli
 	 * @return void
 	 */
 	public function __construct(CommandLine $cli) {
@@ -31,7 +31,7 @@ class Ngrok {
 	}
 
 	/**
-	 * @param  string  $command
+	 * @param string $command
 	 * @return void
 	 */
 	public function run(string $command) {
@@ -41,10 +41,10 @@ class Ngrok {
 	}
 
 	/**
-	 * @param  string  $site The site
-	 * @param  int  $port The site's port
+	 * @param string $site The site
+	 * @param int $port The site's port
 	 * @param bool $debug Allow debug error output
-	 * @param  array  $options Options/flags to pass to ngrok
+	 * @param array $options Options/flags to pass to ngrok
 	 * @return void
 	 */
 	public function start(string $site, int $port, $debug = false, array $options = []) {
@@ -116,7 +116,7 @@ Then use: <fg=magenta>valet set-ngrok-token [token]</>');
 	/**
 	 * Find the HTTP tunnel URL from the list of tunnels.
 	 *
-	 * @param  array  $tunnels
+	 * @param array $tunnels
 	 * @return string|null
 	 * @return void|string
 	 */

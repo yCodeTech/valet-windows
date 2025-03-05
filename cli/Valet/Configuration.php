@@ -13,7 +13,7 @@ class Configuration {
 	/**
 	 * Create a new Valet configuration class instance.
 	 *
-	 * @param  Filesystem  $filesystem
+	 * @param Filesystem $filesystem
 	 * @return void
 	 */
 	public function __construct(Filesystem $files) {
@@ -176,8 +176,6 @@ class Configuration {
 	/**
 	 * Add the given php path to the configuration.
 	 *
-	 * @param  string  $path
-	 * @param  bool  $prepend
 	 * @return void
 	 */
 	public function addDefaultPhp() {
@@ -193,7 +191,7 @@ class Configuration {
 	/**
 	 * Get the php configuration by path.
 	 *
-	 * @param  string  $phpPath
+	 * @param string $phpPath
 	 * @return mixed
 	 */
 	public function getPhp($phpPath) {
@@ -209,7 +207,7 @@ class Configuration {
 	/**
 	 * Get the php configuration by version.
 	 *
-	 * @param  string  $phpVersion
+	 * @param string $phpVersion
 	 * @return mixed
 	 */
 	public function getPhpByVersion($phpVersion) {
@@ -253,7 +251,7 @@ class Configuration {
 	/**
 	 * Add the given php path to the configuration.
 	 *
-	 * @param  string  $phpPath
+	 * @param string $phpPath
 	 * @return mixed
 	 */
 	public function addPhp($phpPath) {
@@ -307,7 +305,7 @@ class Configuration {
 	/**
 	 * Remove the given php path from the configuration.
 	 *
-	 * @param  string  $phpPath
+	 * @param string $phpPath
 	 * @return mixed
 	 */
 	public function removePhp($phpPath) {
@@ -345,8 +343,8 @@ class Configuration {
 	/**
 	 * Add the given path to the configuration.
 	 *
-	 * @param  string  $path
-	 * @param  bool  $prepend
+	 * @param string $path
+	 * @param bool $prepend
 	 * @return void
 	 */
 	public function addPath(string $path, bool $prepend = false) {
@@ -361,7 +359,7 @@ class Configuration {
 	/**
 	 * Prepend the given path to the configuration.
 	 *
-	 * @param  string  $path
+	 * @param string $path
 	 * @return void
 	 */
 	public function prependPath(string $path) {
@@ -372,7 +370,7 @@ class Configuration {
 	 * Remove the given path from the configuration.
 	 * Used by `valet forget`
 	 *
-	 * @param  string  $path
+	 * @param string $path
 	 * @return void
 	 */
 	public function removePath(string $path) {
@@ -421,8 +419,8 @@ class Configuration {
 	/**
 	 * Get an item from the configuration file using "dot" notation.
 	 *
-	 * @param  string|int|null  $key
-	 * @param  mixed  $default
+	 * @param string|int|null $key
+	 * @param mixed $default
 	 * @return mixed
 	 */
 	public function get($key, $default = null) {
@@ -432,8 +430,8 @@ class Configuration {
 	/**
 	 * Update a specific key in the configuration file.
 	 *
-	 * @param  string  $key
-	 * @param  mixed  $value
+	 * @param string $key
+	 * @param mixed $value
 	 * @return array
 	 */
 	public function updateKey(string $key, $value): array {
@@ -447,7 +445,7 @@ class Configuration {
 	/**
 	 * Write the given configuration to disk.
 	 *
-	 * @param  array  $config
+	 * @param array $config
 	 * @return void
 	 */
 	public function write(array $config) {
@@ -469,7 +467,7 @@ class Configuration {
 	/**
 	 * Get the Valet home path.
 	 *
-	 * @param  string  $path
+	 * @param string $path
 	 * @return string
 	 */
 	protected function valetHomePath(string $path = ''): string {

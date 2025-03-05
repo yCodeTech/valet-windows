@@ -11,7 +11,7 @@ class Ansicon {
 	/**
 	 * Create a new Ansicon instance.
 	 *
-	 * @param  CommandLine  $cli
+	 * @param CommandLine $cli
 	 * @return void
 	 */
 	public function __construct(CommandLine $cli) {

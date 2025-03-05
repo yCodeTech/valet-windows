@@ -16,8 +16,8 @@ class WinSwFactory {
 	/**
 	 * Create a new factory instance.
 	 *
-	 * @param  CommandLine  $cli
-	 * @param  Filesystem  $files
+	 * @param CommandLine $cli
+	 * @param Filesystem $files
 	 * @return void
 	 */
 	public function __construct(CommandLine $cli, Filesystem $files) {
@@ -28,8 +28,8 @@ class WinSwFactory {
 	/**
 	 * Make a new WinSW instance.
 	 *
-	 * @param  string  $service
-	 * @param  string  $serviceId
+	 * @param string $service
+	 * @param string $serviceId
 	 * @return WinSW
 	 */
 	public function make(string $service, string $serviceId) {

@@ -33,11 +33,11 @@ class Nginx {
 	/**
 	 * Create a new Nginx instance.
 	 *
-	 * @param  CommandLine  $cli
-	 * @param  Filesystem  $files
-	 * @param  Configuration  $configuration
-	 * @param  Site  $site
-	 * @param  WinSwFactory  $winsw
+	 * @param CommandLine $cli
+	 * @param Filesystem $files
+	 * @param Configuration $configuration
+	 * @param Site $site
+	 * @param WinSwFactory $winsw
 	 * @return void
 	 */
 	public function __construct(CommandLine $cli, Filesystem $files, Configuration $configuration, Site $site, WinSwFactory $winsw) {
@@ -209,7 +209,7 @@ class Nginx {
 	/**
 	 * Get the Nginx path.
 	 *
-	 * @param  string  $path
+	 * @param string $path
 	 * @return string
 	 */
 	public function path(string $path = ''): string {

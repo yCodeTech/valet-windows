@@ -30,7 +30,7 @@ define('COMPOSER_GLOBAL_PATH', trim(\Valet::getComposerGlobalPath()));
 /**
  * Output the given text to the console.
  *
- * @param  string  $output
+ * @param string $output
  * @return void
  */
 function info($output) {
@@ -41,7 +41,7 @@ function info($output) {
  * Debugging only.
  * Output the given array to the console using var_dump.
  *
- * @param  string  $output
+ * @param string $output
  * @return void
  */
 function info_dump($output) {
@@ -51,7 +51,7 @@ function info_dump($output) {
 /**
  * Output the given text to the console.
  *
- * @param  string  $output
+ * @param string $output
  * @return void
  */
 function warning($output) {
@@ -65,8 +65,8 @@ function warning($output) {
 /**
  * Output errors to the console.
  *
- * @param  string  $output
- * @param  boolean $exception
+ * @param string $output
+ * @param boolean $exception
  * @return void
  */
 function error(string $output, $exception = false) {
@@ -131,7 +131,7 @@ function getErrorTypeName($code) {
 /**
  * Output the given text to the console.
  *
- * @param  string  $output
+ * @param string $output
  * @return void
  */
 function output($output) {
@@ -165,8 +165,8 @@ if (!function_exists('array_is_list')) {
 /**
  * Output a table to the console.
  *
- * @param  array  $headers
- * @param  array  $rows
+ * @param array $headers
+ * @param array $rows
  * @return void
  */
 function table(array $headers = [], array $rows = [], $setHorizontal = false, $title = null) {
@@ -245,7 +245,7 @@ if (!function_exists('resolve')) {
 	/**
 	 * Resolve the given class from the container.
 	 *
-	 * @param  string  $class
+	 * @param string $class
 	 * @return mixed
 	 */
 	function resolve($class) {
@@ -256,8 +256,8 @@ if (!function_exists('resolve')) {
 /**
  * Swap the given class implementation in the container.
  *
- * @param  string  $class
- * @param  mixed  $instance
+ * @param string $class
+ * @param mixed $instance
  * @return void
  */
 function swap($class, $instance) {
@@ -268,9 +268,9 @@ if (!function_exists('retry')) {
 	/**
 	 * Retry the given function N times.
 	 *
-	 * @param  int  $retries
-	 * @param  callable  $retries
-	 * @param  int  $sleep
+	 * @param int $retries
+	 * @param callable $retries
+	 * @param int $sleep
 	 * @return mixed
 	 */
 	function retry($retries, $fn, $sleep = 0) {
@@ -298,8 +298,8 @@ if (!function_exists('tap')) {
 	/**
 	 * Tap the given value.
 	 *
-	 * @param  mixed  $value
-	 * @param  callable  $callback
+	 * @param mixed $value
+	 * @param callable $callback
 	 * @return mixed
 	 */
 	function tap($value, callable $callback) {
@@ -316,8 +316,8 @@ if (!function_exists('str_ends_with')) {
 	 * `str_ends_with` function was introduced in PHP 8.
 	 * This is a polyfill for backwards compatibility.
 	 *
-	 * @param  string  $haystack
-	 * @param  string|string[]  $needles
+	 * @param string $haystack
+	 * @param string|string[] $needles
 	 * @return bool
 	 */
 	function str_ends_with($haystack, $needles) {
@@ -338,8 +338,8 @@ if (!function_exists('str_starts_with')) {
 	 * `str_starts_with` function was introduced in PHP 8.
 	 * This is a polyfill for backwards compatibility.
 	 *
-	 * @param  string  $haystack
-	 * @param  string|string[]  $needles
+	 * @param string $haystack
+	 * @param string|string[] $needles
 	 * @return bool
 	 */
 	function str_starts_with($haystack, $needles) {

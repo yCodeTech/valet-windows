@@ -26,8 +26,8 @@ class WinSW {
 	/**
 	 * Create a new WinSW instance.
 	 *
-	 * @param  CommandLine  $cli
-	 * @param  Filesystem  $files
+	 * @param CommandLine $cli
+	 * @param Filesystem $files
 	 * @return void
 	 */
 	public function __construct(string $service, string $serviceId, CommandLine $cli, Filesystem $files) {
@@ -40,7 +40,7 @@ class WinSW {
 	/**
 	 * Install the service.
 	 *
-	 * @param  array  $args
+	 * @param array $args
 	 * @return void
 	 */
 	public function install(array $args = []) {
@@ -56,7 +56,7 @@ class WinSW {
 	/**
 	 * Create the .exe and .xml files.
 	 *
-	 * @param  array  $args
+	 * @param array $args
 	 * @return void
 	 */
 	protected function createConfiguration(array $args = []) {
@@ -167,7 +167,7 @@ class WinSW {
 	/**
 	 * Get the services path.
 	 *
-	 * @param  string  $path
+	 * @param string $path
 	 * @return string
 	 */
 	protected function servicesPath(string $path = ''): string {

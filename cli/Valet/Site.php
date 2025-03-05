@@ -14,9 +14,9 @@ class Site {
 	/**
 	 * Create a new Site instance.
 	 *
-	 * @param  Configuration  $config
-	 * @param  CommandLine  $cli
-	 * @param  Filesystem  $files
+	 * @param Configuration $config
+	 * @param CommandLine $cli
+	 * @param Filesystem $files
 	 * @return void
 	 */
 	public function __construct(Configuration $config, CommandLine $cli, Filesystem $files) {
@@ -28,7 +28,7 @@ class Site {
 	/**
 	 * Get the name of the site.
 	 *
-	 * @param  string|null  $name
+	 * @param string|null $name
 	 * @return string
 	 */
 	private function getRealSiteName($name) {
@@ -63,7 +63,7 @@ class Site {
 	/**
 	 * Get the real hostname for the given path, checking links.
 	 *
-	 * @param  string  $path
+	 * @param string $path
 	 * @return string|null
 	 */
 	public function host($path) {
@@ -79,8 +79,8 @@ class Site {
 	/**
 	 * Link the current working directory with the given name.
 	 *
-	 * @param  string  $target
-	 * @param  string  $link
+	 * @param string $target
+	 * @param string $link
 	 * @return string
 	 */
 	public function link($target, $link) {
@@ -99,7 +99,7 @@ class Site {
 	/**
 	 * Unlink the given symbolic link.
 	 *
-	 * @param  string  $name
+	 * @param string $name
 	 * @return void
 	 */
 	public function unlink($name) {
@@ -175,7 +175,7 @@ class Site {
 	/**
 	 * Get all certificates from config folder.
 	 *
-	 * @param  string  $path
+	 * @param string $path
 	 * @return \Illuminate\Support\Collection
 	 */
 	public function getCertificates($path = null) {
@@ -192,7 +192,7 @@ class Site {
 			$trimToString = '.';
 
 			// If we have the cert ending in our tld strip that tld specifically
-			// if not then just strip the last segment for  backwards compatibility.
+			// if not then just strip the last segment for backwards compatibility.
 			if (str_ends_with($certWithoutSuffix, $config['tld'])) {
 				$trimToString .= $config['tld'];
 			}
@@ -228,8 +228,8 @@ class Site {
 	 * Get list of sites and return them formatted
 	 * Will work for symlink and normal site paths.
 	 *
-	 * @param  string  $path
-	 * @param  \Illuminate\Support\Collection $certs
+	 * @param string $path
+	 * @param \Illuminate\Support\Collection $certs
 	 * @return \Illuminate\Support\Collection
 	 */
 	public function getSites($path, $certs) {
@@ -307,7 +307,7 @@ class Site {
 	/**
 	 * Extract PHP version of exising nginx config.
 	 *
-	 * @param  string  $url
+	 * @param string $url
 	 * @return string|void
 	 */
 	public function customPhpVersion($url) {
@@ -325,7 +325,7 @@ class Site {
 	/**
 	 * Determines which PHP version the current working directory is using.
 	 *
-	 * @param  string  $cwd The current working directory (cwd)
+	 * @param string $cwd The current working directory (cwd)
 	 * @return array|null [ "site" => [sitename], "php" => [PHP version] ]
 	 */
 	public function whichPhp($cwd) {
@@ -352,7 +352,7 @@ class Site {
 	 * Isolate a given directory to use a specific version of PHP.
 	 *
 	 * @param string $phpVersion
-	 * @param  string  $directory
+	 * @param string $directory
 	 * @return void
 	 */
 	public function isolate($phpVersion, $directory) {
@@ -402,7 +402,6 @@ class Site {
 	/**
 	 * Get list of isolated sites.
 	 * @param string $oldTld The old TLD. Only used by `reisolateForNewTld()` when changing the TLD.
-	 *
 	 */
 	public function isolated($oldTld = null) {
 		$dir = $this->nginxPath();
@@ -437,8 +436,8 @@ class Site {
 	/**
 	 * Reisolate all currently isolated sites with the new tld.
 	 *
-	 * @param  string  $oldTld
-	 * @param  string  $tld
+	 * @param string $oldTld
+	 * @param string $tld
 	 * @return void
 	 */
 	public function reisolateForNewTld($oldTld, $tld) {
@@ -464,7 +463,7 @@ class Site {
 	/**
 	 * Get the site URL from a directory if it's a valid Valet site.
 	 *
-	 * @param  string  $directory
+	 * @param string $directory
 	 * @return string|false
 	 */
 	public function getSiteUrl($directory) {
@@ -493,8 +492,8 @@ class Site {
 	/**
 	 * Secure the given host with TLS.
 	 *
-	 * @param  string  $url
-	 * @param  string  $siteConf  pregenerated Nginx config file contents
+	 * @param string $url
+	 * @param string $siteConf pregenerated Nginx config file contents
 	 * @return void
 	 */
 	public function secure($url, $siteConf = null) {
@@ -529,7 +528,7 @@ class Site {
 	/**
 	 * Unsecure the given URL so that it will use HTTP again.
 	 *
-	 * @param  string  $url
+	 * @param string $url
 	 * @return void
 	 */
 	public function unsecure($url) {
@@ -620,8 +619,8 @@ class Site {
 	/**
 	 * Resecure all currently secured sites with a fresh tld.
 	 *
-	 * @param  string  $oldTld
-	 * @param  string  $tld
+	 * @param string $oldTld
+	 * @param string $tld
 	 * @return void
 	 */
 	public function resecureForNewTld($oldTld, $tld) {
@@ -651,9 +650,9 @@ class Site {
 	/**
 	 * Parse Nginx site config file contents to swap old domain to new.
 	 *
-	 * @param  string  $siteConf  Nginx site config content
-	 * @param  string  $old  Old domain
-	 * @param  string  $new  New domain
+	 * @param string $siteConf Nginx site config content
+	 * @param string $old Old domain
+	 * @param string $new New domain
 	 * @return string
 	 */
 	public function replaceOldDomainWithNew($siteConf, $old, $new) {
@@ -677,7 +676,7 @@ class Site {
 	/**
 	 * Get the port of the given host.
 	 *
-	 * @param  string  $url
+	 * @param string $url
 	 * @return int
 	 */
 	public function port(string $url): int {
@@ -749,7 +748,7 @@ class Site {
 	/**
 	 * Create and trust a certificate for the given URL.
 	 *
-	 * @param  string  $url
+	 * @param string $url
 	 * @return void
 	 */
 	public function createCertificate($url) {
@@ -769,7 +768,7 @@ class Site {
 	/**
 	 * Create the private key for the TLS certificate.
 	 *
-	 * @param  string  $keyPath
+	 * @param string $keyPath
 	 * @return void
 	 */
 	public function createPrivateKey(string $keyPath) {
@@ -782,9 +781,9 @@ class Site {
 	/**
 	 * Create the signing request for the TLS certificate.
 	 *
-	 * @param  string  $url
-	 * @param  string  $keyPath
-	 * @param  string  $csrPath
+	 * @param string $url
+	 * @param string $keyPath
+	 * @param string $csrPath
 	 * @return void
 	 */
 	public function createSigningRequest(string $url, string $keyPath, string $csrPath) {
@@ -816,11 +815,11 @@ class Site {
 	/**
 	 * Create the signed TLS certificate.
 	 *
-	 * @param  string  $keyPath
-	 * @param  string  $csrPath
-	 * @param  string  $crtPath
-	 * @param  string  $caPemPath
-	 * @param  string  $caKeyPath
+	 * @param string $keyPath
+	 * @param string $csrPath
+	 * @param string $crtPath
+	 * @param string $caPemPath
+	 * @param string $caKeyPath
 	 * @return void
 	 */
 	public function createSignedCertificate(string $keyPath, string $csrPath, string $crtPath, string $caPemPath, string $caKeyPath) {
@@ -860,7 +859,7 @@ class Site {
 	/**
 	 * Trust the given root certificate file in the Windows Certmgr.
 	 *
-	 * @param  string  $pemPath
+	 * @param string $pemPath
 	 * @return void
 	 */
 	public function trustCa($caPemPath) {
@@ -875,7 +874,7 @@ class Site {
 	/**
 	 * Trust the given certificate file in the Windows Certmgr.
 	 *
-	 * @param  string  $crtPath
+	 * @param string $crtPath
 	 * @return void
 	 */
 	public function trustCertificate(string $crtPath) {
@@ -914,8 +913,8 @@ class Site {
 	/**
 	 * Build the Nginx server configuration for the given Valet site.
 	 *
-	 * @param  string  $valetSite
-	 * @param  string  $phpVersion
+	 * @param string $valetSite
+	 * @param string $phpVersion
 	 * @return string|null
 	 */
 	public function installSiteConfig($valetSite, $phpVersion) {
@@ -943,8 +942,8 @@ class Site {
 	/**
 	 * Build the TLS secured Nginx server for the given URL.
 	 *
-	 * @param  string  $url
-	 * @param  string  $siteConf  (optional) Nginx site config file content
+	 * @param string $url
+	 * @param string $siteConf (optional) Nginx site config file content
 	 * @return string
 	 */
 	public function buildSecureNginxServer($url, $siteConf = null) {
@@ -953,9 +952,6 @@ class Site {
 		}
 
 		$path = $this->certificatesPath();
-
-		//        , 'VALET_PHP_PORT', 'VALET_ISOLATED_PHP_VERSION'
-//    , $php['port'], $php['version']
 
 		return str_replace(
 			['VALET_HOME_PATH', 'VALET_SERVER_PATH', 'VALET_STATIC_PREFIX', 'VALET_SITE', 'VALET_CERT', 'VALET_KEY', 'HOME_PATH'],
@@ -967,8 +963,8 @@ class Site {
 	/**
 	 * Replace PHP version and port in an Nginx site configuration file contents.
 	 *
-	 * @param  string  $siteConf
-	 * @param  string  $phpPort
+	 * @param string $siteConf
+	 * @param string $phpPort
 	 */
 	public function replacePhpVersionInSiteConf($siteConf, $phpPort, $phpVersion = null) {
 		$siteConf = str_replace('127.0.0.1:$valet_php_port;', "127.0.0.1:{$phpPort};", $siteConf);
@@ -986,8 +982,8 @@ class Site {
 	/**
 	 * Build the Nginx proxy config for the specified site.
 	 *
-	 * @param  string $url The site to serve
-	 * @param  string $host The URL to proxy to, eg: http://127.0.0.1:8080
+	 * @param string $url The site to serve
+	 * @param string $host The URL to proxy to, eg: http://127.0.0.1:8080
 	 * @param boolean $secure Is the proxy going to be secured? Default: `false`
 	 * @return void
 	 */
@@ -1031,7 +1027,7 @@ class Site {
 	/**
 	 * Unsecure the given URL so that it will use HTTP again.
 	 *
-	 * @param  string  $url
+	 * @param string $url
 	 * @return void
 	 */
 	public function proxyDelete($url) {
@@ -1099,8 +1095,8 @@ class Site {
 	/**
 	 * Identify whether a site is for a proxy by reading the host name from its config file.
 	 *
-	 * @param  string  $site  Site name without TLD
-	 * @param  string  $configContents  Config file contents
+	 * @param string $site Site name without TLD
+	 * @param string $configContents Config file contents
 	 * @return string|null
 	 */
 	public function getProxyHostForSite($site, $configContents = null) {

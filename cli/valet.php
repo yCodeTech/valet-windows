@@ -782,7 +782,7 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 	 *
 	 * @param string|null $options Optionally, specify ngrok options/flags of its `http` command to pass to ngrok.
 	 * ---
-	 *  Pass the option name without the `--` prefix (so Valet doesn't get confused with it's own options); eg. `--options domain=example.com`.
+	 * Pass the option name without the `--` prefix (so Valet doesn't get confused with its own options); eg. `--options domain=example.com`.
 	 * If there's a space in the value you will need to surround the value in quotes.
 	 * All options will be prefixed with `--` after Valet has processed the command.
 	 * If the `host-header` option is not set, Valet will add it with the default of `rewrite`.
@@ -1232,7 +1232,7 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 	]);
 
 	/**
-	 *  Uninstalls Valet's services
+	 * Uninstalls Valet's services
 	 * @param bool $force Optionally force an uninstall without confirmation.
 	 * @param bool $purgeConfig Optionally purge and remove all Valet configs
 	 */

@@ -16,8 +16,9 @@ class Acrylic {
 	/**
 	 * Create a new Acrylic instance.
 	 *
-	 * @param  CommandLine  $cli
-	 * @param  Filesystem  $files
+	 * @param CommandLine $cli
+	 * @param Filesystem $files
+	 * @param Site $site
 	 * @return void
 	 */
 	public function __construct(CommandLine $cli, Filesystem $files) {
@@ -28,7 +29,7 @@ class Acrylic {
 	/**
 	 * Install Acrylic DNS.
 	 *
-	 * @param  string  $tld
+	 * @param string $tld
 	 * @return void
 	 */
 	public function install(string $tld = 'test') {
@@ -39,7 +40,7 @@ class Acrylic {
 	/**
 	 * Create the AcrylicHosts file.
 	 *
-	 * @param  string  $tld
+	 * @param string $tld
 	 * @return void
 	 */
 	protected function createHostsFile(string $tld) {
@@ -92,7 +93,7 @@ class Acrylic {
 	/**
 	 * Update the tld used by Acrylic DNS.
 	 *
-	 * @param  string  $tld
+	 * @param string $tld
 	 * @return void
 	 */
 	public function updateTld(string $tld) {
@@ -210,7 +211,7 @@ class Acrylic {
 	/**
 	 * Get the Acrylic path.
 	 *
-	 * @param  string  $path
+	 * @param string $path
 	 * @return string
 	 */
 	public function path(string $path = ''): string {

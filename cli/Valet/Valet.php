@@ -12,8 +12,8 @@ class Valet {
 	/**
 	 * Create a new Valet instance.
 	 *
-	 * @param  CommandLine  $cli
-	 * @param  Filesystem  $files
+	 * @param CommandLine $cli
+	 * @param Filesystem $files
 	 * @return void
 	 */
 	public function __construct(CommandLine $cli, Filesystem $files) {
@@ -103,7 +103,7 @@ class Valet {
 	/**
 	 * Determine if this is the latest version of Valet.
 	 *
-	 * @param  string  $currentVersion
+	 * @param string $currentVersion
 	 * @return bool
 	 *
 	 * @throws \GuzzleHttp\Exception\GuzzleException
@@ -266,7 +266,7 @@ class Valet {
 	/**
 	 * Get the Valet home path (VALET_HOME_PATH = ~/.config/valet).
 	 *
-	 * @param  string  $path
+	 * @param string $path
 	 * @return string
 	 */
 	public static function homePath(string $path = ''): string {

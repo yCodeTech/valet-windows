@@ -39,10 +39,10 @@ class PhpCgi {
 	/**
 	 * Create a new PHP CGI class instance.
 	 *
-	 * @param  CommandLine  $cli
-	 * @param  Filesystem  $files
-	 * @param  WinSwFactory  $winsw
-	 * @param  Configuration  $configuration
+	 * @param CommandLine $cli
+	 * @param Filesystem $files
+	 * @param WinSwFactory $winsw
+	 * @param Configuration $configuration
 	 * @return void
 	 */
 	public function __construct(CommandLine $cli, Filesystem $files, WinSwFactory $winswFactory, Configuration $configuration) {

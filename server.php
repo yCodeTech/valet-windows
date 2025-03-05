@@ -81,9 +81,9 @@ function valet_support_wildcard_dns($domain, $config) {
 }
 
 /**
- * @param  array  $config  Valet configuration array
+ * @param array $config Valet configuration array
  * @return string|null If set, default site path for uncaught urls
- * */
+ */
 function valet_default_site_path($config) {
 	if (isset($config['default']) && is_string($config['default']) && is_dir($config['default'])) {
 		return $config['default'];

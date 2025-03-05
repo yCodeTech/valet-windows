@@ -17,8 +17,8 @@ class Diagnose {
 	/**
 	 * Create a new Diagnose instance.
 	 *
-	 * @param  CommandLine  $cli
-	 * @param  Filesystem  $files
+	 * @param CommandLine $cli
+	 * @param Filesystem $files
 	 * @return void
 	 */
 	public function __construct(CommandLine $cli, Filesystem $files) {
