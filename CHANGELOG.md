@@ -7,11 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/yCodeTech/valet-windows/tree/master)
 
-## [3.1.6](https://github.com/yCodeTech/valet-windows/tree/v3.1.6) - 2025-03-04
+## [3.1.6](https://github.com/yCodeTech/valet-windows/tree/v3.1.6) - 2025-03-06
 
 ### Added
 
 -   Added emergency batch script to stop and uninstall services if errors occur when running `composer global update` without uninstalling valet first. This happens because the services are still installed and therefore the files cannot be removed and updated since they're in-use. The batch script is to emergency stop and uninstall the services, so a subsequent composer update is able to work.
+
+### Fixed
+
+-   Fixed `php:which` command to obtain the linked sites and merge with the parked sites array. Previously, it was only getting the parked sites, so not all sites were obtained and queried.
 
 ## [3.1.5](https://github.com/yCodeTech/valet-windows/tree/v3.1.4) - 2025-03-03
 
