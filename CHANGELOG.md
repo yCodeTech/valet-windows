@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/yCodeTech/valet-windows/tree/master)
 
+## [3.2.0](https://github.com/yCodeTech/valet-windows/tree/v3.2.0) - ????-??-??
+
+### Removed
+
+-   Removed the `install` confirmation question of outdated cretueusebiu package. Doesn't affect valet functionality.
+
 ## [3.1.6](https://github.com/yCodeTech/valet-windows/tree/v3.1.6) - 2025-03-06
 
 ### Added

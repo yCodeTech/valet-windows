@@ -1460,9 +1460,9 @@ The `install` command confirmation question about uninstalling the outdated cret
 Doesn't affect valet functionality.
 
 </td>
-    <td>3.1.0</td>
-    <td>3.2.0</td>
-    <td>&#x2717;</td>
+    <td align="center">3.1.0</td>
+    <td align="center">3.2.0</td>
+    <td align="center">&#x2713;</td>
   </tr>
 <table>
 <!--
