@@ -329,7 +329,7 @@ class Site {
 	 * @return array|null [ "site" => [sitename], "php" => [PHP version] ]
 	 */
 	public function whichPhp($cwd) {
-		$currentSite = $this->parked()->filter(function ($site, $key) use ($cwd) {
+		$currentSite = $this->parked()->merge($this->links())->filter(function ($site, $key) use ($cwd) {
 			if ($key === $cwd) return $site;
 		});
 
