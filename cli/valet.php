@@ -71,15 +71,6 @@ $app->command('install [--xdebug]', function ($input, $output, $xdebug) {
 		}
 	}
 
-	/** @deprecated This confirmation question is deprecated since version 3.1.0 */
-	$question = new ConfirmationQuestion("<fg=red>Have you fully uninstalled the outdated cretueusebiu/valet-windows? yes/no</>\n", false);
-
-	if (!$alreadyInstalled && !$helper->ask($input, $output, $question)) {
-		warning("Install aborted. \nPlease fully uninstall Valet from cretueusebiu and purge all configs.");
-		output('<fg=yellow>Remove composer dependency with:</> <bg=magenta>composer global remove cretueusebiu/valet-windows</>');
-		return;
-	}
-
 	$maxItems = $xdebug ? 6 : 5;
 	$progressBar = progressbar($maxItems, "Installing");
 	sleep(1);
