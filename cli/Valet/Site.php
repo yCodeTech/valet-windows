@@ -339,9 +339,14 @@ class Site {
 				$site .= !empty($value["alias"]) ? " (alias: {$value["alias"]})" : "";
 
 				if ($key === "php") {
+					// Extract PHP version from the ansi string, eg. <info>7.4.9 (isolated)</info>
+					// so we only get the raw version string.
+					preg_match("([0-9.]+)", $val, $phpVersion);
+
 					return [
 						"site" => $site,
-						"php" => $val
+						"php" => $val,
+						"phpVersion" => $phpVersion[0]
 					];
 				}
 			}

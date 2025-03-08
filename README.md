@@ -101,7 +101,7 @@ composer global require ycodetech/valet-windows
   <tr>
   <th></th>
     <td></td>
-    <td><a href="#xdebuginstall">xdebug:install</a></td>
+    <td><a href="#phpproxy">php|php:proxy</a></td>
 		<td align="center"><a href="#unsecure">unsecure</a></td>
 		<td align="center"><a href="#proxy">proxy</a></td>
     <td></td>
@@ -112,7 +112,7 @@ composer global require ycodetech/valet-windows
   <tr>
   <th></th>
     <td></td>
-    <td><a href="#xdebuguninstall">xdebug:uninstall</a></td>
+    <td><a href="#xdebuginstall">xdebug:install</a></td>
     <td></td>
 		<td align="center"><a href="#proxies">proxies</a></td>
     <td></td>
@@ -122,7 +122,7 @@ composer global require ycodetech/valet-windows
   <tr>
   <th></th>
     <td></td>
-    <td></td>
+    <td><a href="#xdebuguninstall">xdebug:uninstall</a></td>
     <td></td>
 		<td align="center"><a href="#unproxy">unproxy</a></td>
     <td></td>
@@ -480,10 +480,43 @@ php:which         Determine which PHP version the current working directory is u
 ```console
 $ valet php:which
 The current working directory site1 is using PHP 7.4.33 (isolated)
+The executable is located at: C:/php/7.4/php.exe
 
 $ valet php:which site2
 The specified site site2 is using PHP 8.1.8 (default)
+The executable is located at: C:/php/8.1/php.exe
 ```
+
+<img align="center" src="./The_same_icon.svg" style="width:20px;"> This command is the same as the Mac version, just renamed.
+
+##### php:proxy
+
+```
+php:proxy             Proxy PHP commands with a site's PHP executable
+           phpCommand Command to run with the site's PHP executable
+           [--site=]     Optionally, specify a site instead of the current working directory
+```
+
+`php` is a command alias.
+
+```console
+$ valet php:proxy -v
+
+Proxying the command to PHP 8.2.9 at C:/php/8.2/php.exe
+
+PHP 8.2.9 (cli) (built: Aug  1 2023 12:41:16) (NTS Visual C++ 2019 x64)
+Copyright (c) The PHP Group
+Zend Engine v4.2.9, Copyright (c) Zend Technologies
+
+
+$ valet php:proxy -r "echo 'Hello';" --site=site2
+
+Proxying the command to PHP 7.4.9 c:/php/7.4/php.exe
+
+Hello
+```
+
+<img align="center" src="./The_same_icon.svg" style="width:20px;"> This command is the same as the Mac version.
 
 ##### xdebug:install
 
@@ -1413,15 +1446,16 @@ Commands that have been tested and made parity:
 -   [x] link
 -   [x] links
 -   [x] log
--   [ ] loopback - not applicable
+-   [ ] loopback (the localhost IP) - not applicable
 -   [x] on-latest-version
 -   [x] open
 -   [x] park
 -   [x] parked
 -   [x] paths
--   [ ] php (proxying commands to PHP CLI) - Possible far future feature?
+-   [x] php (proxying commands to PHP CLI) - renamed to `php:proxy` with alias of `php`
 -   [x] proxies
 -   [x] proxy
+-   [ ] renew (Renews all domains with a trusted TLS certificate) - TBD
 -   [x] restart
 -   [x] secure
 -   [x] secured

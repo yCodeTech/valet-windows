@@ -290,11 +290,30 @@ $app->command('php:which [site]', function ($site = null) {
 		return false;
 	}
 
-	info("{$txt} {$which['site']} is using PHP {$which['php']}");
+	info("{$txt} {$which['site']} is using PHP {$which['phpVersion']}");
+	info("The executable is located at: " . PhpCgi::getPhpPath($which['phpVersion']));
 
 })->descriptions('Determine which PHP version the current working directory is using', [
 	"site" => "Optionally, specify a site"
 ])->addUsage("php:which site2");
+
+/**
+ * Proxy PHP commands through to a site's PHP executable.
+ *
+ * This command block doesn't handle the command logic, the `valet` script in the project root does.
+ * (The `valet` script is the actual command script that is called when `valet` is
+ * ran in the terminal.)
+ *
+ * This command block is only to document the command within the CLI.
+ */
+$app->command('php:proxy phpCommand* [--site=]', function ($phpCommand, $site = null) {
+
+	warning('It looks like you are running `cli/valet.php` directly; please use the `valet` script in the project root instead.');
+
+})->setAliases(["php"])->descriptions("Proxy PHP commands through to a site's PHP executable", [
+	'phpCommand' => "PHP command to run with the site's PHP executable",
+	'--site' => 'Specify the site to use to get the PHP version.'
+])->addUsage("php:proxy -v --site=site2")->addUsage("php -v --site=site2")
 
 /**
  * Install Xdebug services for all PHP versions that are specified in `valet php:list`.
@@ -351,7 +370,9 @@ $app->command('parity', function () {
 	// Only get the released version instead of master, to make sure no commands
 	// are added or removed to the macOS version to ensure this version of Valet 3.0
 	// always has parity against the version in the URL. (ie. master can change.)
-	Valet::parity("https://raw.githubusercontent.com/laravel/valet/v4.3.0/cli/app.php");
+	//
+	// Also, don't use a patch version, use the MAJOR.MINOR.0 format. eg. 4.3.0, 4.5.0
+	Valet::parity("https://raw.githubusercontent.com/laravel/valet/v4.8.0/cli/app.php");
 
 })->descriptions("Get a calculation of the percentage of parity completion.");
 

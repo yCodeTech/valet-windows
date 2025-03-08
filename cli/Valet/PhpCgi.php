@@ -203,25 +203,45 @@ class PhpCgi {
 	}
 
 	/**
-	 * Find the PHP path.
+	 * Find the PHP version from the path.
 	 *
-	 * @return mixed
+	 * @param string $phpPath The path to the PHP executable.
+	 * @param bool $getExecPath Optional. Determines whether to return the executable path. Default: `false`.
+	 * @return string|bool The PHP version or the executable path determined by the `$getExecPath` param, returns `false` on error.
 	 */
-	public function findPhpVersion($phpPath) {
-		$phpExecPath = "{$phpPath}\php.exe";
+	public function findPhpVersion($phpPath, $getExecPath = false) {
+		$phpExecPath = "{$phpPath}/php.exe";
+
 		if (!file_exists($phpExecPath)) {
 			error("Failed to find the PHP executable in {$phpPath}");
-
-			return null;
+			return false;
 		}
 
 		$phpVersion = $this->cli->runOrExit("\"$phpExecPath\" -r \"echo PHP_VERSION;\"",
 			function ($code, $output) use ($phpPath) {
-				error("Failed to find the PHP version for {$phpPath}");
+				error("Failed to get the PHP version for {$phpPath}");
 			}
 		);
 
-		return $phpVersion->getOutput();
+		return $getExecPath ? $phpExecPath : $phpVersion->getOutput();
+	}
+
+	/**
+	 * Get the PHP path by version.
+	 * @param string $phpVersion
+	 *
+	 * @return string|null The path to the PHP executable.
+	 */
+	public function getPhpPath($phpVersion) {
+		$phpPath = $this->phpWinSws[$phpVersion]["php"]["path"];
+		$phpExecPath = $this->findPhpVersion($phpPath, true);
+
+		if (!$phpExecPath) {
+			error("PHP executable path not found for version {$phpVersion}");
+			return false;
+		}
+
+		return $phpExecPath;
 	}
 
 	/**
