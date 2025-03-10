@@ -11,7 +11,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
--   Removed the `install` confirmation question of outdated cretueusebiu package. Doesn't affect valet functionality.
+-   Removed the deprecated (since v3.1.0) confirmation question about uninstalling the outdated cretueusebiu package in the `install` command. Doesn't affect valet functionality.
+
+### Added
+
+-   Added new `php:proxy` command with the alias of `php` to proxy PHP commands through to a site's PHP executable.
+
+-   Added new `PhpCgi::getPhpPath` method to get the PHP executable path by specifying a version.
+
+### Changed
+
+-   Version bumped the macOS valet URL in the `parity` command to make sure the command parity is up to date with the latest MINOR version at the time of release.
+
+-   Changed `PhpCGI::findPhpVersion` method to return the executable path if the new `getExecPath` param is `true` otherwise it will default to returning the PHP version. Also changed it's error return value to `false` for easier checking.
+
+-   Changed `Configuration::addPhp` method to `return false` if the `$phpVersion` variable is `false`.
+
+-   Changed `Site::whichPhp` method to extract the PHP version from the ansi coloured output, and the raw version string to a new element in the return array to avoid weird errors when using it in the new `php:proxy` command.
+
+-   Changed the info output in `php:which` command to use the new raw phpVersion string, and added a separate info output to get and display the php executable path using the new `PhpCgi::getPhpPath` method.
 
 ## [3.1.6](https://github.com/yCodeTech/valet-windows/tree/v3.1.6) - 2025-03-06
 
