@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/yCodeTech/valet-windows/tree/master)
 
+## [3.1.6.1](https://github.com/yCodeTech/valet-windows/tree/v3.1.6) - 2025-03-11
+
+## Fixed
+
+-   Fixed version number because in v3.1.6 release, Valet didn't have it's version bumped, so it was displaying as v3.1.5. Fixed by bumping version to v3.1.6.1
+
 ## [3.1.6](https://github.com/yCodeTech/valet-windows/tree/v3.1.6) - 2025-03-06
 
 ### Added
