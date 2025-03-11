@@ -22,7 +22,7 @@ composer global require ycodetech/valet-windows
 
 <br>
 
-[Introduction](#introduction) | [Installation](#installation) | [Commands](#commands) | [Command Parity Checker](#command-parity-checker) | [Deprecations and Removals](#deprecations-and-removals) | [Emergency Stop and Uninstall Services](#emergency-stop-and-uninstall-services) | [Known Issues](#known-issues) | [Xdebug Installation](#xdebug-installation) | [Contributions](#contributions)
+[Introduction](#introduction) | [Installation](#installation) | [Commands](#commands) | [Command Parity Checker](#command-parity-checker) | [Deprecations and Removals](#deprecations-and-removals) | [Emergency Stop and Uninstall Services](#emergency-stop-and-uninstall-services) | [Valet Directories](#valet-directories) | [Known Issues](#known-issues) | [Xdebug Installation](#xdebug-installation) | [Contributions](#contributions)
 
 ---
 
@@ -193,8 +193,7 @@ For commands that are referenced as "the same as the Mac version", please refer 
 ##### install
 
 ```
-install            Install Valet's services and configs
-Install Valet's services and configs, and auto start Valet.
+install            Install Valet's services and configs, and auto start Valet.
         [--xdebug] Optionally, install Xdebug for PHP.
 ```
 
@@ -212,7 +211,7 @@ This installs all Valet services:
 -   Acrylic DNS
 -   Ansicon
 
-And it's configs in `C:\Users\Username\.config\valet`.
+And it's configs in `C:/Users/Username/.config/valet`.
 
 Once complete, Valet will automatically start the services.
 
@@ -823,7 +822,7 @@ link                Register the current working directory as a symbolic link
       [--isolate=]  Optionally isolate the site to a specified PHP version
 ```
 
-`link` is another way to serve directories as sites, except it serves one singular site in a directory rather than the whole directory. It does this by creating a symbolic link inside the `/.config/valet/Sites` directory, of which is a _`parked`_ directory on Valet installation.
+`link` is another way to serve directories as sites, except it serves one singular site in a directory rather than the whole directory. It does this by creating a symbolic link inside the `~/.config/valet/Sites` directory, of which is a _`parked`_ directory on Valet installation.
 
 Serving the current working directory as a site:
 
@@ -891,7 +890,7 @@ unlink          Unlink the current working directory linked site
         [name]  Optionally specify the linked site name
 ```
 
-`unlink` removes the current working directory's (cwd) symbolic linked site. Valet will find the linked site name using the cwd name and delete the symbolic link from the `/.config/valet/Sites/` directory.
+`unlink` removes the current working directory's (cwd) symbolic linked site. Valet will find the linked site name using the cwd name and delete the symbolic link from the `~/.config/valet/Sites/` directory.
 
 ```console
 $ cd /d/sites/my site
@@ -1203,7 +1202,7 @@ This site is served by [BasicValetDriver].
 paths  List all of the paths registered with Valet
 ```
 
-`paths` allows you to view all registered paths. The default path is `.config/valet/Sites`, any others are added via the [`park`](#park) command.
+`paths` allows you to view all registered paths. The default path is `~/.config/valet/Sites`, any others are added via the [`park`](#park) command.
 
 ```console
 $ valet paths
@@ -1517,6 +1516,56 @@ To run, open a CMD terminal with Admin privileges and run this:
 ```
 
 All services will have been stopped and you can then be able to run `composer global update`.
+
+## Valet Directories
+
+Upon installation, Valet creates the following directories and config files:
+
+-   `~/.config/valet`
+    Contains all of Valet's config files. This resides in the home directory (`C:/Users/Username/`) indicated by `~`.
+
+-   `~/.config/valet/CA`
+    Contains Valet's generated self-signed Root CA certificate, of which all site TLS certificates are signed with.
+
+-   `~/.config/valet/Certificates`
+    Contains all the TLS certificates for the secured sites. These files are rebuilt when running the `install` and `secure` commands.
+
+-   `~/.config/valet/Drivers`
+    Contains any user-defined custom Valet drivers. Drivers determine how a particular framework / CMS is served. See the [Valet Docs](https://laravel.com/docs/12.x/valet#custom-valet-drivers) for information on how to create a custom driver.
+
+-   `~/.config/valet/Drivers/SampleValetDriver.php`
+    A sample custom driver.
+
+-   `~/.config/valet/Extensions`
+    Contains custom Valet extensions/commands. You can extend Valet and add your own commands or change existing ones. See [this comment](https://github.com/laravel/valet/issues/804#issuecomment-569731561) for more info and links to examples.
+
+-   `~/.config/valet/Log`
+    Contains all error logs.
+
+-   `~/.config/valet/Nginx`
+    Contains site-specific Nginx configs for any site that is isolated or secured. These files are rebuilt when running the `install`, `tld`, and `secure` commands.
+
+-   `~/.config/valet/Services`
+    Contains the Nginx and PHP config and executable files to be able to run them as Windows services. These files are rebuilt when running the `install` command.
+-   `~/.config/valet/Sites`
+    Contains all of the symbolic links for any `link`ed sites.
+
+-   `~/.config/valet/Xdebug`
+    Contains the output files of Xdebug profiling.
+
+-   `~/.config/valet/config.json`
+    This is the main Valet config file.
+
+-   `~/.config/valet/emergency_uninstall_services.bat`
+    This is an batch file to do an emergency stop and uninstall of all services. See the [Emergency Stop and Uninstall Services section](#emergency-stop-and-uninstall-services).
+
+> [!WARNING]
+>
+> It's not recommended to change the config files except the custom `Drivers` and `Extensions`. Changing any other config file manually will put Valet out of sync and cause errors. Use the CLI instead and let Valet do it for you.
+
+> [!CAUTION]
+>
+> You must not remove any config file (except the custom ones) without first uninstalling Valet.
 
 ## Known Issues
 
