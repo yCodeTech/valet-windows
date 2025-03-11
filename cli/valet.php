@@ -41,6 +41,8 @@ if (is_dir(VALET_HOME_PATH)) {
 	Site::pruneLinks();
 }
 
+// TODO: Abstract all Xdebug related code into a separate opt-in custom extension, this could be an alternative to just deprecating Xdebug functionality altogether.
+
 /**
  * Install Valet's services and configs,
  * and auto start Valet.
