@@ -22,7 +22,7 @@ composer global require ycodetech/valet-windows
 
 <br>
 
-[Introduction](#introduction) | [Installation](#installation) | [Commands](#commands) | [Command Parity Checker](#command-parity-checker) | [Deprecations and Removals](#deprecations-and-removals) | [Emergency Stop and Uninstall Services](#emergency-stop-and-uninstall-services) | [Valet Directories](#valet-directories) | [Known Issues](#known-issues) | [Xdebug Installation](#xdebug-installation) | [Contributions](#contributions)
+[Introduction](#introduction) | [Services Shipped with Valet](#services-shipped-with-valet) | [Installation](#installation) | [Commands](#commands) | [Command Parity Checker](#command-parity-checker) | [Deprecations and Removals](#deprecations-and-removals) | [Emergency Stop and Uninstall Services](#emergency-stop-and-uninstall-services) | [Valet Directories](#valet-directories) | [Known Issues](#known-issues) | [Xdebug Installation](#xdebug-installation) | [Contributions](#contributions)
 
 ---
 
@@ -147,6 +147,18 @@ Valet is a Laravel development environment for Windows. No Vagrant, no `/etc/hos
 Laravel Valet configures your Windows to always run Nginx in the background when your machine starts. Then, using [Acrylic DNS](http://mayakron.altervista.org/wikibase/show.php?id=AcrylicHome), Valet proxies all requests on the `*.test` domain (aka tld) to point to sites installed on your local machine.
 
 This is 3.0 of Valet Windows, branded under the name _Laravel Valet Windows 3_, and is a much needed updated fork of <a href="https://github.com/cretueusebiu/valet-windows">cretueusebiu/valet-windows</a>. It introduces lots of improvements, new commands, and hopes to achieve as much parity as possible with the original Mac version.
+
+## Services shipped with Valet
+
+Valet ships with and installs these services:
+
+|                                                                       Service | Version |
+| ----------------------------------------------------------------------------: | ------- |
+| [Acrylic DNS Proxy](https://mayakron.altervista.org/support/acrylic/Home.htm) | 2.1.0   |
+|                                   [Ansicon](https://github.com/adoxa/ansicon) | 1.89    |
+|                                    [gsudo](https://github.com/gerardog/gsudo) | 2.0.10  |
+|                                                   [nginx](https://nginx.org/) | 1.19.5  |
+|                                                   [ngrok](https://ngrok.com/) | 3.3.1   |
 
 ## Installation
 
