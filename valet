@@ -5,4 +5,99 @@ if (! isset($_SERVER['HOME'])) {
 	$_SERVER['HOME'] = $_SERVER['USERPROFILE'];
 }
 
-require __DIR__.'/cli/valet.php';
+$valetCli = __DIR__.'/cli/valet.php';
+
+/**
+ * @var array $argv The global variable $argv is an array of command line arguments passed
+ * to the script
+ *
+ * ---
+ * `$argv[0]` is the name of the script: `valet`
+ *
+ * `$argv[1]` is the first argument - the valet command: `php`
+ *
+ * `$argv[2]` is the second argument - the php commands or options to passthru to php.exe, eg `-v`
+ *
+ * `$argv[$length]` is the last argument - the site to find its executable to proxy commands to: `--site=example`
+ *
+ * @link https://www.php.net/manual/en/reserved.variables.argv.php
+ */
+
+
+/**
+ * Proxy PHP commands to the "php" executable on the isolated site
+ */
+
+// If the valet command in $argv[1] is set AND the command or it's alias is in the array...
+if (isset($argv[1]) && in_array($argv[1], ["php:proxy", "php"])) {
+
+	$length = count($argv);
+
+	// If only the command or help option is provided, require the valet CLI and exit
+	if($length === 2 || ($length === 3 && $argv[2] === '-h')) {
+		require $valetCli;
+		exit;
+	}
+
+	// If the last argument contains --site=, retrieve the site name
+	if (strpos($argv[$length-1], '--site=') !== false) {
+		// Extract the site name from the argument
+		$site = substr($argv[$length-1], strlen('--site='));
+		// Construct the command to find the PHP executable for the specified site
+		$command = sprintf('php %s php:which %s', $valetCli, $site);
+
+		// Get the arguments excluding the last one
+		$args = array_slice($argv, 2, -1);
+	}
+	// Otherwise, it will use the current working directory.
+	else {
+		// Construct the command to find the PHP executable
+		$command = sprintf('php %s php:which', $valetCli);
+
+		// Get all arguments starting from the second one
+		$args = array_slice($argv, 2);
+	}
+
+	// Escape the arguments for shell execution
+	$phpArgs = implode(' ', array_map('escapeshellarg', $args));
+
+	// Escape the command for shell execution
+	$whichPhpCommand = escapeshellcmd($command);
+
+	// Execute the command to find the PHP executable
+	$output = shell_exec($whichPhpCommand);
+
+	// Match the output to find the PHP version via regex.
+	preg_match("/PHP\s([0-9.]+)/", $output, $versionMatches);
+
+	// Match the output to find the PHP executable path via regex.
+	preg_match("/([a-zA-Z]:\/)(.*)\/php.exe/", $output, $pathMatches);
+
+	// If $pathMatches array has more than 0 elements AND $versionMatches array
+	// also has more than 0 elements...
+	if(count($pathMatches) > 0 && count($versionMatches) > 0) {
+
+		$phpVersion = $versionMatches[0];
+
+		// Escape the PHP executable path for shell execution
+		$phpPath = escapeshellcmd($pathMatches[0]);
+
+		echo PHP_EOL . "Proxying the command to $phpVersion at $phpPath" . PHP_EOL . PHP_EOL;
+
+		// Construct the proxy command with the PHP executable and arguments
+		$phpProxyCommand = "$phpPath $phpArgs";
+
+		echo $phpProxyCommand . PHP_EOL;
+
+		// Execute the proxy command
+		passthru($phpProxyCommand);
+		echo PHP_EOL;
+	}
+	else {
+		echo "Something went wrong finding the php executable." . PHP_EOL;
+	}
+
+	exit;
+}
+
+require $valetCli;
