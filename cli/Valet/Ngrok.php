@@ -38,6 +38,13 @@ class Ngrok {
 	public function run(string $command) {
 		$ngrok = realpath(valetBinPath() . 'ngrok.exe');
 
+		if (trim($command) === "update") {
+			$command = "$command " . $this->getNgrokConfig();
+		}
+		if (trim($command) === "config upgrade") {
+			$command = "$command " . $this->getNgrokConfig();
+		}
+
 		$this->cli->passthru("\"$ngrok\" $command");
 	}
 
