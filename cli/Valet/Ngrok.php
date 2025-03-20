@@ -71,7 +71,28 @@ Then use: <fg=magenta>valet set-ngrok-token [token]</>');
 
 		$newCMD = ($debug) ? "" : "start $newCMDtitle";
 
-		$this->cli->passthru("$newCMD $ngrokCommand");
+		// Test ngrok to make sure there's no errors.
+		$testNgrok = $this->testNgrok($ngrokCommand);
+
+		// If test was successful and no errors occurred...
+		if ($testNgrok->isSuccessful()) {
+			// Run the command again for real this time in a new CMD.
+			$this->cli->passthru("$newCMD $ngrokCommand");
+		}
+		else {
+			// Get the errors.
+			$errors = $testNgrok->getOutput();
+
+			// Output the errors.
+			error($errors . "\n");
+
+			// If errors have the ngrok error code of ERR_NGROK_121,
+			// then the error is ngrok executable is "too old" and needs updating.
+			// So output to prompt the user they can update it themselves with the valet command.
+			if (strstr($errors, "ERR_NGROK_121")) {
+				info("To update ngrok yourself, please run `valet ngrok update` and then upgrade the config file by running `valet ngrok config upgrade`\n");
+			}
+		}
 	}
 
 	/**
@@ -170,5 +191,16 @@ Then use: <fg=magenta>valet set-ngrok-token [token]</>');
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Test the ngrok command to make sure there's no ngrok errors
+	 *
+	 * @param string $ngrokCommand The ngrok command to run
+	 *
+	 * @return \Valet\ProcessOutput
+	 */
+	private function testNgrok($ngrokCommand) {
+		return $this->cli->run("$ngrokCommand");
 	}
 }
