@@ -160,6 +160,15 @@ Valet ships with and installs these services:
 |                                                   [nginx](https://nginx.org/) | 1.19.5  |
 |                                                   [ngrok](https://ngrok.com/) | 3.3.1   |
 
+> [!IMPORTANT]
+> ngrok may error out that it is "too old" when running it for some accounts. In the upcoming v3.2.0 release, Valet will ship with the latest version of ngrok.
+>
+> In the meantime, you can update the ngrok executable manually by running `valet ngrok update`. This will directly update the executable to the latest version.
+>
+> Afterwards, you will need to run `valet ngrok config upgrade` to upgrade the config file to the latest format.
+>
+> For both commands, valet automatically appends the config file location as a flag to the command, so ngrok will already know where the config file is.
+
 ## Installation
 
 Before installation, make sure that no other programs such as Apache or Nginx are binding to your local machine's port 80. If XAMPP or similar is installed make sure they don't have Windows services installed and change their ports.
@@ -1522,6 +1531,9 @@ Upon installation, Valet creates the following directories and config files:
 
 -   `~/.config/valet/Nginx`
     Contains site-specific Nginx configs for any site that is isolated or secured. These files are rebuilt when running the `install`, `tld`, and `secure` commands.
+
+-   `~/.config/valet/Ngrok`
+    Contains the `ngrok.yml` config file for the ngrok executable to be able to `share` sites. This directory and file will only be created when the `set-ngrok-token` command is run.
 
 -   `~/.config/valet/Services`
     Contains the Nginx and PHP config and executable files to be able to run them as Windows services. These files are rebuilt when running the `install` command.
