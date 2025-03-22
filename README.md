@@ -1032,25 +1032,28 @@ $ valet sites
 share                Share the current working directory site with a publically accessible URL
       [site]         Optionally, specify a site
       [-o|--options] Optionally, specify ngrok options/flags
-      [--debug]      Allow error messages to output to the current terminal
 ```
 
 ```console
 $ cd /d/sites/site1
 $ valet share
+Sharing site1.test...
+
+To output the public URL, please open a new terminal and run `valet fetch-share-url site1.test`
 
 $ valet share site1
+Sharing site1.test...
+
+To output the public URL, please open a new terminal and run `valet fetch-share-url site1.test`
 ```
 
 Share your local site publically. ngrok will do all the magic for you and give you a publically accessible URL to share to clients or team members.
 
 Before sharing a site with ngrok, you must first set the authtoken using Valet's [`set-ngrok-token` command](#authset-ngrok-token).
 
-When using the command, a new CMD terminal will be launched with the ngrok information, including the public URL to share.
-
 > [!NOTE]
 >
-> The URL won't be copied to the clipboard, however, in a separate terminal, you can use the [`fetch-share-url` command](#fetch-share-url).
+> The public URL won't be displayed, however, in a separate terminal, you can use the [`fetch-share-url` command](#fetch-share-url) to get the url and copy it to the clipboard.
 
 ###### share --options
 
@@ -1062,10 +1065,6 @@ $ valet share site1 --options domain=example.com//region=eu//request-header-remo
 $ cd /d/sites/site1
 $ valet share -o domain=example.com
 ```
-
-> [!NOTE]
->
-> If you're already sharing a project, and try to share another project simultaneously, the new cmd window may open for a split second and then close. This is due to ngrok failing silently, and won't output any error messages. To output the errors, pass the `--debug` flag to the command. This will cause ngrok to try to run in the current terminal instead of a new window, thus sending the error messages.
 
 ##### auth|set-ngrok-token
 
