@@ -7,9 +7,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/yCodeTech/valet-windows/tree/master)
 
+## [3.1.7](https://github.com/yCodeTech/valet-windows/tree/v3.7) - 2025-03-22
+
+### Fixed
+
+-   Fixed `Ngrok::hasAuthToken` method to explicitly check for an `authtoken` property within the ngrok config file, when the config file already exists.
+
+    Previously, the method only checks if the config file exists, if it doesn't then the authtoken isn't set. But what if the user added the config manually or edited the file? The method would then always `return true` even though the token might not exist.
+
+    Fixed by adding an explicit check of the contents if the file does exist. The contents of the yml config file is read and converted to an associative array.
+
+    From this we can then check if the config version is 2 or 3 (v3 has a new config format), and then we can check if the `authtoken` key exists. In v3 the `authtoken` is defined in a separate `agent` key, so the checks need to be adjusted.
+
+-   Fixed `Ngrok::run` method to check if the command proxying to ngrok executable is the `update` or `config upgrade` command, if it is then append the ngrok config flag to it. This is just so ngrok doesn't complain it can't find the config, and so we can upgrade the config to v3 without the user specifying the config location.
+
+### Added
+
+-   Added `symfony/yaml` dependency to convert contents of a `.yml` file to an associative array. (Required for the fixed `Ngrok::hasAuthToken` method.)
+
+### Changed
+
+-   Dependency version bump for `mnapoli/silly` to 1.9
+
+-   Refactored `Ngrok::getNgrokConfig` method to optionally return only the path of the config file (without the leading `--config` cli flag). (Required for the fixed `Ngrok::hasAuthToken` method.)
+
+-   Changed `Ngrok::start` method to output a message if ngrok errors that the executable is "too old" for the account:
+
+    > ERROR: authentication failed: Your ngrok-agent version "3.3.1" is too old. The minimum supported agent version for your account is "3.6.0". Please update to a newer version with ngrok update...
+
+    Because we can't test ngrok commands for errors or errors in the executable (which was tested in commit f8be62b, but reverted in a449582), we need to return the output of any errors and check the output for a specific error code relating to the "too old" error (`ERR_NGROK_121`). Then output a message (along with the original error output) to the user to inform them that they can update ngrok executable and also upgrade the config file themselves by performing the valet commands: `valet ngrok update` and `valet ngrok config upgrade` respectively.
+
+    All errors other errors will still output to the terminal.
+
+    -   Removed the functionality of the share command starting a new CMD window, since a new window will surpress any errors. We need to be able to output the errors as and when they happen.
+
+    -   Added various output messages to the terminal, so it's more descriptive as to what's happening.
+
+    -   Added new `CommandLine::shellExec` method to execute the command in the terminal, and also be able to return the output as a string to the calling method. This is just a wrapper around the native PHP `shell_exec` function.
+
 ## [3.1.6.1](https://github.com/yCodeTech/valet-windows/tree/v3.1.6.1) - 2025-03-11
 
-## Fixed
+### Fixed
 
 -   Fixed version number because in v3.1.6 release, Valet didn't have it's version bumped, so it was displaying as v3.1.5. Fixed by bumping version to v3.1.6.1
 
