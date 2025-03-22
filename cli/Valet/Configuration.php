@@ -259,6 +259,10 @@ class Configuration {
 
 		$phpVersion = \PhpCgi::findPhpVersion($phpPath);
 
+		if (!$phpVersion) {
+			return false;
+		}
+
 		$config = $this->read();
 		$config['php'] = $config['php'] ?? [];
 
