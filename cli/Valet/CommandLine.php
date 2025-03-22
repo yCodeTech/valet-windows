@@ -16,6 +16,16 @@ class CommandLine {
 	}
 
 	/**
+	 * Execute command via shell and return the complete output as a string
+	 *
+	 * @param string $command
+	 * @return bool|string|null The output.
+	 */
+	public function shellExec($command) {
+		return shell_exec($command);
+	}
+
+	/**
 	 * Pass the given Valet command to the command line with elevated privileges using gsudo.
 	 *
 	 * gsudo is a sudo equivalent of the Mac `sudo` utility. It allows the user to run commands as the root user with elevated privileges with minimal amount of UAC popups, ie. only 1 UAC popup.

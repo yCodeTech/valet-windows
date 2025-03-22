@@ -73,12 +73,20 @@ Then use: <fg=magenta>valet set-ngrok-token [token]</>');
 
 		$ngrok = realpath(valetBinPath() . 'ngrok.exe');
 
-		$newCMDtitle = "\"Sharing $site\"";
 		$ngrokCommand = "\"$ngrok\" http $site:$port " . $this->getNgrokConfig() . " $options";
 
-		$newCMD = ($debug) ? "" : "start $newCMDtitle";
+		info("Sharing $site...\n");
+		info("To output the public URL, please open a new terminal and run `valet fetch-share-url $site`");
 
-		$this->cli->passthru("$newCMD $ngrokCommand");
+		$output = $this->cli->shellExec("$ngrokCommand 2>&1");
+
+		if ($errors = strstr($output, "ERROR")) {
+			error($errors . PHP_EOL);
+
+			if (strpos($errors, 'ERR_NGROK_121') !== false) {
+				info("To update ngrok yourself, please run `valet ngrok update` and then upgrade the config file by running `valet ngrok config upgrade`\n");
+			}
+		}
 	}
 
 	/**
