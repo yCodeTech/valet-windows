@@ -809,10 +809,8 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 	 * - `-o [option]`
 	 * ---
 	 * `valet share mysite --options domain=example.com//region=eu//request-header-remove="blah blah"`
-	 *
-	 * @param bool $debug Allow error messages to output to the current terminal
 	 */
-	$app->command('share [site] [-o|--options=] [--debug]', function ($input, $site = null, $options = null, $debug = null) {
+	$app->command('share [site] [-o|--options=]', function ($input, $site = null, $options = null) {
 
 		// Send an error if the option shortcut has a =
 		if (str_contains($input, "-o=")) {
@@ -823,7 +821,7 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 
 		$options = $options != null ? explode("//", $options) : [];
 
-		Ngrok::start($url, Site::port($url), $debug, $options);
+		Ngrok::start($url, Site::port($url), $options);
 
 	})->descriptions('Share the current working directory site with a publically accessible URL', [
 		"site" => "Optionally, the site name",

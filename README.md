@@ -160,6 +160,15 @@ Valet ships with and installs these services:
 |                                                   [nginx](https://nginx.org/) | 1.19.5  |
 |                                                   [ngrok](https://ngrok.com/) | 3.3.1   |
 
+> [!IMPORTANT]
+> ngrok may error out that it is "too old" when running it for some accounts. In the upcoming v3.2.0 release, Valet will ship with the latest version of ngrok.
+>
+> In the meantime, you can update the ngrok executable manually by running `valet ngrok update`. This will directly update the executable to the latest version.
+>
+> Afterwards, you will need to run `valet ngrok config upgrade` to upgrade the config file to the latest format.
+>
+> For both commands, valet automatically appends the config file location as a flag to the command, so ngrok will already know where the config file is.
+
 ## Installation
 
 Before installation, make sure that no other programs such as Apache or Nginx are binding to your local machine's port 80. If XAMPP or similar is installed make sure they don't have Windows services installed and change their ports.
@@ -1056,25 +1065,28 @@ $ valet sites
 share                Share the current working directory site with a publically accessible URL
       [site]         Optionally, specify a site
       [-o|--options] Optionally, specify ngrok options/flags
-      [--debug]      Allow error messages to output to the current terminal
 ```
 
 ```console
 $ cd /d/sites/site1
 $ valet share
+Sharing site1.test...
+
+To output the public URL, please open a new terminal and run `valet fetch-share-url site1.test`
 
 $ valet share site1
+Sharing site1.test...
+
+To output the public URL, please open a new terminal and run `valet fetch-share-url site1.test`
 ```
 
 Share your local site publically. ngrok will do all the magic for you and give you a publically accessible URL to share to clients or team members.
 
 Before sharing a site with ngrok, you must first set the authtoken using Valet's [`set-ngrok-token` command](#authset-ngrok-token).
 
-When using the command, a new CMD terminal will be launched with the ngrok information, including the public URL to share.
-
 > [!NOTE]
 >
-> The URL won't be copied to the clipboard, however, in a separate terminal, you can use the [`fetch-share-url` command](#fetch-share-url).
+> The public URL won't be displayed, however, in a separate terminal, you can use the [`fetch-share-url` command](#fetch-share-url) to get the url and copy it to the clipboard.
 
 ###### share --options
 
@@ -1086,10 +1098,6 @@ $ valet share site1 --options domain=example.com//region=eu//request-header-remo
 $ cd /d/sites/site1
 $ valet share -o domain=example.com
 ```
-
-> [!NOTE]
->
-> If you're already sharing a project, and try to share another project simultaneously, the new cmd window may open for a split second and then close. This is due to ngrok failing silently, and won't output any error messages. To output the errors, pass the `--debug` flag to the command. This will cause ngrok to try to run in the current terminal instead of a new window, thus sending the error messages.
 
 ##### auth|set-ngrok-token
 
@@ -1556,6 +1564,9 @@ Upon installation, Valet creates the following directories and config files:
 
 -   `~/.config/valet/Nginx`
     Contains site-specific Nginx configs for any site that is isolated or secured. These files are rebuilt when running the `install`, `tld`, and `secure` commands.
+
+-   `~/.config/valet/Ngrok`
+    Contains the `ngrok.yml` config file for the ngrok executable to be able to `share` sites. This directory and file will only be created when the `set-ngrok-token` command is run.
 
 -   `~/.config/valet/Services`
     Contains the Nginx and PHP config and executable files to be able to run them as Windows services. These files are rebuilt when running the `install` command.

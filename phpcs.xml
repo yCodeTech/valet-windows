@@ -82,5 +82,6 @@
 		<exclude name="JPSR12.Files" />
 		<exclude name="JPSR12.Operators.OperatorSpacing" />
 		<exclude name="JPSR12.Types.DeclareStrictTypes" />
+		<exclude name="JPSR12.ControlSignatures.MultiKeyword.SingleNewlineRequired" />
 	</rule>
 </ruleset>
