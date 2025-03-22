@@ -25,6 +25,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 -   Added `symfony/yaml` dependency to convert contents of a `.yml` file to an associative array. (Required for the fixed `Ngrok::hasAuthToken` method.)
 
+-   Added various output messages to the terminal for `Ngrok::start`, so it's more descriptive as to what's happening.
+
+-   Added new `CommandLine::shellExec` method to execute the command in the terminal, and also be able to return the output as a string to the calling method. This is just a wrapper around the native PHP `shell_exec` function.
+
 ### Changed
 
 -   Dependency version bump for `mnapoli/silly` to 1.9
@@ -39,15 +43,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
     All errors other errors will still output to the terminal.
 
-    -   Removed the functionality of the share command starting a new CMD window, since a new window will surpress any errors. We need to be able to output the errors as and when they happen.
-
-    -   Added various output messages to the terminal, so it's more descriptive as to what's happening.
-
-    -   Added new `CommandLine::shellExec` method to execute the command in the terminal, and also be able to return the output as a string to the calling method. This is just a wrapper around the native PHP `shell_exec` function.
-
 ### Removed
 
-Removed the `--debug` flag from the `share` command since this is now defunct with the removal of the new CMD window. (Debug only prevented the CMD window opening, forcing errors to be logged directly to the terminal.) (Not a breaking change.)
+-   Removed the functionality of starting a new CMD window in `Ngrok::start` of the `share` command, since a new window will surpress any errors. We need to be able to output the errors as and when they happen.
+
+-   Removed the `--debug` flag from the `share` command since this is now defunct with the removal of the new CMD window. (Debug only prevented the CMD window opening, forcing errors to be logged directly to the terminal.) (Not a breaking change.)
 
 ## [3.1.6.1](https://github.com/yCodeTech/valet-windows/tree/v3.1.6.1) - 2025-03-11
 
