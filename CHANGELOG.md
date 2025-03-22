@@ -45,6 +45,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
     -   Added new `CommandLine::shellExec` method to execute the command in the terminal, and also be able to return the output as a string to the calling method. This is just a wrapper around the native PHP `shell_exec` function.
 
+### Removed
+
+Removed the `--debug` flag from the `share` command since this is now defunct with the removal of the new CMD window. (Debug only prevented the CMD window opening, forcing errors to be logged directly to the terminal.) (Not a breaking change.)
+
 ## [3.1.6.1](https://github.com/yCodeTech/valet-windows/tree/v3.1.6.1) - 2025-03-11
 
 ### Fixed

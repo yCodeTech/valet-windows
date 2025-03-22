@@ -51,11 +51,10 @@ class Ngrok {
 	/**
 	 * @param string $site The site
 	 * @param int $port The site's port
-	 * @param bool $debug Allow debug error output
 	 * @param array $options Options/flags to pass to ngrok
 	 * @return void
 	 */
-	public function start(string $site, int $port, $debug = false, array $options = []) {
+	public function start(string $site, int $port, array $options = []) {
 		if ($port === 443 && !$this->hasAuthToken()) {
 			output('Forwarding to local port 443 or a local https:// URL is only available after you sign up.
 Sign up at: <fg=blue>https://ngrok.com/signup</>
