@@ -315,7 +315,7 @@ $app->command('php:proxy phpCommand* [--site=]', function ($phpCommand, $site = 
 })->setAliases(["php"])->descriptions("Proxy PHP commands through to a site's PHP executable", [
 	'phpCommand' => "PHP command to run with the site's PHP executable",
 	'--site' => 'Specify the site to use to get the PHP version.'
-])->addUsage("php:proxy -v --site=site2")->addUsage("php -v --site=site2")
+])->addUsage("php:proxy -v --site=site2")->addUsage("php -v --site=site2");
 
 /**
  * Install Xdebug services for all PHP versions that are specified in `valet php:list`.
