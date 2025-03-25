@@ -778,9 +778,13 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 	 * @param string $token Your personal ngrok authtoken
 	 */
 	$app->command('set-ngrok-token [token]', function ($token = null) {
+
+		if (Share::getCurrentShareTool() != "ngrok") {
+			return info("Please set ngrok as your share tool with `valet share-tool ngrok`.");
+		}
+
 		if ($token === null) {
-			warning("Please provide your ngrok authtoken.");
-			return;
+			return warning("Please provide your ngrok authtoken.");
 		}
 
 		Ngrok::run("authtoken $token " . Ngrok::getNgrokConfig());
@@ -812,6 +816,11 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 	 */
 	$app->command('share [site] [-o|--options=]', function ($input, $site = null, $options = null) {
 
+		// If current share tool is set...
+		if (Share::getCurrentShareTool() === null) {
+			return info("Please set your share tool with `valet share-tool`.");
+		}
+
 		// Send an error if the option shortcut has a =
 		if (str_contains($input, "-o=")) {
 			return error("Option shortcuts cannot have a <bg=magenta> = </> immediately after them.\nPlease use a space to separate it from the value: <bg=magenta> valet share $site -o " . preg_replace("/=/", "", $options, 1) . " </>");
@@ -821,7 +830,7 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 
 		$options = $options != null ? explode("//", $options) : [];
 
-		Ngrok::start($url, Site::port($url), $options);
+		Share::shareTool()->start($url, Site::port($url), $options);
 
 	})->descriptions('Share the current working directory site with a publically accessible URL', [
 		"site" => "Optionally, the site name",
@@ -835,14 +844,54 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 	// https://github.com/robbie-cahill/tunnelmole-client
 
 	/**
+	 * Get or set the name of the currently-selected share tool.
+	 *
+	 * @param string|null $tool Optionally, the share tool to set.
+	 */
+	$app->command('share-tool [tool]', function ($tool = null) {
+		$share_tools_list = Share::getShareTools();
+
+		// If a tool is not provided, then we want to get the current tool.
+		if ($tool === null) {
+			// Get the current share tool.
+			$shareTool = Share::getCurrentShareTool();
+
+			// If there is no share tool set, output a warning message.
+			if ($shareTool === null) {
+				return warning("There is no share tool set. The supported tools are: $share_tools_list");
+			}
+
+			// Otherwise, output the current share tool.
+			return info("The current share tool is: $shareTool");
+		}
+
+		// If the tool is not valid, output a warning message.
+		if (!Share::isToolValid($tool)) {
+			return warning("$tool is not a valid share tool. Please use $share_tools_list.");
+		}
+
+		// Otherwise, update the share tool key in the config.
+		Configuration::updateKey('share-tool', $tool);
+		info("Share tool set to $tool.");
+
+	})->descriptions('Get or set the name of the current share tool.', [
+		"tool" => "Optionally, set the current share tool"
+	]);
+
+	/**
 	 * Get and copy the public URL of the current working directory site
 	 * that is currently being shared
 	 * @param string|null $site Optionally, specify a site
 	 */
 	$app->command('fetch-share-url [site]', function ($site = null) {
+		// If current share tool is not set, output a message.
+		if (Share::getCurrentShareTool() === null) {
+			return info("Please set your share tool with `valet share-tool`.");
+		}
+
 		$site = $site ?: Site::host(getcwd()) . '.' . Configuration::read()['tld'];
 
-		$url = Ngrok::currentTunnelUrl($site);
+		$url = Share::currentTunnelUrl($site);
 		info("The public URL for $site is: <fg=blue>$url</>");
 		info("It has been copied to your clipboard.");
 
