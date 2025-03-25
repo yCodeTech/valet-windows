@@ -1,57 +1,25 @@
 <?php
 
-namespace Valet;
+namespace Valet\ShareTools;
 
-use DomainException;
-use GuzzleHttp\Client;
-use Illuminate\Support\Collection;
+use Valet\Valet;
 use Symfony\Component\Yaml\Yaml;
 
-class Ngrok {
-	/**
-	 * @var CommandLine
-	 */
-	protected $cli;
+use function Valet\output;
+use function Valet\info;
+use function Valet\info_dump;
+use function Valet\error;
+use function Valet\valetBinPath;
+use function Valet\prefixOptions;
 
+class Ngrok extends ShareTool {
 	/**
-	 * @var array
-	 */
-	protected $tunnelsEndpoints = [
-		'http://127.0.0.1:4040/api/tunnels',
-		'http://127.0.0.1:4041/api/tunnels'
-	];
-
-	/**
-	 * Create a new Nginx instance.
+	 * Start sharing with ngrok.
 	 *
-	 * @param CommandLine $cli
-	 * @return void
-	 */
-	public function __construct(CommandLine $cli) {
-		$this->cli = $cli;
-	}
-
-	/**
-	 * @param string $command
-	 * @return void
-	 */
-	public function run(string $command) {
-		$ngrok = realpath(valetBinPath() . 'ngrok.exe');
-
-		if (trim($command) === "update") {
-			$command = "$command " . $this->getNgrokConfig();
-		}
-		if (trim($command) === "config upgrade") {
-			$command = "$command " . $this->getNgrokConfig();
-		}
-
-		$this->cli->passthru("\"$ngrok\" $command");
-	}
-
-	/**
 	 * @param string $site The site
 	 * @param int $port The site's port
 	 * @param array $options Options/flags to pass to ngrok
+	 *
 	 * @return void
 	 */
 	public function start(string $site, int $port, array $options = []) {
@@ -72,7 +40,7 @@ Then use: <fg=magenta>valet set-ngrok-token [token]</>');
 
 		$ngrok = realpath(valetBinPath() . 'ngrok.exe');
 
-		$ngrokCommand = "\"$ngrok\" http $site:$port " . $this->getNgrokConfig() . " $options";
+		$ngrokCommand = "\"$ngrok\" http $site:$port " . $this->getConfig() . " $options";
 
 		info("Sharing $site...\n");
 		info("To output the public URL, please open a new terminal and run `valet fetch-share-url $site`");
@@ -89,6 +57,29 @@ Then use: <fg=magenta>valet set-ngrok-token [token]</>');
 	}
 
 	/**
+	 * Run ngrok CLI commands.
+	 *
+	 * @param string $command
+	 *
+	 * @return void
+	 */
+	public function run(string $command) {
+		$ngrok = realpath(valetBinPath() . 'ngrok.exe');
+
+		// If command is `update` then append the config flag.
+		if (trim($command) === "update") {
+			$command = "$command " . $this->getConfig();
+		}
+
+		// If command is `config upgrade` then append the config flag.
+		if (trim($command) === "config upgrade") {
+			$command = "$command " . $this->getConfig();
+		}
+
+		$this->cli->passthru("\"$ngrok\" $command");
+	}
+
+	/**
 	 * Get the ngrok configuration path
 	 *
 	 * @param bool $asCliFlag Determines whether to return the config path as a CLI --flag.
@@ -102,60 +93,12 @@ Then use: <fg=magenta>valet set-ngrok-token [token]</>');
 	 *
 	 * `C:/Users/Username/.config/valet/Ngrok/ngrok.yml`
 	 */
-	public function getNgrokConfig(bool $asCliFlag = true) {
+	public function getConfig(bool $asCliFlag = true) {
 		$configPath = Valet::homePath() . "/Ngrok/ngrok.yml";
 		if ($asCliFlag) {
 			return "--config $configPath";
 		}
 		return $configPath;
-	}
-
-	/**
-	 * Get the current tunnel URL from the ngrok API.
-	 * @param string $site The site
-	 *
-	 * @return string $url The current tunnel URL
-	 */
-	public function currentTunnelUrl(string $site) {
-		// Set a new GuzzleHttp client.
-		$client = new Client();
-
-		// Create a GuzzleHttp get request to the ngrok tunnels API.
-		$response = $client->get('http://127.0.0.1:4040/api/tunnels');
-
-		// Get the contents of the API response.
-		$response = $response->getBody()->getContents();
-		// Decode the json response into a properly formed PHP array.
-		$tunnels = json_decode($response, true);
-
-		// Find and get the public URL of the site.
-		$url = $this->findHttpTunnelUrl($tunnels["tunnels"], $site);
-
-		if (!empty($url)) {
-			// Use | clip to copy the URL to the clipboard.
-			$this->cli->passthru("echo $url | clip");
-			return $url;
-		}
-
-		throw new DomainException('Tunnel not established.');
-	}
-
-	/**
-	 * Find the HTTP tunnel URL from the list of tunnels.
-	 *
-	 * @param array $tunnels
-	 * @return string|null
-	 * @return void|string
-	 */
-	public function findHttpTunnelUrl(array $tunnels, ?string $site = null) {
-		// If there are active tunnels on the ngrok instance we will spin through them and
-		// find the one responding on HTTP. Each tunnel has an HTTP and a HTTPS address
-		// but for local dev purposes we just desire the plain HTTP URL endpoint.
-		foreach ($tunnels as $tunnel) {
-			if (($tunnel["proto"] === 'http' || $tunnel["proto"] === 'https') && strpos($tunnel["config"]["addr"], $site)) {
-				return $tunnel["public_url"];
-			}
-		}
 	}
 
 	/**
@@ -165,9 +108,9 @@ Then use: <fg=magenta>valet set-ngrok-token [token]</>');
 	 */
 	protected function hasAuthToken(): bool {
 		// If the config file exists...
-		if (file_exists($this->getNgrokConfig(false))) {
+		if (file_exists($this->getConfig(false))) {
 			// Read and parse the config yml file and convert to an associative array.
-			$config = Yaml::parseFile($this->getNgrokConfig(false));
+			$config = Yaml::parseFile($this->getConfig(false));
 
 			// If config version is 2...
 			if ($config["version"] === "2") {

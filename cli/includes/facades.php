@@ -9,7 +9,16 @@ class Facade {
 	 * @return string
 	 */
 	public static function containerKey() {
-		return 'Valet\\' . basename(str_replace('\\', '/', get_called_class()));
+		// Default namespace.
+		$namespace = "Valet\\";
+
+		// If the class is Ngrok, then append the ShareTools string to the default Valet namespace,
+		// to use the ShareTools namespace.
+		if (in_array(get_called_class(), ["Ngrok"])) {
+			$namespace .= "ShareTools\\";
+		}
+
+		return $namespace . basename(str_replace('\\', '/', get_called_class()));
 	}
 
 	/**
@@ -35,6 +44,8 @@ class Configuration extends Facade {
 class Diagnose extends Facade {
 }
 class Filesystem extends Facade {
+}
+class Share extends Facade {
 }
 class Ngrok extends Facade {
 }
