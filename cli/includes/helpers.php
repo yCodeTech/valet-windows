@@ -309,50 +309,6 @@ if (!function_exists('tap')) {
 	}
 }
 
-if (!function_exists('str_ends_with')) {
-	/**
-	 * Determine if a given string ends with a given substring.
-	 *
-	 * `str_ends_with` function was introduced in PHP 8.
-	 * This is a polyfill for backwards compatibility.
-	 *
-	 * @param string $haystack
-	 * @param string|string[] $needles
-	 * @return bool
-	 */
-	function str_ends_with($haystack, $needles) {
-		foreach ((array) $needles as $needle) {
-			if (substr($haystack, -strlen($needle)) === (string) $needle) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-}
-
-if (!function_exists('str_starts_with')) {
-	/**
-	 * Determine if a given string starts with a given substring.
-	 *
-	 * `str_starts_with` function was introduced in PHP 8.
-	 * This is a polyfill for backwards compatibility.
-	 *
-	 * @param string $haystack
-	 * @param string|string[] $needles
-	 * @return bool
-	 */
-	function str_starts_with($haystack, $needles) {
-		foreach ((array) $needles as $needle) {
-			if ((string) $needle !== '' && strncmp($haystack, $needle, strlen($needle)) === 0) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-}
-
 /**
  * Get the user.
  *
