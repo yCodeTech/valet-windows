@@ -35,31 +35,17 @@ class Facade {
 	}
 }
 
-class Nginx extends Facade {
-}
-class CommandLine extends Facade {
-}
-class Configuration extends Facade {
-}
-class Diagnose extends Facade {
-}
-class Filesystem extends Facade {
-}
-class Share extends Facade {
-}
-class Ngrok extends Facade {
-}
-class PhpCgi extends Facade {
-}
-class PhpCgiXdebug extends Facade {
-}
-class Site extends Facade {
-}
-class Valet extends Facade {
-}
-class WinSW extends Facade {
-}
-class Acrylic extends Facade {
-}
-class Ansicon extends Facade {
-}
+class Nginx extends Facade {}
+class CommandLine extends Facade {}
+class Configuration extends Facade {}
+class Diagnose extends Facade {}
+class Filesystem extends Facade {}
+class Share extends Facade {}
+class Ngrok extends Facade {}
+class PhpCgi extends Facade {}
+class PhpCgiXdebug extends Facade {}
+class Site extends Facade {}
+class Valet extends Facade {}
+class WinSW extends Facade {}
+class Acrylic extends Facade {}
+class Ansicon extends Facade {}
