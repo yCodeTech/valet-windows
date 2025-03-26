@@ -245,6 +245,8 @@ if (!function_exists('resolve')) {
 	/**
 	 * Resolve the given class from the container.
 	 *
+	 * https://laravel.com/docs/12.x/helpers#method-resolve
+	 *
 	 * @param string $class
 	 * @return mixed
 	 */
@@ -267,6 +269,8 @@ function swap($class, $instance) {
 if (!function_exists('retry')) {
 	/**
 	 * Retry the given function N times.
+	 *
+	 * https://laravel.com/docs/12.x/helpers#method-retry
 	 *
 	 * @param int $retries
 	 * @param callable $fn
@@ -298,6 +302,8 @@ if (!function_exists('tap')) {
 	/**
 	 * Tap the given value.
 	 *
+	 * https://laravel.com/docs/12.x/helpers#method-tap
+	 *
 	 * @param mixed $value
 	 * @param callable $callback
 	 * @return mixed
@@ -315,15 +321,11 @@ if (!function_exists('tap')) {
  * @return string
  */
 function user() {
-	if (!isset($_SERVER['SUDO_USER'])) {
-		if (!isset($_SERVER['USER'])) {
-			return $_SERVER['USERNAME'];
-		}
-
+	if (isset($_SERVER['USER'])) {
 		return $_SERVER['USER'];
 	}
 
-	return $_SERVER['SUDO_USER'];
+	return $_SERVER['USERNAME'];
 }
 
 /**
