@@ -269,7 +269,7 @@ if (!function_exists('retry')) {
 	 * Retry the given function N times.
 	 *
 	 * @param int $retries
-	 * @param callable $retries
+	 * @param callable $fn
 	 * @param int $sleep
 	 * @return mixed
 	 */
