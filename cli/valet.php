@@ -770,28 +770,49 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 	])->addUsage("unisolate --site=mySite")->addUsage("unisolate --all");
 
 	/**
-	 * Sharing - ngrok
+	 * Sharing
 	 */
+
+	// TODO: Share-tool for Expose (https://expose.dev/)
+	// and 2 open-source clients like localtunnel (https://github.com/localtunnel/localtunnel)
+	// https://boringproxy.io/
+	// https://github.com/anderspitman/awesome-tunneling
+	// https://github.com/robbie-cahill/tunnelmole-client
 
 	/**
-	 * Set the ngrok authtoken.
-	 * @param string $token Your personal ngrok authtoken
+	 * Get or set the name of the currently-selected share tool.
+	 *
+	 * @param string|null $tool Optionally, the share tool to set.
 	 */
-	$app->command('set-ngrok-token [token]', function ($token = null) {
+	$app->command('share-tool [tool]', function ($tool = null) {
+		$share_tools_list = Share::getShareTools();
 
-		if (Share::getCurrentShareTool() != "ngrok") {
-			return info("Please set ngrok as your share tool with `valet share-tool ngrok`.");
+		// If a tool is not provided, then we want to get the current tool.
+		if ($tool === null) {
+			// Get the current share tool.
+			$shareTool = Share::getCurrentShareTool();
+
+			// If there is no share tool set, output a warning message.
+			if ($shareTool === null) {
+				return warning("There is no share tool set. The supported tools are: $share_tools_list");
+			}
+
+			// Otherwise, output the current share tool.
+			return info("The current share tool is: $shareTool");
 		}
 
-		if ($token === null) {
-			return warning("Please provide your ngrok authtoken.");
+		// If the tool is not valid, output a warning message.
+		if (!Share::isToolValid($tool)) {
+			return warning("$tool is not a valid share tool. Please use $share_tools_list.");
 		}
 
-		Ngrok::run("authtoken $token " . Ngrok::getNgrokConfig());
+		// Otherwise, update the share tool key in the config.
+		Configuration::updateKey('share-tool', $tool);
+		info("Share tool set to $tool.");
 
-	})->setAliases(["auth"])->descriptions('Set the ngrok auth token', [
-		"token" => "Your personal ngrok authtoken"
-	])->addUsage("set-ngrok-token 123abc")->addUsage("auth 123abc");
+	})->descriptions('Get or set the name of the current share tool.', [
+		"tool" => "Optionally, set the current share tool"
+	]);
 
 	/**
 	 * Share the current working directory site with a publically accessible URL.
@@ -837,47 +858,6 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 		"--options" => "Optionally, specify ngrok options/flags of its `http` command to pass to ngrok, without the leading <fg=green>--</>. Multiple options must be separated by double slashes <fg=green>//</>."
 	])->addUsage("share mysite")->addUsage("share mysite --options domain=example.com//region=eu")->addUsage("share -o domain=example.com");
 
-	// TODO: Share-tool for Expose (https://expose.dev/)
-	// and 2 open-source clients like localtunnel (https://github.com/localtunnel/localtunnel)
-	// https://boringproxy.io/
-	// https://github.com/anderspitman/awesome-tunneling
-	// https://github.com/robbie-cahill/tunnelmole-client
-
-	/**
-	 * Get or set the name of the currently-selected share tool.
-	 *
-	 * @param string|null $tool Optionally, the share tool to set.
-	 */
-	$app->command('share-tool [tool]', function ($tool = null) {
-		$share_tools_list = Share::getShareTools();
-
-		// If a tool is not provided, then we want to get the current tool.
-		if ($tool === null) {
-			// Get the current share tool.
-			$shareTool = Share::getCurrentShareTool();
-
-			// If there is no share tool set, output a warning message.
-			if ($shareTool === null) {
-				return warning("There is no share tool set. The supported tools are: $share_tools_list");
-			}
-
-			// Otherwise, output the current share tool.
-			return info("The current share tool is: $shareTool");
-		}
-
-		// If the tool is not valid, output a warning message.
-		if (!Share::isToolValid($tool)) {
-			return warning("$tool is not a valid share tool. Please use $share_tools_list.");
-		}
-
-		// Otherwise, update the share tool key in the config.
-		Configuration::updateKey('share-tool', $tool);
-		info("Share tool set to $tool.");
-
-	})->descriptions('Get or set the name of the current share tool.', [
-		"tool" => "Optionally, set the current share tool"
-	]);
-
 	/**
 	 * Get and copy the public URL of the current working directory site
 	 * that is currently being shared
@@ -898,6 +878,30 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 	})->setAliases(["url"])->descriptions('Get and copy the public URL of the current working directory site that is currently being shared', [
 		"site" => "Optionally, specify a site"
 	])->addUsage("fetch-share-url site1")->addUsage("url site1");
+
+	/**
+	 * Sharing - ngrok
+	 */
+
+	/**
+	 * Set the ngrok authtoken.
+	 * @param string $token Your personal ngrok authtoken
+	 */
+	$app->command('set-ngrok-token [token]', function ($token = null) {
+
+		if (Share::getCurrentShareTool() != "ngrok") {
+			return info("Please set ngrok as your share tool with `valet share-tool ngrok`.");
+		}
+
+		if ($token === null) {
+			return warning("Please provide your ngrok authtoken.");
+		}
+
+		Ngrok::run("authtoken $token " . Ngrok::getNgrokConfig());
+
+	})->setAliases(["auth"])->descriptions('Set the ngrok auth token', [
+		"token" => "Your personal ngrok authtoken"
+	])->addUsage("set-ngrok-token 123abc")->addUsage("auth 123abc");
 
 	/**
 	 * Run ngrok commands.
@@ -934,6 +938,9 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 		"commands" => "The ngrok command and its argument's values, separated by spaces.",
 		"--options" => "Specify ngrok options/flags without the leading <fg=green>--</>. Multiple options must be separated by double slashes <fg=green>//</>."
 	])->addUsage("ngrok config add-authtoken [token] --options config=C:/ngrok.yml")->addUsage("ngrok config add-authtoken [token] -o config=C:/ngrok.yml");
+
+	/**** End Sharing ****/
+
 
 	/**
 	 * Starts Valet's services
