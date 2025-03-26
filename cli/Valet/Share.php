@@ -51,6 +51,9 @@ class Share {
 		$this->share_tools = [
 			"ngrok"
 		];
+
+		// Create the share tool instance.
+		$this->createShareToolInstance();
 	}
 
 	/**
@@ -60,8 +63,6 @@ class Share {
 	 * @return object
 	 */
 	public function shareTool() {
-		$this->createShareToolInstance();
-
 		return $this->getShareToolInstance();
 	}
 
@@ -86,7 +87,7 @@ class Share {
 	 * Get the share tool child class instance.
 	 * @return object
 	 */
-	public function getShareToolInstance() {
+	private function getShareToolInstance() {
 		return $this->current_tool_instance;
 	}
 
