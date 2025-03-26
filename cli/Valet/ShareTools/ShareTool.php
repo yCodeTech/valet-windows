@@ -8,6 +8,7 @@ use Exception;
 use DomainException;
 use GuzzleHttp\Client;
 use function Valet\retry;
+use function Valet\info;
 
 abstract class ShareTool {
 	/**
@@ -80,24 +81,37 @@ abstract class ShareTool {
 	 * @return string The current tunnel URL
 	 */
 	public function currentTunnelUrl(string $site) {
-		// Set a new GuzzleHttp client.
-		$client = new Client();
+		info("Trying to retrieve tunnel URL...");
 
-		// Create a GuzzleHttp get request to the ngrok tunnels API.
-		$response = $client->get('http://127.0.0.1:4040/api/tunnels');
+		foreach ($this->tunnelsEndpoints as $endpoint) {
+			try {
+				$response = retry(5, function () use ($endpoint, $site) {
+					// Create a GuzzleHttp get request to the ngrok tunnels API and
+					// get the body of the API response and decode the json.
+					$body = json_decode((new Client())->get($endpoint)->getBody());
 
-		// Get the contents of the API response.
-		$response = $response->getBody()->getContents();
-		// Decode the json response into a properly formed PHP array.
-		$tunnels = json_decode($response, true);
+					// If tunnels is set in the body AND has more than 0 tunnels...
+					if (isset($body->tunnels) && count($body->tunnels) > 0) {
+						// If the tunnel URL is NOT null, return the URL.
+						if ($tunnelUrl = $this->findHttpTunnelUrl($body->tunnels, $site)) {
+							// Use | clip to copy the URL to the clipboard.
+							$this->cli->passthru("echo $tunnelUrl | clip");
 
-		// Find and get the public URL of the site.
-		$url = $this->findHttpTunnelUrl($tunnels["tunnels"], $site);
+							return $tunnelUrl;
+						}
+					}
 
-		if (!empty($url)) {
-			// Use | clip to copy the URL to the clipboard.
-			$this->cli->passthru("echo $url | clip");
-			return $url;
+					throw new DomainException('Failed to retrieve tunnel URL.');
+				}, 250);
+
+				// If response is NOT empty, return the response.
+				if (! empty($response)) {
+					return $response;
+				}
+			}
+			catch (Exception $e) {
+				// Do nothing, suppress the exception to check the other port
+			}
 		}
 
 		throw new DomainException('Tunnel not established.');
@@ -115,9 +129,10 @@ abstract class ShareTool {
 		// find the one responding on HTTP. Each tunnel has an HTTP and a HTTPS address
 		// but for local dev purposes we just desire the plain HTTP URL endpoint.
 		foreach ($tunnels as $tunnel) {
-			if (($tunnel["proto"] === 'http' || $tunnel["proto"] === 'https') && strpos($tunnel["config"]["addr"], $site)) {
-				return $tunnel["public_url"];
+			if (($tunnel->proto === 'http' || $tunnel->proto === 'https') && strpos($tunnel->config->addr, $site)) {
+				return $tunnel->public_url;
 			}
 		}
+		return null;
 	}
 }
