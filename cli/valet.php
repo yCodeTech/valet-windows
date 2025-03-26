@@ -871,7 +871,7 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 
 		$site = $site ?: Site::host(getcwd()) . '.' . Configuration::read()['tld'];
 
-		$url = Share::currentTunnelUrl($site);
+		$url = Share::shareTool()->currentTunnelUrl($site);
 		info("The public URL for $site is: <fg=blue>$url</>");
 		info("It has been copied to your clipboard.");
 
