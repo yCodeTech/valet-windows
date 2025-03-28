@@ -773,10 +773,7 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 	 * Sharing
 	 */
 
-	// TODO: Share-tool for Expose (https://expose.dev/)
-	// and 2 open-source clients like localtunnel (https://github.com/localtunnel/localtunnel)
-	// https://boringproxy.io/
-	// https://github.com/anderspitman/awesome-tunneling
+	// TODO: Add support for other share tools.
 	// https://github.com/robbie-cahill/tunnelmole-client
 
 	/**
