@@ -47,11 +47,11 @@ class Server {
 	}
 
 	/**
-	 * You may use wildcard DNS providers xip.io or nip.io as a tool for testing your site via
+	 * You may use wildcard DNS provider nip.io as a tool for testing your site via
 	 * an IP address.
 	 * It's simple to use: First determine the IP address of your local computer
 	 * (like 192.168.0.10).
-	 * Then simply use http://project.your-ip.xip.io - ie: http://laravel.192.168.0.10.xip.io.
+	 * Then simply use http://project.your-ip.nip.io - ie: http://laravel.192.168.0.10.nip.io.
 	 *
 	 * @param string $domain The domain to check.
 	 *
@@ -59,7 +59,6 @@ class Server {
 	 */
 	public function supportWildcardDnsDomains($domain) {
 		$services = [
-			'.*.*.*.*.xip.io',
 			'.*.*.*.*.nip.io',
 			'-*-*-*-*.nip.io'
 		];
