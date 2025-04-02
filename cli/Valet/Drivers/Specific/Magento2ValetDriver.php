@@ -1,5 +1,9 @@
 <?php
 
+namespace Valet\Drivers\Specific;
+
+use Valet\Drivers\ValetDriver;
+
 class Magento2ValetDriver extends ValetDriver {
 	/**
 	 * Holds the MAGE_MODE from app/etc/config.php or $ENV.

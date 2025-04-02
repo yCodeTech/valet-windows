@@ -1,6 +1,10 @@
 <?php
 
-class ContaoValetDriver extends ValetDriver {
+namespace Valet\Drivers\Specific;
+
+use Valet\Drivers\ValetDriver;
+
+class CakeValetDriver extends ValetDriver {
 	/**
 	 * Determine if the driver serves the request.
 	 *
@@ -10,7 +14,7 @@ class ContaoValetDriver extends ValetDriver {
 	 * @return boolean
 	 */
 	public function serves($sitePath, $siteName, $uri) {
-		return is_dir($sitePath . '/vendor/contao') && file_exists($sitePath . '/web/app.php');
+		return file_exists($sitePath . '/bin/cake');
 	}
 
 	/**
@@ -22,7 +26,7 @@ class ContaoValetDriver extends ValetDriver {
 	 * @return string|false
 	 */
 	public function isStaticFile($sitePath, $siteName, $uri) {
-		if ($this->isActualFile($staticFilePath = $sitePath . '/web' . $uri)) {
+		if ($this->isActualFile($staticFilePath = $sitePath . '/webroot/' . $uri)) {
 			return $staticFilePath;
 		}
 
@@ -38,17 +42,11 @@ class ContaoValetDriver extends ValetDriver {
 	 * @return string
 	 */
 	public function frontControllerPath($sitePath, $siteName, $uri) {
-		if ($uri === '/install.php') {
-			return $sitePath . '/web/install.php';
-		}
+		$_SERVER['DOCUMENT_ROOT'] = $sitePath . '/webroot';
+		$_SERVER['SCRIPT_FILENAME'] = $sitePath . '/webroot/index.php';
+		$_SERVER['SCRIPT_NAME'] = '/index.php';
+		$_SERVER['PHP_SELF'] = '/index.php';
 
-		if (0 === strncmp($uri, '/app_dev.php', 12)) {
-			$_SERVER['SCRIPT_NAME'] = '/app_dev.php';
-			$_SERVER['SCRIPT_FILENAME'] = $sitePath . '/app_dev.php';
-
-			return $sitePath . '/web/app_dev.php';
-		}
-
-		return $sitePath . '/web/app.php';
+		return $sitePath . '/webroot/index.php';
 	}
 }

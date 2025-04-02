@@ -1,6 +1,8 @@
 <?php
 
-class NeosValetDriver extends ValetDriver {
+namespace Valet\Drivers;
+
+class LaravelValetDriver extends ValetDriver {
 	/**
 	 * Determine if the driver serves the request.
 	 *
@@ -10,7 +12,7 @@ class NeosValetDriver extends ValetDriver {
 	 * @return boolean
 	 */
 	public function serves($sitePath, $siteName, $uri) {
-		return file_exists($sitePath . '/flow') && is_dir($sitePath . '/Web');
+		return file_exists($sitePath . '/public/index.php') && file_exists($sitePath . '/artisan');
 	}
 
 	/**
@@ -22,8 +24,18 @@ class NeosValetDriver extends ValetDriver {
 	 * @return string|false
 	 */
 	public function isStaticFile($sitePath, $siteName, $uri) {
-		if ($this->isActualFile($staticFilePath = $sitePath . '/Web' . $uri)) {
+		if (file_exists($staticFilePath = $sitePath . '/public' . $uri)&& is_file($staticFilePath)) {
 			return $staticFilePath;
+		}
+
+		$storageUri = $uri;
+
+		if (strpos($uri, '/storage/') === 0) {
+			$storageUri = substr($uri, 8);
+		}
+
+		if ($this->isActualFile($storagePath = $sitePath . '/storage/app/public' . $storageUri)) {
+			return $storagePath;
 		}
 
 		return false;
@@ -38,11 +50,11 @@ class NeosValetDriver extends ValetDriver {
 	 * @return string
 	 */
 	public function frontControllerPath($sitePath, $siteName, $uri) {
-		putenv('FLOW_CONTEXT=Development');
-		putenv('FLOW_REWRITEURLS=1');
-		$_SERVER['SCRIPT_FILENAME'] = $sitePath . '/Web/index.php';
-		$_SERVER['SCRIPT_NAME'] = '/index.php';
+		// Shortcut for getting the "local" hostname as the HTTP_HOST
+		if (isset($_SERVER['HTTP_X_ORIGINAL_HOST'], $_SERVER['HTTP_X_FORWARDED_HOST'])) {
+			$_SERVER['HTTP_HOST'] = $_SERVER['HTTP_X_FORWARDED_HOST'];
+		}
 
-		return $sitePath . '/Web/index.php';
+		return $sitePath . '/public/index.php';
 	}
 }
