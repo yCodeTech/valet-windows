@@ -1,5 +1,9 @@
 <?php
 
+namespace Valet\Drivers\Specific;
+
+use Valet\Drivers\BasicValetDriver;
+
 class WordPressValetDriver extends BasicValetDriver {
 	/**
 	 * Determine if the driver serves the request.

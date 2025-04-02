@@ -1,5 +1,9 @@
 <?php
 
+namespace Valet\Drivers\Specific;
+
+use Valet\Drivers\BasicValetDriver;
+
 class Concrete5ValetDriver extends BasicValetDriver {
 	/**
 	 * If a concrete directory exists, it's probably c5.
