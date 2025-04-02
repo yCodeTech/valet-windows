@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/cli/drivers/require.php';
+require_once __DIR__ . '/cli/includes/require-drivers.php';
 require_once __DIR__ . '/cli/Valet/Server.php';
 
 use Valet\Server;
