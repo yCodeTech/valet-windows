@@ -1,5 +1,9 @@
 <?php
 
+namespace Valet\Drivers\Specific;
+
+use Valet\Drivers\ValetDriver;
+
 /**
  * This driver serves TYPO3 instances (version 7.0 and up). It activates, if it
  * finds the characteristic typo3/ folder in the document root, serves both

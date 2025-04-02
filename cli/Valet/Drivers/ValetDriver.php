@@ -2,6 +2,13 @@
 
 // TODO: Update all Drivers to make sure they're on par with macOS.
 
+namespace Valet\Drivers;
+
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use RecursiveRegexIterator;
+use RegexIterator;
+
 abstract class ValetDriver {
 	/**
 	 * Determine if the driver serves the request.
