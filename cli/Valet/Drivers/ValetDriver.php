@@ -139,6 +139,19 @@ abstract class ValetDriver {
 	}
 
 	/**
+	 * Take any steps necessary before loading the front controller for this driver.
+	 *
+	 * @param string $sitePath
+	 * @param string $siteName
+	 * @param string $uri
+	 *
+	 * @return void
+	 */
+	public function beforeLoading($sitePath, $siteName, $uri) {
+		// Do nothing
+	}
+
+	/**
 	 * Mutate the incoming URI.
 	 *
 	 * @param string $uri

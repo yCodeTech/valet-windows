@@ -57,6 +57,24 @@ class Typo3ValetDriver extends ValetDriver {
 	}
 
 	/**
+	 * Take any steps necessary before loading the front controller for this driver.
+	 *
+	 * @param string $sitePath
+	 * @param string $siteName
+	 * @param string $uri
+	 * @return void
+	 */
+	public function beforeLoading($sitePath, $siteName, $uri) {
+		// without modifying the URI, redirect if necessary
+		$this->handleRedirectBackendShorthandUris($uri);
+
+		$_SERVER['SERVER_NAME'] = "{$siteName}.dev";
+		$_SERVER['DOCUMENT_URI'] = $uri;
+		$_SERVER['SCRIPT_NAME'] = $uri;
+		$_SERVER['PHP_SELF'] = $uri;
+	}
+
+	/**
 	 * Determine if the incoming request is for a static file. That is, it is
 	 * no PHP script file and the URI points to a valid file (no folder) on
 	 * the disk. Access to those static files will be authorized.
@@ -115,9 +133,6 @@ class Typo3ValetDriver extends ValetDriver {
 	 * @return string
 	 */
 	public function frontControllerPath($sitePath, $siteName, $uri) {
-		// without modifying the URI, redirect if necessary
-		$this->handleRedirectBackendShorthandUris($uri);
-
 		// from now on, remove trailing / for convenience for all the following join operations
 		$uri = rtrim($uri, '/');
 
@@ -126,7 +141,7 @@ class Typo3ValetDriver extends ValetDriver {
 			if (is_dir($absoluteFilePath)) {
 				if (file_exists("{$absoluteFilePath}/index.php")) {
 					// this folder can be served by index.php
-					return $this->serveScript($sitePath, $siteName, "{$uri}/index.php");
+					return $this->serveScript($sitePath, "{$uri}/index.php");
 				}
 
 				if (file_exists("{$absoluteFilePath}/index.html")) {
@@ -136,12 +151,12 @@ class Typo3ValetDriver extends ValetDriver {
 			}
 			elseif (pathinfo($absoluteFilePath, PATHINFO_EXTENSION) === 'php') {
 				// this file can be served directly
-				return $this->serveScript($sitePath, $siteName, $uri);
+				return $this->serveScript($sitePath, $uri);
 			}
 		}
 
 		// the global index.php will handle all other cases
-		return $this->serveScript($sitePath, $siteName, '/index.php');
+		return $this->serveScript($sitePath, '/index.php');
 	}
 
 	/**
@@ -170,21 +185,16 @@ class Typo3ValetDriver extends ValetDriver {
 	 * the specified URI and returns it absolute file path.
 	 *
 	 * @param string $sitePath
-	 * @param string $siteName
 	 * @param string $uri
 	 *
 	 * @return string
 	 */
-	private function serveScript($sitePath, $siteName, $uri) {
+	private function serveScript($sitePath, $uri) {
 		$docroot = "{$sitePath}{$this->documentRoot}";
 		$abspath = "{$docroot}{$uri}";
 
-		$_SERVER['SERVER_NAME'] = "{$siteName}.dev";
 		$_SERVER['DOCUMENT_ROOT'] = $docroot;
-		$_SERVER['DOCUMENT_URI'] = $uri;
 		$_SERVER['SCRIPT_FILENAME'] = $abspath;
-		$_SERVER['SCRIPT_NAME'] = $uri;
-		$_SERVER['PHP_SELF'] = $uri;
 
 		return $abspath;
 	}
