@@ -1,5 +1,9 @@
 <?php
 
+namespace Valet\Drivers\Custom;
+
+use Valet\Drivers\ValetDriver;
+
 class SampleValetDriver extends ValetDriver {
 	/**
 	 * Determine if the driver serves the request.
