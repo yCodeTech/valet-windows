@@ -64,7 +64,8 @@ abstract class ValetDriver {
 			$drivers[] = $customSiteDriver;
 		}
 
-		$drivers = array_merge($drivers, static::driversIn(VALET_HOME_PATH . '/Drivers'));
+		// Queue custom drivers for this environment
+		$drivers = array_merge($drivers, static::customDrivers());
 
 		// Queue Valet-shipped drivers
 		$drivers[] = 'Specific\StatamicValetDriver';
@@ -143,6 +144,16 @@ abstract class ValetDriver {
 		}, static::driversIn(__DIR__ . '/Specific'));
 	}
 
+	/**
+	 * Get all of the custom drivers defined by the user in `~/.config/valet/Drivers`.
+	 *
+	 * @return array
+	 */
+	public static function customDrivers() {
+		return array_map(function ($item) {
+			return "Custom\\$item";
+		}, static::driversIn(VALET_HOME_PATH . '/Drivers'));
+	}
 
 	/**
 	 * Take any steps necessary before loading the front controller for this driver.
