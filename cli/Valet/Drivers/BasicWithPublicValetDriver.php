@@ -2,7 +2,7 @@
 
 namespace Valet\Drivers;
 
-class BasicValetDriver extends ValetDriver {
+class BasicWithPublicValetDriver extends ValetDriver {
 	/**
 	 * Determine if the driver serves the request.
 	 *
@@ -13,7 +13,7 @@ class BasicValetDriver extends ValetDriver {
 	 * @return bool
 	 */
 	public function serves($sitePath, $siteName, $uri) {
-		return true;
+		return is_dir("$sitePath/public/");
 	}
 
 	/**
@@ -23,14 +23,16 @@ class BasicValetDriver extends ValetDriver {
 	 * @param string $siteName
 	 * @param string $uri
 	 *
-	 * @return string|false
+	 * @return bool|string
 	 */
 	public function isStaticFile($sitePath, $siteName, $uri) {
-		if (file_exists($staticFilePath = $sitePath . rtrim($uri, '/') . '/index.html')) {
-			return $staticFilePath;
+		$publicPath = "$sitePath/public/" . trim($uri, '/');
+
+		if ($this->isActualFile($publicPath)) {
+			return $publicPath;
 		}
-		elseif ($this->isActualFile($staticFilePath = $sitePath . $uri)) {
-			return $staticFilePath;
+		elseif (file_exists("$publicPath/index.html")) {
+			return "$publicPath/index.html";
 		}
 
 		return false;
@@ -43,27 +45,28 @@ class BasicValetDriver extends ValetDriver {
 	 * @param string $siteName
 	 * @param string $uri
 	 *
-	 * @return string
+	 * @return string|null
 	 */
 	public function frontControllerPath($sitePath, $siteName, $uri) {
 		$_SERVER['PHP_SELF'] = $uri;
 		$_SERVER['SERVER_ADDR'] = '127.0.0.1';
 		$_SERVER['SERVER_NAME'] = $_SERVER['HTTP_HOST'];
-		
+
+		$docRoot = "$sitePath/public";
 		$uri = rtrim($uri, '/');
 
 		$candidates = [
-			$sitePath . $uri,
-			$sitePath . "$uri/index.php",
-			"$sitePath/index.php",
-			"$sitePath/index.html"
+			$docRoot . $uri,
+			$docRoot . "$uri/index.php",
+			"$docRoot/index.php",
+			"$docRoot/index.html"
 		];
 
 		foreach ($candidates as $candidate) {
 			if ($this->isActualFile($candidate)) {
 				$_SERVER['SCRIPT_FILENAME'] = $candidate;
-				$_SERVER['SCRIPT_NAME'] = str_replace($sitePath, '', $candidate);
-				$_SERVER['DOCUMENT_ROOT'] = $sitePath;
+				$_SERVER['SCRIPT_NAME'] = str_replace("$sitePath/public", '', $candidate);
+				$_SERVER['DOCUMENT_ROOT'] = "$sitePath/public";
 
 				return $candidate;
 			}
