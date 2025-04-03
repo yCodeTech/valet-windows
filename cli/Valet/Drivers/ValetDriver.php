@@ -55,38 +55,32 @@ abstract class ValetDriver {
 	public static function assign($sitePath, $siteName, $uri) {
 		$drivers = [];
 
+		// Get all specific drivers.
+		// Must scan these so they're extensible by customSiteDrivers loaded next.
+		$specificDrivers = static::specificDrivers();
+
+		// Queue custom driver based on path
 		if ($customSiteDriver = static::customSiteDriver($sitePath)) {
 			$drivers[] = $customSiteDriver;
 		}
 
 		$drivers = array_merge($drivers, static::driversIn(VALET_HOME_PATH . '/Drivers'));
 
+		// Queue Valet-shipped drivers
+		$drivers[] = 'Specific\StatamicValetDriver';
 		$drivers[] = 'LaravelValetDriver';
-
-		$drivers[] = 'WordPressValetDriver';
-		$drivers[] = 'BedrockValetDriver';
-		$drivers[] = 'ContaoValetDriver';
-		$drivers[] = 'SymfonyValetDriver';
-		$drivers[] = 'CraftValetDriver';
-		$drivers[] = 'StatamicValetDriver';
-		$drivers[] = 'StatamicV1ValetDriver';
-		$drivers[] = 'CakeValetDriver';
-		$drivers[] = 'SculpinValetDriver';
-		$drivers[] = 'JigsawValetDriver';
-		$drivers[] = 'KirbyValetDriver';
-		$drivers[] = 'KatanaValetDriver';
-		$drivers[] = 'JoomlaValetDriver';
-		$drivers[] = 'DrupalValetDriver';
-		$drivers[] = 'Concrete5ValetDriver';
-		$drivers[] = 'Typo3ValetDriver';
-		$drivers[] = 'NeosValetDriver';
-		$drivers[] = 'Magento2ValetDriver';
-
+		$drivers = array_unique(array_merge($drivers, $specificDrivers));
 		$drivers[] = 'BasicWithPublicValetDriver';
 		$drivers[] = 'BasicValetDriver';
 
 		foreach ($drivers as $driver) {
-			$driver = new $driver();
+			if ($driver === 'LocalValetDriver') {
+				$driver = new $driver();
+			}
+			else {
+				$className = "Valet\Drivers\\{$driver}";
+				$driver = new $className();
+			}
 
 			if ($driver->serves($sitePath, $siteName, $driver->mutateUri($uri))) {
 				return $driver;
@@ -137,6 +131,18 @@ abstract class ValetDriver {
 
 		return $drivers;
 	}
+
+	/**
+	 * Get all of the specific drivers shipped with Valet.
+	 *
+	 * @return array
+	 */
+	public static function specificDrivers() {
+		return array_map(function ($item) {
+			return "Specific\\$item";
+		}, static::driversIn(__DIR__ . '/Specific'));
+	}
+
 
 	/**
 	 * Take any steps necessary before loading the front controller for this driver.
