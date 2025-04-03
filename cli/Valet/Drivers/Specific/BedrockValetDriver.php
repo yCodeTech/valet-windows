@@ -19,6 +19,20 @@ class BedrockValetDriver extends BasicValetDriver {
 	}
 
 	/**
+	 * Take any steps necessary before loading the front controller for this driver.
+	 *
+	 * @param string $sitePath
+	 * @param string $siteName
+	 * @param string $uri
+	 *
+	 * @return void
+	 */
+	public function beforeLoading($sitePath, $siteName, $uri) {
+		$_SERVER['PHP_SELF'] = $uri;
+		$_SERVER['SERVER_NAME'] = $_SERVER['HTTP_HOST'];
+	}
+
+	/**
 	 * Determine if the incoming request is for a static file.
 	 *
 	 * @param string $sitePath
@@ -47,9 +61,6 @@ class BedrockValetDriver extends BasicValetDriver {
 	 * @return string
 	 */
 	public function frontControllerPath($sitePath, $siteName, $uri) {
-		$_SERVER['PHP_SELF'] = $uri;
-		$_SERVER['SERVER_NAME'] = $_SERVER['HTTP_HOST'];
-
 		if (strpos($uri, '/wp/') === 0) {
 			return is_dir("$sitePath/web$uri")
 			? "$sitePath/web" . $this->forceTrailingSlash($uri) . '/index.php'

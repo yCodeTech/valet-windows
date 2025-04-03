@@ -19,6 +19,22 @@ class CakeValetDriver extends ValetDriver {
 	}
 
 	/**
+	 * Take any steps necessary before loading the front controller for this driver.
+	 *
+	 * @param string $sitePath
+	 * @param string $siteName
+	 * @param string $uri
+	 *
+	 * @return void
+	 */
+	public function beforeLoading($sitePath, $siteName, $uri) {
+		$_SERVER['DOCUMENT_ROOT'] = "{$sitePath}/webroot";
+		$_SERVER['SCRIPT_FILENAME'] = "{$sitePath}/webroot/index.php";
+		$_SERVER['SCRIPT_NAME'] = '/index.php';
+		$_SERVER['PHP_SELF'] = '/index.php';
+	}
+
+	/**
 	 * Determine if the incoming request is for a static file.
 	 *
 	 * @param string $sitePath
@@ -45,11 +61,6 @@ class CakeValetDriver extends ValetDriver {
 	 * @return string
 	 */
 	public function frontControllerPath($sitePath, $siteName, $uri) {
-		$_SERVER['DOCUMENT_ROOT'] = "{$sitePath}/webroot";
-		$_SERVER['SCRIPT_FILENAME'] = "{$sitePath}/webroot/index.php";
-		$_SERVER['SCRIPT_NAME'] = '/index.php';
-		$_SERVER['PHP_SELF'] = '/index.php';
-
 		return "{$sitePath}/webroot/index.php";
 	}
 }
