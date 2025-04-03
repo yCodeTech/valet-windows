@@ -8,37 +8,32 @@ class DrupalValetDriver extends ValetDriver {
 	/**
 	 * Determine if the driver serves the request.
 	 *
-	 * @param  string  $sitePath
-	 * @param  string  $siteName
-	 * @param  string  $uri
-	 * @return boolean
+	 * @param string $sitePath
+	 * @param string $siteName
+	 * @param string $uri
+	 *
+	 * @return bool
 	 */
 	public function serves($sitePath, $siteName, $uri) {
 		$sitePath = $this->addSubdirectory($sitePath);
 
-		/**
-		 * /misc/drupal.js = Drupal 7
-		 * /core/lib/Drupal.php = Drupal 8.
-		 */
-		if (file_exists($sitePath . '/misc/drupal.js') || file_exists($sitePath . '/core/lib/Drupal.php')) {
-			return true;
-		}
-		return false;
+		return file_exists("{$sitePath}/misc/drupal.js") || file_exists("{$sitePath}/core/lib/Drupal.php");
 	}
 
 	/**
 	 * Determine if the incoming request is for a static file.
 	 *
-	 * @param  string  $sitePath
-	 * @param  string  $siteName
-	 * @param  string  $uri
+	 * @param string $sitePath
+	 * @param string $siteName
+	 * @param string $uri
+	 *
 	 * @return string|false
 	 */
 	public function isStaticFile($sitePath, $siteName, $uri) {
 		$sitePath = $this->addSubdirectory($sitePath);
 
-		if (file_exists($sitePath . $uri) && !is_dir($sitePath . $uri) && pathinfo($sitePath . $uri)['extension'] != 'php') {
-			return $sitePath . $uri;
+		if (file_exists("{$sitePath}{$uri}") && !is_dir("{$sitePath}{$uri}") && pathinfo("{$sitePath}{$uri}")['extension'] != 'php') {
+			return "{$sitePath}{$uri}";
 		}
 
 		return false;
@@ -47,9 +42,10 @@ class DrupalValetDriver extends ValetDriver {
 	/**
 	 * Get the fully resolved path to the application's front controller.
 	 *
-	 * @param  string  $sitePath
-	 * @param  string  $siteName
-	 * @param  string  $uri
+	 * @param string $sitePath
+	 * @param string $siteName
+	 * @param string $uri
+	 *
 	 * @return string
 	 */
 	public function frontControllerPath($sitePath, $siteName, $uri) {
@@ -62,27 +58,30 @@ class DrupalValetDriver extends ValetDriver {
 		$matches = [];
 		if (preg_match('/^\/(.*?)\.php/', $uri, $matches)) {
 			$filename = $matches[0];
-			if (file_exists($sitePath . $filename) && !is_dir($sitePath . $filename)) {
-				$_SERVER['SCRIPT_FILENAME'] = $sitePath . $filename;
+			if (file_exists("{$sitePath}{$filename}") && !is_dir("{$sitePath}{$filename}")) {
+				$_SERVER['SCRIPT_FILENAME'] = "{$sitePath}{$filename}";
 				$_SERVER['SCRIPT_NAME'] = $filename;
 
-				return $sitePath . $filename;
+				return "{$sitePath}{$filename}";
 			}
 		}
 
-		// Fallback
-		$_SERVER['SCRIPT_FILENAME'] = $sitePath . '/index.php';
+		$_SERVER['SCRIPT_FILENAME'] = "{$sitePath}/index.php";
 		$_SERVER['SCRIPT_NAME'] = '/index.php';
 
-		return $sitePath . '/index.php';
+		return "{$sitePath}/index.php";
 	}
 
 	/**
 	 * Add any matching subdirectory to the site path.
+	 *
+	 * @param string $sitePath
+	 *
+	 * @return string
 	 */
 	public function addSubdirectory($sitePath) {
 		$paths = array_map(function ($subDir) use ($sitePath) {
-			return "$sitePath/$subDir";
+			return "{$sitePath}/{$subDir}";
 		}, $this->possibleSubdirectories());
 
 		$foundPaths = array_filter($paths, function ($path) {
