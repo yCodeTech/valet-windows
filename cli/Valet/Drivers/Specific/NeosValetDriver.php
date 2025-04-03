@@ -19,6 +19,21 @@ class NeosValetDriver extends ValetDriver {
 	}
 
 	/**
+	 * Take any steps necessary before loading the front controller for this driver.
+	 *
+	 * @param string $sitePath
+	 * @param string $siteName
+	 * @param string $uri
+	 * @return void
+	 */
+	public function beforeLoading($sitePath, $siteName, $uri) {
+		putenv('FLOW_CONTEXT=Development');
+		putenv('FLOW_REWRITEURLS=1');
+		$_SERVER['SCRIPT_FILENAME'] = "{$sitePath}/Web/index.php";
+		$_SERVER['SCRIPT_NAME'] = '/index.php';
+	}
+
+	/**
 	 * Determine if the incoming request is for a static file.
 	 *
 	 * @param string $sitePath
@@ -45,11 +60,6 @@ class NeosValetDriver extends ValetDriver {
 	 * @return string
 	 */
 	public function frontControllerPath($sitePath, $siteName, $uri) {
-		putenv('FLOW_CONTEXT=Development');
-		putenv('FLOW_REWRITEURLS=1');
-		$_SERVER['SCRIPT_FILENAME'] = "{$sitePath}/Web/index.php";
-		$_SERVER['SCRIPT_NAME'] = '/index.php';
-
 		return "{$sitePath}/Web/index.php";
 	}
 }

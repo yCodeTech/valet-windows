@@ -21,6 +21,18 @@ class RadicleValetDriver extends BasicValetDriver {
 	}
 
 	/**
+	 * Take any steps necessary before loading the front controller for this driver.
+	 *
+	 * @param string $sitePath
+	 * @param string $siteName
+	 * @param string $uri
+	 * @return void
+	 */
+	public function beforeLoading($sitePath, $siteName, $uri) {
+		$_SERVER['PHP_SELF'] = $uri;
+	}
+
+	/**
 	 * Determine if the incoming request is for a static file.
 	 *
 	 * @param string $sitePath
@@ -48,7 +60,6 @@ class RadicleValetDriver extends BasicValetDriver {
 	 * @return string
 	 */
 	public function frontControllerPath($sitePath, $siteName, $uri) {
-		$_SERVER['PHP_SELF'] = $uri;
 		if (strpos($uri, '/wp/') === 0) {
 			return is_dir("{$sitePath}/public{$uri}")
 			? "{$sitePath}/public" . $this->forceTrailingSlash($uri) . '/index.php'

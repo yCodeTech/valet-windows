@@ -17,6 +17,23 @@ class LaravelValetDriver extends ValetDriver {
 	}
 
 	/**
+	 * Take any steps necessary before loading the front controller for this driver.
+	 *
+	 * @param string $sitePath
+	 * @param string $siteName
+	 * @param string $uri
+	 *
+	 * @return void
+	 */
+	public function beforeLoading($sitePath, $siteName, $uri) {
+		// Shortcut for getting the "local" hostname as the HTTP_HOST, especially when
+		// proxied or using 'share'
+		if (isset($_SERVER['HTTP_X_FORWARDED_HOST'])) {
+			$_SERVER['HTTP_HOST'] = $_SERVER['HTTP_X_FORWARDED_HOST'];
+		}
+	}
+
+	/**
 	 * Determine if the incoming request is for a static file.
 	 *
 	 * @param string $sitePath
@@ -53,10 +70,6 @@ class LaravelValetDriver extends ValetDriver {
 	 * @return string
 	 */
 	public function frontControllerPath($sitePath, $siteName, $uri) {
-		// Shortcut for getting the "local" hostname as the HTTP_HOST
-		if (isset($_SERVER['HTTP_X_ORIGINAL_HOST'], $_SERVER['HTTP_X_FORWARDED_HOST'])) {
-			$_SERVER['HTTP_HOST'] = $_SERVER['HTTP_X_FORWARDED_HOST'];
-		}
 
 		return "$sitePath/public/index.php";
 	}

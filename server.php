@@ -74,6 +74,11 @@ if ($staticFilePath) {
 }
 
 /**
+ * Allow for drivers to take pre-loading actions (e.g. setting server variables).
+ */
+$valetDriver->beforeLoading($valetSitePath, $siteName, $uri);
+
+/**
  * Attempt to dispatch to a front controller.
  */
 $frontControllerPath = $valetDriver->frontControllerPath($valetSitePath, $siteName, $uri);
