@@ -182,21 +182,6 @@ class Filesystem {
 	}
 
 	/**
-	 * Create a symlink to the given target.
-	 *
-	 * @param string $target
-	 * @param string $link
-	 * @return void
-	 */
-	public function symlink($target, $link) {
-		if ($this->exists($link)) {
-			$this->unlink($link);
-		}
-
-		symlink($target, $link);
-	}
-
-	/**
 	 * Create a symlink to the given target for the non-root user.
 	 *
 	 * This uses the command line as PHP can't change symlink permissions.
