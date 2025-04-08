@@ -301,7 +301,7 @@ class Filesystem {
 	 * @return bool
 	 */
 	public function isBrokenLink($path) {
-		return is_link($path) || @readlink($path) === false;
+		return $this->isLink($path) && !file_exists($this->readLink($path));
 	}
 
 	/**
