@@ -5,9 +5,6 @@ require_once __DIR__ . '/cli/Valet/Server.php';
 
 use Valet\Server;
 
-/** Load the Valet server instance. */
-$server = new Server($valetConfig);
-
 /**
  * Define the user's "~/.config/valet" path.
  */
@@ -21,6 +18,9 @@ $valetConfig = json_decode(
 	file_get_contents(VALET_HOME_PATH . '/config.json'),
 	true
 );
+
+/** Load the Valet server instance. */
+$server = new Server($valetConfig);
 
 /**
  * Parse the URI and site / host for the incoming request.
