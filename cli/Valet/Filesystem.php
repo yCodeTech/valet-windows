@@ -207,24 +207,14 @@ class Filesystem {
 	 * @return void
 	 */
 	public function unlink($path) {
-		if ($this->isLink($path)) {
-			$dir = pathinfo($path, PATHINFO_DIRNAME);
-			$link = pathinfo($path, PATHINFO_BASENAME);
-
-			if (is_dir($path)) {
-				exec("cd \"{$dir}\" && rmdir {$link}");
-			}
-			else {
-				@unlink($path);
-				@rmdir($path);
-			}
-		}
-		elseif ($this->isDir($path)) {
-			exec('cmd /C rmdir /s /q "' . $path . '"');
-		}
-		elseif (file_exists($path)) {
+		// If the path is a symlinked directory OR is a file, remove it.
+		if ($this->isLink($path) || $this->isFile($path)) {
 			@unlink($path);
 			@rmdir($path);
+		}
+		// If the path is a directory, remove it and all it's contents.
+		elseif ($this->isDir($path)) {
+			exec('cmd /C rmdir /s /q "' . $path . '"');
 		}
 	}
 
@@ -267,11 +257,7 @@ class Filesystem {
 	 * @return bool
 	 */
 	public function isLink($path) {
-		if (is_link($path)) {
-			return true;
-		}
-
-		return $this->isDir($path) && filesize($path) === 0;
+		return is_link($path);
 	}
 
 	/**
@@ -282,6 +268,16 @@ class Filesystem {
 	 */
 	public function readLink($path) {
 		return readlink($path);
+	}
+
+	/**
+	 * Determine if the given path is a file.
+	 *
+	 * @param string $path
+	 * @return bool
+	 */
+	public function isFile($path) {
+		return is_file($path);
 	}
 
 	/**
