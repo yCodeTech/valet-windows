@@ -33,9 +33,15 @@ class CommandLine {
 	 * https://github.com/gerardog/gsudo
 	 *
 	 * @param string $valetCommand The Valet command to run.
+	 * @param bool $asTrustedInstaller Set to `true` to run the command as a trusted installer. Default: `false`
 	 */
-	public function sudo($valetCommand) {
+	public function sudo($valetCommand, $asTrustedInstaller = false) {
 		$gsudo = '"' . realpath(valetBinPath() . 'gsudo/gsudo.exe') . '" --system -d ';
+
+		if ($asTrustedInstaller) {
+			$gsudo .= " --ti ";
+		}
+
 		$this->passthru($gsudo . "$valetCommand");
 	}
 

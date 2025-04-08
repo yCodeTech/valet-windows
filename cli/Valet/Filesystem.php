@@ -2,6 +2,8 @@
 
 namespace Valet;
 
+use CommandLine;
+
 class Filesystem {
 	/**
 	 * Determine if the given path is a directory.
@@ -182,9 +184,7 @@ class Filesystem {
 	}
 
 	/**
-	 * Create a symlink to the given target for the non-root user.
-	 *
-	 * This uses the command line as PHP can't change symlink permissions.
+	 * Create a symlink to the given target.
 	 *
 	 * @param string $target
 	 * @param string $link
@@ -195,7 +195,9 @@ class Filesystem {
 			$this->unlink($link);
 		}
 
-		exec("mklink /D \"{$link}\" \"{$target}\"");
+		// Use `mklink` with the `/D` param to create a directory symlink.
+		// Use sudo to run with trusted installer privileges as the `/D` param requires it.
+		CommandLine::sudo("mklink /D \"{$link}\" \"{$target}\"", true);
 	}
 
 	/**
