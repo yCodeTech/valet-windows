@@ -91,7 +91,7 @@ class Site {
 
 		$this->config->prependPath($linkPath);
 
-		$this->files->symlinkAsUser($target, $linkPath . '/' . $link);
+		$this->files->symlink($target, $linkPath . '/' . $link);
 
 		return $linkPath . '/' . $link;
 	}

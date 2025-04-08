@@ -190,7 +190,7 @@ class Filesystem {
 	 * @param string $link
 	 * @return void
 	 */
-	public function symlinkAsUser($target, $link) {
+	public function symlink($target, $link) {
 		if ($this->exists($link)) {
 			$this->unlink($link);
 		}
