@@ -195,9 +195,7 @@ class Filesystem {
 			$this->unlink($link);
 		}
 
-		$mode = is_dir($target) ? 'J' : 'H';
-
-		exec("mklink /{$mode} \"{$link}\" \"{$target}\"");
+		exec("mklink /D \"{$link}\" \"{$target}\"");
 	}
 
 	/**
