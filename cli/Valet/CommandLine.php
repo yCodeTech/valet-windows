@@ -34,15 +34,16 @@ class CommandLine {
 	 *
 	 * @param string $valetCommand The Valet command to run.
 	 * @param bool $asTrustedInstaller Set to `true` to run the command as a trusted installer. Default: `false`
+	 * @param bool $quiet Set to `true` to suppress the output. Default: `false`
 	 */
-	public function sudo($valetCommand, $asTrustedInstaller = false) {
+	public function sudo($valetCommand, $asTrustedInstaller = false, $quiet = false) {
 		$gsudo = '"' . realpath(valetBinPath() . 'gsudo/gsudo.exe') . '" --system -d ';
 
 		if ($asTrustedInstaller) {
 			$gsudo .= " --ti ";
 		}
 
-		$this->passthru($gsudo . "$valetCommand");
+		$this->passthru($gsudo . $valetCommand . ($quiet ? ' > nul 2>&1' : ''));
 	}
 
 	/**

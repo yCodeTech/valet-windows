@@ -197,7 +197,7 @@ class Filesystem {
 
 		// Use `mklink` with the `/D` param to create a directory symlink.
 		// Use sudo to run with trusted installer privileges as the `/D` param requires it.
-		CommandLine::sudo("mklink /D \"{$link}\" \"{$target}\"", true);
+		CommandLine::sudo("mklink /D \"{$link}\" \"{$target}\"", true, true);
 	}
 
 	/**
