@@ -305,6 +305,63 @@ class Filesystem {
 	}
 
 	/**
+	 * Convert all junction links in the given path to real symlinks.
+	 *
+	 * @param string $path The path to scan for junction links.
+	 */
+	public function convertJunctionsToSymlinks($path) {
+		/**
+		 * @var \Illuminate\Support\Collection
+		 */
+		$collection = $this->getJunctionLinks($path);
+
+		if ($collection->isEmpty()) {
+			return;
+		}
+		// Remove all the junction links and create new symlinks to the same path.
+		$collection->each(function ($link) use ($path) {
+			$output = CommandLine::run('cmd /C rmdir /s /q "' . $path . '/' . $link['linkName']. '"');
+
+			if ($output->isSuccessful()) {
+				$this->symlink($link['path'], $link['linkName']);
+			}
+		});
+	}
+
+	/**
+	 * Get all the junction links in the given path.
+	 *
+	 * @param string $path The path to scan for junction links.
+	 *
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function getJunctionLinks($path) {
+		/**
+		 * @var \Illuminate\Support\Collection
+		 */
+		$collection = collect();
+
+		$output = CommandLine::run("cmd /C dir \"$path\" /a:L | findstr \"<JUNCTION>\"");
+		$outputArray = explode("\n", $output->getOutput());
+
+		foreach ($outputArray as $line) {
+			if (str_contains($line, '<JUNCTION>')) {
+				// Split the line by whitespace, but ignore whitespace inside brackets.
+				// This is to avoid splitting the path if it contains spaces.
+				$line = preg_split('/[\s]+(?![^\[]*\])/', $line);
+
+				// Set the link name and path to the collection.
+				$collection->push([
+					"linkName" => $line[3],
+					"path" => str_replace(["[", "]"], "", $line[4])
+				]);
+			}
+		}
+		return $collection;
+	}
+
+
+	/**
 	 * Scan the given directory path.
 	 *
 	 * @param string $path
