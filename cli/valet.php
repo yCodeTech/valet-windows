@@ -32,14 +32,7 @@ Container::setInstance(new Container());
 
 $app = new Application('Laravel Valet Windows', $version);
 
-/**
- * Prune missing directories and symbolic links on every command.
- */
-if (is_dir(VALET_HOME_PATH)) {
-	Configuration::prune();
-
-	Site::pruneLinks();
-}
+Upgrader::onEveryRun();
 
 // TODO: Abstract all Xdebug related code into a separate opt-in custom extension, this could be an alternative to just deprecating Xdebug functionality altogether.
 
