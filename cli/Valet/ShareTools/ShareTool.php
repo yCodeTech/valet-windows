@@ -30,7 +30,7 @@ abstract class ShareTool {
 	];
 
 	/**
-	 * Create a new Nginx instance.
+	 * Create a new instance.
 	 *
 	 * @param CommandLine $cli
 	 * @param Filesystem $files

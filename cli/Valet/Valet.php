@@ -121,7 +121,7 @@ class Valet {
 			\GuzzleHttp\RequestOptions::VERIFY => CaBundle::getSystemCaRootBundlePath()
 		]);
 
-		// Create a GuzzleHttp get request to the ngrok tunnels API.
+		// Create a GuzzleHttp get request to the github API.
 		$get = $client->request(
 			"GET",
 			'https://api.github.com/repos/ycodetech/valet-windows/releases/latest'
