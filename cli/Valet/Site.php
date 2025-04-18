@@ -548,9 +548,9 @@ class Site {
 			$this->files->unlink($this->certificatesPath($url, 'crt'));
 		}
 
-		$this->cli->run(sprintf('cmd "/C certutil -delstore "CA" "%s""', $url));
+		$this->cli->run(sprintf('cmd "/C certutil -user -delstore "CA" "%s""', $url));
 
-		$this->cli->run(sprintf('cmd "/C certutil -delstore "Root" "%s""', $url));
+		$this->cli->run(sprintf('cmd "/C certutil -user -delstore "Root" "%s""', $url));
 
 		// If the user had isolated the PHP version for this site, swap out .sock file
 		if ($phpVersion) {
@@ -718,7 +718,7 @@ class Site {
 		}
 
 		$this->cli->runOrExit(
-			sprintf('cmd "/C certutil -delstore "Root" "%s""', $cName),
+			sprintf('cmd "/C certutil -user -delstore "Root" "%s""', $cName),
 			function ($code, $output) {
 				error("Failed to delete certificate: $output", true);
 			}
@@ -869,7 +869,7 @@ class Site {
 	 */
 	public function trustCa($caPemPath) {
 		$this->cli->runOrExit(
-			sprintf('cmd "/C certutil -addstore "Root" "%s""', $caPemPath),
+			sprintf('cmd "/C certutil -user -addstore "Root" "%s""', $caPemPath),
 			function ($code, $output) {
 				error("Failed to trust certificate: $output", true);
 			}
@@ -884,7 +884,7 @@ class Site {
 	 */
 	public function trustCertificate(string $crtPath) {
 		$this->cli->runOrExit(
-			sprintf('cmd "/C certutil -addstore "CA" "%s""', $crtPath),
+			sprintf('cmd "/C certutil -user -addstore "CA" "%s""', $crtPath),
 			function ($code, $output) {
 				error("Failed to trust certificate: $output", true);
 			}
@@ -909,9 +909,9 @@ class Site {
 		$tld = $this->config->get('tld');
 
 		foreach ($secured->pluck('site') as $site) {
-			$this->cli->run(sprintf('cmd "/C certutil -delstore "CA" "%s""', $site . '.' . $tld));
+			$this->cli->run(sprintf('cmd "/C certutil -user -delstore "CA" "%s""', $site . '.' . $tld));
 
-			$this->cli->run(sprintf('cmd "/C certutil -delstore "Root" "%s""', $site . '.' . $tld));
+			$this->cli->run(sprintf('cmd "/C certutil -user -delstore "Root" "%s""', $site . '.' . $tld));
 		}
 	}
 
