@@ -2,6 +2,8 @@
 
 namespace Valet;
 
+use Valet\Packages\Gsudo;
+
 use Symfony\Component\Process\Process;
 
 class CommandLine {
@@ -37,13 +39,11 @@ class CommandLine {
 	 * @param bool $quiet Set to `true` to suppress the output. Default: `false`
 	 */
 	public function sudo($valetCommand, $asTrustedInstaller = false, $quiet = false) {
-		$gsudo = '"' . realpath(valetBinPath() . 'gsudo/gsudo.exe') . '" --system -d ';
+		$gsudoClass = resolve(Gsudo::class);
 
-		if ($asTrustedInstaller) {
-			$gsudo .= " --ti ";
-		}
+		$gsudo = $asTrustedInstaller ? $gsudoClass->runAsTrustedInstaller() : $gsudoClass->runAsSystem();
 
-		$this->passthru($gsudo . $valetCommand . ($quiet ? ' > nul 2>&1' : ''));
+		$this->passthru($gsudo . ' ' . $valetCommand . ($quiet ? ' > nul 2>&1' : ''));
 	}
 
 	/**

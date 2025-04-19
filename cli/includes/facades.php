@@ -17,6 +17,9 @@ class Facade {
 		if (in_array(get_called_class(), ["Ngrok"])) {
 			$namespace .= "ShareTools\\";
 		}
+		elseif (in_array(get_called_class(), ["Gsudo"])) {
+			$namespace .= "Packages\\";
+		}
 
 		return $namespace . basename(str_replace('\\', '/', get_called_class()));
 	}
@@ -41,6 +44,7 @@ class CommandLine extends Facade {}
 class Configuration extends Facade {}
 class Diagnose extends Facade {}
 class Filesystem extends Facade {}
+class Gsudo extends Facade {}
 class Nginx extends Facade {}
 class Ngrok extends Facade {}
 class PhpCgi extends Facade {}

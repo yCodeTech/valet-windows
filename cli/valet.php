@@ -66,8 +66,13 @@ $app->command('install [--xdebug]', function ($input, $output, $xdebug) {
 		}
 	}
 
-	$maxItems = $xdebug ? 6 : 5;
+	$maxItems = $xdebug ? 7 : 6;
 	$progressBar = progressbar($maxItems, "Installing");
+	sleep(1);
+
+	$progressBar->setMessage("Gsudo", "placeholder");
+	$progressBar->advance();
+	Gsudo::install();
 	sleep(1);
 
 	$progressBar->setMessage("Configuration", "placeholder");
@@ -128,6 +133,9 @@ $app->command('sudo valetCommand* [-o|--valetOptions=]', function ($valetCommand
 	if (str_contains($valetCommand, 'sudo')) {
 		return error("You can not sudo the sudo command.");
 	}
+
+	// Install Gsudo if it's not already installed.
+	Gsudo::install();
 
 	$valetCommand = str_starts_with($valetCommand, 'valet') ? $valetCommand : "valet $valetCommand";
 

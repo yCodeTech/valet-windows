@@ -184,6 +184,19 @@ class Filesystem {
 	}
 
 	/**
+	 * Move file from one directory to another.
+	 *
+	 * @param string $from
+	 * @param string $to
+	 */
+	public function move($from, $to) {
+		// Copy the file to the new location.
+		$this->copy($from, $to);
+		// Remove the original file.
+		$this->unlink($from);
+	}
+
+	/**
 	 * Create a symlink to the given target.
 	 *
 	 * @param string $target
@@ -371,5 +384,18 @@ class Filesystem {
 		return collect(scandir($path))->reject(function ($file) {
 			return in_array($file, ['.', '..']);
 		})->values()->all();
+	}
+
+	/**
+	 * Unzip the given zip file to the given path.
+	 *
+	 * @uses `tar` The Windows CMD `tar` command to zip/unzip files.
+	 *
+	 * @param string $zipFilePath
+	 * @param string $extractToPath
+	 */
+	public function unzip($zipFilePath, $extractToPath) {
+		$tar = getTarExecutable();
+		CommandLine::passthru("$tar -xf $zipFilePath -C $extractToPath");
 	}
 }

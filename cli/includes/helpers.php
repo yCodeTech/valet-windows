@@ -419,3 +419,14 @@ function progressbar($maxItems, $message, $startingTxt = "services") {
 
 	return $progressBar;
 }
+
+/**
+ * Get the path to the `tar` command executable from the `C:\Windows\System32` directory.
+ *
+ * @link https://ss64.com/nt/tar.html
+ *
+ * @return string
+ */
+function getTarExecutable() {
+	return 'C:\Windows\System32\tar.exe';
+}
