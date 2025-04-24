@@ -396,6 +396,6 @@ class Filesystem {
 	 */
 	public function unzip($zipFilePath, $extractToPath) {
 		$tar = getTarExecutable();
-		CommandLine::passthru("$tar -xf $zipFilePath -C $extractToPath");
+		CommandLine::run("$tar -xf $zipFilePath -C $extractToPath");
 	}
 }
