@@ -17,7 +17,7 @@ class Facade {
 		if (in_array(get_called_class(), ["Ngrok"])) {
 			$namespace .= "ShareTools\\";
 		}
-		elseif (in_array(get_called_class(), ["Gsudo"])) {
+		elseif (in_array(get_called_class(), ["Ansicon", "Gsudo"])) {
 			$namespace .= "Packages\\";
 		}
 
