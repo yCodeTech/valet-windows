@@ -12,11 +12,13 @@ class Facade {
 		// Default namespace.
 		$namespace = "Valet\\";
 
-		// If the class is Ngrok, then append the ShareTools string to the default Valet namespace,
-		// to use the ShareTools namespace.
+		// If the class is any of the strings in the array, then append the ShareTools string
+		// to the default Valet namespace, to use the ShareTools namespace.
 		if (in_array(get_called_class(), ["Ngrok"])) {
 			$namespace .= "ShareTools\\";
 		}
+		// If the class is any of the strings in the array, then append the Packages string
+		// to the default Valet namespace, to use the Packages namespace.
 		elseif (in_array(get_called_class(), ["Ansicon", "Gsudo"])) {
 			$namespace .= "Packages\\";
 		}

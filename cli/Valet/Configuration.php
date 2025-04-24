@@ -162,6 +162,7 @@ class Configuration {
 		$this->updateKey('tld', $config['tld'] ?? 'test');
 		// Add php_port if missing.
 		$this->updateKey('php_port', $config['php_port'] ?? PhpCgi::PORT);
+		// Add the default php_xdebug_port if missing.
 		$this->updateKey('php_xdebug_port', $config['php_xdebug_port'] ?? PhpCgiXdebug::PORT);
 		// Add share-tool if missing.
 		$this->updateKey('share-tool', $config['share-tool'] ?? 'ngrok');
