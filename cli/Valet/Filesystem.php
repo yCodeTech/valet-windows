@@ -398,4 +398,21 @@ class Filesystem {
 		$tar = getTarExecutable();
 		CommandLine::run("$tar -xf $zipFilePath -C $extractToPath");
 	}
+
+	/**
+	 * Get stub file. If a custom stub file exists in the home path, use that instead.
+	 *
+	 * @param string $filename
+	 *
+	 * @return string
+	 */
+	public function getStub($filename) {
+		$default = __DIR__.'/../stubs/'.$filename;
+
+		$custom = VALET_HOME_PATH . "/stubs/$filename";
+
+		$path = file_exists($custom) ? $custom : $default;
+
+		return $this->get($path);
+	}
 }

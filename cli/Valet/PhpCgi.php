@@ -107,10 +107,10 @@ class PhpCgi {
 
 		// copy default phpcgiservice stub to create a new one
 		$phpCgiServiceConfigArgs['PHPCGINAME'] = $phpWinSw['phpCgiName'];
-		$phpCgiServiceConfig = $phpCgiServiceConfig ?? file_get_contents(__DIR__ . '/../stubs/phpcgiservice.xml');
+		$phpCgiServiceConfig ??= $this->files->getStub('phpcgiservice.xml');
 
 		$this->files->put(
-			(__DIR__ . "/../stubs/{$phpWinSw['phpServiceName']}.xml"),
+			$this->files->getStub("{$phpWinSw['phpServiceName']}.xml"),
 			str_replace(array_keys($phpCgiServiceConfigArgs), array_values($phpCgiServiceConfigArgs), $phpCgiServiceConfig ?: '')
 		);
 

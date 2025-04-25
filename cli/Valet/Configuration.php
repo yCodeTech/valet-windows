@@ -73,7 +73,7 @@ class Configuration {
 
 		$this->files->putAsUser(
 			$driversPath . '/SampleValetDriver.php',
-			$this->files->get(__DIR__ . '/../stubs/SampleValetDriver.php')
+			$this->files->getStub('SampleValetDriver.php')
 		);
 	}
 

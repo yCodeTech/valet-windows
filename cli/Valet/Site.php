@@ -931,7 +931,7 @@ class Site {
 			$siteConf = $this->files->get($this->nginxPath($valetSite));
 		}
 		else {
-			$siteConf = $this->files->get(__DIR__ . '/../stubs/unsecure.valet.conf');
+			$siteConf = $this->files->getStub('unsecure.valet.conf');
 			$siteConf = str_replace(
 				['VALET_HOME_PATH', 'VALET_SERVER_PATH', 'VALET_STATIC_PREFIX', 'VALET_SITE', 'HOME_PATH'],
 				[$this->valetHomePath(), VALET_SERVER_PATH, VALET_STATIC_PREFIX, $valetSite, $_SERVER['HOME']],
@@ -953,7 +953,7 @@ class Site {
 	 */
 	public function buildSecureNginxServer($url, $siteConf = null) {
 		if ($siteConf === null) {
-			$siteConf = $this->files->get(__DIR__ . '/../stubs/secure.valet.conf');
+			$siteConf = $this->files->getStub('secure.valet.conf');
 		}
 
 		$path = $this->certificatesPath();
@@ -1005,7 +1005,7 @@ class Site {
 			}
 
 			$stub = $secure ? 'secure.proxy.valet.conf' : 'proxy.valet.conf';
-			$siteConf = $this->files->get(__DIR__ . '/../stubs/' . $stub);
+			$siteConf = $this->files->getStub($stub);
 
 			$siteConf = str_replace(
 				['VALET_HOME_PATH', 'VALET_SERVER_PATH', 'VALET_STATIC_PREFIX', 'VALET_SITE', 'VALET_PROXY_HOST'],
