@@ -27,7 +27,7 @@ class Upgrader {
 	/**
 	 * Run all the upgrades that should be run every time Valet commands are run.
 	 */
-	public function onEveryRun(): void {
+	public function onEveryRun() {
 		$this->prunePathsFromConfig();
 		$this->pruneSymbolicLinks();
 		$this->upgradeSymbolicLinks();
@@ -46,16 +46,17 @@ class Upgrader {
 		}
 	}
 
+	/**
+	 * Prune all symbolic links that no longer point to a valid site.
+	 */
 	public function pruneSymbolicLinks() {
 		$this->site->pruneLinks();
 	}
 
 	/**
-	 * Upgrade and convert all junction links to real symbolic links.
+	 * Upgrade and convert all Windows junction links to real symbolic links.
 	 *
 	 * This is a one-time upgrade that will be run when Valet is first installed.
-	 *
-	 * @return void
 	 */
 	public function upgradeSymbolicLinks() {
 		// Check if the symlinks have already been upgraded, by checking if a key exists in
