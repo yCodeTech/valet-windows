@@ -23,6 +23,9 @@ class WinSwFactory {
 	public function __construct(CommandLine $cli, Filesystem $files) {
 		$this->cli = $cli;
 		$this->files = $files;
+
+		// Download and install the WinSW package if it's not already installed.
+		(new \Valet\Packages\WinSW($cli, $files))->install();
 	}
 
 	/**
