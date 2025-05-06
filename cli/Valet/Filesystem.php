@@ -186,14 +186,16 @@ class Filesystem {
 	/**
 	 * Move file from one directory to another.
 	 *
+	 * This is a simple wrapper around the PHP rename function.
+	 * By renaming the file path, we can move it to a new location. The filepath can be
+	 * a file or a directory. If it's a directory, the contents of the directory will
+	 * be moved at the same time. If the destination directory does not exist, it will be created.
+	 *
 	 * @param string $from
 	 * @param string $to
 	 */
 	public function move($from, $to) {
-		// Copy the file to the new location.
-		$this->copy($from, $to);
-		// Remove the original file.
-		$this->unlink($from);
+		rename($from, $to);
 	}
 
 	/**
