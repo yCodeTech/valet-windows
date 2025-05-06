@@ -30,6 +30,11 @@ abstract class GithubPackage {
 	 */
 	protected $client;
 
+	/**
+	 * @var string The name of the package.
+	 */
+	protected $packageName;
+
 	public function __construct(CommandLine $cli, Filesystem $files) {
 		$this->cli = $cli;
 		$this->files = $files;
@@ -58,11 +63,11 @@ abstract class GithubPackage {
 	/**
 	 * Check if the package is installed.
 	 *
-	 * @param string $packageName
+
 	 * @return bool
 	 */
-	protected function isInstalled(string $packageName) {
-		return $this->files->exists($this->packagePath($packageName));
+	protected function isInstalled() {
+		return $this->files->exists($this->packageExe());
 	}
 
 
@@ -139,8 +144,17 @@ abstract class GithubPackage {
 	 *
 	 * @return string
 	 */
-	protected function packagePath(string $packageName): string {
-		return valetBinPath() . "$packageName/$packageName.exe";
+	protected function packagePath(): string {
+		return valetBinPath() . $this->packageName;
+	}
+
+	/**
+	 * Get the path to the package executable.
+	 *
+	 * @return string
+	 */
+	protected function packageExe(): string {
+		return $this->packagePath() . "/$this->packageName.exe";
 	}
 
 	/**

@@ -3,9 +3,13 @@
 namespace Valet\Packages;
 
 use function Valet\info_dump;
-use function Valet\valetBinPath;
 
 class WinSW extends GithubPackage {
+	/**
+	 * @var string The name of the package: `winsw`.
+	 */
+	protected $packageName = 'winsw';
+
 	/**
 	 * Array of download arguments to be passed to the download method.
 	 *
@@ -34,8 +38,8 @@ class WinSW extends GithubPackage {
 	 * Install WinSW from github releases.
 	 */
 	public function install() {
-		if (!$this->isInstalled("winsw")) {
-			$winswPath = valetBinPath() . 'winsw';
+		if (!$this->isInstalled()) {
+			$winswPath = $this->packagePath();
 
 			$this->files->ensureDirExists($winswPath);
 
@@ -43,7 +47,7 @@ class WinSW extends GithubPackage {
 				$this->download($arg["url"], $arg['filename'], $winswPath . '/' . ($arg['filepath'] ?? $arg['filename']));
 			}
 
-			$this->changeReadme($winswPath);
+			$this->changeReadme();
 		}
 	}
 
@@ -57,11 +61,10 @@ class WinSW extends GithubPackage {
 	 *
 	 * The readme is mainly for dev purposes, to help understand how to use the package.
 	 *
-	 * @param string $winswPath
-	 *
 	 * @return void
 	 */
-	private function changeReadme($winswPath) {
+	private function changeReadme() {
+		$winswPath = $this->packagePath();
 
 		// Get the contents of the readme file.
 		$contents = $this->files->get("$winswPath/readme.md");

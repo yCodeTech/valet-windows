@@ -5,18 +5,22 @@ namespace Valet\Packages;
 use function Valet\info;
 use function Valet\info_dump;
 use function Valet\warning;
-use function Valet\valetBinPath;
 
 class Ansicon extends GithubPackage {
+	/**
+	 * @var string The name of the package: `ansicon`.
+	 */
+	protected $packageName = 'ansicon';
+
 	/**
 	 * Install Ansicon.
 	 *
 	 * @return void
 	 */
 	public function install() {
-		if (!$this->isInstalled("ansicon")) {
-			$zipFilePath = valetBinPath() . 'ansicon/ansi189-bin.zip';
-			$ansiconPath = valetBinPath() . 'ansicon';
+		if (!$this->isInstalled()) {
+			$ansiconPath = $this->packagePath();
+			$zipFilePath = "$ansiconPath/ansicon.zip";
 
 			$this->files->ensureDirExists($ansiconPath);
 
@@ -37,7 +41,7 @@ class Ansicon extends GithubPackage {
 
 		// Install Ansicon into CMD's process to automatically add ANSI support.
 		$this->cli->runOrExit(
-			'"' . $this->packagePath("ansicon") . '" -i',
+			'"' . $this->packageExe() . '" -i',
 			function ($code, $output) {
 				warning("Failed to install ansicon.\n$output");
 			}
@@ -51,7 +55,7 @@ class Ansicon extends GithubPackage {
 	 */
 	public function uninstall() {
 		$this->cli->runOrExit(
-			'"' . $this->packagePath("ansicon") . '" -pu -u',
+			'"' . $this->packageExe() . '" -pu -u',
 			function ($code, $output) {
 				warning("Failed to uninstall ansicon.\n$output");
 			}
