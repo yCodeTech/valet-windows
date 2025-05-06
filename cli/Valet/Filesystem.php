@@ -392,6 +392,9 @@ class Filesystem {
 	 * Unzip the given zip file to the given path.
 	 *
 	 * @uses `tar` The Windows CMD `tar` command to zip/unzip files.
+	 * The `-x` option extracts the zip file.
+	 * The `-f` option specifies the zip file to extract.
+	 * The `-C` option specifies the directory to extract to.
 	 *
 	 * @param string $zipFilePath
 	 * @param string $extractToPath
@@ -399,6 +402,37 @@ class Filesystem {
 	public function unzip($zipFilePath, $extractToPath) {
 		$tar = getTarExecutable();
 		CommandLine::run("$tar -xf $zipFilePath -C $extractToPath");
+	}
+
+	/**
+	 * List the top-level directories in the given zip file.
+	 *
+	 * @uses `tar` The Windows CMD `tar` command to zip/unzip files and list files in the zip.
+	 * The -t option lists the contents of the zip file.
+	 * The -f option specifies the zip file to list.
+	 *
+	 * @param mixed $zipFilePath
+	 * @return string[] Array of top-level directories in the zip file.
+	 */
+	public function listTopLevelZipDirs($zipFilePath) {
+		$tar = getTarExecutable();
+		// Get the contents of the zip file.
+		$output = CommandLine::run("$tar -tf $zipFilePath");
+		// Split the output into an array of lines.
+		// Each line represents a file or directory in the zip file.
+		$contents = explode("\n", trim($output->getOutput()));
+
+		// Collect and map through each item in the contents and return the first part of
+		// the path of each item.
+		return collect($contents)->map(function ($item) {
+				// Split the item by `/` and return the first part of the path with
+				// the leading or trailing whitespace trimmed.
+				// The first part of the path is the top-level directory in the zip file.
+				return explode("/", trim($item))[0];
+		})
+			->unique()
+			->values()
+			->all();
 	}
 
 	/**
