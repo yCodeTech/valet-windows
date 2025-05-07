@@ -203,20 +203,22 @@ abstract class GithubPackage {
 	}
 
 	/**
-	 * Move x64 files to the main gsudo directory.
+	 * Move files to the main package directory.
 	 *
-	 * @param string $dir
-	 * @param string $packagePath
+	 * @param string $dirName
 	 */
-	protected function moveX64Files($dir, $packagePath) {
-		// If the directory is x64...
-		if ($dir === 'x64') {
-			// For each file...
-			foreach ($this->files->scandir("$packagePath/$dir") as $file) {
-				// Move the file to the package's main directory.
-				$this->files->move("$packagePath/$dir/$file", "$packagePath/$file");
+	protected function moveFiles($dirName) {
+		$packagePath = $this->packagePath();
+
+		// For each item in the specified directory...
+		foreach ($this->files->scandir("$packagePath/$dirName") as $item) {
+			// Move the item to the main package directory.
+			// The item could be a file or a directory.
+			$this->files->move("$packagePath/$dirName/$item", "$packagePath/$item");
 			}
-		}
+
+		// Remove the original directory after moving its contents.
+		$this->files->unlink("$packagePath/$dirName");
 	}
 
 	/**

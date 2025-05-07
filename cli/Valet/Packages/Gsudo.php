@@ -31,6 +31,8 @@ class Gsudo extends GithubPackage {
 
 			$this->files->unzip($zipFilePath, $gsudoPath);
 
+			$this->moveFiles("x64");
+
 			// Clean up the package directory.
 			$this->cleanUpPackageDirectory($zipFilePath, "x64");
 

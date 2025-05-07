@@ -31,6 +31,8 @@ class Ansicon extends GithubPackage {
 			// Get the contents of the readme.txt file.
 			$readmeContents = $this->files->get("$ansiconPath/readme.txt");
 
+			$this->moveFiles("x64");
+
 			// Clean up the package directory.
 			$this->cleanUpPackageDirectory($zipFilePath, "x64");
 
