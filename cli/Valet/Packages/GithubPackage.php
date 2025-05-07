@@ -131,6 +131,10 @@ abstract class GithubPackage {
 			error("The GitHub API response doesn't have the expected properties. The API URL queried is: $githubApiUrl\n", true);
 		}
 
+		if (!isset($downloadUrl)) {
+			error("The download URL was not found in the response. The API URL queried is: $githubApiUrl\n", true);
+		}
+
 		// Download the file via Guzzle.
 		$this->client->get($downloadUrl, [
 			\GuzzleHttp\RequestOptions::SINK => $filePath
