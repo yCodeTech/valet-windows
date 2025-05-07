@@ -32,7 +32,7 @@ class Ansicon extends GithubPackage {
 			$readmeContents = $this->files->get("$ansiconPath/readme.txt");
 
 			// Clean up the package directory.
-			$this->cleanUpPackageDirectory($ansiconPath);
+			$this->cleanUpPackageDirectory($zipFilePath, "x64");
 
 			// Create a readme.md file with the contents of the readme.txt file.
 			// This is just for easier reading.

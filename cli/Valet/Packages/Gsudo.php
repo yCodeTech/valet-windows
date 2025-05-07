@@ -32,7 +32,7 @@ class Gsudo extends GithubPackage {
 			$this->files->unzip($zipFilePath, $gsudoPath);
 
 			// Clean up the package directory.
-			$this->cleanUpPackageDirectory($gsudoPath);
+			$this->cleanUpPackageDirectory($zipFilePath, "x64");
 
 			$this->configureGsudo();
 		}

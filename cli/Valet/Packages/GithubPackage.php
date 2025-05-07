@@ -159,22 +159,47 @@ abstract class GithubPackage {
 
 	/**
 	 * Clean up the package directory that was downloaded and unzipped from GitHub.
-	 * Move the x64 files to the main package directory and remove all other
-	 * irrelevant directories and files.
+	 * Remove all unnecessary directories and files.
 	 *
-	 * @param mixed $packagePath
+	 * @param mixed $zipFilePath
+	 *
+	 * @param array $unnecessaryDirsToRemove
 	 *
 	 * @return void
 	 */
-	protected function cleanUpPackageDirectory($packagePath) {
-		// For each directory in the package directory...
-		foreach ($this->files->scandir($packagePath) as $dir) {
-			// Move the necessary files to the package directory.
-			$this->moveX64Files($dir, $packagePath);
-
-			// Remove all unnecessary directories and files.
-			$this->files->unlink("$packagePath/$dir");
+	protected function cleanUpPackageDirectory($zipFilePath, $requiredDir = "") {
+		// For each unnecessary directory in the package directory...
+		foreach ($this->getUnnecessaryDirs($zipFilePath, $requiredDir) as $dir) {
+			// Remove all unnecessary directories and their files.
+			$this->files->unlink($this->packagePath() . "/$dir");
 		}
+
+		$this->removeZip($zipFilePath);
+	}
+
+	/**
+	 * Get the unnecessary directories to remove in the package directory.
+	 *
+	 * @param string $zipFilePath
+	 * @param string $requiredDir
+	 *
+	 * @return array
+	 */
+	protected function getUnnecessaryDirs($zipFilePath, $requiredDir) {
+		return collect($this->files->listTopLevelZipDirs($zipFilePath))->reject(function ($dir) use ($requiredDir) {
+			// If the directory name contains the required directory name, then we remove
+			// it from the collection of unnecessary directories that we want to delete.
+			return str_contains($dir, $requiredDir);
+		})->all();
+	}
+
+	/**
+	 * Remove the zip file after extracting its contents.
+	 *
+	 * @param string $zipFilePath
+	 */
+	protected function removeZip($zipFilePath) {
+		$this->files->unlink($zipFilePath);
 	}
 
 	/**
