@@ -2,12 +2,6 @@
 
 namespace Valet\Packages;
 
-use Valet\CommandLine;
-use Valet\Filesystem;
-
-use GuzzleHttp\Client;
-use Composer\CaBundle\CaBundle;
-
 use function Valet\info;
 use function Valet\info_dump;
 
