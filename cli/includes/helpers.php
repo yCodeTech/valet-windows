@@ -141,27 +141,6 @@ function output($output) {
 	(new ConsoleOutput())->writeln($output);
 }
 
-if (!function_exists('array_is_list')) {
-	/**
-	 * Checks whether a given `array` is a list
-	 *
-	 * *This function was introduced in PHP 8.1, so this is a polyfill only in usage on PHP versions below 8.1 (thanks to this StackOverflow answer: https://stackoverflow.com/a/173479/2358222).*
-	 *
-	 * Determines if the given `array` is a list. An `array` is considered a list if its keys consist of consecutive numbers from `0` to `count($array)-1`.
-	 * https://www.php.net/manual/function.array-is-list.php
-	 *
-	 * @param $array The `array` being evaluated.
-	 *
-	 * @return bool Returns `true` if `array` is a list, `false` otherwise.
-	 */
-	function array_is_list(array $array) {
-		if ($array === []) {
-			return true;
-		}
-		return array_keys($array) === range(0, count($array) - 1);
-	}
-}
-
 /**
  * Output a table to the console.
  *
