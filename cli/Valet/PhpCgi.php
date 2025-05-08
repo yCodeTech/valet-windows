@@ -110,7 +110,7 @@ class PhpCgi {
 		$phpCgiServiceConfig ??= $this->files->getStub('phpcgiservice.xml');
 
 		$this->files->put(
-			$this->files->getStub("{$phpWinSw['phpServiceName']}.xml"),
+			__DIR__ . "/../stubs/{$phpWinSw['phpServiceName']}.xml",
 			str_replace(array_keys($phpCgiServiceConfigArgs), array_values($phpCgiServiceConfigArgs), $phpCgiServiceConfig ?: '')
 		);
 
