@@ -446,6 +446,9 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 
 		if ($isolate) {
 			Site::isolate($isolate, $name);
+
+			info('Restarting Nginx...');
+			Nginx::restart();
 		}
 	})->descriptions('Register the current working directory as a symbolic link', [
 		'name' => 'Optionally specify a new name to be linked as',
@@ -493,9 +496,11 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 
 			$site = $name . '.' . Configuration::read()['tld'];
 			Site::unsecure($site);
-
-			Nginx::restart();
 		}
+
+		info('Restarting Nginx...');
+			Nginx::restart();
+
 		// Unlink the site.
 		Site::unlink($name);
 
@@ -714,6 +719,9 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 			info("Isolating the current working directory...");
 			Site::isolate($phpVersion, $site);
 
+			info('Restarting Nginx...');
+			Nginx::restart();
+
 			return;
 		}
 
@@ -721,6 +729,9 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 		foreach ($site as $sitename) {
 			Site::isolate($phpVersion, $sitename);
 		}
+		info('Restarting Nginx...');
+		Nginx::restart();
+
 	})->descriptions('Isolate the current working directory to a specific PHP version', [
 		'phpVersion' => 'The PHP version you want to use; e.g 7.4, 7.4.33',
 		'--site' => 'Optionally specify the site.'
@@ -756,6 +767,9 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 				Site::unisolate($array["site"]);
 			}
 
+			info('Restarting Nginx...');
+			Nginx::restart();
+
 			return;
 		}
 
@@ -764,6 +778,9 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 		}
 
 		Site::unisolate($site);
+
+		info('Restarting Nginx...');
+		Nginx::restart();
 
 	})->descriptions('Remove [unisolate] the current working directory\'s site', [
 		'--site' => 'Optionally specify the site',

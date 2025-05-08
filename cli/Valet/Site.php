@@ -367,9 +367,6 @@ class Site {
 
 		$this->installSiteConfig($site, $php['version']);
 
-		info('Restarting Nginx...');
-		\Nginx::stop();
-		\Nginx::restart();
 		info("The site [$site] is now using $phpVersion.");
 	}
 
@@ -396,10 +393,6 @@ class Site {
 			// When site doesn't have SSL/TLS, we can remove the custom nginx config file to remove isolation
 			$this->files->unlink($this->nginxPath($site));
 		}
-
-		info('Restarting Nginx...');
-		\Nginx::stop();
-		\Nginx::restart();
 
 		info(sprintf('The site [%s] is now using the default PHP version.', $site));
 	}
