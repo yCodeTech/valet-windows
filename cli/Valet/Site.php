@@ -618,6 +618,9 @@ class Site {
 	public function isSecured($site) {
 		$tld = $this->config->read()['tld'];
 
+		// Remove .tld from sitename if it was provided, to avoid double .tld (.tld.tld)
+		$site = str_replace('.' . $tld, '', $site);
+
 		return in_array($site . '.' . $tld, $this->secured());
 	}
 
