@@ -128,15 +128,31 @@ class Nginx {
 	/**
 	 * Check nginx.conf for errors.
 	 */
-	private function lint() {
-		$this->cli->run(
-			'"' . $this->path('nginx.exe') . '" -c "' . $this->path('conf/nginx.conf') . '" -t -q -p "' . $this->path() . '"',
+	private function lint($returnOutput = false) {
+		$output = $this->cli->run(
+			'"' . $this->path('nginx.exe') . '" -c "' . $this->path('conf/nginx.conf') . '" -t -q -p "' . $this->path() . '" 2>&1',
 			function ($exitCode, $outputMessage) {
 				$outputMessage = preg_replace("/\r\n|\n|\r/", "\r\n\r\n", $outputMessage);
 
-				throw new DomainException("Nginx cannot start; please check your nginx.conf \r\n\r\nExit code $exitCode: \r\n\r\n$outputMessage");
+				error("Nginx cannot start; please check your nginx.conf \r\n\r\nExit code $exitCode: \r\n\r\n$outputMessage", true);
 			}
 		);
+
+		$outputContent = $output->getOutput();
+
+		if ($output->isSuccessful() && !empty($outputContent)) {
+			if ($returnOutput) {
+				return $outputContent;
+			}
+			else {
+				if (str_contains($outputContent, 'warn')) {
+					warning($outputContent);
+				}
+				else {
+					output($outputContent);
+				}
+			}
+		}
 	}
 
 	/**
