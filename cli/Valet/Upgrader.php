@@ -38,7 +38,7 @@ class Upgrader {
 	/**
 	 * Prune all non-existent paths from the configuration.
 	 */
-	public function prunePathsFromConfig() {
+	private function prunePathsFromConfig() {
 		try {
 			$this->config->prune();
 		}
@@ -51,7 +51,7 @@ class Upgrader {
 	/**
 	 * Prune all symbolic links that no longer point to a valid site.
 	 */
-	public function pruneSymbolicLinks() {
+	private function pruneSymbolicLinks() {
 		$this->site->pruneLinks();
 	}
 
@@ -60,7 +60,7 @@ class Upgrader {
 	 *
 	 * This is a one-time upgrade that will be run when Valet is first installed.
 	 */
-	public function upgradeSymbolicLinks() {
+	private function upgradeSymbolicLinks() {
 		// Check if the symlinks have already been upgraded, by checking if a key exists in
 		// the config. If not, then upgrade them.
 		if ($this->config->get("symlinks_upgraded", false) === false) {
