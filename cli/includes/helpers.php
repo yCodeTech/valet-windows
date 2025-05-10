@@ -409,3 +409,21 @@ function progressbar($maxItems, $message, $startingTxt = "services") {
 function getTarExecutable() {
 	return 'C:\Windows\System32\tar.exe';
 }
+
+/**
+ * Check if a string contains any of the needles in an array.
+ * Code based on this StackOverflow answer:
+ * https://stackoverflow.com/a/74876203/2358222
+ *
+ * @param string $haystack
+ * @param array $needles
+ * @return bool
+ */
+function str_contains_any($haystack, $needles) {
+	foreach ($needles as $needle) {
+		if (str_contains($haystack, $needle)) {
+			return true;
+		}
+	}
+	return false;
+}
