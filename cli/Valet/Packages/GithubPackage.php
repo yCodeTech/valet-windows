@@ -75,12 +75,12 @@ abstract class GithubPackage {
 	 * Download the package from GitHub.
 	 *
 	 * @param string $githubApiUrl The GitHub API URL for the release.
-	 * @param string $fileName The name of the file to download.
+	 * @param string $filename The name of the file to download.
 	 * @param string $filePath The path where the file will be saved and as what name.
 	 *
 	 * @return void
 	 */
-	protected function download(string $githubApiUrl, string $fileName, string $filePath) {
+	protected function download(string $githubApiUrl, string $filename, string $filePath) {
 		// Try to get the information from the GitHub API, otherwise
 		// catch the exception and handle it.
 		try {
@@ -115,7 +115,14 @@ abstract class GithubPackage {
 		if (property_exists($response, 'assets')) {
 			// Find the asset with the specified filename and get the download URL.
 			foreach ($response->assets as $asset) {
-				if ($asset->name === $fileName) {
+				// If the filename contains "VERSION", then we need to use regex
+				// to match the version number in the filename.
+				if (str_contains($filename, "VERSION")) {
+					$filename = $this->getVersionedFilename($filename, $asset->name)?? $filename;
+				}
+
+				// If the asset name equals the filename, then get the download URL.
+				if ($asset->name === $filename) {
 					$downloadUrl = $asset->browser_download_url;
 					break;
 				}
@@ -142,7 +149,7 @@ abstract class GithubPackage {
 	}
 
 	/**
-	 * Get the path to the package executable.
+	 * Get the path to the package directory.
 	 *
 	 * @param string $packageName
 	 *
@@ -219,12 +226,43 @@ abstract class GithubPackage {
 			// Move the item to the main package directory.
 			// The item could be a file or a directory.
 			$this->files->move("$packagePath/$dirName/$item", "$packagePath/$item");
-			}
+		}
 
 		// Remove the original directory after moving its contents.
 		$this->files->unlink("$packagePath/$dirName");
 	}
 
+	/**
+	 * Get the versioned filename from the asset name, replacing the "VERSION"
+	 * placeholder with the version number obtained via regex.
+	 *
+	 * @param string $filename The filename with "VERSION" placeholder.
+	 * @param string $assetName The asset name from the GitHub API response.
+	 *
+	 * @return string|null The versioned filename or null if not found.
+	 */
+	protected function getVersionedFilename($filename, $assetName) {
+
+		$filenameArray = explode('VERSION', $filename);
+		// Escape special regex characters in the filename parts.
+		$filenamePart1 = preg_quote($filenameArray[0], '/');
+		$filenamePart2 = preg_quote($filenameArray[1], '/');
+
+		// Regex to the filename parts 1 and 2 and a version number in between.
+		// Part 1 could be "nginx\-" and part 2 could be "\.zip"
+		// (with escaped special characters).
+		// So the regex would look like this:
+		// nginx\-(\d+\.\d+\.\d+)\.zip"
+		// Example match: "nginx-1.28.0.zip"
+		$regex = "/$filenamePart1(\d+\.\d+\.\d+)$filenamePart2/";
+		preg_match($regex, $assetName, $matches);
+
+		if (!empty($matches)) {
+			return $matches[0];
+		}
+	}
+
+	// TODO: Transfer all error handling to a new separate class.
 	/**
 	 * If the GitHub API rate limit has exceeded, we need to handle it.
 	 *
