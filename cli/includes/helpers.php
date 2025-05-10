@@ -2,6 +2,8 @@
 
 namespace Valet;
 
+use Valet\ValetException;
+
 use Exception;
 use Illuminate\Container\Container;
 use RuntimeException;
@@ -66,7 +68,11 @@ function warning($output) {
  * Output errors to the console.
  *
  * @param string $output
- * @param boolean $exception
+ * @param boolean $exception Optionally pass a boolean to indicate whether to throw an exception. If `true`, the error will be thrown as a `ValetException`. [default: `false`]
+ *
+ * @throws RuntimeException
+ * @throws ValetException
+ *
  * @return void
  */
 function error(string $output, $exception = false) {
@@ -74,58 +80,20 @@ function error(string $output, $exception = false) {
 		throw new RuntimeException($output);
 	}
 	if ($exception === true) {
-		// $errors = error_get_last();
-
-		// $outputTxt = getErrorTypeName($errors['type']) . ": "
-		// 	. "$output\n"
-		// 	. $errors['message']
-		// 	. "\n{$errors['file']}:{$errors['line']}";
-		// throw new \Exception($outputTxt);
-
-
-		$errors = new Exception($output);
-
-		$errorCode = $errors->getCode();
-		$errorMsg = $errors->getMessage();
-		$errorTrace = $errors->getTrace();
-
-		$constructTrace = [];
-		$count = 0;
-		foreach ($errorTrace as $key => $value) {
-			$count_num = $count++ . ") ";
-			$class = isset($value["class"]) ? $value["class"] : "";
-			$type = isset($value["type"]) ? $value["type"] : "";
-			$func = isset($value["function"]) ? $value["function"] : "";
-
-			$file_n_line = isset($value["file"]) ?
-			" ------ " . $value["file"] . ":" . $value["line"] : "";
-
-			$constructTrace[] = $count_num . $class . $type . $func . $file_n_line;
-		}
-
-		$output = getErrorTypeName($errorCode) . ": $errorMsg\n\n" . implode("\n", $constructTrace);
+		$errors = (new ValetException($output))->getError();
 
 		// Wait 1 microsecond, to make sure all output before the error call has reached
 		// the terminal.
 		usleep(1);
-		(new ConsoleOutput())->getErrorOutput()->writeln("\n\n<error>$output</error>");
+
+		// Print the error message to the console.
+		(new ConsoleOutput())->getErrorOutput()->writeln("\n\n<error>$errors</error>");
 
 		exit();
 	}
 	else {
 		(new ConsoleOutput())->getErrorOutput()->writeln("<error>$output</error>");
 	}
-}
-
-/**
- * Get the error type name.
- * Eg.: Inputs error code `0`, outputs error name `"FATAL"`
- *
- * @param mixed $code The numeric error type/code
- * @return string The error type name
- */
-function getErrorTypeName($code) {
-	return $code == 0 ? "FATAL" : array_search($code, get_defined_constants(true)['Core']);
 }
 
 /**
