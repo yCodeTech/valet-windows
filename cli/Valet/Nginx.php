@@ -54,6 +54,9 @@ class Nginx {
 	 * @return void
 	 */
 	public function install() {
+		// Install the Nginx package if it is not already installed.
+		resolve(Packages\Nginx::class)->install();
+		// Install the Nginx configs, server, and service.
 		$this->installConfiguration();
 		$this->installServer();
 		$this->installNginxDirectory();
