@@ -83,7 +83,9 @@ class Upgrader {
 	 * @return string|null
 	 */
 	private function lintNginxConfigs($returnOutput = false) {
-		return \Nginx::lint($returnOutput);
+		if (resolve(Packages\Nginx::class)->isInstalled()) {
+			return \Nginx::lint($returnOutput);
+		}
 	}
 
 	/**

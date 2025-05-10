@@ -66,7 +66,7 @@ abstract class GithubPackage {
 
 	 * @return bool
 	 */
-	protected function isInstalled() {
+	public function isInstalled() {
 		return $this->files->exists($this->packageExe());
 	}
 
