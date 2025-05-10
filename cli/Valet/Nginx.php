@@ -126,15 +126,15 @@ class Nginx {
 	}
 
 	/**
-	 * Check nginx.conf for errors.
+	 * Check nginx.conf and all linked site configurations for errors.
 	 */
-	private function lint($returnOutput = false) {
+	public function lint($returnOutput = false) {
 		$output = $this->cli->run(
 			'"' . $this->path('nginx.exe') . '" -c "' . $this->path('conf/nginx.conf') . '" -t -q -p "' . $this->path() . '" 2>&1',
 			function ($exitCode, $outputMessage) {
 				$outputMessage = preg_replace("/\r\n|\n|\r/", "\r\n\r\n", $outputMessage);
 
-				error("Nginx cannot start; please check your nginx.conf \r\n\r\nExit code $exitCode: \r\n\r\n$outputMessage", true);
+				error("Nginx cannot start; please check your nginx.conf and all linked site configurations \r\n\r\nExit code $exitCode: \r\n\r\n$outputMessage", true);
 			}
 		);
 
