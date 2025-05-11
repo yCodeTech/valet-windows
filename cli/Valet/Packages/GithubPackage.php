@@ -162,7 +162,7 @@ abstract class GithubPackage {
 	 *
 	 * @return string
 	 */
-	protected function packagePath(): string {
+	public function packagePath(): string {
 		return valetBinPath() . $this->packageName;
 	}
 
@@ -171,7 +171,7 @@ abstract class GithubPackage {
 	 *
 	 * @return string
 	 */
-	protected function packageExe(): string {
+	public function packageExe(): string {
 		return $this->packagePath() . "/$this->packageName.exe";
 	}
 
