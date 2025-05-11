@@ -38,7 +38,7 @@ class Diagnose {
 			'php --info',
 			'php --ri curl',
 			'cmd /C curl --version',
-			'cat "' . pathFilter(COMPOSER_GLOBAL_PATH) . '/composer.json"',
+			'cat "' . pathFilter(trim(\Valet::getComposerGlobalPath())) . '/composer.json"',
 			'composer global diagnose --no-ansi 1>' . VALET_HOME_PATH . '/composer.txt',
 			'composer global outdated --format json'
 		];
