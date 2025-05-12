@@ -13,6 +13,8 @@ class Diagnose {
 	protected $cli;
 	protected $files;
 	protected $print;
+	protected $progressBar;
+
 
 	/**
 	 * Create a new Diagnose instance.
