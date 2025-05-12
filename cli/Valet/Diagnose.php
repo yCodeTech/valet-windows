@@ -26,13 +26,18 @@ class Diagnose {
 	public function __construct(CommandLine $cli, Filesystem $files) {
 		$this->cli = $cli;
 		$this->files = $files;
+
+		$nginxPkgClass = resolve(Packages\Nginx::class);
+
 		$this->commands = [
 			'systeminfo',
 			'valet --version',
 			'cat ~/.config/valet/config.json',
-			valetBinPath() . 'nginx/nginx.exe -v 2>&1',
-			valetBinPath() . 'nginx/nginx.exe -c \"' . __DIR__ . '/../../bin/nginx/conf/nginx.conf\" -t -p ' . valetBinPath() . 'nginx 2>&1',
-			'foreach ($file in get-ChildItem -Path "' . valetBinPath() . 'nginx/conf/nginx.conf", "' . valetBinPath() . 'nginx/valet/valet.conf", "' . VALET_HOME_PATH . '/Nginx/*.conf"){echo $file.fullname --------------------`n; Get-Content -Path $file; echo `n;}',
+			$nginxPkgClass->packageExe() . ' -v 2>&1',
+			$nginxPkgClass->packageExe() . ' -c \"' . $nginxPkgClass->packagePath() . '/conf/nginx.conf\" -t -p ' . $nginxPkgClass->packagePath() . ' 2>&1',
+
+			'foreach ($file in get-ChildItem -Path "' . $nginxPkgClass->packagePath() . '/conf/nginx.conf", "' . $nginxPkgClass->packagePath() . '/valet/valet.conf", "' . VALET_HOME_PATH . '/Nginx/*.conf"){echo $file.fullname --------------------`n; Get-Content -Path $file; echo `n;}',
+
 			valetBinPath() . 'ngrok.exe version',
 			'php -v',
 			'cmd /C "where /f php"',
