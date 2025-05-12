@@ -166,7 +166,7 @@ class Diagnose {
 	 * if the raw output isn't sufficient enough.
 	 *
 	 * @param string $command
-	 * @param string $output
+	 * @param string|ProcessOutput $output
 	 * @return string $output The edited output.
 	 */
 	protected function editOutput($command, $output) {
