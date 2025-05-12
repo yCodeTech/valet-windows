@@ -32,13 +32,16 @@ class Diagnose {
 		$this->commands = [
 			'systeminfo',
 			'valet --version',
-			'cat ~/.config/valet/config.json',
+			'cat ' . \Configuration::path(),
 			$nginxPkgClass->packageExe() . ' -v 2>&1',
 			$nginxPkgClass->packageExe() . ' -c \"' . $nginxPkgClass->packagePath() . '/conf/nginx.conf\" -t -p ' . $nginxPkgClass->packagePath() . ' 2>&1',
 
 			'foreach ($file in get-ChildItem -Path "' . $nginxPkgClass->packagePath() . '/conf/nginx.conf", "' . $nginxPkgClass->packagePath() . '/valet/valet.conf", "' . VALET_HOME_PATH . '/Nginx/*.conf"){echo $file.fullname --------------------`n; Get-Content -Path $file; echo `n;}',
 
 			valetBinPath() . 'ngrok.exe version',
+			resolve(Packages\Gsudo::class)->packageExe() . ' -v',
+			resolve(Packages\Ansicon::class)->packageExe() . ' /?',
+			'cat "' . valetBinPath() . 'acrylic/Readme.txt"',
 			'php -v',
 			'cmd /C "where /f php"',
 			'php --ini',
@@ -222,6 +225,12 @@ class Diagnose {
 			}
 
 			$output = json_encode($output, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+		}
+
+		if (str_contains($command, "acrylic")) {
+			if (preg_match("/version is:\s+\d+(\.\d+)+/", $output, $matches)) {
+				$output = "Acrylic " . preg_replace("/:\s+/", " ", $matches[0]);
+			}
 		}
 
 		return $output;
@@ -408,6 +417,9 @@ class Diagnose {
 			"nginx Config Check",
 			"nginx Config Files",
 			"ngrok Version",
+			"gsudo Version",
+			"Ansicon Version",
+			"Acrylic Version",
 			"PHP Version",
 			"PHP Location",
 			"PHP Ini Location",
