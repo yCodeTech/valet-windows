@@ -26,6 +26,13 @@
 	<rule ref="PSR1.Classes.ClassDeclaration.MultipleClasses">
 		<exclude-pattern>*facades.php</exclude-pattern>
 	</rule>
+	<!-- Allow closing brace on same line as the content ONLY for facades.php files,
+	ie. exclude the file from the sniff.
+	This allows empty class declarations to use only 1 line. -->
+	<rule ref="Squiz.WhiteSpace.ScopeClosingBrace.ContentBefore">
+		<exclude-pattern>*facades.php</exclude-pattern>
+	</rule>
+
 
 	<!-- Use PSR-2 as a base -->
 	<rule ref="PSR2">

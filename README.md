@@ -101,7 +101,7 @@ composer global require ycodetech/valet-windows
   <tr>
   <th></th>
     <td></td>
-    <td><a href="#xdebuginstall">xdebug:install</a></td>
+    <td><a href="#phpproxy">php|php:proxy</a></td>
 		<td align="center"><a href="#unsecure">unsecure</a></td>
 		<td align="center"><a href="#proxy">proxy</a></td>
     <td></td>
@@ -112,7 +112,7 @@ composer global require ycodetech/valet-windows
   <tr>
   <th></th>
     <td></td>
-    <td><a href="#xdebuguninstall">xdebug:uninstall</a></td>
+    <td><a href="#xdebuginstall">xdebug:install</a></td>
     <td></td>
 		<td align="center"><a href="#proxies">proxies</a></td>
     <td></td>
@@ -122,7 +122,7 @@ composer global require ycodetech/valet-windows
   <tr>
   <th></th>
     <td></td>
-    <td></td>
+    <td><a href="#xdebuguninstall">xdebug:uninstall</a></td>
     <td></td>
 		<td align="center"><a href="#unproxy">unproxy</a></td>
     <td></td>
@@ -155,9 +155,6 @@ Valet ships with and installs these services:
 |                                                                       Service | Version |
 | ----------------------------------------------------------------------------: | ------- |
 | [Acrylic DNS Proxy](https://mayakron.altervista.org/support/acrylic/Home.htm) | 2.1.0   |
-|                                   [Ansicon](https://github.com/adoxa/ansicon) | 1.89    |
-|                                    [gsudo](https://github.com/gerardog/gsudo) | 2.0.10  |
-|                                                   [nginx](https://nginx.org/) | 1.19.5  |
 |                                                   [ngrok](https://ngrok.com/) | 3.3.1   |
 
 > [!IMPORTANT]
@@ -168,6 +165,21 @@ Valet ships with and installs these services:
 > Afterwards, you will need to run `valet ngrok config upgrade` to upgrade the config file to the latest format.
 >
 > For both commands, valet automatically appends the config file location as a flag to the command, so ngrok will already know where the config file is.
+
+As of v3.2.0, Valet no longer ships with the executables for the following services, instead they will be downloaded and installed automatically from GitHub's API. This is so that the latest versions with bug fixes and security updates can be installed.
+
+|                                     Service | Latest Version as of 13/05/2025 |
+| ------------------------------------------: | ------------------------------- |
+| [Ansicon](https://github.com/adoxa/ansicon) | 1.89                            |
+|  [gsudo](https://github.com/gerardog/gsudo) | 2.6.0                           |
+|                 [nginx](https://nginx.org/) | 1.28.0                          |
+|     [WinSW](https://github.com/winsw/winsw) | 2.12.0                          |
+
+> [!IMPORTANT]
+>
+> `nginx` has changed some of the config options in v1.25.1, due to this, valet will run a site config check to detect if any of the site.conf needs upgrading. Valet will then automatically remove any of the old conf files and re-isolate/re-secure the sites with the updated configurations.
+>
+> Theses upgrades are only for `http2` and `http2_push_preload` options. Any future changes from `nginx` will be need to be upgraded in Valet internally as and when they arise, please submit an [issue](https://github.com/yCodeTech/valet-windows/issues/new?template=nginx-config-upgrade.md).
 
 ## Installation
 
@@ -500,10 +512,43 @@ php:which         Determine which PHP version the current working directory is u
 ```console
 $ valet php:which
 The current working directory site1 is using PHP 7.4.33 (isolated)
+The executable is located at: C:/php/7.4/php.exe
 
 $ valet php:which site2
 The specified site site2 is using PHP 8.1.8 (default)
+The executable is located at: C:/php/8.1/php.exe
 ```
+
+<img align="center" src="./The_same_icon.svg" style="width:20px;"> This command is the same as the Mac version, just renamed.
+
+##### php:proxy
+
+```
+php:proxy             Proxy PHP commands with a site's PHP executable
+           phpCommand Command to run with the site's PHP executable
+           [--site=]     Optionally, specify a site instead of the current working directory
+```
+
+`php` is a command alias.
+
+```console
+$ valet php:proxy -v
+
+Proxying the command to PHP 8.2.9 at C:/php/8.2/php.exe
+
+PHP 8.2.9 (cli) (built: Aug  1 2023 12:41:16) (NTS Visual C++ 2019 x64)
+Copyright (c) The PHP Group
+Zend Engine v4.2.9, Copyright (c) Zend Technologies
+
+
+$ valet php:proxy -r "echo 'Hello';" --site=site2
+
+Proxying the command to PHP 7.4.9 c:/php/7.4/php.exe
+
+Hello
+```
+
+<img align="center" src="./The_same_icon.svg" style="width:20px;"> This command is the same as the Mac version.
 
 ##### xdebug:install
 
@@ -1432,15 +1477,16 @@ Commands that have been tested and made parity:
 -   [x] link
 -   [x] links
 -   [x] log
--   [ ] loopback - not applicable
+-   [ ] loopback (the localhost IP) - not applicable
 -   [x] on-latest-version
 -   [x] open
 -   [x] park
 -   [x] parked
 -   [x] paths
--   [ ] php (proxying commands to PHP CLI) - Possible far future feature?
+-   [x] php (proxying commands to PHP CLI) - renamed to `php:proxy` with alias of `php`
 -   [x] proxies
 -   [x] proxy
+-   [ ] renew (Renews all domains with a trusted TLS certificate) - TBD
 -   [x] restart
 -   [x] secure
 -   [x] secured
@@ -1479,9 +1525,9 @@ The `install` command confirmation question about uninstalling the outdated cret
 Doesn't affect valet functionality.
 
 </td>
-    <td>3.1.0</td>
-    <td>3.2.0</td>
-    <td>&#x2717;</td>
+    <td align="center">3.1.0</td>
+    <td align="center">3.2.0</td>
+    <td align="center">&#x2713;</td>
   </tr>
 <table>
 <!--
@@ -1536,8 +1582,12 @@ Upon installation, Valet creates the following directories and config files:
 
 -   `~/.config/valet/Services`
     Contains the Nginx and PHP config and executable files to be able to run them as Windows services. These files are rebuilt when running the `install` command.
+
 -   `~/.config/valet/Sites`
     Contains all of the symbolic links for any `link`ed sites.
+
+-   `~/.config/valet/stubs`
+    A user-created directory to contain custom stubs. Only used in Valet if it exists, and overrides Valet's internal stubs.
 
 -   `~/.config/valet/Xdebug`
     Contains the output files of Xdebug profiling.

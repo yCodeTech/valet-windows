@@ -13,6 +13,8 @@ class Diagnose {
 	protected $cli;
 	protected $files;
 	protected $print;
+	protected $progressBar;
+
 
 	/**
 	 * Create a new Diagnose instance.
@@ -24,21 +26,29 @@ class Diagnose {
 	public function __construct(CommandLine $cli, Filesystem $files) {
 		$this->cli = $cli;
 		$this->files = $files;
+
+		$nginxPkgClass = resolve(Packages\Nginx::class);
+
 		$this->commands = [
 			'systeminfo',
 			'valet --version',
-			'cat ~/.config/valet/config.json',
-			valetBinPath() . 'nginx/nginx.exe -v 2>&1',
-			valetBinPath() . 'nginx/nginx.exe -c \"' . __DIR__ . '/../../bin/nginx/conf/nginx.conf\" -t -p ' . valetBinPath() . 'nginx 2>&1',
-			'foreach ($file in get-ChildItem -Path "' . valetBinPath() . 'nginx/conf/nginx.conf", "' . valetBinPath() . 'nginx/valet/valet.conf", "' . VALET_HOME_PATH . '/Nginx/*.conf"){echo $file.fullname --------------------`n; Get-Content -Path $file; echo `n;}',
+			'cat ' . \Configuration::path(),
+			$nginxPkgClass->packageExe() . ' -v 2>&1',
+			$nginxPkgClass->packageExe() . ' -c \"' . $nginxPkgClass->packagePath() . '/conf/nginx.conf\" -t -p ' . $nginxPkgClass->packagePath() . ' 2>&1',
+
+			'foreach ($file in get-ChildItem -Path "' . $nginxPkgClass->packagePath() . '/conf/nginx.conf", "' . $nginxPkgClass->packagePath() . '/valet/valet.conf", "' . VALET_HOME_PATH . '/Nginx/*.conf"){echo $file.fullname --------------------`n; Get-Content -Path $file; echo `n;}',
+
 			valetBinPath() . 'ngrok.exe version',
+			resolve(Packages\Gsudo::class)->packageExe() . ' -v',
+			resolve(Packages\Ansicon::class)->packageExe() . ' /?',
+			'cat "' . valetBinPath() . 'acrylic/Readme.txt"',
 			'php -v',
 			'cmd /C "where /f php"',
 			'php --ini',
 			'php --info',
 			'php --ri curl',
 			'cmd /C curl --version',
-			'cat "' . pathFilter(COMPOSER_GLOBAL_PATH) . '/composer.json"',
+			'cat "' . pathFilter(trim(\Valet::getComposerGlobalPath())) . '/composer.json"',
 			'composer global diagnose --no-ansi 1>' . VALET_HOME_PATH . '/composer.txt',
 			'composer global outdated --format json'
 		];
@@ -159,7 +169,7 @@ class Diagnose {
 	 * if the raw output isn't sufficient enough.
 	 *
 	 * @param string $command
-	 * @param string $output
+	 * @param string|ProcessOutput $output
 	 * @return string $output The edited output.
 	 */
 	protected function editOutput($command, $output) {
@@ -215,6 +225,12 @@ class Diagnose {
 			}
 
 			$output = json_encode($output, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+		}
+
+		if (str_contains($command, "acrylic")) {
+			if (preg_match("/version is:\s+\d+(\.\d+)+/", $output, $matches)) {
+				$output = "Acrylic " . preg_replace("/:\s+/", " ", $matches[0]);
+			}
 		}
 
 		return $output;
@@ -401,6 +417,9 @@ class Diagnose {
 			"nginx Config Check",
 			"nginx Config Files",
 			"ngrok Version",
+			"gsudo Version",
+			"Ansicon Version",
+			"Acrylic Version",
 			"PHP Version",
 			"PHP Location",
 			"PHP Ini Location",

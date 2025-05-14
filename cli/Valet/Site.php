@@ -91,7 +91,7 @@ class Site {
 
 		$this->config->prependPath($linkPath);
 
-		$this->files->symlinkAsUser($target, $linkPath . '/' . $link);
+		$this->files->symlink($target, $linkPath . '/' . $link);
 
 		return $linkPath . '/' . $link;
 	}
@@ -339,9 +339,14 @@ class Site {
 				$site .= !empty($value["alias"]) ? " (alias: {$value["alias"]})" : "";
 
 				if ($key === "php") {
+					// Extract PHP version from the ansi string, eg. <info>7.4.9 (isolated)</info>
+					// so we only get the raw version string.
+					preg_match("([0-9.]+)", $val, $phpVersion);
+
 					return [
 						"site" => $site,
-						"php" => $val
+						"php" => $val,
+						"phpVersion" => $phpVersion[0]
 					];
 				}
 			}
@@ -362,9 +367,6 @@ class Site {
 
 		$this->installSiteConfig($site, $php['version']);
 
-		info('Restarting Nginx...');
-		\Nginx::stop();
-		\Nginx::restart();
 		info("The site [$site] is now using $phpVersion.");
 	}
 
@@ -391,10 +393,6 @@ class Site {
 			// When site doesn't have SSL/TLS, we can remove the custom nginx config file to remove isolation
 			$this->files->unlink($this->nginxPath($site));
 		}
-
-		info('Restarting Nginx...');
-		\Nginx::stop();
-		\Nginx::restart();
 
 		info(sprintf('The site [%s] is now using the default PHP version.', $site));
 	}
@@ -543,9 +541,9 @@ class Site {
 			$this->files->unlink($this->certificatesPath($url, 'crt'));
 		}
 
-		$this->cli->run(sprintf('cmd "/C certutil -delstore "CA" "%s""', $url));
+		$this->cli->run(sprintf('cmd "/C certutil -user -delstore "CA" "%s""', $url));
 
-		$this->cli->run(sprintf('cmd "/C certutil -delstore "Root" "%s""', $url));
+		$this->cli->run(sprintf('cmd "/C certutil -user -delstore "Root" "%s""', $url));
 
 		// If the user had isolated the PHP version for this site, swap out .sock file
 		if ($phpVersion) {
@@ -612,6 +610,9 @@ class Site {
 	 */
 	public function isSecured($site) {
 		$tld = $this->config->read()['tld'];
+
+		// Remove .tld from sitename if it was provided, to avoid double .tld (.tld.tld)
+		$site = str_replace('.' . $tld, '', $site);
 
 		return in_array($site . '.' . $tld, $this->secured());
 	}
@@ -713,7 +714,7 @@ class Site {
 		}
 
 		$this->cli->runOrExit(
-			sprintf('cmd "/C certutil -delstore "Root" "%s""', $cName),
+			sprintf('cmd "/C certutil -user -delstore "Root" "%s""', $cName),
 			function ($code, $output) {
 				error("Failed to delete certificate: $output", true);
 			}
@@ -864,7 +865,7 @@ class Site {
 	 */
 	public function trustCa($caPemPath) {
 		$this->cli->runOrExit(
-			sprintf('cmd "/C certutil -addstore "Root" "%s""', $caPemPath),
+			sprintf('cmd "/C certutil -user -addstore "Root" "%s""', $caPemPath),
 			function ($code, $output) {
 				error("Failed to trust certificate: $output", true);
 			}
@@ -879,7 +880,7 @@ class Site {
 	 */
 	public function trustCertificate(string $crtPath) {
 		$this->cli->runOrExit(
-			sprintf('cmd "/C certutil -addstore "CA" "%s""', $crtPath),
+			sprintf('cmd "/C certutil -user -addstore "CA" "%s""', $crtPath),
 			function ($code, $output) {
 				error("Failed to trust certificate: $output", true);
 			}
@@ -904,9 +905,9 @@ class Site {
 		$tld = $this->config->get('tld');
 
 		foreach ($secured->pluck('site') as $site) {
-			$this->cli->run(sprintf('cmd "/C certutil -delstore "CA" "%s""', $site . '.' . $tld));
+			$this->cli->run(sprintf('cmd "/C certutil -user -delstore "CA" "%s""', $site . '.' . $tld));
 
-			$this->cli->run(sprintf('cmd "/C certutil -delstore "Root" "%s""', $site . '.' . $tld));
+			$this->cli->run(sprintf('cmd "/C certutil -user -delstore "Root" "%s""', $site . '.' . $tld));
 		}
 	}
 
@@ -926,7 +927,7 @@ class Site {
 			$siteConf = $this->files->get($this->nginxPath($valetSite));
 		}
 		else {
-			$siteConf = $this->files->get(__DIR__ . '/../stubs/unsecure.valet.conf');
+			$siteConf = $this->files->getStub('unsecure.valet.conf');
 			$siteConf = str_replace(
 				['VALET_HOME_PATH', 'VALET_SERVER_PATH', 'VALET_STATIC_PREFIX', 'VALET_SITE', 'HOME_PATH'],
 				[$this->valetHomePath(), VALET_SERVER_PATH, VALET_STATIC_PREFIX, $valetSite, $_SERVER['HOME']],
@@ -948,7 +949,7 @@ class Site {
 	 */
 	public function buildSecureNginxServer($url, $siteConf = null) {
 		if ($siteConf === null) {
-			$siteConf = $this->files->get(__DIR__ . '/../stubs/secure.valet.conf');
+			$siteConf = $this->files->getStub('secure.valet.conf');
 		}
 
 		$path = $this->certificatesPath();
@@ -1000,7 +1001,7 @@ class Site {
 			}
 
 			$stub = $secure ? 'secure.proxy.valet.conf' : 'proxy.valet.conf';
-			$siteConf = $this->files->get(__DIR__ . '/../stubs/' . $stub);
+			$siteConf = $this->files->getStub($stub);
 
 			$siteConf = str_replace(
 				['VALET_HOME_PATH', 'VALET_SERVER_PATH', 'VALET_STATIC_PREFIX', 'VALET_SITE', 'VALET_PROXY_HOST'],

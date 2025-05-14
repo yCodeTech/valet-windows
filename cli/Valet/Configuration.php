@@ -73,7 +73,7 @@ class Configuration {
 
 		$this->files->putAsUser(
 			$driversPath . '/SampleValetDriver.php',
-			$this->files->get(__DIR__ . '/../stubs/SampleValetDriver.php')
+			$this->files->getStub('SampleValetDriver.php')
 		);
 	}
 
@@ -144,7 +144,8 @@ class Configuration {
 				'tld' => 'test',
 				'paths' => [$this->valetHomePath('Sites')],
 				'php_port' => PhpCgi::PORT,
-				'php_xdebug_port' => PhpCgiXdebug::PORT
+				'php_xdebug_port' => PhpCgiXdebug::PORT,
+				'share-tool' => 'ngrok'
 			];
 
 			$this->write($baseConfig);
@@ -161,7 +162,10 @@ class Configuration {
 		$this->updateKey('tld', $config['tld'] ?? 'test');
 		// Add php_port if missing.
 		$this->updateKey('php_port', $config['php_port'] ?? PhpCgi::PORT);
+		// Add the default php_xdebug_port if missing.
 		$this->updateKey('php_xdebug_port', $config['php_xdebug_port'] ?? PhpCgiXdebug::PORT);
+		// Add share-tool if missing.
+		$this->updateKey('share-tool', $config['share-tool'] ?? 'ngrok');
 	}
 
 	/**
@@ -258,6 +262,10 @@ class Configuration {
 		$phpPath = str_replace('\\', "/", $phpPath);
 
 		$phpVersion = \PhpCgi::findPhpVersion($phpPath);
+
+		if (!$phpVersion) {
+			return false;
+		}
 
 		$config = $this->read();
 		$config['php'] = $config['php'] ?? [];

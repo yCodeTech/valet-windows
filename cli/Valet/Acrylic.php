@@ -44,7 +44,7 @@ class Acrylic {
 	 * @return void
 	 */
 	protected function createHostsFile(string $tld) {
-		$contents = $this->files->get(__DIR__ . '/../stubs/AcrylicHosts.txt');
+		$contents = $this->files->getStub('AcrylicHosts.txt');
 
 		$this->files->put(
 			$this->path('AcrylicHosts.txt'),

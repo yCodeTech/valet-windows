@@ -63,7 +63,8 @@ class PhpCgiXdebug extends PhpCgi {
 	public function installService($phpVersion, $phpCgiServiceConfig = null, $installConfig = null) {
 		$phpWinSw = $this->phpWinSws[$phpVersion];
 
-		$phpCgiServiceConfig = $phpCgiServiceConfig ?? file_get_contents(__DIR__ . '/../stubs/phpcgixdebugservice.xml');
+		$phpCgiServiceConfig ??= $this->files->getStub('phpcgixdebugservice.xml');
+
 		$installConfig = $installConfig ?? [
 			'PHP_PATH' => $phpWinSw['php']['path'],
 			'PHP_XDEBUG_PORT' => $phpWinSw['php']['xdebug_port']

@@ -2,6 +2,8 @@
 
 namespace Valet;
 
+use CommandLine;
+
 class Filesystem {
 	/**
 	 * Determine if the given path is a directory.
@@ -182,6 +184,21 @@ class Filesystem {
 	}
 
 	/**
+	 * Move file from one directory to another.
+	 *
+	 * This is a simple wrapper around the PHP rename function.
+	 * By renaming the file path, we can move it to a new location. The filepath can be
+	 * a file or a directory. If it's a directory, the contents of the directory will
+	 * be moved at the same time. If the destination directory does not exist, it will be created.
+	 *
+	 * @param string $from
+	 * @param string $to
+	 */
+	public function move($from, $to) {
+		rename($from, $to);
+	}
+
+	/**
 	 * Create a symlink to the given target.
 	 *
 	 * @param string $target
@@ -193,26 +210,9 @@ class Filesystem {
 			$this->unlink($link);
 		}
 
-		symlink($target, $link);
-	}
-
-	/**
-	 * Create a symlink to the given target for the non-root user.
-	 *
-	 * This uses the command line as PHP can't change symlink permissions.
-	 *
-	 * @param string $target
-	 * @param string $link
-	 * @return void
-	 */
-	public function symlinkAsUser($target, $link) {
-		if ($this->exists($link)) {
-			$this->unlink($link);
-		}
-
-		$mode = is_dir($target) ? 'J' : 'H';
-
-		exec("mklink /{$mode} \"{$link}\" \"{$target}\"");
+		// Use `mklink` with the `/D` param to create a directory symlink.
+		// Use sudo to run with trusted installer privileges as the `/D` param requires it.
+		CommandLine::sudo("mklink /D \"{$link}\" \"{$target}\"", true, true);
 	}
 
 	/**
@@ -222,24 +222,14 @@ class Filesystem {
 	 * @return void
 	 */
 	public function unlink($path) {
-		if ($this->isLink($path)) {
-			$dir = pathinfo($path, PATHINFO_DIRNAME);
-			$link = pathinfo($path, PATHINFO_BASENAME);
-
-			if (is_dir($path)) {
-				exec("cd \"{$dir}\" && rmdir {$link}");
-			}
-			else {
-				@unlink($path);
-				@rmdir($path);
-			}
-		}
-		elseif ($this->isDir($path)) {
-			exec('cmd /C rmdir /s /q "' . $path . '"');
-		}
-		elseif (file_exists($path)) {
+		// If the path is a symlinked directory OR is a file, remove it.
+		if ($this->isLink($path) || $this->isFile($path)) {
 			@unlink($path);
 			@rmdir($path);
+		}
+		// If the path is a directory, remove it and all it's contents.
+		elseif ($this->isDir($path)) {
+			exec('cmd /C rmdir /s /q "' . $path . '"');
 		}
 	}
 
@@ -282,11 +272,7 @@ class Filesystem {
 	 * @return bool
 	 */
 	public function isLink($path) {
-		if (is_link($path)) {
-			return true;
-		}
-
-		return $this->isDir($path) && filesize($path) === 0;
+		return is_link($path);
 	}
 
 	/**
@@ -297,6 +283,16 @@ class Filesystem {
 	 */
 	public function readLink($path) {
 		return readlink($path);
+	}
+
+	/**
+	 * Determine if the given path is a file.
+	 *
+	 * @param string $path
+	 * @return bool
+	 */
+	public function isFile($path) {
+		return is_file($path);
 	}
 
 	/**
@@ -320,8 +316,65 @@ class Filesystem {
 	 * @return bool
 	 */
 	public function isBrokenLink($path) {
-		return is_link($path) || @readlink($path) === false;
+		return $this->isLink($path) && !file_exists($this->readLink($path));
 	}
+
+	/**
+	 * Convert all junction links in the given path to real symlinks.
+	 *
+	 * @param string $path The path to scan for junction links.
+	 */
+	public function convertJunctionsToSymlinks($path) {
+		/**
+		 * @var \Illuminate\Support\Collection
+		 */
+		$collection = $this->getJunctionLinks($path);
+
+		if ($collection->isEmpty()) {
+			return;
+		}
+		// Remove all the junction links and create new symlinks to the same path.
+		$collection->each(function ($link) use ($path) {
+			$output = CommandLine::run('cmd /C rmdir /s /q "' . $path . '/' . $link['linkName']. '"');
+
+			if ($output->isSuccessful()) {
+				$this->symlink($link['path'], $link['linkName']);
+			}
+		});
+	}
+
+	/**
+	 * Get all the junction links in the given path.
+	 *
+	 * @param string $path The path to scan for junction links.
+	 *
+	 * @return \Illuminate\Support\Collection
+	 */
+	public function getJunctionLinks($path) {
+		/**
+		 * @var \Illuminate\Support\Collection
+		 */
+		$collection = collect();
+
+		$output = CommandLine::run("cmd /C dir \"$path\" /a:L | findstr \"<JUNCTION>\"");
+		$outputArray = explode("\n", $output->getOutput());
+
+		foreach ($outputArray as $line) {
+			if (str_contains($line, '<JUNCTION>')) {
+				// Split the line by whitespace, but ignore whitespace inside brackets.
+				// This is to avoid splitting the path if it contains spaces.
+				$line = preg_split('/[\s]+(?![^\[]*\])/', $line);
+
+				// Set the link name and path to the collection.
+				$collection->push([
+					"linkName" => $line[3],
+					"path" => str_replace(["[", "]"], "", $line[4])
+				]);
+			}
+		}
+		return $collection;
+	}
+
 
 	/**
 	 * Scan the given directory path.
@@ -333,5 +386,69 @@ class Filesystem {
 		return collect(scandir($path))->reject(function ($file) {
 			return in_array($file, ['.', '..']);
 		})->values()->all();
+	}
+
+	/**
+	 * Unzip the given zip file to the given path.
+	 *
+	 * @uses `tar` The Windows CMD `tar` command to zip/unzip files.
+	 * The `-x` option extracts the zip file.
+	 * The `-f` option specifies the zip file to extract.
+	 * The `-C` option specifies the directory to extract to.
+	 *
+	 * @param string $zipFilePath
+	 * @param string $extractToPath
+	 */
+	public function unzip($zipFilePath, $extractToPath) {
+		$tar = getTarExecutable();
+		CommandLine::run("$tar -xf $zipFilePath -C $extractToPath");
+	}
+
+	/**
+	 * List the top-level directories in the given zip file.
+	 *
+	 * @uses `tar` The Windows CMD `tar` command to zip/unzip files and list files in the zip.
+	 * The -t option lists the contents of the zip file.
+	 * The -f option specifies the zip file to list.
+	 *
+	 * @param mixed $zipFilePath
+	 * @return string[] Array of top-level directories in the zip file.
+	 */
+	public function listTopLevelZipDirs($zipFilePath) {
+		$tar = getTarExecutable();
+		// Get the contents of the zip file.
+		$output = CommandLine::run("$tar -tf $zipFilePath");
+		// Split the output into an array of lines.
+		// Each line represents a file or directory in the zip file.
+		$contents = explode("\n", trim($output->getOutput()));
+
+		// Collect and map through each item in the contents and return the first part of
+		// the path of each item.
+		return collect($contents)->map(function ($item) {
+				// Split the item by `/` and return the first part of the path with
+				// the leading or trailing whitespace trimmed.
+				// The first part of the path is the top-level directory in the zip file.
+				return explode("/", trim($item))[0];
+		})
+			->unique()
+			->values()
+			->all();
+	}
+
+	/**
+	 * Get stub file. If a custom stub file exists in the home path, use that instead.
+	 *
+	 * @param string $filename
+	 *
+	 * @return string
+	 */
+	public function getStub($filename) {
+		$default = __DIR__.'/../stubs/'.$filename;
+
+		$custom = VALET_HOME_PATH . "/stubs/$filename";
+
+		$path = file_exists($custom) ? $custom : $default;
+
+		return $this->get($path);
 	}
 }

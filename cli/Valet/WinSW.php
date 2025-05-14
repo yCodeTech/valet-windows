@@ -63,11 +63,11 @@ class WinSW {
 		$args['VALET_HOME_PATH'] = Valet::homePath();
 
 		$this->files->copy(
-			realpath(valetBinPath() . 'winsw/WinSW.NET4.exe'),
+			realpath(valetBinPath() . 'winsw/winsw.exe'),
 			$this->binaryPath()
 		);
 
-		$config = $this->files->get(__DIR__ . "/../stubs/$this->service.xml");
+		$config = $this->files->getStub("$this->service.xml");
 
 		$this->files->put(
 			$this->configPath(),

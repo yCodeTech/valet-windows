@@ -32,14 +32,7 @@ Container::setInstance(new Container());
 
 $app = new Application('Laravel Valet Windows', $version);
 
-/**
- * Prune missing directories and symbolic links on every command.
- */
-if (is_dir(VALET_HOME_PATH)) {
-	Configuration::prune();
-
-	Site::pruneLinks();
-}
+Upgrader::onEveryRun();
 
 // TODO: Abstract all Xdebug related code into a separate opt-in custom extension, this could be an alternative to just deprecating Xdebug functionality altogether.
 
@@ -73,17 +66,13 @@ $app->command('install [--xdebug]', function ($input, $output, $xdebug) {
 		}
 	}
 
-	/** @deprecated This confirmation question is deprecated since version 3.1.0 */
-	$question = new ConfirmationQuestion("<fg=red>Have you fully uninstalled the outdated cretueusebiu/valet-windows? yes/no</>\n", false);
-
-	if (!$alreadyInstalled && !$helper->ask($input, $output, $question)) {
-		warning("Install aborted. \nPlease fully uninstall Valet from cretueusebiu and purge all configs.");
-		output('<fg=yellow>Remove composer dependency with:</> <bg=magenta>composer global remove cretueusebiu/valet-windows</>');
-		return;
-	}
-
-	$maxItems = $xdebug ? 6 : 5;
+	$maxItems = $xdebug ? 7 : 6;
 	$progressBar = progressbar($maxItems, "Installing");
+	sleep(1);
+
+	$progressBar->setMessage("Gsudo", "placeholder");
+	$progressBar->advance();
+	Gsudo::install();
 	sleep(1);
 
 	$progressBar->setMessage("Configuration", "placeholder");
@@ -144,6 +133,9 @@ $app->command('sudo valetCommand* [-o|--valetOptions=]', function ($valetCommand
 	if (str_contains($valetCommand, 'sudo')) {
 		return error("You can not sudo the sudo command.");
 	}
+
+	// Install Gsudo if it's not already installed.
+	Gsudo::install();
 
 	$valetCommand = str_starts_with($valetCommand, 'valet') ? $valetCommand : "valet $valetCommand";
 
@@ -301,11 +293,30 @@ $app->command('php:which [site]', function ($site = null) {
 		return false;
 	}
 
-	info("{$txt} {$which['site']} is using PHP {$which['php']}");
+	info("{$txt} {$which['site']} is using PHP {$which['phpVersion']}");
+	info("The executable is located at: " . PhpCgi::getPhpPath($which['phpVersion']));
 
 })->descriptions('Determine which PHP version the current working directory is using', [
 	"site" => "Optionally, specify a site"
 ])->addUsage("php:which site2");
+
+/**
+ * Proxy PHP commands through to a site's PHP executable.
+ *
+ * This command block doesn't handle the command logic, the `valet` script in the project root does.
+ * (The `valet` script is the actual command script that is called when `valet` is
+ * ran in the terminal.)
+ *
+ * This command block is only to document the command within the CLI.
+ */
+$app->command('php:proxy phpCommand* [--site=]', function ($phpCommand, $site = null) {
+
+	warning('It looks like you are running `cli/valet.php` directly; please use the `valet` script in the project root instead.');
+
+})->setAliases(["php"])->descriptions("Proxy PHP commands through to a site's PHP executable", [
+	'phpCommand' => "PHP command to run with the site's PHP executable",
+	'--site' => 'Specify the site to use to get the PHP version.'
+])->addUsage("php:proxy -v --site=site2")->addUsage("php -v --site=site2");
 
 /**
  * Install Xdebug services for all PHP versions that are specified in `valet php:list`.
@@ -362,7 +373,9 @@ $app->command('parity', function () {
 	// Only get the released version instead of master, to make sure no commands
 	// are added or removed to the macOS version to ensure this version of Valet 3.0
 	// always has parity against the version in the URL. (ie. master can change.)
-	Valet::parity("https://raw.githubusercontent.com/laravel/valet/v4.3.0/cli/app.php");
+	//
+	// Also, don't use a patch version, use the MAJOR.MINOR.0 format. eg. 4.3.0, 4.5.0
+	Valet::parity("https://raw.githubusercontent.com/laravel/valet/v4.8.0/cli/app.php");
 
 })->descriptions("Get a calculation of the percentage of parity completion.");
 
@@ -433,6 +446,9 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 
 		if ($isolate) {
 			Site::isolate($isolate, $name);
+
+			info('Restarting Nginx...');
+			Nginx::restart();
 		}
 	})->descriptions('Register the current working directory as a symbolic link', [
 		'name' => 'Optionally specify a new name to be linked as',
@@ -480,9 +496,11 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 
 			$site = $name . '.' . Configuration::read()['tld'];
 			Site::unsecure($site);
-
-			Nginx::restart();
 		}
+
+		info('Restarting Nginx...');
+			Nginx::restart();
+
 		// Unlink the site.
 		Site::unlink($name);
 
@@ -701,6 +719,9 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 			info("Isolating the current working directory...");
 			Site::isolate($phpVersion, $site);
 
+			info('Restarting Nginx...');
+			Nginx::restart();
+
 			return;
 		}
 
@@ -708,6 +729,9 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 		foreach ($site as $sitename) {
 			Site::isolate($phpVersion, $sitename);
 		}
+		info('Restarting Nginx...');
+		Nginx::restart();
+
 	})->descriptions('Isolate the current working directory to a specific PHP version', [
 		'phpVersion' => 'The PHP version you want to use; e.g 7.4, 7.4.33',
 		'--site' => 'Optionally specify the site.'
@@ -743,6 +767,9 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 				Site::unisolate($array["site"]);
 			}
 
+			info('Restarting Nginx...');
+			Nginx::restart();
+
 			return;
 		}
 
@@ -752,30 +779,55 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 
 		Site::unisolate($site);
 
+		info('Restarting Nginx...');
+		Nginx::restart();
+
 	})->descriptions('Remove [unisolate] the current working directory\'s site', [
 		'--site' => 'Optionally specify the site',
 		'--all' => 'Optionally remove all isolated sites'
 	])->addUsage("unisolate --site=mySite")->addUsage("unisolate --all");
 
 	/**
-	 * Sharing - ngrok
+	 * Sharing
 	 */
+
+	// TODO: Add support for other share tools.
+	// https://github.com/robbie-cahill/tunnelmole-client
 
 	/**
-	 * Set the ngrok authtoken.
-	 * @param string $token Your personal ngrok authtoken
+	 * Get or set the name of the currently-selected share tool.
+	 *
+	 * @param string|null $tool Optionally, the share tool to set.
 	 */
-	$app->command('set-ngrok-token [token]', function ($token = null) {
-		if ($token === null) {
-			warning("Please provide your ngrok authtoken.");
-			return;
+	$app->command('share-tool [tool]', function ($tool = null) {
+		$share_tools_list = Share::getShareTools();
+
+		// If a tool is not provided, then we want to get the current tool.
+		if ($tool === null) {
+			// Get the current share tool.
+			$shareTool = Share::getCurrentShareTool();
+
+			// If there is no share tool set, output a warning message.
+			if ($shareTool === null) {
+				return warning("There is no share tool set. The supported tools are: $share_tools_list");
+			}
+
+			// Otherwise, output the current share tool.
+			return info("The current share tool is: $shareTool");
 		}
 
-		Ngrok::run("authtoken $token " . Ngrok::getNgrokConfig());
+		// If the tool is not valid, output a warning message.
+		if (!Share::isToolValid($tool)) {
+			return warning("$tool is not a valid share tool. Please use $share_tools_list.");
+		}
 
-	})->setAliases(["auth"])->descriptions('Set the ngrok auth token', [
-		"token" => "Your personal ngrok authtoken"
-	])->addUsage("set-ngrok-token 123abc")->addUsage("auth 123abc");
+		// Otherwise, update the share tool key in the config.
+		Configuration::updateKey('share-tool', $tool);
+		info("Share tool set to $tool.");
+
+	})->descriptions('Get or set the name of the current share tool.', [
+		"tool" => "Optionally, set the current share tool"
+	]);
 
 	/**
 	 * Share the current working directory site with a publically accessible URL.
@@ -800,6 +852,11 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 	 */
 	$app->command('share [site] [-o|--options=]', function ($input, $site = null, $options = null) {
 
+		// If current share tool is set...
+		if (Share::getCurrentShareTool() === null) {
+			return info("Please set your share tool with `valet share-tool`.");
+		}
+
 		// Send an error if the option shortcut has a =
 		if (str_contains($input, "-o=")) {
 			return error("Option shortcuts cannot have a <bg=magenta> = </> immediately after them.\nPlease use a space to separate it from the value: <bg=magenta> valet share $site -o " . preg_replace("/=/", "", $options, 1) . " </>");
@@ -809,18 +866,12 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 
 		$options = $options != null ? explode("//", $options) : [];
 
-		Ngrok::start($url, Site::port($url), $options);
+		Share::shareTool()->start($url, Site::port($url), $options);
 
 	})->descriptions('Share the current working directory site with a publically accessible URL', [
 		"site" => "Optionally, the site name",
 		"--options" => "Optionally, specify ngrok options/flags of its `http` command to pass to ngrok, without the leading <fg=green>--</>. Multiple options must be separated by double slashes <fg=green>//</>."
 	])->addUsage("share mysite")->addUsage("share mysite --options domain=example.com//region=eu")->addUsage("share -o domain=example.com");
-
-	// TODO: Share-tool for Expose (https://expose.dev/)
-	// and 2 open-source clients like localtunnel (https://github.com/localtunnel/localtunnel)
-	// https://boringproxy.io/
-	// https://github.com/anderspitman/awesome-tunneling
-	// https://github.com/robbie-cahill/tunnelmole-client
 
 	/**
 	 * Get and copy the public URL of the current working directory site
@@ -828,15 +879,44 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 	 * @param string|null $site Optionally, specify a site
 	 */
 	$app->command('fetch-share-url [site]', function ($site = null) {
+		// If current share tool is not set, output a message.
+		if (Share::getCurrentShareTool() === null) {
+			return info("Please set your share tool with `valet share-tool`.");
+		}
+
 		$site = $site ?: Site::host(getcwd()) . '.' . Configuration::read()['tld'];
 
-		$url = Ngrok::currentTunnelUrl($site);
+		$url = Share::shareTool()->currentTunnelUrl($site);
 		info("The public URL for $site is: <fg=blue>$url</>");
 		info("It has been copied to your clipboard.");
 
 	})->setAliases(["url"])->descriptions('Get and copy the public URL of the current working directory site that is currently being shared', [
 		"site" => "Optionally, specify a site"
 	])->addUsage("fetch-share-url site1")->addUsage("url site1");
+
+	/**
+	 * Sharing - ngrok
+	 */
+
+	/**
+	 * Set the ngrok authtoken.
+	 * @param string $token Your personal ngrok authtoken
+	 */
+	$app->command('set-ngrok-token [token]', function ($token = null) {
+
+		if (Share::getCurrentShareTool() != "ngrok") {
+			return info("Please set ngrok as your share tool with `valet share-tool ngrok`.");
+		}
+
+		if ($token === null) {
+			return warning("Please provide your ngrok authtoken.");
+		}
+
+		Ngrok::run("authtoken $token " . Ngrok::getNgrokConfig());
+
+	})->setAliases(["auth"])->descriptions('Set the ngrok auth token', [
+		"token" => "Your personal ngrok authtoken"
+	])->addUsage("set-ngrok-token 123abc")->addUsage("auth 123abc");
 
 	/**
 	 * Run ngrok commands.
@@ -873,6 +953,9 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 		"commands" => "The ngrok command and its argument's values, separated by spaces.",
 		"--options" => "Specify ngrok options/flags without the leading <fg=green>--</>. Multiple options must be separated by double slashes <fg=green>//</>."
 	])->addUsage("ngrok config add-authtoken [token] --options config=C:/ngrok.yml")->addUsage("ngrok config add-authtoken [token] -o config=C:/ngrok.yml");
+
+	/**** End Sharing ****/
+
 
 	/**
 	 * Starts Valet's services
