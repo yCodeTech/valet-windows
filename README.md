@@ -1492,7 +1492,7 @@ Commands that have been tested and made parity:
 -   [x] secured
 -   [x] set-ngrok-token
 -   [x] share
--   [ ] share-tool - Next feature drop
+-   [x] share-tool
 -   [x] start
 -   [x] status - renamed to `services`
 -   [x] stop
