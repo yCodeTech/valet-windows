@@ -35,7 +35,7 @@ This is a large [Release PR](https://github.com/yCodeTech/valet-windows/pull/18)
 
     -   The command is defined in `valet.php`, while the logic resides in the `valet` script in the project root.
 
--   Added new `PhpCgi::getPhpPath` method to get the PHP executable path by specifying a version.
+    -   Added new `PhpCgi::getPhpPath` method to get the PHP executable path by specifying a version.
 
     -   Changed `PhpCgi::findPhpVersion` method to return the executable path if the new `getExecPath` param is `true` otherwise it will default to returning the PHP version. Also changed it's error return value to `false` for easier checking.
 
@@ -368,7 +368,7 @@ This is a large [Release PR](https://github.com/yCodeTech/valet-windows/pull/18)
 
     > ERROR: authentication failed: Your ngrok-agent version "3.3.1" is too old. The minimum supported agent version for your account is "3.6.0". Please update to a newer version with ngrok update...
 
-    Because we can't test ngrok commands for errors or errors in the executable (which was tested in commit f8be62b, but reverted in a449582), we need to return the output of any errors and check the output for a specific error code relating to the "too old" error (`ERR_NGROK_121`). Then output a message (along with the original error output) to the user to inform them that they can update ngrok executable and also upgrade the config file themselves by performing the valet commands: `valet ngrok update` and `valet ngrok config upgrade` respectively.
+    Because we can't test ngrok commands for errors or errors in the executable (which was tested in commit [f8be62b](https://github.com/yCodeTech/valet-windows/commit/f8be62b), but reverted in [a449582](https://github.com/yCodeTech/valet-windows/commit/a449582)), we need to return the output of any errors and check the output for a specific error code relating to the "too old" error (`ERR_NGROK_121`). Then output a message (along with the original error output) to the user to inform them that they can update ngrok executable and also upgrade the config file themselves by performing the valet commands: `valet ngrok update` and `valet ngrok config upgrade` respectively.
 
     All errors other errors will still output to the terminal.
 
