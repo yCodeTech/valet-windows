@@ -33,7 +33,6 @@ class Configuration {
 		$this->createLogDirectory();
 		$this->createCertificatesDirectory();
 		$this->createServicesDirectory();
-		$this->createXdebugDirectory();
 		$this->writeBaseConfiguration();
 
 		// Copy the emergency stop and uninstall services script to the Valet home
@@ -92,7 +91,17 @@ class Configuration {
 	 * @return void
 	 */
 	public function createExtensionsDirectory() {
-		$this->files->ensureDirExists(Valet::homePath('Extensions'), user());
+		$extensionsPath = $this->valetHomePath('Extensions');
+
+		$this->files->ensureDirExists($extensionsPath, user());
+
+		// Copy the extensions stubs to the Extensions directory.
+		foreach ($this->files->scandir(__DIR__ . '/../stubs/extensions') as $file) {
+			$this->files->putAsUser(
+				"$extensionsPath/$file",
+				$this->files->getStub("extensions/$file")
+			);
+		}
 	}
 
 	/**
@@ -122,15 +131,6 @@ class Configuration {
 	 */
 	public function createServicesDirectory() {
 		$this->files->ensureDirExists($this->valetHomePath('Services'), user());
-	}
-
-	/**
-	 * Create the directory for the Xdebug profiler.
-	 *
-	 * @return void
-	 */
-	public function createXdebugDirectory() {
-		$this->files->ensureDirExists($this->valetHomePath('Xdebug'), user());
 	}
 
 	/**

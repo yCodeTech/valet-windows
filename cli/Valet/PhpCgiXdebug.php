@@ -9,6 +9,12 @@ class PhpCgiXdebug extends PhpCgi {
 	 * @inheritDoc
 	 */
 	public function __construct(CommandLine $cli, Filesystem $files, WinSwFactory $winswFactory, Configuration $configuration) {
+
+		$this->files = $files;
+		$this->configuration = $configuration;
+
+		$this->setupXdebugConfig();
+
 		parent::__construct($cli, $files, $winswFactory, $configuration);
 
 		foreach ($this->phpWinSws as $phpVersion => $phpWinSw) {
@@ -100,5 +106,33 @@ class PhpCgiXdebug extends PhpCgi {
 		}
 
 		return $this->phpWinSws[$phpVersion]['winsw']->installed();
+	}
+
+	/**
+	 * Setup Xdebug configuration.
+	 *
+	 * @return void
+	 */
+	public function setupXdebugConfig() {
+		$this->createXdebugDirectory();
+		$this->setXdebugPortsPerPhp();
+	}
+
+	/**
+	 * Create the directory for the Xdebug profiler in the `~/.config/valet` directory.
+	 *
+	 * @return void
+	 */
+	private function createXdebugDirectory() {
+		$this->files->ensureDirExists(Valet::homePath('Xdebug'), user());
+	}
+
+	private function setXdebugPortsPerPhp() {
+		$phps = $this->configuration->get('php', []);
+
+		foreach ($phps as $php) {
+			$phps[$php['version']]['xdebug_port'] = $php['port'] + 100;
+		}
+		$this->configuration->updateKey("php", $phps);
 	}
 }
