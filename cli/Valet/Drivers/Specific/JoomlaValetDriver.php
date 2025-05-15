@@ -1,40 +1,33 @@
 <?php
 
-namespace Valet\Drivers\Custom;
+namespace Valet\Drivers\Specific;
 
-use Valet\Drivers\ValetDriver;
+use Valet\Drivers\BasicValetDriver;
 
-class SampleValetDriver extends ValetDriver {
+class JoomlaValetDriver extends BasicValetDriver {
 	/**
 	 * Determine if the driver serves the request.
 	 *
 	 * @param string $sitePath
 	 * @param string $siteName
 	 * @param string $uri
+	 *
 	 * @return bool
 	 */
 	public function serves($sitePath, $siteName, $uri) {
-		// if (file_exists("$sitePath/file-that-identifies-my-framework")) {
-		//     return true;
-		// }
-
-		return false;
+		return is_dir("{$sitePath}/libraries/joomla");
 	}
 
 	/**
-	 * Determine if the incoming request is for a static file.
+	 * Take any steps necessary before loading the front controller for this driver.
 	 *
 	 * @param string $sitePath
 	 * @param string $siteName
 	 * @param string $uri
-	 * @return string|false
+	 * @return void
 	 */
-	public function isStaticFile($sitePath, $siteName, $uri) {
-		if (file_exists($staticFilePath = "$sitePath/public/$uri")) {
-			return $staticFilePath;
-		}
-
-		return false;
+	public function beforeLoading($sitePath, $siteName, $uri) {
+		$_SERVER['PHP_SELF'] = $uri;
 	}
 
 	/**
@@ -43,9 +36,10 @@ class SampleValetDriver extends ValetDriver {
 	 * @param string $sitePath
 	 * @param string $siteName
 	 * @param string $uri
+	 *
 	 * @return string
 	 */
 	public function frontControllerPath($sitePath, $siteName, $uri) {
-		return "$sitePath/public/index.php";
+		return parent::frontControllerPath($sitePath, $siteName, $uri);
 	}
 }
