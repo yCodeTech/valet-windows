@@ -445,7 +445,7 @@ class Filesystem {
 	public function getStub($filename) {
 		$default = __DIR__.'/../stubs/'.$filename;
 
-		$custom = VALET_HOME_PATH . "/stubs/$filename";
+		$custom = Valet::homePath() . "/stubs/$filename";
 
 		$path = file_exists($custom) ? $custom : $default;
 

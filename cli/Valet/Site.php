@@ -1116,7 +1116,7 @@ class Site {
 	}
 
 	public function valetHomePath() {
-		return VALET_HOME_PATH;
+		return Valet::homePath();
 	}
 
 	/**
