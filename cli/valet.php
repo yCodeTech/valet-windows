@@ -380,6 +380,19 @@ $app->command('parity', function () {
 })->descriptions("Get a calculation of the percentage of parity completion.");
 
 /**
+ * List the installed Valet services.
+ */
+$app->command('services', function () {
+	info("Checking the Valet services...");
+
+	$services = Valet::services();
+	output("\n");
+
+	table(['Service', 'Windows Name', 'Status'], $services, true);
+	info('Use <bg=magenta> start </> <bg=magenta> stop </> or <bg=magenta> restart </> commands to change the status, eg. <bg=magenta> valet restart nginx </>');
+})->descriptions('List the installed Valet services.');
+
+/**
  * Most commands are available only if Valet is installed.
  */
 if (is_dir(Valet::homePath()) && Nginx::isInstalled()) {
@@ -1278,19 +1291,6 @@ if (is_dir(Valet::homePath()) && Nginx::isInstalled()) {
 		"--lines" => "The number of lines to view.",
 		"--follow" => "Follow real time streaming output of the changing file"
 	])->addUsage("log nginx --lines=3 --follow")->addUsage("log nginx -l 3 -f");
-
-	/**
-	 * List the installed Valet services.
-	 */
-	$app->command('services', function () {
-		info("Checking the Valet services...");
-
-		$services = Valet::services();
-		output("\n");
-
-		table(['Service', 'Windows Name', 'Status'], $services, true);
-		info('Use <bg=magenta> start </> <bg=magenta> stop </> or <bg=magenta> restart </> commands to change the status, eg. <bg=magenta> valet restart nginx </>');
-	})->descriptions('List the installed Valet services.');
 
 	/**
 	 * Determine directory-listing behaviour. Default is off, which means a 404 will display.
