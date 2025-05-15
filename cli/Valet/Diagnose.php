@@ -36,7 +36,7 @@ class Diagnose {
 			$nginxPkgClass->packageExe() . ' -v 2>&1',
 			$nginxPkgClass->packageExe() . ' -c \"' . $nginxPkgClass->packagePath() . '/conf/nginx.conf\" -t -p ' . $nginxPkgClass->packagePath() . ' 2>&1',
 
-			'foreach ($file in get-ChildItem -Path "' . $nginxPkgClass->packagePath() . '/conf/nginx.conf", "' . $nginxPkgClass->packagePath() . '/valet/valet.conf", "' . VALET_HOME_PATH . '/Nginx/*.conf"){echo $file.fullname --------------------`n; Get-Content -Path $file; echo `n;}',
+			'foreach ($file in get-ChildItem -Path "' . $nginxPkgClass->packagePath() . '/conf/nginx.conf", "' . $nginxPkgClass->packagePath() . '/valet/valet.conf", "' . Valet::homePath() . '/Nginx/*.conf"){echo $file.fullname --------------------`n; Get-Content -Path $file; echo `n;}',
 
 			valetBinPath() . 'ngrok.exe version',
 			resolve(Packages\Gsudo::class)->packageExe() . ' -v',
@@ -49,7 +49,7 @@ class Diagnose {
 			'php --ri curl',
 			'cmd /C curl --version',
 			'cat "' . pathFilter(trim(\Valet::getComposerGlobalPath())) . '/composer.json"',
-			'composer global diagnose --no-ansi 1>' . VALET_HOME_PATH . '/composer.txt',
+			'composer global diagnose --no-ansi 1>' . Valet::homePath() . '/composer.txt',
 			'composer global outdated --format json'
 		];
 	}
@@ -197,8 +197,8 @@ class Diagnose {
 		}
 
 		if (str_contains($command, "composer global diagnose")) {
-			$output = $this->cli->powershell('cat '. VALET_HOME_PATH .'/composer.txt');
-			$this->files->unlink(VALET_HOME_PATH .'/composer.txt');
+			$output = $this->cli->powershell('cat '. Valet::homePath() .'/composer.txt');
+			$this->files->unlink(Valet::homePath() .'/composer.txt');
 		}
 
 		if (str_contains($command, "composer global outdated")) {
@@ -396,9 +396,9 @@ class Diagnose {
 		// Code based on https://stackoverflow.com/a/40731340/2358222
 		$output = preg_replace('/(\e)|([[]|[]])[A-Za-z0-9];*[0-9]*m?/', '', $output);
 
-		$this->files->put(VALET_HOME_PATH . '/valet_diagnostics.txt', $output);
-		$this->cli->powershell('type ' . VALET_HOME_PATH . '/valet_diagnostics.txt | clip');
-		$this->files->unlink(VALET_HOME_PATH . '/valet_diagnostics.txt');
+		$this->files->put(Valet::homePath() . '/valet_diagnostics.txt', $output);
+		$this->cli->powershell('type ' . Valet::homePath() . '/valet_diagnostics.txt | clip');
+		$this->files->unlink(Valet::homePath() . '/valet_diagnostics.txt');
 	}
 
 	/**
