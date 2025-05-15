@@ -245,7 +245,7 @@ class Valet {
 	 * @return string The path to the global composer directory.
 	 */
 	public function getComposerGlobalPath() {
-		return $this->cli->runAsUser('composer -n config --global home');
+		return $this->cli->run('composer -n config --global home');
 	}
 
 	/**
