@@ -76,7 +76,7 @@ class Nginx {
 			$this->path('conf/nginx.conf'),
 			str_replace(
 				['VALET_USER', 'VALET_HOME_PATH', '__VALET_PHP_PORT__', '__VALET_PHP_XDEBUG_PORT__'],
-				[user(), VALET_HOME_PATH, $defaultPhp['port'], $defaultPhp['xdebug_port']],
+				[user(), Valet::homePath(), $defaultPhp['port'], $defaultPhp['xdebug_port']],
 				$this->files->getStub('nginx.conf')
 			)
 		);
@@ -97,7 +97,7 @@ class Nginx {
 			$this->path('valet/valet.conf'),
 			str_replace(
 				['VALET_HOME_PATH', 'VALET_SERVER_PATH', 'VALET_STATIC_PREFIX', 'HOME_PATH', 'VALET_PHP_PORT'],
-				[VALET_HOME_PATH, VALET_SERVER_PATH, VALET_STATIC_PREFIX, $_SERVER['HOME'], $defaultPhp['port']],
+				[Valet::homePath(), VALET_SERVER_PATH, VALET_STATIC_PREFIX, $_SERVER['HOME'], $defaultPhp['port']],
 				$this->files->getStub('valet.conf')
 			)
 		);

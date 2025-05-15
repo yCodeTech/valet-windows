@@ -382,7 +382,7 @@ $app->command('parity', function () {
 /**
  * Most commands are available only if Valet is installed.
  */
-if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
+if (is_dir(Valet::homePath()) && Nginx::isInstalled()) {
 	/**
 	 * Upgrade helper: ensure the tld config exists.
 	 */
@@ -499,7 +499,7 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 		}
 
 		info('Restarting Nginx...');
-			Nginx::restart();
+		Nginx::restart();
 
 		// Unlink the site.
 		Site::unlink($name);
@@ -1209,13 +1209,13 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 	 */
 	$app->command('log [key] [-l|--lines=] [-f|--follow]', function ($key, $lines, $follow) {
 		$defaultLogs = [
-			'nginx' => VALET_HOME_PATH . '/Log/nginx-error.log',
-			'nginxservice.err' => VALET_HOME_PATH . '/Log/nginxservice.err.log',
-			'nginxservice.out' => VALET_HOME_PATH . '/Log/nginxservice.out.log',
-			'nginxservice.wrapper' => VALET_HOME_PATH . '/Log/nginxservice.wrapper.log',
-			'phpcgiservice.err' => VALET_HOME_PATH . '/Log/phpcgiservice.err.log',
-			'phpcgiservice.out' => VALET_HOME_PATH . '/Log/phpcgiservice.out.log',
-			'phpcgiservice.wrapper' => VALET_HOME_PATH . '/Log/phpcgiservice.wrapper.log'
+			'nginx' => Valet::homePath() . '/Log/nginx-error.log',
+			'nginxservice.err' => Valet::homePath() . '/Log/nginxservice.err.log',
+			'nginxservice.out' => Valet::homePath() . '/Log/nginxservice.out.log',
+			'nginxservice.wrapper' => Valet::homePath() . '/Log/nginxservice.wrapper.log',
+			'phpcgiservice.err' => Valet::homePath() . '/Log/phpcgiservice.err.log',
+			'phpcgiservice.out' => Valet::homePath() . '/Log/phpcgiservice.out.log',
+			'phpcgiservice.wrapper' => Valet::homePath() . '/Log/phpcgiservice.wrapper.log'
 		];
 
 		$configLogs = data_get(Configuration::read(), 'logs');
