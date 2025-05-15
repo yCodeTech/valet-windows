@@ -42,6 +42,7 @@ class Diagnose {
 			resolve(Packages\Gsudo::class)->packageExe() . ' -v',
 			resolve(Packages\Ansicon::class)->packageExe() . ' /?',
 			'cat "' . valetBinPath() . 'acrylic/Readme.txt"',
+			'cat "' . valetBinPath() . 'winsw/README.md"',
 			'php -v',
 			'cmd /C "where /f php"',
 			'php --ini',
@@ -173,12 +174,14 @@ class Diagnose {
 	 * @return string $output The edited output.
 	 */
 	protected function editOutput($command, $output) {
+		/** System Info **/
 		// Extract the OS Name and OS Version, lines 2 and 3.
 		if (str_contains($command, "systeminfo")) {
 			$output = explode("\n", $output);
 			$output = implode("\n", [$output[2], $output[3]]);
 		}
 
+		/** Nginx **/
 		if (str_contains($command, "nginx.exe")) {
 			$output = $output->__toString();
 
@@ -196,11 +199,13 @@ class Diagnose {
 			}
 		}
 
+		/** Composer Diagnose **/
 		if (str_contains($command, "composer global diagnose")) {
 			$output = $this->cli->powershell('cat '. Valet::homePath() .'/composer.txt');
 			$this->files->unlink(Valet::homePath() .'/composer.txt');
 		}
 
+		/** Composer Outdated **/
 		if (str_contains($command, "composer global outdated")) {
 			$output = json_decode($output, true);
 			$output = $output["installed"];
@@ -227,9 +232,17 @@ class Diagnose {
 			$output = json_encode($output, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
 		}
 
+		/** Acrylic **/
 		if (str_contains($command, "acrylic")) {
 			if (preg_match("/version is:\s+\d+(\.\d+)+/", $output, $matches)) {
 				$output = "Acrylic " . preg_replace("/:\s+/", " ", $matches[0]);
+			}
+		}
+
+		/** WinSW **/
+		if (str_contains($command, "winsw")) {
+			if (preg_match("/\(v\d+(\.\d+)+\)/", $output, $matches)) {
+				$output = "WinSW version is " . preg_replace("/(\(|\))/", "", $matches[0]);
 			}
 		}
 
@@ -420,6 +433,7 @@ class Diagnose {
 			"gsudo Version",
 			"Ansicon Version",
 			"Acrylic Version",
+			"WinSW Version",
 			"PHP Version",
 			"PHP Location",
 			"PHP Ini Location",
