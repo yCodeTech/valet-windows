@@ -47,7 +47,9 @@ class CommandLine {
 	}
 
 	/**
-	 * Run the given command as the non-root user.
+	 * Run the given command.
+	 *
+	 * Uses the Symfony Process component to run the command.
 	 *
 	 * @param string $command
 	 * @param callable|null $onError
@@ -55,18 +57,6 @@ class CommandLine {
 	 * @return ProcessOutput
 	 */
 	public function run($command, ?callable $onError = null, $realTimeOutput = false) {
-		return $this->runCommand($command, $onError, $realTimeOutput);
-	}
-
-	/**
-	 * Run the given command.
-	 *
-	 * @param string $command
-	 * @param callable|null $onError
-	 * @param boolean $realTimeOutput Set to `true` to get the output in real time as the command is running. Default: `false`
-	 * @return ProcessOutput
-	 */
-	public function runAsUser($command, ?callable $onError = null, $realTimeOutput = false) {
 		return $this->runCommand($command, $onError, $realTimeOutput);
 	}
 

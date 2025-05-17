@@ -32,16 +32,20 @@ class Diagnose {
 		$this->commands = [
 			'systeminfo',
 			'valet --version',
+
+			'foreach ($dir in Get-ChildItem -Path "' . Valet::homePath() . '" -Directory) { Add-content -Path \'' . Valet::homePath() . '/valet_structure.txt\' -Value (\'Dir: \' + $dir.Name); Get-ChildItem -Path $dir.FullName -Recurse | ForEach-Object { Add-content -Path \'' . Valet::homePath() . '/valet_structure.txt\' -Value (\'File: \' + $_.Name) }}',
+
 			'cat ' . \Configuration::path(),
 			$nginxPkgClass->packageExe() . ' -v 2>&1',
 			$nginxPkgClass->packageExe() . ' -c \"' . $nginxPkgClass->packagePath() . '/conf/nginx.conf\" -t -p ' . $nginxPkgClass->packagePath() . ' 2>&1',
 
-			'foreach ($file in get-ChildItem -Path "' . $nginxPkgClass->packagePath() . '/conf/nginx.conf", "' . $nginxPkgClass->packagePath() . '/valet/valet.conf", "' . VALET_HOME_PATH . '/Nginx/*.conf"){echo $file.fullname --------------------`n; Get-Content -Path $file; echo `n;}',
+			'foreach ($file in get-ChildItem -Path "' . $nginxPkgClass->packagePath() . '/conf/nginx.conf", "' . $nginxPkgClass->packagePath() . '/valet/valet.conf", "' . Valet::homePath() . '/Nginx/*.conf"){echo $file.fullname --------------------`n; Get-Content -Path $file; echo `n;}',
 
 			valetBinPath() . 'ngrok.exe version',
 			resolve(Packages\Gsudo::class)->packageExe() . ' -v',
 			resolve(Packages\Ansicon::class)->packageExe() . ' /?',
 			'cat "' . valetBinPath() . 'acrylic/Readme.txt"',
+			'cat "' . valetBinPath() . 'winsw/README.md"',
 			'php -v',
 			'cmd /C "where /f php"',
 			'php --ini',
@@ -49,7 +53,7 @@ class Diagnose {
 			'php --ri curl',
 			'cmd /C curl --version',
 			'cat "' . pathFilter(trim(\Valet::getComposerGlobalPath())) . '/composer.json"',
-			'composer global diagnose --no-ansi 1>' . VALET_HOME_PATH . '/composer.txt',
+			'composer global diagnose --no-ansi 1>' . Valet::homePath() . '/composer.txt',
 			'composer global outdated --format json'
 		];
 	}
@@ -173,12 +177,14 @@ class Diagnose {
 	 * @return string $output The edited output.
 	 */
 	protected function editOutput($command, $output) {
+		/** System Info **/
 		// Extract the OS Name and OS Version, lines 2 and 3.
 		if (str_contains($command, "systeminfo")) {
 			$output = explode("\n", $output);
 			$output = implode("\n", [$output[2], $output[3]]);
 		}
 
+		/** Nginx **/
 		if (str_contains($command, "nginx.exe")) {
 			$output = $output->__toString();
 
@@ -196,11 +202,13 @@ class Diagnose {
 			}
 		}
 
+		/** Composer Diagnose **/
 		if (str_contains($command, "composer global diagnose")) {
-			$output = $this->cli->powershell('cat '. VALET_HOME_PATH .'/composer.txt');
-			$this->files->unlink(VALET_HOME_PATH .'/composer.txt');
+			$output = $this->cli->powershell('cat '. Valet::homePath() .'/composer.txt');
+			$this->files->unlink(Valet::homePath() .'/composer.txt');
 		}
 
+		/** Composer Outdated **/
 		if (str_contains($command, "composer global outdated")) {
 			$output = json_decode($output, true);
 			$output = $output["installed"];
@@ -227,10 +235,69 @@ class Diagnose {
 			$output = json_encode($output, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
 		}
 
+		/** Acrylic **/
 		if (str_contains($command, "acrylic")) {
 			if (preg_match("/version is:\s+\d+(\.\d+)+/", $output, $matches)) {
 				$output = "Acrylic " . preg_replace("/:\s+/", " ", $matches[0]);
 			}
+		}
+
+		/** WinSW **/
+		if (str_contains($command, "winsw")) {
+			if (preg_match("/\(v\d+(\.\d+)+\)/", $output, $matches)) {
+				$output = "WinSW version is " . preg_replace("/(\(|\))/", "", $matches[0]);
+			}
+		}
+
+		/** Valet Home Structure **/
+		if (str_contains($command, "valet_structure.txt")) {
+			$fileOutput = $this->cli->powershell('cat ' . Valet::homePath() . '/valet_structure.txt');
+			$this->files->unlink(Valet::homePath() . '/valet_structure.txt');
+
+			$lines = explode("\n", $fileOutput);
+			$tree = [];
+			$stack = [];
+			$lastDir = '';
+
+			// Parse the lines to build a tree structure
+			foreach ($lines as $line) {
+				$line = trim($line);
+				if (strpos($line, 'Dir: ') === 0) {
+					$dir = substr($line, strlen('Dir: '));
+					$stack = [$dir];
+					$tree[$dir] = [];
+					$lastDir = $dir;
+				}
+				elseif (strpos($line, 'File: ') === 0 && $lastDir) {
+					$file = substr($line, strlen('File: '));
+					$tree[$lastDir][] = $file;
+				}
+			}
+
+			// Build a simple tree diagram
+
+			$diagram = ".config/valet\n|\n";
+
+			foreach ($tree as $dir => $files) {
+				$diagram .= "|-- $dir\n";
+
+				// Skip the Log, Ngrok, and Xdebug files.
+				if (in_array($dir, ['Log', 'Ngrok', "Xdebug"])) {
+					$diagram .= "|\n";
+					continue;
+				}
+
+				foreach ($files as $file) {
+					$diagram .= "|    |-- $file\n";
+				}
+
+				$diagram .= "|\n";
+			}
+
+			// Remove the last line with the trailing pipe and newline.
+			$diagram = rtrim($diagram, "|\n");
+
+			$output = $diagram;
 		}
 
 		return $output;
@@ -369,7 +436,7 @@ class Diagnose {
 		}
 
 		return sprintf(
-			'<details>%s<summary>%s</summary>%s<p>%s</p>%s<pre>%s</pre>%s</details>',
+			'<details>%s<summary>%s</summary>%s<p>%s</p>%s<pre><code>%s</code></pre>%s</details>',
 			PHP_EOL,
 			$heading,
 			PHP_EOL,
@@ -396,9 +463,9 @@ class Diagnose {
 		// Code based on https://stackoverflow.com/a/40731340/2358222
 		$output = preg_replace('/(\e)|([[]|[]])[A-Za-z0-9];*[0-9]*m?/', '', $output);
 
-		$this->files->put(VALET_HOME_PATH . '/valet_diagnostics.txt', $output);
-		$this->cli->powershell('type ' . VALET_HOME_PATH . '/valet_diagnostics.txt | clip');
-		$this->files->unlink(VALET_HOME_PATH . '/valet_diagnostics.txt');
+		$this->files->put(Valet::homePath() . '/valet_diagnostics.txt', $output);
+		$this->cli->powershell('type ' . Valet::homePath() . '/valet_diagnostics.txt | clip');
+		$this->files->unlink(Valet::homePath() . '/valet_diagnostics.txt');
 	}
 
 	/**
@@ -412,6 +479,7 @@ class Diagnose {
 		return collect([
 			"System Version",
 			"Valet Version",
+			"Valet Home Structure",
 			"Valet Config",
 			"nginx Version",
 			"nginx Config Check",
@@ -420,6 +488,7 @@ class Diagnose {
 			"gsudo Version",
 			"Ansicon Version",
 			"Acrylic Version",
+			"WinSW Version",
 			"PHP Version",
 			"PHP Location",
 			"PHP Ini Location",
