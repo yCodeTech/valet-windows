@@ -32,6 +32,9 @@ class Diagnose {
 		$this->commands = [
 			'systeminfo',
 			'valet --version',
+
+			'foreach ($dir in Get-ChildItem -Path "' . Valet::homePath() . '" -Directory) { Add-content -Path \'' . Valet::homePath() . '/valet_structure.txt\' -Value (\'Dir: \' + $dir.Name); Get-ChildItem -Path $dir.FullName -Recurse | ForEach-Object { Add-content -Path \'' . Valet::homePath() . '/valet_structure.txt\' -Value (\'File: \' + $_.Name) }}',
+
 			'cat ' . \Configuration::path(),
 			$nginxPkgClass->packageExe() . ' -v 2>&1',
 			$nginxPkgClass->packageExe() . ' -c \"' . $nginxPkgClass->packagePath() . '/conf/nginx.conf\" -t -p ' . $nginxPkgClass->packagePath() . ' 2>&1',
@@ -246,6 +249,57 @@ class Diagnose {
 			}
 		}
 
+		/** Valet Home Structure **/
+		if (str_contains($command, "valet_structure.txt")) {
+			$fileOutput = $this->cli->powershell('cat ' . Valet::homePath() . '/valet_structure.txt');
+			$this->files->unlink(Valet::homePath() . '/valet_structure.txt');
+
+			$lines = explode("\n", $fileOutput);
+			$tree = [];
+			$stack = [];
+			$lastDir = '';
+
+			// Parse the lines to build a tree structure
+			foreach ($lines as $line) {
+				$line = trim($line);
+				if (strpos($line, 'Dir: ') === 0) {
+					$dir = substr($line, strlen('Dir: '));
+					$stack = [$dir];
+					$tree[$dir] = [];
+					$lastDir = $dir;
+				}
+				elseif (strpos($line, 'File: ') === 0 && $lastDir) {
+					$file = substr($line, strlen('File: '));
+					$tree[$lastDir][] = $file;
+				}
+			}
+
+			// Build a simple tree diagram
+
+			$diagram = ".config/valet\n|\n";
+
+			foreach ($tree as $dir => $files) {
+				$diagram .= "|-- $dir\n";
+
+				// Skip the Log, Ngrok, and Xdebug files.
+				if (in_array($dir, ['Log', 'Ngrok', "Xdebug"])) {
+					$diagram .= "|\n";
+					continue;
+				}
+
+				foreach ($files as $file) {
+					$diagram .= "|    |-- $file\n";
+				}
+
+				$diagram .= "|\n";
+			}
+
+			// Remove the last line with the trailing pipe and newline.
+			$diagram = rtrim($diagram, "|\n");
+
+			$output = $diagram;
+		}
+
 		return $output;
 	}
 
@@ -382,7 +436,7 @@ class Diagnose {
 		}
 
 		return sprintf(
-			'<details>%s<summary>%s</summary>%s<p>%s</p>%s<pre>%s</pre>%s</details>',
+			'<details>%s<summary>%s</summary>%s<p>%s</p>%s<pre><code>%s</code></pre>%s</details>',
 			PHP_EOL,
 			$heading,
 			PHP_EOL,
@@ -425,6 +479,7 @@ class Diagnose {
 		return collect([
 			"System Version",
 			"Valet Version",
+			"Valet Home Structure",
 			"Valet Config",
 			"nginx Version",
 			"nginx Config Check",
