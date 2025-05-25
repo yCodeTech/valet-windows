@@ -62,7 +62,7 @@ class Diagnose {
 	 * Run diagnostics.
 	 *
 	 * @param boolean $print Print the output as the commands are running.
-	 * @param boolean $plain Print and format the output as plain text (aka pretty print).
+	 * @param boolean $plainText Print and format the output as plain text (aka pretty print).
 	 */
 	public function run($print, $plainText) {
 		$this->print = $print;
@@ -73,7 +73,13 @@ class Diagnose {
 
 			$this->beforeCommand($command);
 
-			$output = $this->cli->powershell($command);
+			if ($this->isNonCliCommand($command)) {
+				$output = $this->runNonCliCommand($command);
+			}
+			else {
+				$output = $this->cli->powershell($command);
+			}
+
 
 			if ($this->ignoreOutput($command)) {
 				return;
@@ -102,6 +108,20 @@ class Diagnose {
 		$this->copyToClipboard($plainText ? $formatted_for_copy : $output);
 
 		$this->afterRun();
+	}
+
+	/**
+	 * Run a non-CLI command, ie. run a task that is not a commandline command,
+	 * and only achievable via PHP to generate the output.
+	 *
+	 * @param string $command The command placeholder to check for to run the task.
+	 *
+	 * @return string|array The output of the task.
+	 */
+	protected function runNonCliCommand($command) {
+		$output = '';
+
+		return $output;
 	}
 
 	/**
@@ -138,6 +158,9 @@ class Diagnose {
 	 */
 	protected function beforeCommand($command) {
 		if ($this->print) {
+			if ($this->isNonCliCommand($command)) {
+				$command = str_replace("placeholder", "", $command);
+			}
 			info(PHP_EOL . "$ $command");
 		}
 	}
@@ -165,6 +188,18 @@ class Diagnose {
 	 */
 	protected function ignoreOutput($command) {
 		return strpos($command, '> /dev/null 2>&1') !== false;
+	}
+
+	/**
+	 * Determines if the command is a non-CLI command,
+	 * which is not a real command, but a placeholder for
+	 * a command or task that is run via PHP instead of the CLI.
+	 *
+	 * @param string $command
+	 * @return boolean
+	 */
+	protected function isNonCliCommand($command) {
+		return strpos($command, 'placeholder') !== false;
 	}
 
 	/**
