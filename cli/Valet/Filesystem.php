@@ -388,6 +388,41 @@ class Filesystem {
 		})->values()->all();
 	}
 
+
+	/**
+	 * Scan the given directory path recursively, returning an
+	 * associative array of all files and directories.
+	 *
+	 * @param string $dir The directory to scan.
+	 * @return array An associative array of all files and directories.
+	 */
+	public function scanDirRecursive($dir) {
+		$result = [];
+		$items = $this->scandir($dir);
+
+		// Loop through each item in the directory.
+		foreach ($items as $item) {
+			// Skip the current and parent directory entries.
+			if ($item === '.' || $item === '..') {
+				continue;
+			}
+			// Get the full path of the item.
+			$fullPath = rtrim($dir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $item;
+
+			// If the item is a directory and not a symlink...
+			if ($this->isDir($fullPath) && !$this->isLink($fullPath)) {
+				// Recursively scan the directory and add the directory name as the key,
+				// and the result of the recursive scan as the value of the array.
+				$result[$item] = $this->scanDirRecursive($fullPath);
+			}
+			// Otherwise, add the item to the result array.
+			else {
+				$result[] = $item;
+			}
+		}
+		return $result;
+	}
+
 	/**
 	 * Unzip the given zip file to the given path.
 	 *
