@@ -28,11 +28,14 @@ class Upgrader {
 	 * Run all the upgrades that should be run every time Valet commands are run.
 	 */
 	public function onEveryRun() {
-		$this->prunePathsFromConfig();
-		$this->pruneSymbolicLinks();
-		$this->upgradeSymbolicLinks();
-		$this->lintNginxConfigs();
-		$this->upgradeNginxSiteConfigs();
+		// Only run if the Valet home path exists.
+		if ($this->files->isDir(Valet::homePath())) {
+			$this->prunePathsFromConfig();
+			$this->pruneSymbolicLinks();
+			$this->upgradeSymbolicLinks();
+			$this->lintNginxConfigs();
+			$this->upgradeNginxSiteConfigs();
+		}
 	}
 
 	/**
