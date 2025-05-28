@@ -330,9 +330,11 @@ class Filesystem {
 		 */
 		$collection = $this->getJunctionLinks($path);
 
+		// If there are no junction links to convert, we can exit early.
 		if ($collection->isEmpty()) {
 			return;
 		}
+
 		// Remove all the junction links and create new symlinks to the same path.
 		$collection->each(function ($link) use ($path) {
 			$output = CommandLine::run('cmd /C rmdir /s /q "' . $path . '/' . $link['linkName']. '"');
@@ -341,6 +343,8 @@ class Filesystem {
 				$this->symlink($link['path'], $link['linkName']);
 			}
 		});
+
+		return;
 	}
 
 	/**
@@ -421,6 +425,16 @@ class Filesystem {
 			}
 		}
 		return $result;
+	}
+
+	/**
+	 * Check if the given directory is empty.
+	 *
+	 * @param string $path The path to the directory to check.
+	 * @return bool
+	 */
+	public function isDirEmpty($path) {
+		return $this->isDir($path) && collect($this->scandir($path))->isEmpty();
 	}
 
 	/**

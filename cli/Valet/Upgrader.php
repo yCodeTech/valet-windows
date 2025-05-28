@@ -64,18 +64,39 @@ class Upgrader {
 	 * This is a one-time upgrade that will be run when Valet is first installed.
 	 */
 	private function upgradeSymbolicLinks() {
-		// Check if the symlinks have already been upgraded, by checking if a key exists in
-		// the config. If not, then upgrade them.
-		if ($this->config->get("symlinks_upgraded", false) === false) {
+		if ($this->shouldUpgradeSymbolicLinks()) {
 			info("Upgrading your linked sites from the old junction links to symbolic links...");
-
+			// Convert all junction links to symbolic links.
 			$this->files->convertJunctionsToSymlinks($this->site->sitesPath());
+
 			// Add a new key to the config file to indicate that the symlinks have been upgraded.
 			// This will prevent the upgrade from running again, since it is a one-time upgrade.
 			$this->config->updateKey("symlinks_upgraded", true);
 
 			info("Successfully upgraded junction links to symbolic links.");
 		}
+	}
+
+	/**
+	 * Check if the symbolic links should be upgraded.
+	 *
+	 * @return bool Returns a boolean indicating whether the symlinks should be upgraded.
+	 *
+	 * The symlinks should be upgraded if:
+	 *
+	 * 1. The symlinks have not been upgraded yet (`$symlinksUpgraded` is `false`).
+	 * 2. The sites directory is not empty (`$isDirEmpty` is `false`).
+	 */
+	private function shouldUpgradeSymbolicLinks() {
+		// Get the value of the "symlinks_upgraded" key from the config.
+		// If the key doesn't exist, it will return false.
+		$symlinksUpgraded = $this->config->get("symlinks_upgraded", false);
+
+		// Check if the sites directory is empty.
+		$isDirEmpty = $this->files->isDirEmpty($this->site->sitesPath());
+
+		// Check if the symlinks have not been upgraded yet AND the sites directory is not empty.
+		return !$symlinksUpgraded && !$isDirEmpty;
 	}
 
 	/**
