@@ -33,7 +33,8 @@ class Diagnose {
 			'systeminfo',
 			'valet --version',
 
-			'foreach ($dir in Get-ChildItem -Path "' . Valet::homePath() . '" -Directory) { Add-content -Path \'' . Valet::homePath() . '/valet_structure.txt\' -Value (\'Dir: \' + $dir.Name); Get-ChildItem -Path $dir.FullName -Recurse | ForEach-Object { Add-content -Path \'' . Valet::homePath() . '/valet_structure.txt\' -Value (\'File: \' + $_.Name) }}',
+			'Valet Home Structure placeholder',
+			'Valet Bin Structure placeholder',
 
 			'cat ' . \Configuration::path(),
 			$nginxPkgClass->packageExe() . ' -v 2>&1',
@@ -119,7 +120,29 @@ class Diagnose {
 	 * @return string|array The output of the task.
 	 */
 	protected function runNonCliCommand($command) {
-		$output = '';
+
+		/** Valet Home Structure & Valet Bin Structure **/
+		if (str_contains($command, "Valet Home Structure") || str_contains($command, "Valet Bin Structure")) {
+			/** Valet Home Structure **/
+			if (str_contains($command, "Valet Home Structure")) {
+				// Recursively scan all directories and files in valet's home path.
+				$dirsArray = $this->files->scanDirRecursive(Valet::homePath());
+			}
+			/** Valet Bin Structure **/
+			elseif (str_contains($command, "Valet Bin Structure")) {
+				// Recursively scan all directories and files in valet's bin path.
+				$dirsArray = $this->files->scanDirRecursive(valetBinPath());
+			}
+
+			// Generate a directory tree structure from the output array.
+
+			$isBin = str_contains($command, "Bin");
+
+			$parentDir = $isBin ? "valet/bin" : ".config/valet";
+			$skip = $isBin ? ["temp"] : ['Log', 'Ngrok', "Xdebug"];
+
+			$output = $this->generateDirectoryTree($dirsArray, $parentDir, $skip);
+		}
 
 		return $output;
 	}
@@ -284,58 +307,111 @@ class Diagnose {
 			}
 		}
 
-		/** Valet Home Structure **/
-		if (str_contains($command, "valet_structure.txt")) {
-			$fileOutput = $this->cli->powershell('cat ' . Valet::homePath() . '/valet_structure.txt');
-			$this->files->unlink(Valet::homePath() . '/valet_structure.txt');
+		return $output;
+	}
 
-			$lines = explode("\n", $fileOutput);
-			$tree = [];
-			$stack = [];
-			$lastDir = '';
+	/**
+	 * Generate a directory tree structure from the output array.
+	 * This is used to visually represent the directory structures.
+	 *
+	 * @param array $array The array to generate the tree from.
+	 * @param string $parentDir The parent directory name to start the tree from.
+	 * @param array $skip An array of directory names to skip looping their files.
+	 * @param string $indent The indentation string to use for the tree structure.
+	 * This is very important as it determines the visual representation of the tree.
+	 * It uses combinations of spaces and tree characters to create the structure.
+	 *
+	 * @return string The generated directory tree structure.
+	 */
+	private function generateDirectoryTree($array, $parentDir, $skip, $indent = '') {
+		// Setup the tree characters
+		$treeItemChar = "┣━";
+		$treeSeparatorChar = "┃";
+		$treeEndItemChar = "┗━";
+		$dirEmoji = "📁";
 
-			// Parse the lines to build a tree structure
-			foreach ($lines as $line) {
-				$line = trim($line);
-				if (strpos($line, 'Dir: ') === 0) {
-					$dir = substr($line, strlen('Dir: '));
-					$stack = [$dir];
-					$tree[$dir] = [];
-					$lastDir = $dir;
-				}
-				elseif (strpos($line, 'File: ') === 0 && $lastDir) {
-					$file = substr($line, strlen('File: '));
-					$tree[$lastDir][] = $file;
+		// Helper to check if any skip string is in the dir name
+		$shouldSkip = function ($name) use ($skip) {
+			foreach ($skip as $s) {
+				if (stripos($name, $s) !== false) {
+					return true;
 				}
 			}
+			return false;
+		};
 
-			// Build a simple tree diagram
+		// If the indent is empty, then this is the first line of the tree,
+		// so start the tree with the parent directory name, otherwise an empty string.
+		$tree = $indent === '' ? "$parentDir\n$treeSeparatorChar\n" : '';
 
-			$diagram = ".config/valet\n|\n";
+		$entries = [];
+		foreach ($array as $key => $value) {
+			$name = is_string($key) ? $key : $value;
+			$entries[] = ['name' => $name, 'value' => $value];
+		}
+		$count = count($entries);
 
-			foreach ($tree as $dir => $files) {
-				$diagram .= "|-- $dir\n";
+		foreach ($entries as $i => $entry) {
+			$name = $entry['name'];
+			$value = $entry['value'];
+			$isLast = ($i === $count - 1);
+			$isDir = is_array($value);
+			$isNextItemDir = ($i < $count - 1 && is_array($entries[$i + 1]['value']));
 
-				// Skip the Log, Ngrok, and Xdebug files.
-				if (in_array($dir, ['Log', 'Ngrok', "Xdebug"])) {
-					$diagram .= "|\n";
-					continue;
-				}
+			// If the item is a directory, then add the directory emoji to the item character.
+			// Otherwise, just use the item character.
+			// This is so that we can better visually determine which items are directories.
+			$itemChar = $isDir ? $treeItemChar . $dirEmoji : $treeItemChar;
+			$endItemChar = $isDir ? $treeEndItemChar . $dirEmoji : $treeEndItemChar;
 
-				foreach ($files as $file) {
-					$diagram .= "|    |-- $file\n";
-				}
-
-				$diagram .= "|\n";
+			// If the item is a directory and should be skipped, then just output the directory name
+			if ($shouldSkip($name)) {
+				// Add the directory name to the tree.
+				$tree .= $indent . ($isLast ? $endItemChar : $itemChar) . " $name\n";
+				// Add a line separation.
+				$tree .= $indent . "$treeSeparatorChar\n";
+				continue;
 			}
 
-			// Remove the last line with the trailing pipe and newline.
-			$diagram = rtrim($diagram, "|\n");
+			// If the item is not a directory, ie a file, then add the file name to the tree.
+			$tree .= $indent . ($isLast ? $endItemChar : $itemChar) . " $name\n";
 
-			$output = $diagram;
+			if (!$isDir && !$isLast && $isNextItemDir) {
+				// Add a line separation between the file and the next item.
+				$tree .= $indent . "$treeSeparatorChar\n";
+			}
+
+			// If the item is a directory...
+			if ($isDir) {
+				// Recurse into subdirectory and increase the indentation.
+				$tree .= $this->generateDirectoryTree(
+					$value,
+					$name,
+					$skip,
+					$indent . ($isLast ? "      " : "$treeSeparatorChar     ")
+				);
+			}
+
+			// Get the current line in the string (the last line added to $tree)
+			$lines = explode("\n", rtrim($tree, "\n"));
+			$currentLine = trim(end($lines));
+
+			// If item is a directory AND the next item is also a directory,
+			// OR
+			// the current line contains a tree end item character AND
+			// the next item is not a directory (ie. is a file) AND
+			// is also not last,
+			// then add a line separation.
+			//
+			// This separates consecutive empty directories
+			// and also separates a directory's tree from the next file.
+			if (($isDir && $isNextItemDir) || (str_contains($currentLine, $treeEndItemChar) && !$isNextItemDir && !$isLast)) {
+				// Add a line separation.
+				$tree .= $indent . "$treeSeparatorChar\n";
+			}
 		}
 
-		return $output;
+		return $tree;
 	}
 
 	/**
@@ -515,6 +591,7 @@ class Diagnose {
 			"System Version",
 			"Valet Version",
 			"Valet Home Structure",
+			"Valet Bin Structure",
 			"Valet Config",
 			"nginx Version",
 			"nginx Config Check",
