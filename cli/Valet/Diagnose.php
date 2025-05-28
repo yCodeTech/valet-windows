@@ -574,9 +574,12 @@ class Diagnose {
 		// Code based on https://stackoverflow.com/a/40731340/2358222
 		$output = preg_replace('/(\e)|([[]|[]])[A-Za-z0-9];*[0-9]*m?/', '', $output);
 
-		$this->files->put(Valet::homePath() . '/valet_diagnostics.txt', $output);
-		$this->cli->powershell('type ' . Valet::homePath() . '/valet_diagnostics.txt | clip');
-		$this->files->unlink(Valet::homePath() . '/valet_diagnostics.txt');
+		$file = Valet::homePath() . '/valet_diagnostics.txt';
+
+		// Write to file as UTF-8 with BOM to help Set-Clipboard recognize Unicode characters.
+		$this->files->put($file, "\xEF\xBB\xBF" . $output);
+		$this->cli->powershell('type ' . $file . ' | Set-Clipboard');
+		$this->files->unlink($file);
 	}
 
 	/**
