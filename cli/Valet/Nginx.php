@@ -120,8 +120,6 @@ class Nginx {
 			$this->files->mkdirAsUser($nginxDirectory);
 		}
 
-		$this->files->putAsUser($nginxDirectory . '/.keep', "\n");
-
 		$this->rewriteSecureNginxFiles();
 	}
 
