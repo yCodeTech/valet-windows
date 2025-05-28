@@ -13,6 +13,8 @@ class Diagnose {
 	protected $cli;
 	protected $files;
 	protected $print;
+	protected $progressBar;
+
 
 	/**
 	 * Create a new Diagnose instance.
@@ -24,22 +26,35 @@ class Diagnose {
 	public function __construct(CommandLine $cli, Filesystem $files) {
 		$this->cli = $cli;
 		$this->files = $files;
+
+		$nginxPkgClass = resolve(Packages\Nginx::class);
+
 		$this->commands = [
 			'systeminfo',
 			'valet --version',
-			'cat ~/.config/valet/config.json',
-			valetBinPath() . 'nginx/nginx.exe -v 2>&1',
-			valetBinPath() . 'nginx/nginx.exe -c \"' . __DIR__ . '/../../bin/nginx/conf/nginx.conf\" -t -p ' . valetBinPath() . 'nginx 2>&1',
-			'foreach ($file in get-ChildItem -Path "' . valetBinPath() . 'nginx/conf/nginx.conf", "' . valetBinPath() . 'nginx/valet/valet.conf", "' . VALET_HOME_PATH . '/Nginx/*.conf"){echo $file.fullname --------------------`n; Get-Content -Path $file; echo `n;}',
+
+			'Valet Home Structure placeholder',
+			'Valet Bin Structure placeholder',
+
+			'cat ' . \Configuration::path(),
+			$nginxPkgClass->packageExe() . ' -v 2>&1',
+			$nginxPkgClass->packageExe() . ' -c \"' . $nginxPkgClass->packagePath() . '/conf/nginx.conf\" -t -p ' . $nginxPkgClass->packagePath() . ' 2>&1',
+
+			'foreach ($file in get-ChildItem -Path "' . $nginxPkgClass->packagePath() . '/conf/nginx.conf", "' . $nginxPkgClass->packagePath() . '/valet/valet.conf", "' . Valet::homePath() . '/Nginx/*.conf"){echo $file.fullname --------------------`n; Get-Content -Path $file; echo `n;}',
+
 			valetBinPath() . 'ngrok.exe version',
+			resolve(Packages\Gsudo::class)->packageExe() . ' -v',
+			resolve(Packages\Ansicon::class)->packageExe() . ' /?',
+			'cat "' . valetBinPath() . 'acrylic/Readme.txt"',
+			'cat "' . valetBinPath() . 'winsw/README.md"',
 			'php -v',
 			'cmd /C "where /f php"',
 			'php --ini',
 			'php --info',
 			'php --ri curl',
 			'cmd /C curl --version',
-			'cat "' . pathFilter(COMPOSER_GLOBAL_PATH) . '/composer.json"',
-			'composer global diagnose --no-ansi 1>' . VALET_HOME_PATH . '/composer.txt',
+			'cat "' . pathFilter(trim(\Valet::getComposerGlobalPath())) . '/composer.json"',
+			'composer global diagnose --no-ansi 1>' . Valet::homePath() . '/composer.txt',
 			'composer global outdated --format json'
 		];
 	}
@@ -48,7 +63,7 @@ class Diagnose {
 	 * Run diagnostics.
 	 *
 	 * @param boolean $print Print the output as the commands are running.
-	 * @param boolean $plain Print and format the output as plain text (aka pretty print).
+	 * @param boolean $plainText Print and format the output as plain text (aka pretty print).
 	 */
 	public function run($print, $plainText) {
 		$this->print = $print;
@@ -59,7 +74,13 @@ class Diagnose {
 
 			$this->beforeCommand($command);
 
-			$output = $this->cli->powershell($command);
+			if ($this->isNonCliCommand($command)) {
+				$output = $this->runNonCliCommand($command);
+			}
+			else {
+				$output = $this->cli->powershell($command);
+			}
+
 
 			if ($this->ignoreOutput($command)) {
 				return;
@@ -88,6 +109,42 @@ class Diagnose {
 		$this->copyToClipboard($plainText ? $formatted_for_copy : $output);
 
 		$this->afterRun();
+	}
+
+	/**
+	 * Run a non-CLI command, ie. run a task that is not a commandline command,
+	 * and only achievable via PHP to generate the output.
+	 *
+	 * @param string $command The command placeholder to check for to run the task.
+	 *
+	 * @return string|array The output of the task.
+	 */
+	protected function runNonCliCommand($command) {
+
+		/** Valet Home Structure & Valet Bin Structure **/
+		if (str_contains($command, "Valet Home Structure") || str_contains($command, "Valet Bin Structure")) {
+			/** Valet Home Structure **/
+			if (str_contains($command, "Valet Home Structure")) {
+				// Recursively scan all directories and files in valet's home path.
+				$dirsArray = $this->files->scanDirRecursive(Valet::homePath());
+			}
+			/** Valet Bin Structure **/
+			elseif (str_contains($command, "Valet Bin Structure")) {
+				// Recursively scan all directories and files in valet's bin path.
+				$dirsArray = $this->files->scanDirRecursive(valetBinPath());
+			}
+
+			// Generate a directory tree structure from the output array.
+
+			$isBin = str_contains($command, "Bin");
+
+			$parentDir = $isBin ? "valet/bin" : ".config/valet";
+			$skip = $isBin ? ["temp"] : ['Log', 'Ngrok', "Xdebug"];
+
+			$output = $this->generateDirectoryTree($dirsArray, $parentDir, $skip);
+		}
+
+		return $output;
 	}
 
 	/**
@@ -124,6 +181,9 @@ class Diagnose {
 	 */
 	protected function beforeCommand($command) {
 		if ($this->print) {
+			if ($this->isNonCliCommand($command)) {
+				$command = str_replace("placeholder", "", $command);
+			}
 			info(PHP_EOL . "$ $command");
 		}
 	}
@@ -154,21 +214,35 @@ class Diagnose {
 	}
 
 	/**
+	 * Determines if the command is a non-CLI command,
+	 * which is not a real command, but a placeholder for
+	 * a command or task that is run via PHP instead of the CLI.
+	 *
+	 * @param string $command
+	 * @return boolean
+	 */
+	protected function isNonCliCommand($command) {
+		return strpos($command, 'placeholder') !== false;
+	}
+
+	/**
 	 * Edit the output of a specific command, to improve
 	 * the human readability of the diagnostics, and/or
 	 * if the raw output isn't sufficient enough.
 	 *
 	 * @param string $command
-	 * @param string $output
+	 * @param string|ProcessOutput $output
 	 * @return string $output The edited output.
 	 */
 	protected function editOutput($command, $output) {
+		/** System Info **/
 		// Extract the OS Name and OS Version, lines 2 and 3.
 		if (str_contains($command, "systeminfo")) {
 			$output = explode("\n", $output);
 			$output = implode("\n", [$output[2], $output[3]]);
 		}
 
+		/** Nginx **/
 		if (str_contains($command, "nginx.exe")) {
 			$output = $output->__toString();
 
@@ -186,11 +260,13 @@ class Diagnose {
 			}
 		}
 
+		/** Composer Diagnose **/
 		if (str_contains($command, "composer global diagnose")) {
-			$output = $this->cli->powershell('cat '. VALET_HOME_PATH .'/composer.txt');
-			$this->files->unlink(VALET_HOME_PATH .'/composer.txt');
+			$output = $this->cli->powershell('cat '. Valet::homePath() .'/composer.txt');
+			$this->files->unlink(Valet::homePath() .'/composer.txt');
 		}
 
+		/** Composer Outdated **/
 		if (str_contains($command, "composer global outdated")) {
 			$output = json_decode($output, true);
 			$output = $output["installed"];
@@ -217,7 +293,125 @@ class Diagnose {
 			$output = json_encode($output, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
 		}
 
+		/** Acrylic **/
+		if (str_contains($command, "acrylic")) {
+			if (preg_match("/version is:\s+\d+(\.\d+)+/", $output, $matches)) {
+				$output = "Acrylic " . preg_replace("/:\s+/", " ", $matches[0]);
+			}
+		}
+
+		/** WinSW **/
+		if (str_contains($command, "winsw")) {
+			if (preg_match("/\(v\d+(\.\d+)+\)/", $output, $matches)) {
+				$output = "WinSW version is " . preg_replace("/(\(|\))/", "", $matches[0]);
+			}
+		}
+
 		return $output;
+	}
+
+	/**
+	 * Generate a directory tree structure from the output array.
+	 * This is used to visually represent the directory structures.
+	 *
+	 * @param array $array The array to generate the tree from.
+	 * @param string $parentDir The parent directory name to start the tree from.
+	 * @param array $skip An array of directory names to skip looping their files.
+	 * @param string $indent The indentation string to use for the tree structure.
+	 * This is very important as it determines the visual representation of the tree.
+	 * It uses combinations of spaces and tree characters to create the structure.
+	 *
+	 * @return string The generated directory tree structure.
+	 */
+	private function generateDirectoryTree($array, $parentDir, $skip, $indent = '') {
+		// Setup the tree characters
+		$treeItemChar = "┣━";
+		$treeSeparatorChar = "┃";
+		$treeEndItemChar = "┗━";
+		$dirEmoji = "📁";
+
+		// Helper to check if any skip string is in the dir name
+		$shouldSkip = function ($name) use ($skip) {
+			foreach ($skip as $s) {
+				if (stripos($name, $s) !== false) {
+					return true;
+				}
+			}
+			return false;
+		};
+
+		// If the indent is empty, then this is the first line of the tree,
+		// so start the tree with the parent directory name, otherwise an empty string.
+		$tree = $indent === '' ? "$parentDir\n$treeSeparatorChar\n" : '';
+
+		$entries = [];
+		foreach ($array as $key => $value) {
+			$name = is_string($key) ? $key : $value;
+			$entries[] = ['name' => $name, 'value' => $value];
+		}
+		$count = count($entries);
+
+		foreach ($entries as $i => $entry) {
+			$name = $entry['name'];
+			$value = $entry['value'];
+			$isLast = ($i === $count - 1);
+			$isDir = is_array($value);
+			$isNextItemDir = ($i < $count - 1 && is_array($entries[$i + 1]['value']));
+
+			// If the item is a directory, then add the directory emoji to the item character.
+			// Otherwise, just use the item character.
+			// This is so that we can better visually determine which items are directories.
+			$itemChar = $isDir ? $treeItemChar . $dirEmoji : $treeItemChar;
+			$endItemChar = $isDir ? $treeEndItemChar . $dirEmoji : $treeEndItemChar;
+
+			// If the item is a directory and should be skipped, then just output the directory name
+			if ($shouldSkip($name)) {
+				// Add the directory name to the tree.
+				$tree .= $indent . ($isLast ? $endItemChar : $itemChar) . " $name\n";
+				// Add a line separation.
+				$tree .= $indent . "$treeSeparatorChar\n";
+				continue;
+			}
+
+			// If the item is not a directory, ie a file, then add the file name to the tree.
+			$tree .= $indent . ($isLast ? $endItemChar : $itemChar) . " $name\n";
+
+			if (!$isDir && !$isLast && $isNextItemDir) {
+				// Add a line separation between the file and the next item.
+				$tree .= $indent . "$treeSeparatorChar\n";
+			}
+
+			// If the item is a directory...
+			if ($isDir) {
+				// Recurse into subdirectory and increase the indentation.
+				$tree .= $this->generateDirectoryTree(
+					$value,
+					$name,
+					$skip,
+					$indent . ($isLast ? "      " : "$treeSeparatorChar     ")
+				);
+			}
+
+			// Get the current line in the string (the last line added to $tree)
+			$lines = explode("\n", rtrim($tree, "\n"));
+			$currentLine = trim(end($lines));
+
+			// If item is a directory AND the next item is also a directory,
+			// OR
+			// the current line contains a tree end item character AND
+			// the next item is not a directory (ie. is a file) AND
+			// is also not last,
+			// then add a line separation.
+			//
+			// This separates consecutive empty directories
+			// and also separates a directory's tree from the next file.
+			if (($isDir && $isNextItemDir) || (str_contains($currentLine, $treeEndItemChar) && !$isNextItemDir && !$isLast)) {
+				// Add a line separation.
+				$tree .= $indent . "$treeSeparatorChar\n";
+			}
+		}
+
+		return $tree;
 	}
 
 	/**
@@ -353,7 +547,7 @@ class Diagnose {
 		}
 
 		return sprintf(
-			'<details>%s<summary>%s</summary>%s<p>%s</p>%s<pre>%s</pre>%s</details>',
+			'<details>%s<summary>%s</summary>%s<p>%s</p>%s<pre><code>%s</code></pre>%s</details>',
 			PHP_EOL,
 			$heading,
 			PHP_EOL,
@@ -380,9 +574,12 @@ class Diagnose {
 		// Code based on https://stackoverflow.com/a/40731340/2358222
 		$output = preg_replace('/(\e)|([[]|[]])[A-Za-z0-9];*[0-9]*m?/', '', $output);
 
-		$this->files->put(VALET_HOME_PATH . '/valet_diagnostics.txt', $output);
-		$this->cli->powershell('type ' . VALET_HOME_PATH . '/valet_diagnostics.txt | clip');
-		$this->files->unlink(VALET_HOME_PATH . '/valet_diagnostics.txt');
+		$file = Valet::homePath() . '/valet_diagnostics.txt';
+
+		// Write to file as UTF-8 with BOM to help Set-Clipboard recognize Unicode characters.
+		$this->files->put($file, "\xEF\xBB\xBF" . $output);
+		$this->cli->powershell('type ' . $file . ' | Set-Clipboard');
+		$this->files->unlink($file);
 	}
 
 	/**
@@ -396,11 +593,17 @@ class Diagnose {
 		return collect([
 			"System Version",
 			"Valet Version",
+			"Valet Home Structure",
+			"Valet Bin Structure",
 			"Valet Config",
 			"nginx Version",
 			"nginx Config Check",
 			"nginx Config Files",
 			"ngrok Version",
+			"gsudo Version",
+			"Ansicon Version",
+			"Acrylic Version",
+			"WinSW Version",
 			"PHP Version",
 			"PHP Location",
 			"PHP Ini Location",

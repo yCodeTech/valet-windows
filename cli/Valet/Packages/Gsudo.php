@@ -2,24 +2,22 @@
 
 namespace Valet\Packages;
 
-use Valet\CommandLine;
-use Valet\Filesystem;
-
-use GuzzleHttp\Client;
-use Composer\CaBundle\CaBundle;
-
 use function Valet\info;
 use function Valet\info_dump;
-use function Valet\valetBinPath;
 
 class Gsudo extends GithubPackage {
+	/**
+	 * @var string The name of the package: `gsudo`.
+	 */
+	protected $packageName = 'gsudo';
+
 	/**
 	 * Install gsudo
 	 */
 	public function install() {
-		if (!$this->isInstalled("gsudo")) {
-			$zipFilePath = valetBinPath() . 'gsudo/gsudo.portable.zip';
-			$gsudoPath = valetBinPath() . 'gsudo';
+		if (!$this->isInstalled()) {
+			$gsudoPath = $this->packagePath();
+			$zipFilePath = "$gsudoPath/gsudo.portable.zip";
 
 			$this->files->ensureDirExists($gsudoPath);
 
@@ -27,8 +25,10 @@ class Gsudo extends GithubPackage {
 
 			$this->files->unzip($zipFilePath, $gsudoPath);
 
+			$this->moveFiles("x64");
+
 			// Clean up the package directory.
-			$this->cleanUpPackageDirectory($gsudoPath);
+			$this->cleanUpPackageDirectory($zipFilePath, "x64");
 
 			$this->configureGsudo();
 		}
@@ -38,7 +38,7 @@ class Gsudo extends GithubPackage {
 	 * Configure Gsudo settings.
 	 */
 	private function configureGsudo() {
-		$gsudo = '"' . $this->packagePath("gsudo") . '"';
+		$gsudo = '"' . $this->packageExe() . '"';
 		$this->cli->passthru("$gsudo config CacheMode Auto");
 	}
 
@@ -47,13 +47,13 @@ class Gsudo extends GithubPackage {
 	 * @return string
 	 */
 	public function runAsSystem() {
-		return '"' . $this->packagePath("gsudo") . '" --system -d ';
+		return '"' . $this->packageExe() . '" --system -d ';
 	}
 	/**
 	 * Run as the Trusted Installer account (NT SERVICE\TrustedInstaller).
 	 * @return string
 	 */
 	public function runAsTrustedInstaller() {
-		return '"' . $this->packagePath("gsudo") . '" --ti -d ';
+		return '"' . $this->packageExe() . '" --ti -d ';
 	}
 }

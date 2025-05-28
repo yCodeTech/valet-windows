@@ -54,6 +54,9 @@ class Nginx {
 	 * @return void
 	 */
 	public function install() {
+		// Install the Nginx package if it is not already installed.
+		resolve(Packages\Nginx::class)->install();
+		// Install the Nginx configs, server, and service.
 		$this->installConfiguration();
 		$this->installServer();
 		$this->installNginxDirectory();
@@ -73,7 +76,7 @@ class Nginx {
 			$this->path('conf/nginx.conf'),
 			str_replace(
 				['VALET_USER', 'VALET_HOME_PATH', '__VALET_PHP_PORT__', '__VALET_PHP_XDEBUG_PORT__'],
-				[user(), VALET_HOME_PATH, $defaultPhp['port'], $defaultPhp['xdebug_port']],
+				[user(), Valet::homePath(), $defaultPhp['port'], $defaultPhp['xdebug_port']],
 				$this->files->getStub('nginx.conf')
 			)
 		);
@@ -94,7 +97,7 @@ class Nginx {
 			$this->path('valet/valet.conf'),
 			str_replace(
 				['VALET_HOME_PATH', 'VALET_SERVER_PATH', 'VALET_STATIC_PREFIX', 'HOME_PATH', 'VALET_PHP_PORT'],
-				[VALET_HOME_PATH, VALET_SERVER_PATH, VALET_STATIC_PREFIX, $_SERVER['HOME'], $defaultPhp['port']],
+				[Valet::homePath(), VALET_SERVER_PATH, VALET_STATIC_PREFIX, $_SERVER['HOME'], $defaultPhp['port']],
 				$this->files->getStub('valet.conf')
 			)
 		);
@@ -117,23 +120,37 @@ class Nginx {
 			$this->files->mkdirAsUser($nginxDirectory);
 		}
 
-		$this->files->putAsUser($nginxDirectory . '/.keep', "\n");
-
 		$this->rewriteSecureNginxFiles();
 	}
 
 	/**
-	 * Check nginx.conf for errors.
+	 * Check nginx.conf and all linked site configurations for errors.
 	 */
-	private function lint() {
-		$this->cli->run(
-			'"' . $this->path('nginx.exe') . '" -c "' . $this->path('conf/nginx.conf') . '" -t -q -p "' . $this->path() . '"',
+	public function lint($returnOutput = false) {
+		$output = $this->cli->run(
+			'"' . $this->path('nginx.exe') . '" -c "' . $this->path('conf/nginx.conf') . '" -t -q -p "' . $this->path() . '" 2>&1',
 			function ($exitCode, $outputMessage) {
 				$outputMessage = preg_replace("/\r\n|\n|\r/", "\r\n\r\n", $outputMessage);
 
-				throw new DomainException("Nginx cannot start; please check your nginx.conf \r\n\r\nExit code $exitCode: \r\n\r\n$outputMessage");
+				error("Nginx cannot start; please check your nginx.conf and all linked site configurations \r\n\r\nExit code $exitCode: \r\n\r\n$outputMessage", true);
 			}
 		);
+
+		$outputContent = $output->getOutput();
+
+		if ($output->isSuccessful() && !empty($outputContent)) {
+			if ($returnOutput) {
+				return $outputContent;
+			}
+			else {
+				if (str_contains($outputContent, 'warn')) {
+					warning($outputContent);
+				}
+				else {
+					output($outputContent);
+				}
+			}
+		}
 	}
 
 	/**

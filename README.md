@@ -155,9 +155,6 @@ Valet ships with and installs these services:
 |                                                                       Service | Version |
 | ----------------------------------------------------------------------------: | ------- |
 | [Acrylic DNS Proxy](https://mayakron.altervista.org/support/acrylic/Home.htm) | 2.1.0   |
-|                                   [Ansicon](https://github.com/adoxa/ansicon) | 1.89    |
-|                                    [gsudo](https://github.com/gerardog/gsudo) | 2.0.10  |
-|                                                   [nginx](https://nginx.org/) | 1.19.5  |
 |                                                   [ngrok](https://ngrok.com/) | 3.3.1   |
 
 > [!IMPORTANT]
@@ -168,6 +165,21 @@ Valet ships with and installs these services:
 > Afterwards, you will need to run `valet ngrok config upgrade` to upgrade the config file to the latest format.
 >
 > For both commands, valet automatically appends the config file location as a flag to the command, so ngrok will already know where the config file is.
+
+As of v3.2.0, Valet no longer ships with the executables for the following services, instead they will be downloaded and installed automatically from GitHub's API. This is so that the latest versions with bug fixes and security updates can be installed.
+
+|                                     Service | Latest Version as of 13/05/2025 |
+| ------------------------------------------: | ------------------------------- |
+| [Ansicon](https://github.com/adoxa/ansicon) | 1.89                            |
+|  [gsudo](https://github.com/gerardog/gsudo) | 2.6.0                           |
+|                 [nginx](https://nginx.org/) | 1.28.0                          |
+|     [WinSW](https://github.com/winsw/winsw) | 2.12.0                          |
+
+> [!IMPORTANT]
+>
+> `nginx` has changed some of the config options in v1.25.1, due to this, valet will run a site config check to detect if any of the site.conf needs upgrading. Valet will then automatically remove any of the old conf files and re-isolate/re-secure the sites with the updated configurations.
+>
+> Theses upgrades are only for `http2` and `http2_push_preload` options. Any future changes from `nginx` will be need to be upgraded in Valet internally as and when they arise, please submit an [issue](https://github.com/yCodeTech/valet-windows/issues/new?template=nginx-config-upgrade.md).
 
 ## Installation
 
@@ -1480,7 +1492,7 @@ Commands that have been tested and made parity:
 -   [x] secured
 -   [x] set-ngrok-token
 -   [x] share
--   [ ] share-tool - Next feature drop
+-   [x] share-tool
 -   [x] start
 -   [x] status - renamed to `services`
 -   [x] stop
@@ -1570,8 +1582,12 @@ Upon installation, Valet creates the following directories and config files:
 
 -   `~/.config/valet/Services`
     Contains the Nginx and PHP config and executable files to be able to run them as Windows services. These files are rebuilt when running the `install` command.
+
 -   `~/.config/valet/Sites`
     Contains all of the symbolic links for any `link`ed sites.
+
+-   `~/.config/valet/stubs`
+    A user-created directory to contain custom stubs. Only used in Valet if it exists, and overrides Valet's internal stubs.
 
 -   `~/.config/valet/Xdebug`
     Contains the output files of Xdebug profiling.

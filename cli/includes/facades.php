@@ -55,4 +55,5 @@ class Share extends Facade {}
 class Site extends Facade {}
 class Upgrader extends Facade {}
 class Valet extends Facade {}
+class ValetException extends Facade {}
 class WinSW extends Facade {}

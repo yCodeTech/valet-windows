@@ -380,9 +380,22 @@ $app->command('parity', function () {
 })->descriptions("Get a calculation of the percentage of parity completion.");
 
 /**
+ * List the installed Valet services.
+ */
+$app->command('services', function () {
+	info("Checking the Valet services...");
+
+	$services = Valet::services();
+	output("\n");
+
+	table(['Service', 'Windows Name', 'Status'], $services, true);
+	info('Use <bg=magenta> start </> <bg=magenta> stop </> or <bg=magenta> restart </> commands to change the status, eg. <bg=magenta> valet restart nginx </>');
+})->descriptions('List the installed Valet services.');
+
+/**
  * Most commands are available only if Valet is installed.
  */
-if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
+if (is_dir(Valet::homePath()) && Nginx::isInstalled()) {
 	/**
 	 * Upgrade helper: ensure the tld config exists.
 	 */
@@ -446,6 +459,9 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 
 		if ($isolate) {
 			Site::isolate($isolate, $name);
+
+			info('Restarting Nginx...');
+			Nginx::restart();
 		}
 	})->descriptions('Register the current working directory as a symbolic link', [
 		'name' => 'Optionally specify a new name to be linked as',
@@ -493,9 +509,11 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 
 			$site = $name . '.' . Configuration::read()['tld'];
 			Site::unsecure($site);
-
-			Nginx::restart();
 		}
+
+		info('Restarting Nginx...');
+		Nginx::restart();
+
 		// Unlink the site.
 		Site::unlink($name);
 
@@ -714,6 +732,9 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 			info("Isolating the current working directory...");
 			Site::isolate($phpVersion, $site);
 
+			info('Restarting Nginx...');
+			Nginx::restart();
+
 			return;
 		}
 
@@ -721,6 +742,9 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 		foreach ($site as $sitename) {
 			Site::isolate($phpVersion, $sitename);
 		}
+		info('Restarting Nginx...');
+		Nginx::restart();
+
 	})->descriptions('Isolate the current working directory to a specific PHP version', [
 		'phpVersion' => 'The PHP version you want to use; e.g 7.4, 7.4.33',
 		'--site' => 'Optionally specify the site.'
@@ -756,6 +780,9 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 				Site::unisolate($array["site"]);
 			}
 
+			info('Restarting Nginx...');
+			Nginx::restart();
+
 			return;
 		}
 
@@ -764,6 +791,9 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 		}
 
 		Site::unisolate($site);
+
+		info('Restarting Nginx...');
+		Nginx::restart();
 
 	})->descriptions('Remove [unisolate] the current working directory\'s site', [
 		'--site' => 'Optionally specify the site',
@@ -1192,13 +1222,13 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 	 */
 	$app->command('log [key] [-l|--lines=] [-f|--follow]', function ($key, $lines, $follow) {
 		$defaultLogs = [
-			'nginx' => VALET_HOME_PATH . '/Log/nginx-error.log',
-			'nginxservice.err' => VALET_HOME_PATH . '/Log/nginxservice.err.log',
-			'nginxservice.out' => VALET_HOME_PATH . '/Log/nginxservice.out.log',
-			'nginxservice.wrapper' => VALET_HOME_PATH . '/Log/nginxservice.wrapper.log',
-			'phpcgiservice.err' => VALET_HOME_PATH . '/Log/phpcgiservice.err.log',
-			'phpcgiservice.out' => VALET_HOME_PATH . '/Log/phpcgiservice.out.log',
-			'phpcgiservice.wrapper' => VALET_HOME_PATH . '/Log/phpcgiservice.wrapper.log'
+			'nginx' => Valet::homePath() . '/Log/nginx-error.log',
+			'nginxservice.err' => Valet::homePath() . '/Log/nginxservice.err.log',
+			'nginxservice.out' => Valet::homePath() . '/Log/nginxservice.out.log',
+			'nginxservice.wrapper' => Valet::homePath() . '/Log/nginxservice.wrapper.log',
+			'phpcgiservice.err' => Valet::homePath() . '/Log/phpcgiservice.err.log',
+			'phpcgiservice.out' => Valet::homePath() . '/Log/phpcgiservice.out.log',
+			'phpcgiservice.wrapper' => Valet::homePath() . '/Log/phpcgiservice.wrapper.log'
 		];
 
 		$configLogs = data_get(Configuration::read(), 'logs');
@@ -1261,19 +1291,6 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 		"--lines" => "The number of lines to view.",
 		"--follow" => "Follow real time streaming output of the changing file"
 	])->addUsage("log nginx --lines=3 --follow")->addUsage("log nginx -l 3 -f");
-
-	/**
-	 * List the installed Valet services.
-	 */
-	$app->command('services', function () {
-		info("Checking the Valet services...");
-
-		$services = Valet::services();
-		output("\n");
-
-		table(['Service', 'Windows Name', 'Status'], $services, true);
-		info('Use <bg=magenta> start </> <bg=magenta> stop </> or <bg=magenta> restart </> commands to change the status, eg. <bg=magenta> valet restart nginx </>');
-	})->descriptions('List the installed Valet services.');
 
 	/**
 	 * Determine directory-listing behaviour. Default is off, which means a 404 will display.

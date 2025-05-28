@@ -234,33 +234,18 @@ class Valet {
 	}
 
 	/**
-	 * Run composer global diagnose.
-	 */
-	public function composerGlobalDiagnose() {
-		$this->cli->runAsUser('composer global diagnose');
-	}
-
-	/**
-	 * Run composer global update.
-	 */
-	public function composerGlobalUpdate() {
-		$this->cli->runAsUser('composer global update');
-	}
-
-	/**
 	 * Get the path to the home directory of composer global.
 	 *
 	 * While the default is "~/AppData/Roaming/Composer",
 	 * composer does allow the user to change where global packages are installed.
 	 * So we need to essentially ask composer where the home directory is.
 	 *
-	 * This is used to set the `COMPOSER_GLOBAL_PATH` constant, which in turn is used
-	 * by the `Diagnose` class.
+	 * This is used by the `Diagnose` class.
 	 *
 	 * @return string The path to the global composer directory.
 	 */
 	public function getComposerGlobalPath() {
-		return $this->cli->runAsUser('composer -n config --global home');
+		return $this->cli->run('composer -n config --global home');
 	}
 
 	/**

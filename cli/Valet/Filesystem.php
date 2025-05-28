@@ -186,14 +186,16 @@ class Filesystem {
 	/**
 	 * Move file from one directory to another.
 	 *
+	 * This is a simple wrapper around the PHP rename function.
+	 * By renaming the file path, we can move it to a new location. The filepath can be
+	 * a file or a directory. If it's a directory, the contents of the directory will
+	 * be moved at the same time. If the destination directory does not exist, it will be created.
+	 *
 	 * @param string $from
 	 * @param string $to
 	 */
 	public function move($from, $to) {
-		// Copy the file to the new location.
-		$this->copy($from, $to);
-		// Remove the original file.
-		$this->unlink($from);
+		rename($from, $to);
 	}
 
 	/**
@@ -328,9 +330,11 @@ class Filesystem {
 		 */
 		$collection = $this->getJunctionLinks($path);
 
+		// If there are no junction links to convert, we can exit early.
 		if ($collection->isEmpty()) {
 			return;
 		}
+
 		// Remove all the junction links and create new symlinks to the same path.
 		$collection->each(function ($link) use ($path) {
 			$output = CommandLine::run('cmd /C rmdir /s /q "' . $path . '/' . $link['linkName']. '"');
@@ -339,6 +343,8 @@ class Filesystem {
 				$this->symlink($link['path'], $link['linkName']);
 			}
 		});
+
+		return;
 	}
 
 	/**
@@ -386,10 +392,58 @@ class Filesystem {
 		})->values()->all();
 	}
 
+
+	/**
+	 * Scan the given directory path recursively, returning an
+	 * associative array of all files and directories.
+	 *
+	 * @param string $dir The directory to scan.
+	 * @return array An associative array of all files and directories.
+	 */
+	public function scanDirRecursive($dir) {
+		$result = [];
+		$items = $this->scandir($dir);
+
+		// Loop through each item in the directory.
+		foreach ($items as $item) {
+			// Skip the current and parent directory entries.
+			if ($item === '.' || $item === '..') {
+				continue;
+			}
+			// Get the full path of the item.
+			$fullPath = rtrim($dir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $item;
+
+			// If the item is a directory and not a symlink...
+			if ($this->isDir($fullPath) && !$this->isLink($fullPath)) {
+				// Recursively scan the directory and add the directory name as the key,
+				// and the result of the recursive scan as the value of the array.
+				$result[$item] = $this->scanDirRecursive($fullPath);
+			}
+			// Otherwise, add the item to the result array.
+			else {
+				$result[] = $item;
+			}
+		}
+		return $result;
+	}
+
+	/**
+	 * Check if the given directory is empty.
+	 *
+	 * @param string $path The path to the directory to check.
+	 * @return bool
+	 */
+	public function isDirEmpty($path) {
+		return $this->isDir($path) && collect($this->scandir($path))->isEmpty();
+	}
+
 	/**
 	 * Unzip the given zip file to the given path.
 	 *
 	 * @uses `tar` The Windows CMD `tar` command to zip/unzip files.
+	 * The `-x` option extracts the zip file.
+	 * The `-f` option specifies the zip file to extract.
+	 * The `-C` option specifies the directory to extract to.
 	 *
 	 * @param string $zipFilePath
 	 * @param string $extractToPath
@@ -397,6 +451,37 @@ class Filesystem {
 	public function unzip($zipFilePath, $extractToPath) {
 		$tar = getTarExecutable();
 		CommandLine::run("$tar -xf $zipFilePath -C $extractToPath");
+	}
+
+	/**
+	 * List the top-level directories in the given zip file.
+	 *
+	 * @uses `tar` The Windows CMD `tar` command to zip/unzip files and list files in the zip.
+	 * The -t option lists the contents of the zip file.
+	 * The -f option specifies the zip file to list.
+	 *
+	 * @param mixed $zipFilePath
+	 * @return string[] Array of top-level directories in the zip file.
+	 */
+	public function listTopLevelZipDirs($zipFilePath) {
+		$tar = getTarExecutable();
+		// Get the contents of the zip file.
+		$output = CommandLine::run("$tar -tf $zipFilePath");
+		// Split the output into an array of lines.
+		// Each line represents a file or directory in the zip file.
+		$contents = explode("\n", trim($output->getOutput()));
+
+		// Collect and map through each item in the contents and return the first part of
+		// the path of each item.
+		return collect($contents)->map(function ($item) {
+				// Split the item by `/` and return the first part of the path with
+				// the leading or trailing whitespace trimmed.
+				// The first part of the path is the top-level directory in the zip file.
+				return explode("/", trim($item))[0];
+		})
+			->unique()
+			->values()
+			->all();
 	}
 
 	/**
@@ -409,7 +494,7 @@ class Filesystem {
 	public function getStub($filename) {
 		$default = __DIR__.'/../stubs/'.$filename;
 
-		$custom = VALET_HOME_PATH . "/stubs/$filename";
+		$custom = Valet::homePath() . "/stubs/$filename";
 
 		$path = file_exists($custom) ? $custom : $default;
 

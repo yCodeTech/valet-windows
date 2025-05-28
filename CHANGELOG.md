@@ -7,29 +7,334 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/yCodeTech/valet-windows/tree/master)
 
-## [3.2.0](https://github.com/yCodeTech/valet-windows/tree/v3.2.0) - ????-??-??
+## [3.2.0](https://github.com/yCodeTech/valet-windows/tree/v3.2.0) - 2025-05-14
+
+This is a large [Release PR](https://github.com/yCodeTech/valet-windows/pull/18) that adds new `php:proxy` and `share-tool` commands, lots of refactoring for improved maintainability, dynamically downloading the latest versions of the required executables from GitHub, and brings a lot of the code inline with macOS Valet. For the full changelog please view the PR commits.
 
 ### Removed
 
--   Removed the deprecated (since v3.1.0) confirmation question about uninstalling the outdated cretueusebiu package in the `install` command. Doesn't affect valet functionality.
+-   Removed the deprecated (since v3.1.0) confirmation question about uninstalling the outdated cretueusebiu package in the `install` command. **Doesn't affect valet functionality.**
+
+-   Remove references to the defunct `xip.io`, inline with macOS Valet.
+
+-   Removed unused code:
+
+    -   `Filesystem::symlink` method in favour of `Filesystem::symlinkAsUser` as the new `Filesystem::symlink` method.
+
+    -   `SUDO_USER` from the `user` helper function since Windows doesn't set `SUDO_USER` environment variable at all, so this is redundant code.
+
+    -   `array_is_list` helper function, which was a polyfill for the PHP 8.1 function and was introduced in commit [a7312ef](https://github.com/yCodeTech/valet-windows/commit/a7312ef). But has been unused since commit [e30fd4f](https://github.com/yCodeTech/valet-windows/commit/e30fd4f) (where the usage of `array_is_list` in `addTableSeparator` function was removed). So we can safely remove it.
+
+    -   `str_ends_with` and `str_starts_with` helper functions as these will be handled by the Symfony dependency.
+
+-   Removed all bin files for `gsudo`, `ansicon`, `WinSW`, and `nginx`, in favour of downloading the latest versions from GitHub via the API.
 
 ### Added
 
--   Added new `php:proxy` command with the alias of `php` to proxy PHP commands through to a site's PHP executable.
+-   Added new `php:proxy` command with the alias of `php` to proxy PHP commands through to a site's PHP executable. This is inline with macOS Valet.
 
--   Added new `PhpCgi::getPhpPath` method to get the PHP executable path by specifying a version.
+    -   The command is defined in `valet.php`, while the logic resides in the `valet` script in the project root.
+
+    -   Added new `PhpCgi::getPhpPath` method to get the PHP executable path by specifying a version.
+
+    -   Changed `PhpCgi::findPhpVersion` method to return the executable path if the new `getExecPath` param is `true` otherwise it will default to returning the PHP version. Also changed it's error return value to `false` for easier checking.
+
+    -   Changed `Site::whichPhp` method to extract the PHP version from the ansi coloured output, and the raw version string to a new element in the return array to avoid weird errors when using it in the new `php:proxy` command.
+
+    -   Changed the info output in `php:which` command to use the new raw phpVersion string, and added a separate info output to get and display the php executable path using the new `PhpCgi::getPhpPath` method.
+
+-   Added new `share-tool` command to get or set the name of the currently selected share tool. This is inline with macOS Valet. Only supported option at the moment is `ngrok`, which is the default tool in the config.
+
+-   Added new `Share` and `ShareTools\ShareTool` classes to setup the supported share tools and communicate with the share tool classes.
+
+    -   `Share` class defines methods to set and get the share tools (eg. `ngrok`), and setup the share tool class instance to be able to chain their methods.
+
+        -   Added methods:
+
+            -   `shareTool` is the main method to use which returns the share tool's class instance to be able to access the methods in a chainable way.
+
+            -   `createShareToolInstance` to create the share tool child class instance.
+
+            -   `getShareToolInstance` to get the share tool child class instance.
+
+            -   `getShareTools` to get all the supported share tools as a string.
+
+            -   `isToolValid` to check if the specified tool is valid.
+
+            -   `getCurrentShareTool` to get the current share tool from the config.
+
+    -   `ShareTool` (abstract) class with the namespace `Valet\ShareTools` is the base class that all other share tool classes will extend and implement required methods, it also holds some shared methods.
+
+        -   Added methods:
+
+            -   `start` (abstract) to start sharing. A share tool class is required to implement the method since each tool could have different steps.
+
+            -   `run` (abstract) to proxy CLI commands through to the tool's executable and run them. A share tool class is required to implement the method.
+
+            -   `getConfig` to get the config path. A share tool class is required to implement the method.
+
+            -   `currentTunnelUrl` to get the current tunnel URL from the API. The method was moved from `Ngrok::currentTunnelUrl` into this new shared method.
+
+            -   `findHttpTunnelUrl` to find the HTTP tunnel URL from the list of tunnels. The method was moved from `Ngrok::findHttpTunnelUrl` into this new shared method.
+
+    -   Moved `Ngrok` class into the new `ShareTools` namespace, and changed it to extend the new `ShareTool` class.
+
+    -   Renamed `Ngrok::getNgrokConfig` method to the new `Ngrok::getConfig` and changed all references.
+
+    -   Changed the `Ngrok` class in `fetch-share-url` command for the new `Share` class.
+
+    -   Refactored `ShareTool::currentTunnelUrl` to loop through all tunnel endpoints, which is inline with the macOS Valet.
+
+    -   Changed `findHttpTunnelUrl` method back to using the object operator, that was changed in commit [2ea79e6](https://github.com/yCodeTech/valet-windows/commit/2ea79e6). Because we are no longer changing the object to an array, so we need to change it. This is more inline with macOS Valet code.
+
+    -   Changed `set-ngrok-token`, `share` and `fetch-share-url` commands to ensure that they don't run if a share tool isn't set. Also `set-ngrok-token` shouldn't be able to run when `ngrok` is not the current share tool. This is useful for when there are more share tools to use.
+
+    -   Changed `share` command to use the new `Share` class and using the `shareTool` method to get the current share tool's class instance and access the tool's `start` method directly via method chaining.
+
+-   Add `symfony/polyfill-php80` dependency to polyfill various PHP 8.0 functions for backwards compatibility, including `str_contains`, `str_starts_with`, and `str_ends_with`. https://github.com/symfony/polyfill/blob/1.x/src/Php80/README.md
+
+-   Added new `Upgrader` class to define methods that will run every time valet is ran.
+
+    -   Removed the `Configuration::prune` and `Site::pruneLinks` method calls from `valet.php` in favour of the new methods in this class.
+
+    -   Added methods:
+
+        -   `onEveryRun` to call all the other `Upgrader` methods so they can run on every valet run.
+
+        -   `prunePathsFromConfig` to prune all non-existent paths from the configuration (uses `Configuration::prune`).
+
+        -   `pruneSymbolicLinks` to prune all symbolic links that no longer point to a valid site (uses `Site::pruneLinks`).
+
+        -   `upgradeSymbolicLinks` to upgrade and convert all Windows junction links to real symbolic links. This is a one-time upgrade that will be run when Valet is first installed.
+
+        -   `lintNginxConfigs` to lint the Nginx configuration files. This is just a wrapper around the `Nginx::lint` method.
+
+        -   `upgradeNginxSiteConfigs` to upgrade Nginx site configurations if they contain deprecation warnings for `http2` param and `http2_push_preload` directive.
+
+    -   Added a call to `onEveryRun` method in `valet.php`.
+
+-   Added new `Filesystem` methods:
+
+    -   `isFile`, which is a wrapper around the PHP `is_file` function to check if a path is a normal file.
+
+    -   `convertJunctionsToSymlinks` to remove the Windows junction links, and re-link the sites as real symlinks.
+
+    -   `getJunctionLinks` to get all the site links that are junctions.
+
+    -   `move` method to rename a filepath which moves it to a new location, eg. `my/path/to/file.txt` --> `new/path/to/file.txt`. The filepath can be a file or directory. If it's a directory, the contents will be moved at the same time. If the destination directory or any subdirectories does not exist, it will be created.
+        This uses the PHP `rename` function, and is the [PHP docs](https://www.php.net/manual/en/function.copy.php) recommended way for moving files:
+
+        > "If you wish to move a file, use the rename() function."
+
+        (Originally, PHP's `copy` function was used in this method, but it doesn't create directories if they don't exist, causing errors.)
+
+    -   `unzip` method to unzip a zip file into the specified location.
+
+    -   `listTopLevelZipDirs` to list top-level directories in a zip file.
+
+    -   `getStub` method to get the specified stub file. This is inline with macOS Valet. This gets the contents of a file from the internal `stubs` directory, but if the user has a custom stub file in a `stubs` directory in the home path (`~/.config/valet/stubs`), then we use the custom stub instead.
+
+        -   Changed all references of getting a file from the `stubs` directory to use the new `getStub` method, which makes the code slightly DRYer as it's not constantly repeating the `stub` path.
+
+-   Added new `GithubPackage` abstract class in the new `Packages` directory with the namespace `Valet\Packages`. This is the base class that all other package classes will extend.
+
+    -   Added methods:
+
+        -   `install` (abstract) to allow a package class to define the `install` method since each package could have different install steps.
+
+        -   `isInstalled` to check if the package is installed (ie. the package executable exists).
+
+        -   `download` to download the package files from GitHub API via Guzzle.
+
+        -   `packagePath` to get the path to the package directory.
+
+        -   `packageExe` to get the path to the package executable.
+
+        -   `cleanUpPackageDirectory` to clean up the downloaded package's directory, removing all unnecessary directories and files.
+
+        -   `getUnnecessaryDirs` to get the unnecessary directories to remove in the package directory.
+
+        -   `removeZip` to remove the zip file after extracting its contents.
+
+        -   `moveFiles` to move files from the extracted directory into the main package directory.
+
+        -   `getVersionedFilename` to get the versioned filename from the asset name, replacing the `VERSION` placeholder with the version number obtained via regex. This is so we can get the nginx zip file which is named with it's version.
+
+    -   Added `packageName` property, so that all the package classes can define it with the package's name as value. Allowing the use of the property within the `GithubPackage` class to dynamically refer to the package that the current child class is referring to. This makes methods like `isInstalled`, `packagePath`, and `packageExe` easier to read and use, without the need for passing an arg for the package name, it just uses the dynamic property instead.
+
+-   Added new `Gsudo`, `WinSW`, and `Nginx` classes with the namespace `Valet\Packages` that extend the `GithubPackage` class. These classes will download the latest versions from the GitHub API.
+
+    -   `Gsudo` class:
+
+        -   Added methods:
+
+            -   `install` to download and install the latest version of Gsudo from GitHub releases.
+
+            -   `configureGsudo` to configure Gsudo's settings.
+
+            -   `runAsSystem` to run Gsudo as the Local System account.
+
+            -   `runAsTrustedInstaller` to run Gsudo as the Trusted Installer account. Required for `Filesystem::symlink` method.
+
+        -   Added a call to the `install` method in Valet's commands `install` and `sudo` to install the Gsudo package from GitHub if it's not already installed.
+
+    -   `WinSW` class:
+
+        -   Added methods:
+
+            -   `install` to download and install the latest version of WinSW from GitHub releases.
+
+            -   `changeReadme` to change the downloaded `readme.md` to:
+
+                -   Add the release version to the top of the file so we can detect what version it is by reading it.
+
+                -   Replace relative links with absolute links to the source code and docs on GitHub. (For dev usage.)
+
+        -   Added a call to the `install` method in the `WinSWFactory::__construct` method to download and install the WinSW package from GitHub if it's not already installed.
+
+    -   `Nginx` class:
+
+        -   Added methods:
+
+            -   `install` to download and install the latest version of Nginx from GitHub releases.
+
+            -   `moveNginxFiles` to move the required Nginx files into the package directory. This is needed as it loops through and the zip directories, and finds the correct name of the directory needed to move.
+
+        -   Added a call to the `install` method in the `Nginx::install` method. So that everytime Nginx is installed, it also calls the `Packages\Nginx` to download and install the Nginx package from GitHub if it's not already installed.
+
+-   Added `getTarExecutable` helper function to return the path to `tar.exe` which resides in `C:\Windows\System32` directory.
+
+    This is needed because just using `tar` as a command might not get the correct `tar` syntax if bash is installed. Bash also installs it's own global version of the `tar` command with a very different set of options. So outright specifying the Windows `tar` executable path prevents any clashes. Used in `Filesystem::unzip` method.
+
+-   Added new `str_contains_any` helper function, to check if the string includes any of the strings in an array. There is no PHP native function equivalent to this, so it just loops through the array of needles and uses the PHP native `str_contains` function under the hood to check a singular string within a string. This is used in the `Upgrader::upgradeNginxSiteConfigs` method.
+
+-   Added new `ValetException` class which extends the PHP native `Exception`, and holds various methods to help construct the `Exception` error messages.
+
+    -   Added methods:
+
+        -   `getError` to construct and get the error message. The code was moved from the `error` helper function into this new public method, with a few refactorings. This will be the method that `error` helper function will use to obtain the error message.
+
+        -   `getErrorTypeName` to get the error type name from the error code. The method was moved from the `getErrorTypeName` helper function into this new private method.
+
+        -   `constructTrace` to construct a better-formatted error trace. The code was moved from the `error` helper function into its this new private method, with a few refactorings.
+
+        -   `githubApiRateLimitExceededError` to handle the GitHub API "rate limit exceeded" error from the `GithubPackage::download` method. This gets the rate limit and limit reset time from the API response headers, and extracts the IP address from the original response error via regex. It then displays the error in the terminal with more information than the original error would have displayed.
+
+        -   `calculateTimeToGithubApiLimitReset` to calculate the time left for GitHub API rate limit to reset when the API sends the "rate limit exceeded" error from the `GithubPackage::download` method. It uses the reset time from the API headers, and gets the time difference from the current time. We then get the difference in minutes and seconds, and construct a human-readable string for the error output.
+
+    -   Changed `error` helper function to get the constructed `ValetException` error message via `ValetException::getError` method and output it to the console.
+
+-   Added new `Diagnose` commands to output the version number of `gsudo`, `ansicon`, and `acrylic`.
+
+    Gsudo and Ansicon use the `packageExe` method of their respective package class and use their CLI commands to get the versions. But Acrylic doesn't have a CLI command, so we have to get the contents of it's Readme.txt, and find the version later on.
+
+    -   Added a conditional to the `editOutput` method to edit the output of Acrylic's Readme.txt content. We use regex to find the version number within the file contents, and only output the version number.
 
 ### Changed
 
 -   Version bumped the macOS valet URL in the `parity` command to make sure the command parity is up to date with the latest MINOR version at the time of release.
 
--   Changed `PhpCGI::findPhpVersion` method to return the executable path if the new `getExecPath` param is `true` otherwise it will default to returning the PHP version. Also changed it's error return value to `false` for easier checking.
+-   Update `ngrok` executable to v3.22.0
 
--   Changed `Configuration::addPhp` method to `return false` if the `$phpVersion` variable is `false`.
+-   Bumped versions of composer dependencies: `composer/ca-bundle` and `guzzlehttp/guzzle`
 
--   Changed `Site::whichPhp` method to extract the PHP version from the ansi coloured output, and the raw version string to a new element in the return array to avoid weird errors when using it in the new `php:proxy` command.
+-   Refactored the `user` helper function to have the `USERNAME` variable return by default, and only return the `USER` if it's set.
 
--   Changed the info output in `php:which` command to use the new raw phpVersion string, and added a separate info output to get and display the php executable path using the new `PhpCgi::getPhpPath` method.
+-   Extracted much of `server.php` into a new `Server` class, inline with the macOS Valet; simplifying a lot of the code and renaming some methods.
+
+-   Refactored the requiring of valet driver files for simplicity by looping through the directory, instead of listing all the files to include.
+
+-   Refactored `Filesystem::unlink` for simplicity.
+
+    -   Removed the `is_dir` check from the symlink part of the code since the `unlink` and `rmdir` does both symlinked files and folders.
+
+    -   Remove `file_exists` check since it was only checking for files and the code is the same as the symlink. Combine it into the `isLink` check to also check for files with the new `isFile` method instead of `file_exists`.
+
+    -   Refactored `isLink` method since we're dealing with real symlinks now instead of junctions, so the PHP `is_link` function works as intended now.
+
+-   Changed `Ansicon` class:
+
+    -   Moved the class into the `Packages` directory under the new namespace `Valet\Packages`, and changed it to extend the new `GithubPackage` class.
+
+    -   Changed the `install` method to download the latest version from the Github API using Guzzle and unzip the zip file before running the `runOrExit` installation code.
+
+        The method also creates a `readme.md` file with the contents of the `readme.txt`, just to make it easier to read for dev purposes.
+
+    -   Changed the `runOrExit` code in both `install` and `uninstall` methods to use the parent class's new `packageExe` method, which gets the executable path of the package.
+
+    -   Removed the `__construct` methods from this new `Ansicon` class, since it will now be using the parent's `__construct` method instead.
+
+-   Changed the name of the WinSW executable from `WinSW.NET4.exe` to just `winsw.exe` in the `copy` call of the `WinSW::createConfiguration` method. This is because the executable needs to be the same name as the directory, otherwise the new `GithubPackage::packagePath` method wouldn't work.
+
+-   Changed the `CommandLine::sudo` method to use the new `Gsudo::runAsTrustedInstaller`, and `Gsudo::runAsSystem` methods, instead of explicitly hardcoding the executable path and command flags in this `CommandLine` method. This uses the `resolve` helper function to setup a new `Gsudo` class instance and access the methods in the normal object way.
+
+-   Changed the `Nginx::lint` method to:
+
+    -   Allow it to return the output to the calling function instead of the terminal if the `returnOutput` variable is `true`.
+
+    -   Redirect the stderr of nginx's configuration test command to stdout so we can catch the errors in the output if returning. Ie. added `2>&1` to the nginx command.
+
+    -   Use the `error` helper function to throw an `Exception` and colour code the output instead of throwing a `DomainException` by itself which has no colour output.
+
+    -   Colour the output as a `warning` if the `outputContent` contains the word `warn`. Otherwise, a standard `output` will be used.
+
+-   Combined redundant `COMPOSER_GLOBAL_PATH` constant into the `Diagnose` command.
+
+    -   Removed the redundant `COMPOSER_GLOBAL_PATH` constant because it's only used by one thing. So it doesn't need to exist.
+
+    -   Changed the `Diagnose` command to get the contents of the global `composer.json` to use the code that was originally used to set the `COMPOSER_GLOBAL_PATH` constant. Ie. The command now directly uses the `Valet::getComposerGlobalPath` method to get the global composer path.
+
+-   Refactored `Diagnose` commands, making them DRYer:
+
+    -   For nginx to use the new `packagePath` and `packageExe` method of the `Packages\Nginx` class.
+
+    -   That gets the contents of valet's `config.json` to use the `Configuration::path` method instead of repeating it's path (`~/.config/valet/config.json`).
+
+### Fixed
+
+-   Fixed `Filesystem::symlinkAsUser` method to:
+
+    -   Create a real symbolic link instead of a Windows directory junction link.
+
+        As per the [docs](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/mklink), `mklink` params are `/D` for symbolic link, `/H` for hard link, and `/J` for directory junction.
+
+        Previously, site links are created as a directory junction. This is not a real symbolic link, and PHP's `is_link` function always fails. Fixed by using the proper param `/D` to create a real symlink.
+
+    -   Renamed the method to `symlink` since `AsUser` doesn't make sense in this context.
+
+    -   Changed how valet runs the `mklink` command. It now uses `CommandLine::sudo` to run with trusted installer privileges since the `/D` param requires trusted installer privileges not just elevated privileges.
+
+    -   Fixed unwanted output from `mklink` Windows command by adding a quiet mode to `sudo`.
+
+-   Fixed the check in `Filesystem::isBrokenLink` method to determine if the resolved symlinked path doesn't exist by using `file_exists` PHP function. This is because `readlink` will always resolve it's target path and will never return false, so it doesn't really check if it exists or not.
+
+-   Fixed `certutil` requiring elevated privileges for SSL certificates.
+
+    When securing/unsecuring a site, valet uses `certutil` Windows command to add/delete SSL certificates from the machine store, which requires elevated privileges. But `certutil` has a `-user` option to store the certificates in the user store instead of machine store, which doesn't require privileges. So added the option to all `certutil` usages.
+
+-   Fixed `Site::isSecured` method that was failing due to double TLDs (`.tld.tld`, eg. `.test.test`). This is easily fixed by removing the TLD if it's provided before the method continues which re-adds the TLD.
+
+-   Fixed `Site::isolate` and `Site::unisolate` methods from spamming the `Nginx::stop` and `Nginx::restart` methods.
+
+    The `Nginx::stop` and `Nginx::restart` methods are spammed if the `Site::isolate` or `Site::unisolate` methods are used in a loop, causing a plethora of Windows UAC popups (if `sudo` wasn't used).
+
+    Fixed by removing the `Nginx` calls within the `Site` methods and added the `Nginx::restart` method call to the relevant command definitions in `valet.php` after where `Site::isolate` or `Site::unisolate` are called.
+
+-   Fixed nginx's deprecated `http2` param and `http2_push_preload` directive.
+
+    As of nginx 1.25.1 (we're using the latest 1.28.0), the `http2_push_preload` directive and the `http2` param of the `listen` directive are deprecated. To fix we need to remove them.
+
+    -   Removed the `http2` param of the `listen` directive in all relevant `*.valet.conf` stub files.
+
+    -   Removed the `http2_push_preload` directive in all relevant `*.valet.conf` stub files.
+
+    -   Added the recommended `http2` directive instead of the param on `listen`, in all relevant `*.valet.conf` stub files.
+
+-   Fixed the `PHP Deprecated: Creation of dynamic property Valet\Diagnose::$progressBar` error which is caused by the `progressBar` property being dynamically created in `Diagnose::beforeRun` method.
+
+    The creation of a dynamic property without being defined first is deprecated in PHP 8.2. See https://php.watch/versions/8.2/dynamic-properties-deprecated for more info.
+
+    To fix the deprecation error, we just need to declare the property in the class first.
 
 ## [3.1.7](https://github.com/yCodeTech/valet-windows/tree/v3.7) - 2025-03-22
 
@@ -63,7 +368,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
     > ERROR: authentication failed: Your ngrok-agent version "3.3.1" is too old. The minimum supported agent version for your account is "3.6.0". Please update to a newer version with ngrok update...
 
-    Because we can't test ngrok commands for errors or errors in the executable (which was tested in commit f8be62b, but reverted in a449582), we need to return the output of any errors and check the output for a specific error code relating to the "too old" error (`ERR_NGROK_121`). Then output a message (along with the original error output) to the user to inform them that they can update ngrok executable and also upgrade the config file themselves by performing the valet commands: `valet ngrok update` and `valet ngrok config upgrade` respectively.
+    Because we can't test ngrok commands for errors or errors in the executable (which was tested in commit [f8be62b](https://github.com/yCodeTech/valet-windows/commit/f8be62b), but reverted in [a449582](https://github.com/yCodeTech/valet-windows/commit/a449582)), we need to return the output of any errors and check the output for a specific error code relating to the "too old" error (`ERR_NGROK_121`). Then output a message (along with the original error output) to the user to inform them that they can update ngrok executable and also upgrade the config file themselves by performing the valet commands: `valet ngrok update` and `valet ngrok config upgrade` respectively.
 
     All errors other errors will still output to the terminal.
 

@@ -2,6 +2,8 @@
 
 namespace Valet;
 
+use Valet\ValetException;
+
 use Exception;
 use Illuminate\Container\Container;
 use RuntimeException;
@@ -22,10 +24,6 @@ $_SERVER['HOME'] = str_replace('\\', '/', $_SERVER['HOME']);
 define('VALET_HOME_PATH', pathFilter($_SERVER['HOME'] . '/.config/valet'));
 define('VALET_SERVER_PATH', str_replace('\\', '/', realpath(__DIR__ . '/../../server.php')));
 define('VALET_STATIC_PREFIX', '41c270e4-5535-4daa-b23e-c269744c2f45');
-/**
- * Define the composer global path as a constant. For use with `Diagnose` class.
- */
-define('COMPOSER_GLOBAL_PATH', trim(\Valet::getComposerGlobalPath()));
 
 /**
  * Output the given text to the console.
@@ -66,7 +64,11 @@ function warning($output) {
  * Output errors to the console.
  *
  * @param string $output
- * @param boolean $exception
+ * @param boolean $exception Optionally pass a boolean to indicate whether to throw an exception. If `true`, the error will be thrown as a `ValetException`. [default: `false`]
+ *
+ * @throws RuntimeException
+ * @throws ValetException
+ *
  * @return void
  */
 function error(string $output, $exception = false) {
@@ -74,58 +76,20 @@ function error(string $output, $exception = false) {
 		throw new RuntimeException($output);
 	}
 	if ($exception === true) {
-		// $errors = error_get_last();
-
-		// $outputTxt = getErrorTypeName($errors['type']) . ": "
-		// 	. "$output\n"
-		// 	. $errors['message']
-		// 	. "\n{$errors['file']}:{$errors['line']}";
-		// throw new \Exception($outputTxt);
-
-
-		$errors = new Exception($output);
-
-		$errorCode = $errors->getCode();
-		$errorMsg = $errors->getMessage();
-		$errorTrace = $errors->getTrace();
-
-		$constructTrace = [];
-		$count = 0;
-		foreach ($errorTrace as $key => $value) {
-			$count_num = $count++ . ") ";
-			$class = isset($value["class"]) ? $value["class"] : "";
-			$type = isset($value["type"]) ? $value["type"] : "";
-			$func = isset($value["function"]) ? $value["function"] : "";
-
-			$file_n_line = isset($value["file"]) ?
-			" ------ " . $value["file"] . ":" . $value["line"] : "";
-
-			$constructTrace[] = $count_num . $class . $type . $func . $file_n_line;
-		}
-
-		$output = getErrorTypeName($errorCode) . ": $errorMsg\n\n" . implode("\n", $constructTrace);
+		$errors = (new ValetException($output))->getError();
 
 		// Wait 1 microsecond, to make sure all output before the error call has reached
 		// the terminal.
 		usleep(1);
-		(new ConsoleOutput())->getErrorOutput()->writeln("\n\n<error>$output</error>");
+
+		// Print the error message to the console.
+		(new ConsoleOutput())->getErrorOutput()->writeln("\n\n<error>$errors</error>");
 
 		exit();
 	}
 	else {
 		(new ConsoleOutput())->getErrorOutput()->writeln("<error>$output</error>");
 	}
-}
-
-/**
- * Get the error type name.
- * Eg.: Inputs error code `0`, outputs error name `"FATAL"`
- *
- * @param mixed $code The numeric error type/code
- * @return string The error type name
- */
-function getErrorTypeName($code) {
-	return $code == 0 ? "FATAL" : array_search($code, get_defined_constants(true)['Core']);
 }
 
 /**
@@ -139,27 +103,6 @@ function output($output) {
 		return;
 	}
 	(new ConsoleOutput())->writeln($output);
-}
-
-if (!function_exists('array_is_list')) {
-	/**
-	 * Checks whether a given `array` is a list
-	 *
-	 * *This function was introduced in PHP 8.1, so this is a polyfill only in usage on PHP versions below 8.1 (thanks to this StackOverflow answer: https://stackoverflow.com/a/173479/2358222).*
-	 *
-	 * Determines if the given `array` is a list. An `array` is considered a list if its keys consist of consecutive numbers from `0` to `count($array)-1`.
-	 * https://www.php.net/manual/function.array-is-list.php
-	 *
-	 * @param $array The `array` being evaluated.
-	 *
-	 * @return bool Returns `true` if `array` is a list, `false` otherwise.
-	 */
-	function array_is_list(array $array) {
-		if ($array === []) {
-			return true;
-		}
-		return array_keys($array) === range(0, count($array) - 1);
-	}
 }
 
 /**
@@ -429,4 +372,22 @@ function progressbar($maxItems, $message, $startingTxt = "services") {
  */
 function getTarExecutable() {
 	return 'C:\Windows\System32\tar.exe';
+}
+
+/**
+ * Check if a string contains any of the needles in an array.
+ * Code based on this StackOverflow answer:
+ * https://stackoverflow.com/a/74876203/2358222
+ *
+ * @param string $haystack
+ * @param array $needles
+ * @return bool
+ */
+function str_contains_any($haystack, $needles) {
+	foreach ($needles as $needle) {
+		if (str_contains($haystack, $needle)) {
+			return true;
+		}
+	}
+	return false;
 }
