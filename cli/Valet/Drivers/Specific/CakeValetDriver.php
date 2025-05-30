@@ -1,24 +1,37 @@
 <?php
 
-namespace Valet\Drivers\Custom;
+namespace Valet\Drivers\Specific;
 
 use Valet\Drivers\ValetDriver;
 
-class SampleValetDriver extends ValetDriver {
+class CakeValetDriver extends ValetDriver {
 	/**
 	 * Determine if the driver serves the request.
 	 *
 	 * @param string $sitePath
 	 * @param string $siteName
 	 * @param string $uri
+	 *
 	 * @return bool
 	 */
 	public function serves($sitePath, $siteName, $uri) {
-		// if (file_exists("$sitePath/file-that-identifies-my-framework")) {
-		//     return true;
-		// }
+		return file_exists("{$sitePath}/bin/cake");
+	}
 
-		return false;
+	/**
+	 * Take any steps necessary before loading the front controller for this driver.
+	 *
+	 * @param string $sitePath
+	 * @param string $siteName
+	 * @param string $uri
+	 *
+	 * @return void
+	 */
+	public function beforeLoading($sitePath, $siteName, $uri) {
+		$_SERVER['DOCUMENT_ROOT'] = "{$sitePath}/webroot";
+		$_SERVER['SCRIPT_FILENAME'] = "{$sitePath}/webroot/index.php";
+		$_SERVER['SCRIPT_NAME'] = '/index.php';
+		$_SERVER['PHP_SELF'] = '/index.php';
 	}
 
 	/**
@@ -27,10 +40,11 @@ class SampleValetDriver extends ValetDriver {
 	 * @param string $sitePath
 	 * @param string $siteName
 	 * @param string $uri
+	 *
 	 * @return string|false
 	 */
 	public function isStaticFile($sitePath, $siteName, $uri) {
-		if (file_exists($staticFilePath = "$sitePath/public/$uri")) {
+		if ($this->isActualFile($staticFilePath = "{$sitePath}/webroot/{$uri}")) {
 			return $staticFilePath;
 		}
 
@@ -43,9 +57,10 @@ class SampleValetDriver extends ValetDriver {
 	 * @param string $sitePath
 	 * @param string $siteName
 	 * @param string $uri
+	 *
 	 * @return string
 	 */
 	public function frontControllerPath($sitePath, $siteName, $uri) {
-		return "$sitePath/public/index.php";
+		return "{$sitePath}/webroot/index.php";
 	}
 }

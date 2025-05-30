@@ -99,10 +99,12 @@ abstract class GithubPackage {
 			$responseMsg = $responseBody->message;
 
 			if (str_contains($responseMsg, 'API rate limit exceeded')) {
-				[$ip, $rateLimit, $timeLeftToReset] = \ValetException::githubApiRateLimitExceededError($responseHeaders, $responseMsg);
+				$rateLimit = $responseHeaders["X-RateLimit-Limit"][0];
+
+				$timeLeftToReset = $this->calculateTimeToApiRateLimitReset($responseHeaders["X-RateLimit-Reset"][0]);
 
 				// Print the error messages.
-				error("\n\nThe GitHub API rate limit has been exceeded for your IP address ($ip). The rate limit is $rateLimit requests per hour.\n\n");
+				error("\n\nThe GitHub API rate limit has been exceeded for your IP address. The rate limit is $rateLimit requests per hour.\n\n");
 
 				info("\nThe rate limit will reset in $timeLeftToReset.");
 
@@ -267,5 +269,35 @@ abstract class GithubPackage {
 		if (!empty($matches)) {
 			return $matches[0];
 		}
+	}
+
+	/**
+	 * Calculate the time left to reset the GitHub API rate limit.
+	 *
+	 * @param string $resetTime The reset time in UTC epoch seconds.
+	 *
+	 * @return string The time left to reset the rate limit in a human-readable format.
+	 */
+	private function calculateTimeToApiRateLimitReset($resetTime) {
+		// Create new DateTime objects for the reset time and the current time.
+		$reset_time = new \DateTime("@$resetTime");
+		$current_time = new \DateTime("now");
+
+		// Get the difference between the 2 times.
+		$timeDifference = $reset_time->diff($current_time);
+
+		// Get the difference in minutes and seconds.
+		// The DateInterval object has many properties, including minutes and seconds,
+		// which we can directly access.
+		$mins = $timeDifference->i;
+		$secs = $timeDifference->s;
+
+		// Format the minutes and seconds into a human-readable string.
+		// If the minutes or seconds equals 1, we need to use the singular form
+		// of "minute" or "second".
+		$minsTxt = $mins === 1 ? "$mins minute" : "$mins minutes";
+		$secsTxt = $secs === 1 ? "$secs second" : "$secs seconds";
+
+		return "$minsTxt and $secsTxt";
 	}
 }

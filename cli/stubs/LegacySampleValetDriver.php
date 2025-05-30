@@ -1,8 +1,6 @@
 <?php
 
-namespace Valet\Drivers\Custom;
-
-use Valet\Drivers\ValetDriver;
+// DEPRECATED: This legacy sample driver is deprecated as of v3.3.0, and will be removed in 4.0.0.
 
 class SampleValetDriver extends ValetDriver {
 	/**
