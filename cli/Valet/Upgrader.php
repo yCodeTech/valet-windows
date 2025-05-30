@@ -35,6 +35,7 @@ class Upgrader {
 			$this->upgradeSymbolicLinks();
 			$this->lintNginxConfigs();
 			$this->upgradeNginxSiteConfigs();
+			$this->fixOldSampleValetDriver();
 		}
 	}
 
@@ -158,6 +159,35 @@ class Upgrader {
 						}
 					}
 				}
+			}
+		}
+	}
+
+	/**
+	 * If the user has the old `SampleValetDriver` without the Valet namespace,
+	 * replace it with the new `SampleValetDriver` that uses the namespace.
+	 */
+	public function fixOldSampleValetDriver(): void {
+		$samplePath = Valet::homePath() . '/Drivers/SampleValetDriver.php';
+
+		if ($this->files->exists($samplePath)) {
+			$contents = $this->files->get($samplePath);
+
+			if (! str_contains($contents, 'namespace')) {
+				if ($contents !== $this->files->getStub('LegacySampleValetDriver.php')) {
+					warning('Existing SampleValetDriver.php has been customized.');
+					warning("Backing up at '$samplePath.bak'");
+
+					$this->files->putAsUser(
+						"$samplePath.bak",
+						$contents
+					);
+				}
+
+				$this->files->putAsUser(
+					$samplePath,
+					$this->files->getStub('SampleValetDriver.php')
+				);
 			}
 		}
 	}
