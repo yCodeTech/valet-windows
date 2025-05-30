@@ -1,4 +1,4 @@
 <?php
 
-class StatamicV1ValetDriver extends Valet\Drivers\StatamicV1ValetDriver {
+class StatamicV1ValetDriver extends Valet\Drivers\Specific\StatamicV1ValetDriver {
 }

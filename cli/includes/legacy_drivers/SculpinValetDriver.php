@@ -1,4 +1,4 @@
 <?php
 
-class SculpinValetDriver extends Valet\Drivers\SculpinValetDriver {
+class SculpinValetDriver extends Valet\Drivers\Specific\SculpinValetDriver {
 }

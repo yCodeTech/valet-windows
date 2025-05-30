@@ -1,4 +1,4 @@
 <?php
 
-class KatanaValetDriver extends Valet\Drivers\KatanaValetDriver {
+class KatanaValetDriver extends Valet\Drivers\Specific\KatanaValetDriver {
 }

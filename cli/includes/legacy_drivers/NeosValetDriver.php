@@ -1,4 +1,4 @@
 <?php
 
-class NeosValetDriver extends Valet\Drivers\NeosValetDriver {
+class NeosValetDriver extends Valet\Drivers\Specific\NeosValetDriver {
 }

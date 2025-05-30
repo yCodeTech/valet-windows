@@ -1,4 +1,4 @@
 <?php
 
-class SymfonyValetDriver extends Valet\Drivers\SymfonyValetDriver {
+class SymfonyValetDriver extends Valet\Drivers\Specific\SymfonyValetDriver {
 }
