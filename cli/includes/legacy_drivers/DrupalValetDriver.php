@@ -1,4 +1,4 @@
 <?php
 
-class DrupalValetDriver extends Valet\Drivers\DrupalValetDriver {
+class DrupalValetDriver extends Valet\Drivers\Specific\DrupalValetDriver {
 }

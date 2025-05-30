@@ -1,4 +1,4 @@
 <?php
 
-class KirbyValetDriver extends Valet\Drivers\KirbyValetDriver {
+class KirbyValetDriver extends Valet\Drivers\Specific\KirbyValetDriver {
 }

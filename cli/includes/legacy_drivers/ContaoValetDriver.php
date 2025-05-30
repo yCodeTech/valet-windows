@@ -1,4 +1,4 @@
 <?php
 
-class ContaoValetDriver extends Valet\Drivers\ContaoValetDriver {
+class ContaoValetDriver extends Valet\Drivers\Specific\ContaoValetDriver {
 }

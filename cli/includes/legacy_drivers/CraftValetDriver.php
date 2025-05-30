@@ -1,4 +1,4 @@
 <?php
 
-class CraftValetDriver extends Valet\Drivers\CraftValetDriver {
+class CraftValetDriver extends Valet\Drivers\Specific\CraftValetDriver {
 }

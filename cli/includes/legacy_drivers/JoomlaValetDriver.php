@@ -1,4 +1,4 @@
 <?php
 
-class JoomlaValetDriver extends Valet\Drivers\JoomlaValetDriver {
+class JoomlaValetDriver extends Valet\Drivers\Specific\JoomlaValetDriver {
 }
