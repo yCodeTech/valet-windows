@@ -4,6 +4,7 @@ require_once __DIR__ . '/cli/includes/require-drivers.php';
 require_once __DIR__ . '/cli/Valet/Server.php';
 
 use Valet\Server;
+use Valet\Drivers\ValetDriver;
 
 /**
  * Define the user's "~/.config/valet" path.
