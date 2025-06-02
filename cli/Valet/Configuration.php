@@ -234,7 +234,7 @@ class Configuration {
 	 * Determine if the given PHP version is the alias.
 	 *
 	 * @param string $phpVersion
-	 * @return boolean
+	 * @return bool
 	 */
 	public function isPhpAlias($phpVersion) {
 		$php = $this->getPhpByVersion($phpVersion);

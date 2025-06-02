@@ -62,8 +62,8 @@ class Diagnose {
 	/**
 	 * Run diagnostics.
 	 *
-	 * @param boolean $print Print the output as the commands are running.
-	 * @param boolean $plainText Print and format the output as plain text (aka pretty print).
+	 * @param bool $print Print the output as the commands are running.
+	 * @param bool $plainText Print and format the output as plain text (aka pretty print).
 	 */
 	public function run($print, $plainText) {
 		$this->print = $print;
@@ -207,7 +207,7 @@ class Diagnose {
 	 * Determines if Valet should ignore the output of a command.
 	 *
 	 * @param string $command
-	 * @return boolean
+	 * @return bool
 	 */
 	protected function ignoreOutput($command) {
 		return strpos($command, '> /dev/null 2>&1') !== false;
@@ -219,7 +219,7 @@ class Diagnose {
 	 * a command or task that is run via PHP instead of the CLI.
 	 *
 	 * @param string $command
-	 * @return boolean
+	 * @return bool
 	 */
 	protected function isNonCliCommand($command) {
 		return strpos($command, 'placeholder') !== false;
@@ -418,7 +418,7 @@ class Diagnose {
 	 * Format the output for the terminal.
 	 *
 	 * @param \Illuminate\Support\Collection $results A collection of the outputs.
-	 * @param boolean $plainText
+	 * @param bool $plainText
 	 * @return array|string The formatted output as a `string`,
 	 * or if `plainText` is `true`, then an `array` of the formatted plain output
 	 * as a `string` for the terminal

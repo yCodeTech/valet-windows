@@ -135,7 +135,7 @@ class WinSW {
 	/**
 	 * Is a service running?
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function isRunning() {
 		$output = $this->cli->powershell('Get-Service -Name ' . $this->serviceId)->__toString();

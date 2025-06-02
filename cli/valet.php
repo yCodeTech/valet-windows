@@ -39,7 +39,7 @@ Upgrader::onEveryRun();
 /**
  * Install Valet's services and configs,
  * and auto start Valet.
- * @param boolean $xdebug Optionally, install Xdebug for PHP
+ * @param bool $xdebug Optionally, install Xdebug for PHP
  */
 $app->command('install [--xdebug]', function ($input, $output, $xdebug) {
 	$helper = $this->getHelperSet()->get('question');
@@ -154,8 +154,8 @@ $app->command('sudo valetCommand* [-o|--valetOptions=]', function ($valetCommand
 
 /**
  * Output diagnostics to aid in debugging Valet.
- * @param boolean $print Optionally print diagnostics output while running
- * @param boolean $plain Optionally format clipboard output as plain text
+ * @param bool $print Optionally print diagnostics output while running
+ * @param bool $plain Optionally format clipboard output as plain text
  */
 $app->command('diagnose [-p|--print] [--plain]', function ($print, $plain) {
 	info('Running diagnostics... (this may take a while)');
@@ -445,7 +445,7 @@ if (is_dir(Valet::homePath()) && Nginx::isInstalled()) {
 	 * Register the current working directory as a symbolic link.
 	 *
 	 * @param string $name Optionally specify a new name to be linked as.
-	 * @param boolean $secure Optionally secure the site
+	 * @param bool $secure Optionally secure the site
 	 * @param string $isolate Optionally isolate the site to a specified PHP version
 	 */
 	$app->command('link [name] [--secure] [--isolate=]', function ($name, $secure, $isolate = null) {
@@ -528,7 +528,7 @@ if (is_dir(Valet::homePath()) && Nginx::isInstalled()) {
 	 * @param string $site The site to be proxied.
 	 * Multiple sites can be proxied at the same time to 1 host. Separated by commas. eg. `site1,site2,site3`
 	 * @param string $host The host to receive the site traffic
-	 * @param boolean $secure Optionally, create a proxy with a trusted TLS certificate
+	 * @param bool $secure Optionally, create a proxy with a trusted TLS certificate
 	 */
 	$app->command('proxy site host [--secure]', function ($site, $host, $secure) {
 		Site::proxyCreate($site, $host, $secure);
@@ -654,7 +654,7 @@ if (is_dir(Valet::homePath()) && Nginx::isInstalled()) {
 	/**
 	 * Unsecure the current working directory
 	 * @param string $site Optionally specify the site.
-	 * @param boolean $all Optionally unsecure all secured sites
+	 * @param bool $all Optionally unsecure all secured sites
 	 */
 	$app->command('unsecure [site] [--all]', function ($site = null, $all = null) {
 		if ($all) {
@@ -769,7 +769,7 @@ if (is_dir(Valet::homePath()) && Nginx::isInstalled()) {
 	/**
 	 * Remove [unisolate] the current working directory's site
 	 * @param string $site Optionally specify the site
-	 * @param boolean $all Optionally unisolates all isolated sites
+	 * @param bool $all Optionally unisolates all isolated sites
 	 *
 	 */
 	$app->command('unisolate [--site=] [--all]', function ($output, $site = null, $all = null) {
@@ -1218,7 +1218,7 @@ if (is_dir(Valet::homePath()) && Nginx::isInstalled()) {
 	 * View and follow a log file.
 	 * @param string $key The name of the log
 	 * @param string $lines The number of lines to view
-	 * @param boolean $follow Follow real time streaming output of the changing file
+	 * @param bool $follow Follow real time streaming output of the changing file
 	 */
 	$app->command('log [key] [-l|--lines=] [-f|--follow]', function ($key, $lines, $follow) {
 		$defaultLogs = [
