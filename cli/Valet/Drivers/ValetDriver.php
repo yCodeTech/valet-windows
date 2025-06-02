@@ -39,7 +39,7 @@ abstract class ValetDriver {
 	 * @param string $siteName
 	 * @param string $uri
 	 *
-	 * @return string
+	 * @return string|null
 	 */
 	abstract public function frontControllerPath($sitePath, $siteName, $uri);
 
