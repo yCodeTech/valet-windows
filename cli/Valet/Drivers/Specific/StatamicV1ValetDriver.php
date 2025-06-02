@@ -28,7 +28,16 @@ class StatamicV1ValetDriver extends ValetDriver {
 	 * @return string|false
 	 */
 	public function isStaticFile($sitePath, $siteName, $uri) {
-		if (strpos($uri, '/_add-ons') === 0 || strpos($uri, '/_app') === 0 || strpos($uri, '/_content') === 0 || strpos($uri, '/_cache') === 0 || strpos($uri, '/_config') === 0 || strpos($uri, '/_logs') === 0 || $uri === '/admin') {
+		// phpcs:disable PSR2.ControlStructures.ControlStructureSpacing.SpacingAfterOpenBrace, PSR12.ControlStructures.ControlStructureSpacing.FirstExpressionLine
+		if (strpos($uri, '/_add-ons') === 0
+			|| strpos($uri, '/_app') === 0
+			|| strpos($uri, '/_content') === 0
+			|| strpos($uri, '/_cache') === 0
+			|| strpos($uri, '/_config') === 0
+			|| strpos($uri, '/_logs') === 0
+			|| $uri === '/admin'
+		) {
+			// phpcs:enable
 			return false;
 		}
 

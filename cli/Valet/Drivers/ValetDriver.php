@@ -94,11 +94,11 @@ abstract class ValetDriver {
 	 *
 	 * @param string $sitePath
 	 *
-	 * @return void|string
+	 * @return string|null
 	 */
 	public static function customSiteDriver($sitePath) {
 		if (!file_exists("$sitePath/LocalValetDriver.php")) {
-			return;
+			return null;
 		}
 
 		require_once "$sitePath/LocalValetDriver.php";

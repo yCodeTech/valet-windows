@@ -15,9 +15,9 @@ class RadicleValetDriver extends BasicValetDriver {
 	 * @return bool
 	 */
 	public function serves($sitePath, $siteName, $uri) {
-		return file_exists("{$sitePath}/public/content/mu-plugins/bedrock-autoloader.php") &&
-		file_exists("{$sitePath}/public/wp-config.php") &&
-		file_exists("{$sitePath}/bedrock/application.php");
+		return file_exists("{$sitePath}/public/content/mu-plugins/bedrock-autoloader.php")
+		&& file_exists("{$sitePath}/public/wp-config.php")
+		&& file_exists("{$sitePath}/bedrock/application.php");
 	}
 
 	/**
