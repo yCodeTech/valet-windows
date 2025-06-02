@@ -15,7 +15,8 @@ class SculpinValetDriver extends BasicValetDriver {
 	 * @return bool
 	 */
 	public function serves($sitePath, $siteName, $uri) {
-		return $this->isModernSculpinProject($sitePath) || $this->isLegacySculpinProject($sitePath);
+		return $this->isModernSculpinProject($sitePath)
+		|| $this->isLegacySculpinProject($sitePath);
 	}
 
 	/**
@@ -26,7 +27,9 @@ class SculpinValetDriver extends BasicValetDriver {
 	 * @return bool
 	 */
 	private function isModernSculpinProject($sitePath) {
-		return is_dir("{$sitePath}/source") && is_dir("{$sitePath}/output_dev") && $this->composerRequires($sitePath, 'sculpin/sculpin');
+		return is_dir("{$sitePath}/source")
+		&& is_dir("{$sitePath}/output_dev")
+		&& $this->composerRequires($sitePath, 'sculpin/sculpin');
 	}
 
 	/**

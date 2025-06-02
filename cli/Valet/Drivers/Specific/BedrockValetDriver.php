@@ -15,7 +15,11 @@ class BedrockValetDriver extends BasicValetDriver {
 	 * @return bool
 	 */
 	public function serves($sitePath, $siteName, $uri) {
-		return $this->composerRequires($sitePath, 'roots/bedrock-autoloader') || file_exists("$sitePath/web/app/mu-plugins/bedrock-autoloader.php") || (is_dir("$sitePath/web/app/") && file_exists("$sitePath/web/wp-config.php") && file_exists("$sitePath/config/application.php"));
+		return $this->composerRequires($sitePath, 'roots/bedrock-autoloader')
+		|| file_exists("$sitePath/web/app/mu-plugins/bedrock-autoloader.php")
+		|| (is_dir("$sitePath/web/app/")
+			&& file_exists("$sitePath/web/wp-config.php")
+			&& file_exists("$sitePath/config/application.php"));
 	}
 
 	/**
@@ -47,13 +51,11 @@ class BedrockValetDriver extends BasicValetDriver {
 	 * @return string|null
 	 */
 	public function frontControllerPath($sitePath, $siteName, $uri) {
-		if (strpos($uri, '/wp/') === 0) {
-			return is_dir("$sitePath/web$uri")
-			? "$sitePath/web" . $this->forceTrailingSlash($uri) . '/index.php'
-			: "$sitePath/web$uri";
-		}
-
-		return "$sitePath/web/index.php";
+		return parent::frontControllerPath(
+			"{$sitePath}/web",
+			$siteName,
+			$this->forceTrailingSlash($uri)
+		);
 	}
 
 	/**

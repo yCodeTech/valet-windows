@@ -21,7 +21,8 @@ class DrupalValetDriver extends ValetDriver {
 		 * /misc/drupal.js = Drupal 7
 		 * /core/lib/Drupal.php = Drupal 8.
 		 */
-		return file_exists("{$sitePath}/misc/drupal.js") || file_exists("{$sitePath}/core/lib/Drupal.php");
+		return file_exists("{$sitePath}/misc/drupal.js")
+		|| file_exists("{$sitePath}/core/lib/Drupal.php");
 	}
 
 	/**
@@ -36,7 +37,12 @@ class DrupalValetDriver extends ValetDriver {
 	public function isStaticFile($sitePath, $siteName, $uri) {
 		$sitePath = $this->addSubdirectory($sitePath);
 
-		if (file_exists("{$sitePath}{$uri}") && !is_dir("{$sitePath}{$uri}") && pathinfo("{$sitePath}{$uri}")['extension'] != 'php') {
+		// phpcs:disable PSR2.ControlStructures.ControlStructureSpacing.SpacingAfterOpenBrace, PSR12.ControlStructures.ControlStructureSpacing.FirstExpressionLine
+		if (file_exists("{$sitePath}{$uri}")
+			&& !is_dir("{$sitePath}{$uri}")
+			&& pathinfo("{$sitePath}{$uri}")['extension'] != 'php'
+		) {
+			// phpcs:enable
 			return "{$sitePath}{$uri}";
 		}
 
@@ -55,14 +61,24 @@ class DrupalValetDriver extends ValetDriver {
 	public function frontControllerPath($sitePath, $siteName, $uri) {
 		$sitePath = $this->addSubdirectory($sitePath);
 
-		if (!isset($_GET['Q']) && !empty($uri) && $uri !== '/' && strpos($uri, '/jsonapi/') === false) {
+		// phpcs:disable PSR2.ControlStructures.ControlStructureSpacing.SpacingAfterOpenBrace, PSR12.ControlStructures.ControlStructureSpacing.FirstExpressionLine
+		if (!isset($_GET['Q'])
+			&& !empty($uri)
+			&& $uri !== '/'
+			&& strpos($uri, '/jsonapi/') === false
+		) {
+			// phpcs:enable
 			$_GET['Q'] = $uri;
 		}
 
 		$matches = [];
 		if (preg_match('/^\/(.*?)\.php/', $uri, $matches)) {
 			$filename = $matches[0];
-			if (file_exists("{$sitePath}{$filename}") && !is_dir("{$sitePath}{$filename}")) {
+			// phpcs:disable PSR2.ControlStructures.ControlStructureSpacing.SpacingAfterOpenBrace, PSR12.ControlStructures.ControlStructureSpacing.FirstExpressionLine
+			if (file_exists("{$sitePath}{$filename}")
+				&& !is_dir("{$sitePath}{$filename}")
+			) {
+				// phpcs:enable
 				$_SERVER['SCRIPT_FILENAME'] = "{$sitePath}{$filename}";
 				$_SERVER['SCRIPT_NAME'] = $filename;
 

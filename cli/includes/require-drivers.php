@@ -17,7 +17,7 @@ foreach (scandir($valetDriversDir) as $file) {
  * Require legacy drivers
  */
 
-// DEPRECATED: The legacy drivers are deprecated as of v3.2.0 and therefore so is this code.
+// DEPRECATED: The legacy drivers are deprecated as of v3.3.0 and therefore so is this code, and will be removed in 4.0.0.
 
 // Require specific drivers.
 

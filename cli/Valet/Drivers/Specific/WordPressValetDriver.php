@@ -15,7 +15,8 @@ class WordPressValetDriver extends BasicValetDriver {
 	 * @return bool
 	 */
 	public function serves($sitePath, $siteName, $uri) {
-		return file_exists("{$sitePath}/wp-config.php") || file_exists("{$sitePath}/wp-config-sample.php");
+		return file_exists("{$sitePath}/wp-config.php")
+		|| file_exists("{$sitePath}/wp-config-sample.php");
 	}
 
 	/**
