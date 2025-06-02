@@ -277,7 +277,7 @@ class Site {
 	/**
 	 * Get the PHP version for the given site.
 	 * @param string $site
-	 * @param boolean $symlink Are we getting the version for a symbolic link site? Default `false`.
+	 * @param bool $symlink Are we getting the version for a symbolic link site? Default `false`.
 	 * @return string PHP version
 	 */
 	public function getPhpVersion($site, $symlink = false) {
@@ -985,7 +985,7 @@ class Site {
 	 *
 	 * @param string $url The site to serve
 	 * @param string $host The URL to proxy to, eg: http://127.0.0.1:8080
-	 * @param boolean $secure Is the proxy going to be secured? Default: `false`
+	 * @param bool $secure Is the proxy going to be secured? Default: `false`
 	 * @return void
 	 */
 	public function proxyCreate($url, $host, $secure = false) {

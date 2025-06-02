@@ -103,7 +103,7 @@ class Upgrader {
 	/**
 	 * Lint the Nginx configuration files.
 	 *
-	 * @param boolean $returnOutput
+	 * @param bool $returnOutput
 	 *
 	 * @return string|null
 	 */

@@ -239,7 +239,7 @@ class Nginx {
 	 * For use in valet.php to check if Valet is installed
 	 * to enable most of the commands.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function isInstalled() {
 		return $this->winsw->installed();

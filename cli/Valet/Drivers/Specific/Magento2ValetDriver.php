@@ -19,7 +19,7 @@ class Magento2ValetDriver extends ValetDriver {
 	 * @param string $siteName
 	 * @param string $uri
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function serves($sitePath, $siteName, $uri) {
 		return file_exists("{$sitePath}/bin/magento") && file_exists("{$sitePath}/pub/index.php");
