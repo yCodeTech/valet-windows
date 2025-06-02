@@ -29,17 +29,4 @@ class JoomlaValetDriver extends BasicValetDriver {
 	public function beforeLoading($sitePath, $siteName, $uri) {
 		$_SERVER['PHP_SELF'] = $uri;
 	}
-
-	/**
-	 * Get the fully resolved path to the application's front controller.
-	 *
-	 * @param string $sitePath
-	 * @param string $siteName
-	 * @param string $uri
-	 *
-	 * @return string
-	 */
-	public function frontControllerPath($sitePath, $siteName, $uri) {
-		return parent::frontControllerPath($sitePath, $siteName, $uri);
-	}
 }
