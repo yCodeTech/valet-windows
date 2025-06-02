@@ -58,7 +58,7 @@ class CakeValetDriver extends ValetDriver {
 	 * @param string $siteName
 	 * @param string $uri
 	 *
-	 * @return string
+	 * @return string|null
 	 */
 	public function frontControllerPath($sitePath, $siteName, $uri) {
 		return "{$sitePath}/webroot/index.php";

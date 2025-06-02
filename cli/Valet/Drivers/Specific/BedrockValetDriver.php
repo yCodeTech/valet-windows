@@ -44,7 +44,7 @@ class BedrockValetDriver extends BasicValetDriver {
 	 * @param string $siteName
 	 * @param string $uri
 	 *
-	 * @return string
+	 * @return string|null
 	 */
 	public function frontControllerPath($sitePath, $siteName, $uri) {
 		if (strpos($uri, '/wp/') === 0) {

@@ -17,6 +17,10 @@ class DrupalValetDriver extends ValetDriver {
 	public function serves($sitePath, $siteName, $uri) {
 		$sitePath = $this->addSubdirectory($sitePath);
 
+		/**
+		 * /misc/drupal.js = Drupal 7
+		 * /core/lib/Drupal.php = Drupal 8.
+		 */
 		return file_exists("{$sitePath}/misc/drupal.js") || file_exists("{$sitePath}/core/lib/Drupal.php");
 	}
 
@@ -46,7 +50,7 @@ class DrupalValetDriver extends ValetDriver {
 	 * @param string $siteName
 	 * @param string $uri
 	 *
-	 * @return string
+	 * @return string|null
 	 */
 	public function frontControllerPath($sitePath, $siteName, $uri) {
 		$sitePath = $this->addSubdirectory($sitePath);
@@ -66,6 +70,7 @@ class DrupalValetDriver extends ValetDriver {
 			}
 		}
 
+		// Fallback
 		$_SERVER['SCRIPT_FILENAME'] = "{$sitePath}/index.php";
 		$_SERVER['SCRIPT_NAME'] = '/index.php';
 

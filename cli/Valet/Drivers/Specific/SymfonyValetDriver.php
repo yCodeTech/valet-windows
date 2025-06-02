@@ -45,7 +45,7 @@ class SymfonyValetDriver extends ValetDriver {
 	 * @param string $siteName
 	 * @param string $uri
 	 *
-	 * @return string
+	 * @return string|null
 	 */
 	public function frontControllerPath($sitePath, $siteName, $uri) {
 		if (file_exists($frontControllerPath = "{$sitePath}/web/app_dev.php")) {
@@ -58,4 +58,3 @@ class SymfonyValetDriver extends ValetDriver {
 			return $frontControllerPath;
 		}
 	}
-}
