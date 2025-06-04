@@ -1,7 +1,5 @@
 <?php
 
-// TODO: Update all Drivers to make sure they're on par with macOS.
-
 namespace Valet\Drivers;
 
 use RecursiveDirectoryIterator;
