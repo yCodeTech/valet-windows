@@ -81,43 +81,31 @@ abstract class GithubPackage {
 	 * @return void
 	 */
 	protected function download(string $githubApiUrl, string $filename, string $filePath) {
-		// Try to get the information from the GitHub API, otherwise
-		// catch the exception and handle it.
-		try {
-			// Process response normally...
-			$response = json_decode($this->client->get($githubApiUrl)->getBody());
-		}
-		catch (ClientException $e) {
-			// An exception was raised but there is an HTTP response body
-			// with the exception (in case of 404 and similar errors)
-			$response = $e->getResponse();
+		// Get the response from the GitHub API OR handle errors.
+		$response = $this->getApiResponse($githubApiUrl,
+			function ($errorCode, $responseHeaders, $responseMsg) use ($githubApiUrl) {
 
-			$errorCode = $response->getStatusCode();
+				if (str_contains($responseMsg, 'API rate limit exceeded')) {
+					$rateLimit = $responseHeaders["X-RateLimit-Limit"][0];
 
-			$responseHeaders = $response->getHeaders();
-			$responseBody = json_decode($response->getBody());
-			$responseMsg = $responseBody->message;
+					$timeLeftToReset = $this->calculateTimeToApiRateLimitReset($responseHeaders["X-RateLimit-Reset"][0]);
 
-			if (str_contains($responseMsg, 'API rate limit exceeded')) {
-				$rateLimit = $responseHeaders["X-RateLimit-Limit"][0];
+					// Print the error messages.
+					error("\n\nThe GitHub API rate limit has been exceeded for your IP address. The rate limit is $rateLimit requests per hour.\n\n");
 
-				$timeLeftToReset = $this->calculateTimeToApiRateLimitReset($responseHeaders["X-RateLimit-Reset"][0]);
+					info("\nThe rate limit will reset in $timeLeftToReset.");
 
-				// Print the error messages.
-				error("\n\nThe GitHub API rate limit has been exceeded for your IP address. The rate limit is $rateLimit requests per hour.\n\n");
+					error("API rate limit exceeded", true);
+				}
+				else {
+					$error = "Error Code: $errorCode\n";
+					$error .= "Error Message: $responseMsg\n";
+					$error .= "The GitHub API URL queried is: $githubApiUrl\n";
 
-				info("\nThe rate limit will reset in $timeLeftToReset.");
-
-				error("API rate limit exceeded", true);
+					error($error, true);
+				}
 			}
-			else {
-				$error = "Error Code: $errorCode\n";
-				$error .= "Error Message: $responseMsg\n";
-				$error .= "The GitHub API URL queried is: $githubApiUrl\n";
-
-				error($error, true);
-			}
-		}
+		);
 
 		// If the 'assets' property exists in the response, it means we are downloading
 		// a release asset.
@@ -155,6 +143,57 @@ abstract class GithubPackage {
 		$this->client->get($downloadUrl, [
 			\GuzzleHttp\RequestOptions::SINK => $filePath
 		]);
+	}
+
+	/**
+	 * Get the response of the API.
+	 *
+	 * @param string $apiUrl The GitHub API URL to query.
+	 * @param callable|null $onError Optional callback to handle errors.
+	 *
+	 * @return mixed The response from the API, if successful.
+	 * @throws \ValetException
+	 */
+	protected function getApiResponse(string $apiUrl, ?callable $onError = null) {
+
+		// If no error callback is provided, set it to a default function that does nothing.
+		$onError = $onError ?: function () {
+		};
+
+		// Try to get the information from the API, otherwise
+		// catch the exception and handle it.
+		try {
+			// Process response normally...
+			$response = json_decode($this->client->get($apiUrl)->getBody());
+		}
+		catch (ClientException $e) {
+			// An exception was raised but there is an HTTP response body
+			// with the exception (in case of 404 and similar errors)
+			$response = $e->getResponse();
+
+			$errorCode = $response->getStatusCode();
+
+			$responseHeaders = $response->getHeaders();
+			$responseBody = json_decode($response->getBody());
+			$responseMsg = $responseBody->message;
+
+			// If an error callback is provided...
+			if ($onError) {
+				// Call the error callback with the error code and message.
+				$onError($errorCode, $responseHeaders, $responseMsg);
+			}
+			// Otherwise if no error callback is provided...
+			else {
+				// Throw the default error with the details.
+				$error = "Error Code: $errorCode\n";
+				$error .= "Error Message: $responseMsg\n";
+				$error .= "The API URL queried is: $apiUrl\n";
+
+				error($error, true);
+			}
+		}
+
+		return $response;
 	}
 
 	/**
