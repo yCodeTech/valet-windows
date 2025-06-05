@@ -139,10 +139,7 @@ abstract class GithubPackage {
 			error("The download URL was not found in the response. The API URL queried is: $githubApiUrl\n", true);
 		}
 
-		// Download the file via Guzzle.
-		$this->client->get($downloadUrl, [
-			\GuzzleHttp\RequestOptions::SINK => $filePath
-		]);
+		$this->downloadFile($downloadUrl, $filePath);
 	}
 
 	/**
@@ -194,6 +191,21 @@ abstract class GithubPackage {
 		}
 
 		return $response;
+	}
+
+	/**
+	 * Download a file from the specified URL and save it to the specified path.
+	 *
+	 * @param string $downloadUrl The URL to download the file from.
+	 * @param string $filePath The path where the file will be saved.
+	 *
+	 * @return void
+	 */
+	public function downloadFile(string $downloadUrl, string $filePath) {
+		// Download the file via Guzzle.
+		$this->client->get($downloadUrl, [
+			\GuzzleHttp\RequestOptions::SINK => $filePath
+		]);
 	}
 
 	/**
