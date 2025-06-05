@@ -23,7 +23,7 @@ class Gsudo extends GithubPackage {
 
 			$this->download('https://api.github.com/repos/gerardog/gsudo/releases/latest', 'gsudo.portable.zip', $zipFilePath);
 
-			$this->files->unzip($zipFilePath, $gsudoPath);
+			$this->unzip();
 
 			$this->moveFiles("x64");
 

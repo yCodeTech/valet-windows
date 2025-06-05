@@ -23,7 +23,7 @@ class Nginx extends GithubPackage {
 
 			$this->download("https://api.github.com/repos/nginx/nginx/releases/latest", "nginx-VERSION.zip", $zipFilePath);
 
-			$this->files->unzip($zipFilePath, $nginxPath);
+			$this->unzip();
 
 			$this->moveNginxFiles();
 

@@ -26,7 +26,7 @@ class Ansicon extends GithubPackage {
 
 			$this->download('https://api.github.com/repos/adoxa/ansicon/releases/latest', 'ansi189-bin.zip', $zipFilePath);
 
-			$this->files->unzip($zipFilePath, $ansiconPath);
+			$this->unzip();
 
 			// Get the contents of the readme.txt file.
 			$readmeContents = $this->files->get("$ansiconPath/readme.txt");
