@@ -178,35 +178,41 @@ abstract class GithubPackage {
 	}
 
 	/**
+	 * Get the path to the package zip file.
+	 *
+	 * @return string
+	 */
+	protected function packageZipFilePath(): string {
+		return $this->packagePath() . "/$this->packageName.zip";
+	}
+
+	/**
 	 * Clean up the package directory that was downloaded and unzipped from GitHub.
 	 * Remove all unnecessary directories and files.
-	 *
-	 * @param mixed $zipFilePath
 	 *
 	 * @param array $unnecessaryDirsToRemove
 	 *
 	 * @return void
 	 */
-	protected function cleanUpPackageDirectory($zipFilePath, $requiredDir = "") {
+	protected function cleanUpPackageDirectory($requiredDir = "") {
 		// For each unnecessary directory in the package directory...
-		foreach ($this->getUnnecessaryDirs($zipFilePath, $requiredDir) as $dir) {
+		foreach ($this->getUnnecessaryDirs($requiredDir) as $dir) {
 			// Remove all unnecessary directories and their files.
 			$this->files->unlink($this->packagePath() . "/$dir");
 		}
 
-		$this->removeZip($zipFilePath);
+		$this->removeZip();
 	}
 
 	/**
 	 * Get the unnecessary directories to remove in the package directory.
 	 *
-	 * @param string $zipFilePath
 	 * @param string $requiredDir
 	 *
 	 * @return array
 	 */
-	protected function getUnnecessaryDirs($zipFilePath, $requiredDir) {
-		return collect($this->files->listTopLevelZipDirs($zipFilePath))->reject(function ($dir) use ($requiredDir) {
+	protected function getUnnecessaryDirs($requiredDir) {
+		return collect($this->files->listTopLevelZipDirs($this->packageZipFilePath()))->reject(function ($dir) use ($requiredDir) {
 			// If the directory name contains the required directory name, then we remove
 			// it from the collection of unnecessary directories that we want to delete.
 			return str_contains($dir, $requiredDir);
@@ -216,10 +222,9 @@ abstract class GithubPackage {
 	/**
 	 * Remove the zip file after extracting its contents.
 	 *
-	 * @param string $zipFilePath
 	 */
-	protected function removeZip($zipFilePath) {
-		$this->files->unlink($zipFilePath);
+	protected function removeZip() {
+		$this->files->unlink($this->packageZipFilePath());
 	}
 
 	/**
