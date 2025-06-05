@@ -220,6 +220,13 @@ abstract class GithubPackage {
 	}
 
 	/**
+	 * Unzip the package zip file into the package directory.
+	 */
+	protected function unzip() {
+		$this->files->unzip($this->packageZipFilePath(), $this->packagePath());
+	}
+
+	/**
 	 * Remove the zip file after extracting its contents.
 	 *
 	 */
