@@ -1,5 +1,13 @@
 @echo off
 
+:: Check for admin rights and relaunch as admin if needed
+net session >nul 2>&1
+if %errorlevel% neq 0 (
+	echo This script requires administrator privileges. Relaunching...
+	powershell -Command "Start-Process '%~f0' -Verb RunAs"
+	exit /b
+)
+
 echo "Stopping and uninstalling all services..."
 
 @REM Stop and uninstall Acrylic process
