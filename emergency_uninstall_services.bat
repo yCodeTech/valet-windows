@@ -1,5 +1,7 @@
 @echo off
 
+:: // TODO: Add a script to remove ansicon from the registry AutoRun value of HKEY_CURRENT_USER\Software\Microsoft\Command Processor. But it must not disturb other AutoRun values.
+
 :: Check for admin rights and relaunch as admin if needed
 net session >nul 2>&1
 if %errorlevel% neq 0 (
@@ -29,4 +31,9 @@ for /f %%f in ('dir /b /s "%UserProfile%\.config\valet\Services\*.exe"') do (
 	%%~dpnf uninstall
 )
 
+@REM Delete all files in %UserProfile%\.config\valet\Services
+del /q "%UserProfile%\.config\valet\Services\*.*"
+
 echo "All services stopped and uninstalled."
+
+pause
