@@ -83,6 +83,14 @@
 			<property name="allowMultipleArguments" value="false"/>
 		</properties>
 	</rule>
+	<!-- Allow concatenation spacing.
+	1 space after and 1 space before the concatenation operator (.) -->
+	<rule ref="Squiz.Strings.ConcatenationSpacing">
+		<properties>
+			<property name="spacing" value="1" />
+			<property name="ignoreNewlines" value="true" />
+		</properties>
+	</rule>
 	<!-- External standard. https://github.com/JParkinson1991/phpcodesniffer-standards/blob/master/docs/Standards/JPSR12/JPSR12.md -->
 	<!-- Exclude certain sniffs. -->
 	<rule ref="JPSR12">
