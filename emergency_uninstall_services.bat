@@ -1,7 +1,5 @@
 @echo off
 
-:: // TODO: Add a script to remove ansicon from the registry AutoRun value of HKEY_CURRENT_USER\Software\Microsoft\Command Processor. But it must not disturb other AutoRun values.
-
 :: Check for admin rights and relaunch as admin if needed
 net session >nul 2>&1
 if %errorlevel% neq 0 (
@@ -9,6 +7,12 @@ if %errorlevel% neq 0 (
 	powershell -Command "Start-Process '%~f0' -Verb RunAs"
 	exit /b
 )
+
+:: Remove Ansicon from the registry AutoRun value of HKEY_CURRENT_USER\Software\Microsoft\Command
+:: Processor key by running the emergency copy of ansicon.exe.
+"%UserProfile%\.config\valet\Emergency Uninstall\ansicon\ansicon.exe" -pu -u
+echo "Removed Ansicon"
+
 
 echo "Stopping and uninstalling all services..."
 
