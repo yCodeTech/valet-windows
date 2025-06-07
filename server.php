@@ -1,9 +1,10 @@
 <?php
 
-require_once __DIR__ . '/cli/drivers/require.php';
+require_once __DIR__ . '/cli/includes/require-drivers.php';
 require_once __DIR__ . '/cli/Valet/Server.php';
 
 use Valet\Server;
+use Valet\Drivers\ValetDriver;
 
 /**
  * Define the user's "~/.config/valet" path.
@@ -72,6 +73,11 @@ $staticFilePath = $server->isRequestStaticFile($uri, $valetSitePath, $siteName, 
 if ($staticFilePath) {
 	return $valetDriver->serveStaticFile($staticFilePath, $valetSitePath, $siteName, $uri);
 }
+
+/**
+ * Allow for drivers to take pre-loading actions (e.g. setting server variables).
+ */
+$valetDriver->beforeLoading($valetSitePath, $siteName, $uri);
 
 /**
  * Attempt to dispatch to a front controller.

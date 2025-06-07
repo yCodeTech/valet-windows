@@ -330,9 +330,11 @@ class Filesystem {
 		 */
 		$collection = $this->getJunctionLinks($path);
 
+		// If there are no junction links to convert, we can exit early.
 		if ($collection->isEmpty()) {
 			return;
 		}
+
 		// Remove all the junction links and create new symlinks to the same path.
 		$collection->each(function ($link) use ($path) {
 			$output = CommandLine::run('cmd /C rmdir /s /q "' . $path . '/' . $link['linkName']. '"');
@@ -341,6 +343,8 @@ class Filesystem {
 				$this->symlink($link['path'], $link['linkName']);
 			}
 		});
+
+		return;
 	}
 
 	/**
@@ -386,6 +390,51 @@ class Filesystem {
 		return collect(scandir($path))->reject(function ($file) {
 			return in_array($file, ['.', '..']);
 		})->values()->all();
+	}
+
+
+	/**
+	 * Scan the given directory path recursively, returning an
+	 * associative array of all files and directories.
+	 *
+	 * @param string $dir The directory to scan.
+	 * @return array An associative array of all files and directories.
+	 */
+	public function scanDirRecursive($dir) {
+		$result = [];
+		$items = $this->scandir($dir);
+
+		// Loop through each item in the directory.
+		foreach ($items as $item) {
+			// Skip the current and parent directory entries.
+			if ($item === '.' || $item === '..') {
+				continue;
+			}
+			// Get the full path of the item.
+			$fullPath = rtrim($dir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $item;
+
+			// If the item is a directory and not a symlink...
+			if ($this->isDir($fullPath) && !$this->isLink($fullPath)) {
+				// Recursively scan the directory and add the directory name as the key,
+				// and the result of the recursive scan as the value of the array.
+				$result[$item] = $this->scanDirRecursive($fullPath);
+			}
+			// Otherwise, add the item to the result array.
+			else {
+				$result[] = $item;
+			}
+		}
+		return $result;
+	}
+
+	/**
+	 * Check if the given directory is empty.
+	 *
+	 * @param string $path The path to the directory to check.
+	 * @return bool
+	 */
+	public function isDirEmpty($path) {
+		return $this->isDir($path) && collect($this->scandir($path))->isEmpty();
 	}
 
 	/**
@@ -445,7 +494,7 @@ class Filesystem {
 	public function getStub($filename) {
 		$default = __DIR__.'/../stubs/'.$filename;
 
-		$custom = VALET_HOME_PATH . "/stubs/$filename";
+		$custom = Valet::homePath() . "/stubs/$filename";
 
 		$path = file_exists($custom) ? $custom : $default;
 

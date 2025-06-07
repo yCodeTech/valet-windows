@@ -35,13 +35,7 @@ class Configuration {
 		$this->createServicesDirectory();
 		$this->createXdebugDirectory();
 		$this->writeBaseConfiguration();
-
-		// Copy the emergency stop and uninstall services script to the Valet home
-		// directory for safe keeping.
-		$this->files->copy(
-			realpath(__DIR__ . '/../../emergency_uninstall_services.bat'),
-			$this->valetHomePath("emergency_uninstall_services.bat")
-		);
+		$this->createEmergencyUninstallFiles();
 
 		$this->files->chown($this->path(), user());
 	}
@@ -169,6 +163,41 @@ class Configuration {
 	}
 
 	/**
+	 * Create the emergency uninstall files.
+	 *
+	 * This is used to emergency uninstall leftover Valet services, if `composer global update`
+	 * was ran before uninstalling Valet.
+	 */
+	private function createEmergencyUninstallFiles() {
+		$emergencyUninstallPath = $this->valetHomePath("Emergency Uninstall");
+
+		$this->files->ensureDirExists($emergencyUninstallPath, user());
+
+		// Copy the emergency stop and uninstall services script to the Valet home
+		// directory for safe keeping.
+		$this->files->copy(
+			realpath(__DIR__ . '/../../emergency_uninstall_services.bat'),
+			"$emergencyUninstallPath/emergency_uninstall_services.bat"
+		);
+
+		// Copy the Ansicon bin files into the Valet home directory for emergency uninstall.
+		//
+		// This is because Ansicon uses the Windows Registry to autorun, so we must ensure it's
+		// safely removed from the Registry too by uninstalling Ansicon officially instead of
+		// hacking it out of the system.
+
+		$this->files->ensureDirExists("$emergencyUninstallPath/ansicon", user());
+		$ansiconBinPath = resolve(Packages\Ansicon::class)->packagePath();
+
+		collect($this->files->scandir($ansiconBinPath))->each(function ($file) use ($emergencyUninstallPath, $ansiconBinPath) {
+			$this->files->copy(
+				realpath("$ansiconBinPath/$file"),
+				"$emergencyUninstallPath/ansicon/$file"
+			);
+		});
+	}
+
+	/**
 	 * Forcefully delete the Valet home configuration directory and contents.
 	 *
 	 * @return void
@@ -234,7 +263,7 @@ class Configuration {
 	 * Determine if the given PHP version is the alias.
 	 *
 	 * @param string $phpVersion
-	 * @return boolean
+	 * @return bool
 	 */
 	public function isPhpAlias($phpVersion) {
 		$php = $this->getPhpByVersion($phpVersion);

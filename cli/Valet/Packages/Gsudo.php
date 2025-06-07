@@ -17,18 +17,18 @@ class Gsudo extends GithubPackage {
 	public function install() {
 		if (!$this->isInstalled()) {
 			$gsudoPath = $this->packagePath();
-			$zipFilePath = "$gsudoPath/gsudo.portable.zip";
+			$zipFilePath = $this->packageZipFilePath();
 
 			$this->files->ensureDirExists($gsudoPath);
 
 			$this->download('https://api.github.com/repos/gerardog/gsudo/releases/latest', 'gsudo.portable.zip', $zipFilePath);
 
-			$this->files->unzip($zipFilePath, $gsudoPath);
+			$this->unzip();
 
 			$this->moveFiles("x64");
 
 			// Clean up the package directory.
-			$this->cleanUpPackageDirectory($zipFilePath, "x64");
+			$this->cleanUpPackageDirectory("x64");
 
 			$this->configureGsudo();
 		}

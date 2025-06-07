@@ -81,41 +81,31 @@ abstract class GithubPackage {
 	 * @return void
 	 */
 	protected function download(string $githubApiUrl, string $filename, string $filePath) {
-		// Try to get the information from the GitHub API, otherwise
-		// catch the exception and handle it.
-		try {
-			// Process response normally...
-			$response = json_decode($this->client->get($githubApiUrl)->getBody());
-		}
-		catch (ClientException $e) {
-			// An exception was raised but there is an HTTP response body
-			// with the exception (in case of 404 and similar errors)
-			$response = $e->getResponse();
+		// Get the response from the GitHub API OR handle errors.
+		$response = $this->getApiResponse($githubApiUrl,
+			function ($errorCode, $responseHeaders, $responseMsg) use ($githubApiUrl) {
 
-			$errorCode = $response->getStatusCode();
+				if (str_contains($responseMsg, 'API rate limit exceeded')) {
+					$rateLimit = $responseHeaders["X-RateLimit-Limit"][0];
 
-			$responseHeaders = $response->getHeaders();
-			$responseBody = json_decode($response->getBody());
-			$responseMsg = $responseBody->message;
+					$timeLeftToReset = $this->calculateTimeToApiRateLimitReset($responseHeaders["X-RateLimit-Reset"][0]);
 
-			if (str_contains($responseMsg, 'API rate limit exceeded')) {
-				[$ip, $rateLimit, $timeLeftToReset] = \ValetException::githubApiRateLimitExceededError($responseHeaders, $responseMsg);
+					// Print the error messages.
+					error("\n\nThe GitHub API rate limit has been exceeded for your IP address. The rate limit is $rateLimit requests per hour.\n\n");
 
-				// Print the error messages.
-				error("\n\nThe GitHub API rate limit has been exceeded for your IP address ($ip). The rate limit is $rateLimit requests per hour.\n\n");
+					info("\nThe rate limit will reset in $timeLeftToReset.");
 
-				info("\nThe rate limit will reset in $timeLeftToReset.");
+					error("API rate limit exceeded", true);
+				}
+				else {
+					$error = "Error Code: $errorCode\n";
+					$error .= "Error Message: $responseMsg\n";
+					$error .= "The GitHub API URL queried is: $githubApiUrl\n";
 
-				error("API rate limit exceeded", true);
+					error($error, true);
+				}
 			}
-			else {
-				$error = "Error Code: $errorCode\n";
-				$error .= "Error Message: $responseMsg\n";
-				$error .= "The GitHub API URL queried is: $githubApiUrl\n";
-
-				error($error, true);
-			}
-		}
+		);
 
 		// If the 'assets' property exists in the response, it means we are downloading
 		// a release asset.
@@ -149,6 +139,69 @@ abstract class GithubPackage {
 			error("The download URL was not found in the response. The API URL queried is: $githubApiUrl\n", true);
 		}
 
+		$this->downloadFile($downloadUrl, $filePath);
+	}
+
+	/**
+	 * Get the response of the API.
+	 *
+	 * @param string $apiUrl The GitHub API URL to query.
+	 * @param callable|null $onError Optional callback to handle errors.
+	 *
+	 * @return mixed The response from the API, if successful.
+	 * @throws \ValetException
+	 */
+	protected function getApiResponse(string $apiUrl, ?callable $onError = null) {
+
+		// If no error callback is provided, set it to a default function that does nothing.
+		$onError = $onError ?: function () {
+		};
+
+		// Try to get the information from the API, otherwise
+		// catch the exception and handle it.
+		try {
+			// Process response normally...
+			$response = json_decode($this->client->get($apiUrl)->getBody());
+		}
+		catch (ClientException $e) {
+			// An exception was raised but there is an HTTP response body
+			// with the exception (in case of 404 and similar errors)
+			$response = $e->getResponse();
+
+			$errorCode = $response->getStatusCode();
+
+			$responseHeaders = $response->getHeaders();
+			$responseBody = json_decode($response->getBody());
+			$responseMsg = $responseBody->message;
+
+			// If an error callback is provided...
+			if ($onError) {
+				// Call the error callback with the error code and message.
+				$onError($errorCode, $responseHeaders, $responseMsg);
+			}
+			// Otherwise if no error callback is provided...
+			else {
+				// Throw the default error with the details.
+				$error = "Error Code: $errorCode\n";
+				$error .= "Error Message: $responseMsg\n";
+				$error .= "The API URL queried is: $apiUrl\n";
+
+				error($error, true);
+			}
+		}
+
+		return $response;
+	}
+
+	/**
+	 * Download a file from the specified URL and save it to the specified path.
+	 *
+	 * @param string $downloadUrl The URL to download the file from.
+	 * @param string $filePath The path where the file will be saved.
+	 *
+	 * @return void
+	 */
+	public function downloadFile(string $downloadUrl, string $filePath) {
 		// Download the file via Guzzle.
 		$this->client->get($downloadUrl, [
 			\GuzzleHttp\RequestOptions::SINK => $filePath
@@ -176,35 +229,41 @@ abstract class GithubPackage {
 	}
 
 	/**
+	 * Get the path to the package zip file.
+	 *
+	 * @return string
+	 */
+	protected function packageZipFilePath(): string {
+		return $this->packagePath() . "/$this->packageName.zip";
+	}
+
+	/**
 	 * Clean up the package directory that was downloaded and unzipped from GitHub.
 	 * Remove all unnecessary directories and files.
-	 *
-	 * @param mixed $zipFilePath
 	 *
 	 * @param array $unnecessaryDirsToRemove
 	 *
 	 * @return void
 	 */
-	protected function cleanUpPackageDirectory($zipFilePath, $requiredDir = "") {
+	protected function cleanUpPackageDirectory($requiredDir = "") {
 		// For each unnecessary directory in the package directory...
-		foreach ($this->getUnnecessaryDirs($zipFilePath, $requiredDir) as $dir) {
+		foreach ($this->getUnnecessaryDirs($requiredDir) as $dir) {
 			// Remove all unnecessary directories and their files.
 			$this->files->unlink($this->packagePath() . "/$dir");
 		}
 
-		$this->removeZip($zipFilePath);
+		$this->removeZip();
 	}
 
 	/**
 	 * Get the unnecessary directories to remove in the package directory.
 	 *
-	 * @param string $zipFilePath
 	 * @param string $requiredDir
 	 *
 	 * @return array
 	 */
-	protected function getUnnecessaryDirs($zipFilePath, $requiredDir) {
-		return collect($this->files->listTopLevelZipDirs($zipFilePath))->reject(function ($dir) use ($requiredDir) {
+	protected function getUnnecessaryDirs($requiredDir) {
+		return collect($this->files->listTopLevelZipDirs($this->packageZipFilePath()))->reject(function ($dir) use ($requiredDir) {
 			// If the directory name contains the required directory name, then we remove
 			// it from the collection of unnecessary directories that we want to delete.
 			return str_contains($dir, $requiredDir);
@@ -212,12 +271,18 @@ abstract class GithubPackage {
 	}
 
 	/**
+	 * Unzip the package zip file into the package directory.
+	 */
+	protected function unzip() {
+		$this->files->unzip($this->packageZipFilePath(), $this->packagePath());
+	}
+
+	/**
 	 * Remove the zip file after extracting its contents.
 	 *
-	 * @param string $zipFilePath
 	 */
-	protected function removeZip($zipFilePath) {
-		$this->files->unlink($zipFilePath);
+	protected function removeZip() {
+		$this->files->unlink($this->packageZipFilePath());
 	}
 
 	/**
@@ -267,5 +332,35 @@ abstract class GithubPackage {
 		if (!empty($matches)) {
 			return $matches[0];
 		}
+	}
+
+	/**
+	 * Calculate the time left to reset the GitHub API rate limit.
+	 *
+	 * @param string $resetTime The reset time in UTC epoch seconds.
+	 *
+	 * @return string The time left to reset the rate limit in a human-readable format.
+	 */
+	private function calculateTimeToApiRateLimitReset($resetTime) {
+		// Create new DateTime objects for the reset time and the current time.
+		$reset_time = new \DateTime("@$resetTime");
+		$current_time = new \DateTime("now");
+
+		// Get the difference between the 2 times.
+		$timeDifference = $reset_time->diff($current_time);
+
+		// Get the difference in minutes and seconds.
+		// The DateInterval object has many properties, including minutes and seconds,
+		// which we can directly access.
+		$mins = $timeDifference->i;
+		$secs = $timeDifference->s;
+
+		// Format the minutes and seconds into a human-readable string.
+		// If the minutes or seconds equals 1, we need to use the singular form
+		// of "minute" or "second".
+		$minsTxt = $mins === 1 ? "$mins minute" : "$mins minutes";
+		$secsTxt = $secs === 1 ? "$secs second" : "$secs seconds";
+
+		return "$minsTxt and $secsTxt";
 	}
 }
