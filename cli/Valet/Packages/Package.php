@@ -35,6 +35,14 @@ abstract class Package {
 	 */
 	protected $packageName;
 
+	/**
+	 * @var string The name of the package executable.
+	 *
+	 * Optionally used to specify the name of the executable file
+	 * if it differs from the package name.
+	 */
+	protected $packageExeName;
+
 	public function __construct(CommandLine $cli, Filesystem $files) {
 		$this->cli = $cli;
 		$this->files = $files;
@@ -164,7 +172,8 @@ abstract class Package {
 	 * @return string
 	 */
 	public function packageExe(): string {
-		return $this->packagePath() . "/$this->packageName.exe";
+		$name = $this->packageExeName ?: $this->packageName;
+		return $this->packagePath() . "/$name.exe";
 	}
 
 	/**
