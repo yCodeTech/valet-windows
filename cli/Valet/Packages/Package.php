@@ -189,16 +189,38 @@ abstract class Package {
 	 * Clean up the package directory that was downloaded and unzipped.
 	 * Remove all unnecessary directories and files.
 	 *
-	 * @param array $unnecessaryDirsToRemove
+	 * @param string $requiredDir The name of the required directory to keep.
+	 * If empty, no directories will be removed.
+	 * @param array $searchStrings An array of strings to search for in the filenames.
+	 * If empty, no files will be removed.
 	 *
 	 * @return void
 	 */
-	protected function cleanUpPackageDirectory($requiredDir = "") {
-		// For each unnecessary directory in the package directory...
-		foreach ($this->getUnnecessaryDirs($requiredDir) as $dir) {
+	protected function cleanUpPackageDirectory($requiredDir = "", $searchStrings = []) {
+
+		/** Remove unnecessary directories **/
+
+		// If the required directory is not empty...
+		if (!empty($requiredDir)) {
+			// For each unnecessary directory in the package directory...
+			foreach ($this->getUnnecessaryDirs($requiredDir) as $dir) {
 			// Remove all unnecessary directories and their files.
-			$this->files->unlink($this->packagePath() . "/$dir");
+				$this->files->unlink($this->packagePath() . "/$dir");
+			}
 		}
+
+		/** Remove unnecessary files **/
+
+		// If the search strings array is not empty...
+		if (!count($searchStrings) != 0) {
+			// For each unnecessary file in the package directory...
+			foreach ($this->getUnnecessaryFiles($searchStrings) as $file) {
+				// Remove the file.
+				$this->files->unlink($this->packagePath() . "/$file");
+			}
+		}
+
+		/** Remove the zip file **/
 
 		$this->removeZip();
 	}
@@ -215,6 +237,23 @@ abstract class Package {
 			// If the directory name contains the required directory name, then we remove
 			// it from the collection of unnecessary directories that we want to delete.
 			return str_contains($dir, $requiredDir);
+		})->all();
+	}
+
+	/**
+	 * Get the unnecessary files by a search string to remove in the package directory.
+	 *
+	 * @param array $searchStrings Strings to search for in the filenames.
+	 *
+	 * @return array
+	 */
+	protected function getUnnecessaryFiles(array $searchStrings): array {
+		return collect($this->files->scandir($this->packagePath()))->filter(function ($file) use ($searchStrings) {
+			foreach ($searchStrings as $string) {
+				// If the filename contains the string, then we add it to the
+				// collection of unnecessary files that we want to delete.
+				return str_contains($file, $string);
+			}
 		})->all();
 	}
 
