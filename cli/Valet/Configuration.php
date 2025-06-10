@@ -26,6 +26,8 @@ class Configuration {
 	 * @return void
 	 */
 	public function install() {
+		$this->createDirectories();
+
 		$this->createConfigurationDirectory();
 		$this->createDriversDirectory();
 		$this->createSitesDirectory();
@@ -35,9 +37,19 @@ class Configuration {
 		$this->createServicesDirectory();
 		$this->createXdebugDirectory();
 		$this->createEmergencyUninstallDirectory();
+
 		$this->writeBaseConfiguration();
 
 		$this->files->chown($this->path(), user());
+	}
+
+	/**
+	 * Create the Valet configuration directories.
+	 *
+	 * @return void
+	 */
+	public function createDirectories() {
+
 	}
 
 	/**
