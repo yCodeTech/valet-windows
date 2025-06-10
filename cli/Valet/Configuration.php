@@ -27,17 +27,6 @@ class Configuration {
 	 */
 	public function install() {
 		$this->createDirectories();
-
-		$this->createConfigurationDirectory();
-		$this->createDriversDirectory();
-		$this->createSitesDirectory();
-		$this->createExtensionsDirectory();
-		$this->createLogDirectory();
-		$this->createCertificatesDirectory();
-		$this->createServicesDirectory();
-		$this->createXdebugDirectory();
-		$this->createEmergencyUninstallDirectory();
-
 		$this->writeBaseConfiguration();
 
 		$this->files->chown($this->path(), user());
@@ -49,7 +38,15 @@ class Configuration {
 	 * @return void
 	 */
 	public function createDirectories() {
-
+		$this->createConfigurationDirectory();
+		$this->createDriversDirectory();
+		$this->createSitesDirectory();
+		$this->createExtensionsDirectory();
+		$this->createLogDirectory();
+		$this->createCertificatesDirectory();
+		$this->createServicesDirectory();
+		$this->createXdebugDirectory();
+		$this->createEmergencyUninstallDirectory();
 	}
 
 	/**
