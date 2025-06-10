@@ -38,27 +38,43 @@ class Configuration {
 	 * @return void
 	 */
 	public function createDirectories() {
+		// Create the .config directory and the Valet home directory if they don't exist.
 		$this->createConfigurationDirectory();
+
+		// Create the directories within the Valet home directory.
+		$this->createCertificatesDirectory();
 		$this->createDriversDirectory();
-		$this->createSitesDirectory();
+		$this->createEmergencyUninstallDirectory();
 		$this->createExtensionsDirectory();
 		$this->createLogDirectory();
-		$this->createCertificatesDirectory();
-		$this->createServicesDirectory();
-		$this->createXdebugDirectory();
-		$this->createEmergencyUninstallDirectory();
 		$this->createNginxDirectory();
+		$this->createServicesDirectory();
+		$this->createSitesDirectory();
+		$this->createXdebugDirectory();
 	}
 
 	/**
-	 * Create the Valet configuration directory.
+	 * Create the `~\.config` directory and the Valet configuration directory (`~\.config\valet`).
 	 *
 	 * @return void
 	 */
 	public function createConfigurationDirectory() {
+		// Create the `.config` directory if it doesn't exist.
+
 		// The preg_replace gets "C:/Users/Username/.config"
 		$this->files->ensureDirExists(preg_replace('~/valet$~', '', $this->valetHomePath()), user());
+
+		// Create the Valet home directory if it doesn't exist.
 		$this->files->ensureDirExists($this->valetHomePath(), user());
+	}
+
+	/**
+	 * Create the directory for SSL/TLS certificates.
+	 *
+	 * @return void
+	 */
+	public function createCertificatesDirectory() {
+		$this->files->ensureDirExists($this->valetHomePath('Certificates'), user());
 	}
 
 	/**
@@ -82,12 +98,12 @@ class Configuration {
 	}
 
 	/**
-	 * Create the Valet sites directory.
+	 * Create the directory for the Emergency Uninstall files.
 	 *
 	 * @return void
 	 */
-	public function createSitesDirectory() {
-		$this->files->ensureDirExists($this->valetHomePath('Sites'), user());
+	public function createEmergencyUninstallDirectory() {
+		$this->files->ensureDirExists($this->valetHomePath('Emergency Uninstall'), user());
 	}
 
 	/**
@@ -111,12 +127,12 @@ class Configuration {
 	}
 
 	/**
-	 * Create the directory for SSL/TLS certificates.
+	 * Create the directory for the site-specific Nginx server config files.
 	 *
 	 * @return void
 	 */
-	public function createCertificatesDirectory() {
-		$this->files->ensureDirExists($this->valetHomePath('Certificates'), user());
+	public function createNginxDirectory() {
+		$this->files->ensureDirExists($this->valetHomePath('Nginx'), user());
 	}
 
 	/**
@@ -129,30 +145,21 @@ class Configuration {
 	}
 
 	/**
+	 * Create the Valet sites directory.
+	 *
+	 * @return void
+	 */
+	public function createSitesDirectory() {
+		$this->files->ensureDirExists($this->valetHomePath('Sites'), user());
+	}
+
+	/**
 	 * Create the directory for the Xdebug profiler.
 	 *
 	 * @return void
 	 */
 	public function createXdebugDirectory() {
 		$this->files->ensureDirExists($this->valetHomePath('Xdebug'), user());
-	}
-
-	/**
-	 * Create the directory for the Emergency Uninstall files.
-	 *
-	 * @return void
-	 */
-	public function createEmergencyUninstallDirectory() {
-		$this->files->ensureDirExists($this->valetHomePath('Emergency Uninstall'), user());
-	}
-
-	/**
-	 * Create the directory for the site-specific Nginx server config files.
-	 *
-	 * @return void
-	 */
-	public function createNginxDirectory() {
-		$this->files->ensureDirExists($this->valetHomePath('Nginx'), user());
 	}
 
 	/**
