@@ -66,7 +66,7 @@ $app->command('install [--xdebug]', function ($input, $output, $xdebug) {
 		}
 	}
 
-	$maxItems = $xdebug ? 7 : 6;
+	$maxItems = $xdebug ? 8 : 7;
 	$progressBar = progressbar($maxItems, "Installing");
 	sleep(1);
 
@@ -105,6 +105,11 @@ $app->command('install [--xdebug]', function ($input, $output, $xdebug) {
 	$progressBar->setMessage("Ansicon", "placeholder");
 	$progressBar->advance();
 	Ansicon::install();
+	sleep(1);
+
+	$progressBar->setMessage("Emergency Uninstall Files", "placeholder");
+	$progressBar->advance();
+	Valet::createEmergencyUninstallFiles();
 	sleep(1);
 
 	$progressBar->finish();
