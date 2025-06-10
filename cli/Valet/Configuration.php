@@ -47,6 +47,7 @@ class Configuration {
 		$this->createServicesDirectory();
 		$this->createXdebugDirectory();
 		$this->createEmergencyUninstallDirectory();
+		$this->createNginxDirectory();
 	}
 
 	/**
@@ -135,6 +136,7 @@ class Configuration {
 	public function createXdebugDirectory() {
 		$this->files->ensureDirExists($this->valetHomePath('Xdebug'), user());
 	}
+
 	/**
 	 * Create the directory for the Emergency Uninstall files.
 	 *
@@ -142,6 +144,15 @@ class Configuration {
 	 */
 	public function createEmergencyUninstallDirectory() {
 		$this->files->ensureDirExists($this->valetHomePath('Emergency Uninstall'), user());
+	}
+
+	/**
+	 * Create the directory for the site-specific Nginx server config files.
+	 *
+	 * @return void
+	 */
+	public function createNginxDirectory() {
+		$this->files->ensureDirExists($this->valetHomePath('Nginx'), user());
 	}
 
 	/**
