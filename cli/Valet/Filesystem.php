@@ -21,6 +21,7 @@ class Filesystem {
 	 * @param string $path
 	 * @param string|null $owner
 	 * @param int $mode
+	 *
 	 * @return void
 	 */
 	public function mkdir($path, $owner = null, $mode = 0755) {
@@ -29,6 +30,18 @@ class Filesystem {
 		if ($owner) {
 			$this->chown($path, $owner);
 		}
+	}
+
+	/**
+	 * Create a directory as the non-root user.
+	 *
+	 * @param string $path
+	 * @param int $mode
+	 *
+	 * @return void
+	 */
+	public function mkdirAsUser($path, $mode = 0755) {
+		$this->mkdir($path, user(), $mode);
 	}
 
 	/**
@@ -43,17 +56,6 @@ class Filesystem {
 		if (!$this->isDir($path)) {
 			$this->mkdir($path, $owner, $mode);
 		}
-	}
-
-	/**
-	 * Create a directory as the non-root user.
-	 *
-	 * @param string $path
-	 * @param int $mode
-	 * @return void
-	 */
-	public function mkdirAsUser($path, $mode = 0755) {
-		$this->mkdir($path, user(), $mode);
 	}
 
 	/**
@@ -337,7 +339,7 @@ class Filesystem {
 
 		// Remove all the junction links and create new symlinks to the same path.
 		$collection->each(function ($link) use ($path) {
-			$output = CommandLine::run('cmd /C rmdir /s /q "' . $path . '/' . $link['linkName']. '"');
+			$output = CommandLine::run('cmd /C rmdir /s /q "' . $path . '/' . $link['linkName'] . '"');
 
 			if ($output->isSuccessful()) {
 				$this->symlink($link['path'], $link['linkName']);
@@ -492,7 +494,7 @@ class Filesystem {
 	 * @return string
 	 */
 	public function getStub($filename) {
-		$default = __DIR__.'/../stubs/'.$filename;
+		$default = __DIR__ . '/../stubs/' . $filename;
 
 		$custom = Valet::homePath() . "/stubs/$filename";
 
