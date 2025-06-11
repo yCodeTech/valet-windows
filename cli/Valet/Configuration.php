@@ -42,6 +42,7 @@ class Configuration {
 		$this->createConfigurationDirectory();
 
 		// Create the directories within the Valet home directory.
+		$this->createCaDirectory();
 		$this->createCertificatesDirectory();
 		$this->createDriversDirectory();
 		$this->createEmergencyUninstallDirectory();
@@ -66,6 +67,15 @@ class Configuration {
 
 		// Create the Valet home directory if it doesn't exist.
 		$this->files->ensureDirExists($this->valetHomePath(), user());
+	}
+
+	/**
+	 * Create the directory for the Valet self-signed Certificate Authority (CA) certificates.
+	 *
+	 * @return void
+	 */
+	public function createCaDirectory() {
+		$this->files->ensureDirExists($this->valetHomePath('CA'), user());
 	}
 
 	/**
