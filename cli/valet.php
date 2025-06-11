@@ -930,7 +930,7 @@ if (is_dir(Valet::homePath()) && Nginx::isInstalled()) {
 			return warning("Please provide your ngrok authtoken.");
 		}
 
-		Ngrok::run("authtoken $token " . Ngrok::getNgrokConfig());
+		Ngrok::run("authtoken $token " . Ngrok::getConfig());
 
 	})->setAliases(["auth"])->descriptions('Set the ngrok auth token', [
 		"token" => "Your personal ngrok authtoken"
