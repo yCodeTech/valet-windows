@@ -20,13 +20,13 @@ class Ansicon extends GithubPackage {
 	public function install() {
 		if (!$this->isInstalled()) {
 			$ansiconPath = $this->packagePath();
-			$zipFilePath = "$ansiconPath/ansicon.zip";
+			$zipFilePath = $this->packageZipFilePath();
 
 			$this->files->ensureDirExists($ansiconPath);
 
 			$this->download('https://api.github.com/repos/adoxa/ansicon/releases/latest', 'ansi189-bin.zip', $zipFilePath);
 
-			$this->files->unzip($zipFilePath, $ansiconPath);
+			$this->unzip();
 
 			// Get the contents of the readme.txt file.
 			$readmeContents = $this->files->get("$ansiconPath/readme.txt");
@@ -34,7 +34,7 @@ class Ansicon extends GithubPackage {
 			$this->moveFiles("x64");
 
 			// Clean up the package directory.
-			$this->cleanUpPackageDirectory($zipFilePath, "x64");
+			$this->cleanUpPackageDirectory("x64");
 
 			// Create a readme.md file with the contents of the readme.txt file.
 			// This is just for easier reading.
