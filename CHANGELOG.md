@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
--   Added support for Laravel 12 in PR #25
+-   Added support for Laravel 12 in PR [#25](https://github.com/yCodeTech/valet-windows/pull/25).
 
 ## [3.2.0](https://github.com/yCodeTech/valet-windows/tree/v3.2.0) - 2025-05-14
 
