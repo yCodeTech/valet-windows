@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/yCodeTech/valet-windows/tree/master)
 
+## [3.2.1](https://github.com/yCodeTech/valet-windows/tree/v3.2.0) - 2025-08-03
+
+### Added
+
+-   Added support for Laravel 12 in PR [#25](https://github.com/yCodeTech/valet-windows/pull/25).
+
 ## [3.2.0](https://github.com/yCodeTech/valet-windows/tree/v3.2.0) - 2025-05-14
 
 This is a large [Release PR](https://github.com/yCodeTech/valet-windows/pull/18) that adds new `php:proxy` and `share-tool` commands, lots of refactoring for improved maintainability, dynamically downloading the latest versions of the required executables from GitHub, and brings a lot of the code inline with macOS Valet. For the full changelog please view the PR commits.
