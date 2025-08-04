@@ -111,6 +111,23 @@ class Nginx {
 	}
 
 	/**
+	 * Install the Nginx configuration directory to the ~/.config/valet directory.
+	 *
+	 * This directory contains all site-specific Nginx servers.
+	 *
+	 * @return void
+	 */
+	public function installNginxDirectory() {
+		if (!$this->files->isDir($nginxDirectory = Valet::homePath('Nginx'))) {
+			$this->files->mkdirAsUser($nginxDirectory);
+		}
+
+		$this->files->putAsUser($nginxDirectory . '/.keep', "\n");
+
+		$this->rewriteNginxFiles();
+	}
+
+	/**
 	 * Check nginx.conf and all linked site configurations for errors.
 	 */
 	public function lint($returnOutput = false) {
@@ -145,10 +162,11 @@ class Nginx {
 	 *
 	 * @return void
 	 */
-	public function rewriteSecureNginxFiles() {
+	public function rewriteNginxFiles() {
 		$tld = $this->configuration->read()['tld'];
 
 		$this->site->resecureForNewTld($tld, $tld);
+		$this->site->reisolateForNewTld($tld, $tld);
 	}
 
 	/**
