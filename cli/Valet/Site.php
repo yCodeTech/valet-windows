@@ -366,8 +366,6 @@ class Site {
 		$php = $this->config->getPhpByVersion($phpVersion);
 
 		$this->installSiteConfig($site, $php['version']);
-
-		info("The site [$site] is now using $phpVersion.");
 	}
 
 	/**
@@ -393,8 +391,6 @@ class Site {
 			// When site doesn't have SSL/TLS, we can remove the custom nginx config file to remove isolation
 			$this->files->unlink($this->nginxPath($site));
 		}
-
-		info(sprintf('The site [%s] is now using the default PHP version.', $site));
 	}
 
 	/**

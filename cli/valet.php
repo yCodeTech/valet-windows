@@ -464,6 +464,7 @@ if (is_dir(Valet::homePath()) && Nginx::isInstalled()) {
 
 		if ($isolate) {
 			Site::isolate($isolate, $name);
+			info("The site [$name] is now using $isolate.");
 
 			info('Restarting Nginx...');
 			Nginx::restart();
@@ -507,6 +508,7 @@ if (is_dir(Valet::homePath()) && Nginx::isInstalled()) {
 
 		if (Site::isIsolated($name) === true) {
 			Site::unisolate($name);
+			info(sprintf('The site [%s] is now using the default PHP version.', $name));
 		}
 
 		if (Site::isSecured($name) === true) {
@@ -734,8 +736,10 @@ if (is_dir(Valet::homePath()) && Nginx::isInstalled()) {
 
 		// If $site is empty, then isolate the current working directory.
 		if (!$site) {
+
 			info("Isolating the current working directory...");
 			Site::isolate($phpVersion, $site);
+			info("The current working directory is now using $phpVersion.");
 
 			info('Restarting Nginx...');
 			Nginx::restart();
@@ -746,6 +750,7 @@ if (is_dir(Valet::homePath()) && Nginx::isInstalled()) {
 		// Loop through the sites array and isolate each one.
 		foreach ($site as $sitename) {
 			Site::isolate($phpVersion, $sitename);
+			info("The site [$sitename] is now using $phpVersion.");
 		}
 		info('Restarting Nginx...');
 		Nginx::restart();
@@ -783,6 +788,7 @@ if (is_dir(Valet::homePath()) && Nginx::isInstalled()) {
 
 			foreach ($isolated as $array) {
 				Site::unisolate($array["site"]);
+				info(sprintf('The site [%s] is now using the default PHP version.', $array["site"]));
 			}
 
 			info('Restarting Nginx...');
@@ -796,6 +802,7 @@ if (is_dir(Valet::homePath()) && Nginx::isInstalled()) {
 		}
 
 		Site::unisolate($site);
+		info(sprintf('The site [%s] is now using the default PHP version.', $site));
 
 		info('Restarting Nginx...');
 		Nginx::restart();
