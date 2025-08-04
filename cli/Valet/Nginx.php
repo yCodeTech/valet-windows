@@ -93,11 +93,13 @@ class Nginx {
 
 		$this->files->ensureDirExists($this->path('valet'));
 
+		$valetErrorTemplatePath = $this->files->realpath(valetBinPath(). '../cli/templates');
+
 		$this->files->putAsUser(
 			$this->path('valet/valet.conf'),
 			str_replace(
-				['VALET_HOME_PATH', 'VALET_SERVER_PATH', 'VALET_STATIC_PREFIX', 'HOME_PATH', 'VALET_PHP_PORT'],
-				[Valet::homePath(), VALET_SERVER_PATH, VALET_STATIC_PREFIX, $_SERVER['HOME'], $defaultPhp['port']],
+				['VALET_HOME_PATH', 'VALET_SERVER_PATH', 'VALET_STATIC_PREFIX', 'HOME_PATH', 'VALET_PHP_PORT', 'VALET_ERROR_TEMPLATE_PATH'],
+				[Valet::homePath(), VALET_SERVER_PATH, VALET_STATIC_PREFIX, $_SERVER['HOME'], $defaultPhp['port'], $valetErrorTemplatePath],
 				$this->files->getStub('valet.conf')
 			)
 		);
