@@ -124,7 +124,7 @@ class Nginx {
 
 		$this->files->putAsUser($nginxDirectory . '/.keep', "\n");
 
-		$this->rewriteSecureNginxFiles();
+		$this->rewriteNginxFiles();
 	}
 
 	/**
@@ -162,10 +162,11 @@ class Nginx {
 	 *
 	 * @return void
 	 */
-	public function rewriteSecureNginxFiles() {
+	public function rewriteNginxFiles() {
 		$tld = $this->configuration->read()['tld'];
 
 		$this->site->resecureForNewTld($tld, $tld);
+		$this->site->reisolateForNewTld($tld, $tld);
 	}
 
 	/**
