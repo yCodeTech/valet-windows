@@ -59,7 +59,7 @@ class Nginx {
 		// Install the Nginx configs, server, and service.
 		$this->installConfiguration();
 		$this->installServer();
-		$this->rewriteSecureNginxFiles();
+		$this->rewriteNginxFiles();
 		$this->installService();
 	}
 
@@ -108,23 +108,6 @@ class Nginx {
 			$this->path() . '/conf/fastcgi_params',
 			$this->files->getStub('fastcgi_params')
 		);
-	}
-
-	/**
-	 * Install the Nginx configuration directory to the ~/.config/valet directory.
-	 *
-	 * This directory contains all site-specific Nginx servers.
-	 *
-	 * @return void
-	 */
-	public function installNginxDirectory() {
-		if (!$this->files->isDir($nginxDirectory = Valet::homePath('Nginx'))) {
-			$this->files->mkdirAsUser($nginxDirectory);
-		}
-
-		$this->files->putAsUser($nginxDirectory . '/.keep', "\n");
-
-		$this->rewriteNginxFiles();
 	}
 
 	/**
