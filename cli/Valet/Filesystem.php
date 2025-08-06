@@ -263,8 +263,19 @@ class Filesystem {
 	 * @param string $path
 	 * @return string
 	 */
-	public function realpath($path) {
-		return realpath($path);
+	public function realpath($path, $normalise = true) {
+		$realPath = realpath($path);
+		return $normalise ? $this->normalisePath($realPath) : $realPath;
+	}
+
+	/**
+	 * Normalise the given path by replacing backslashes with forward slashes.
+	 *
+	 * @param string $path
+	 * @return string
+	 */
+	public function normalisePath($path) {
+		return str_replace('\\', '/', $path);
 	}
 
 	/**
