@@ -366,8 +366,6 @@ class Site {
 		$php = $this->config->getPhpByVersion($phpVersion);
 
 		$this->installSiteConfig($site, $php['version']);
-
-		info("The site [$site] is now using $phpVersion.");
 	}
 
 	/**
@@ -393,8 +391,6 @@ class Site {
 			// When site doesn't have SSL/TLS, we can remove the custom nginx config file to remove isolation
 			$this->files->unlink($this->nginxPath($site));
 		}
-
-		info(sprintf('The site [%s] is now using the default PHP version.', $site));
 	}
 
 	/**
@@ -927,10 +923,11 @@ class Site {
 			$siteConf = $this->files->get($this->nginxPath($valetSite));
 		}
 		else {
+			$valetErrorTemplatePath = $this->files->realpath(valetBinPath(). '../cli/templates');
 			$siteConf = $this->files->getStub('unsecure.valet.conf');
 			$siteConf = str_replace(
-				['VALET_HOME_PATH', 'VALET_SERVER_PATH', 'VALET_STATIC_PREFIX', 'VALET_SITE', 'HOME_PATH'],
-				[$this->valetHomePath(), VALET_SERVER_PATH, VALET_STATIC_PREFIX, $valetSite, $_SERVER['HOME']],
+				['VALET_HOME_PATH', 'VALET_SERVER_PATH', 'VALET_STATIC_PREFIX', 'VALET_SITE', 'HOME_PATH', 'VALET_ERROR_TEMPLATE_PATH'],
+				[$this->valetHomePath(), VALET_SERVER_PATH, VALET_STATIC_PREFIX, $valetSite, $_SERVER['HOME'], $valetErrorTemplatePath],
 				$siteConf
 			);
 		}
@@ -954,9 +951,11 @@ class Site {
 
 		$path = $this->certificatesPath();
 
+		$valetErrorTemplatePath = $this->files->realpath(valetBinPath(). '../cli/templates');
+
 		return str_replace(
-			['VALET_HOME_PATH', 'VALET_SERVER_PATH', 'VALET_STATIC_PREFIX', 'VALET_SITE', 'VALET_CERT', 'VALET_KEY', 'HOME_PATH'],
-			[$this->valetHomePath(), VALET_SERVER_PATH, VALET_STATIC_PREFIX, $url, $path . '/' . $url . '.crt', $path . '/' . $url . '.key', $_SERVER['HOME']],
+			['VALET_HOME_PATH', 'VALET_SERVER_PATH', 'VALET_STATIC_PREFIX', 'VALET_SITE', 'VALET_CERT', 'VALET_KEY', 'HOME_PATH', 'VALET_ERROR_TEMPLATE_PATH'],
+			[$this->valetHomePath(), VALET_SERVER_PATH, VALET_STATIC_PREFIX, $url, $path . '/' . $url . '.crt', $path . '/' . $url . '.key', $_SERVER['HOME'], $valetErrorTemplatePath],
 			$siteConf
 		);
 	}
@@ -1003,9 +1002,11 @@ class Site {
 			$stub = $secure ? 'secure.proxy.valet.conf' : 'proxy.valet.conf';
 			$siteConf = $this->files->getStub($stub);
 
+			$valetErrorTemplatePath = $this->files->realpath(valetBinPath(). '../cli/templates');
+
 			$siteConf = str_replace(
-				['VALET_HOME_PATH', 'VALET_SERVER_PATH', 'VALET_STATIC_PREFIX', 'VALET_SITE', 'VALET_PROXY_HOST'],
-				[$this->valetHomePath(), VALET_SERVER_PATH, VALET_STATIC_PREFIX, $proxyUrl, $host],
+				['VALET_HOME_PATH', 'VALET_SERVER_PATH', 'VALET_STATIC_PREFIX', 'VALET_SITE', 'VALET_PROXY_HOST', 'VALET_ERROR_TEMPLATE_PATH'],
+				[$this->valetHomePath(), VALET_SERVER_PATH, VALET_STATIC_PREFIX, $proxyUrl, $host, $valetErrorTemplatePath],
 				$siteConf
 			);
 
