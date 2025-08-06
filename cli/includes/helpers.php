@@ -64,7 +64,7 @@ function warning($output) {
  * Output errors to the console.
  *
  * @param string $output
- * @param boolean $exception Optionally pass a boolean to indicate whether to throw an exception. If `true`, the error will be thrown as a `ValetException`. [default: `false`]
+ * @param bool $exception Optionally pass a boolean to indicate whether to throw an exception. If `true`, the error will be thrown as a `ValetException`. [default: `false`]
  *
  * @throws RuntimeException
  * @throws ValetException

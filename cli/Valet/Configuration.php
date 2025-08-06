@@ -26,35 +26,65 @@ class Configuration {
 	 * @return void
 	 */
 	public function install() {
-		$this->createConfigurationDirectory();
-		$this->createDriversDirectory();
-		$this->createSitesDirectory();
-		$this->createExtensionsDirectory();
-		$this->createLogDirectory();
-		$this->createCertificatesDirectory();
-		$this->createServicesDirectory();
-		$this->createXdebugDirectory();
+		$this->createDirectories();
 		$this->writeBaseConfiguration();
-
-		// Copy the emergency stop and uninstall services script to the Valet home
-		// directory for safe keeping.
-		$this->files->copy(
-			realpath(__DIR__ . '/../../emergency_uninstall_services.bat'),
-			$this->valetHomePath("emergency_uninstall_services.bat")
-		);
 
 		$this->files->chown($this->path(), user());
 	}
 
 	/**
-	 * Create the Valet configuration directory.
+	 * Create the Valet configuration directories.
+	 *
+	 * @return void
+	 */
+	public function createDirectories() {
+		// Create the .config directory and the Valet home directory if they don't exist.
+		$this->createConfigurationDirectory();
+
+		// Create the directories within the Valet home directory.
+		$this->createCaDirectory();
+		$this->createCertificatesDirectory();
+		$this->createDriversDirectory();
+		$this->createEmergencyUninstallDirectory();
+		$this->createExtensionsDirectory();
+		$this->createLogDirectory();
+		$this->createNginxDirectory();
+		$this->createServicesDirectory();
+		$this->createSitesDirectory();
+		$this->createXdebugDirectory();
+	}
+
+	/**
+	 * Create the `~\.config` directory and the Valet configuration directory (`~\.config\valet`).
 	 *
 	 * @return void
 	 */
 	public function createConfigurationDirectory() {
+		// Create the `.config` directory if it doesn't exist.
+
 		// The preg_replace gets "C:/Users/Username/.config"
 		$this->files->ensureDirExists(preg_replace('~/valet$~', '', $this->valetHomePath()), user());
+
+		// Create the Valet home directory if it doesn't exist.
 		$this->files->ensureDirExists($this->valetHomePath(), user());
+	}
+
+	/**
+	 * Create the directory for the Valet self-signed Certificate Authority (CA) certificates.
+	 *
+	 * @return void
+	 */
+	public function createCaDirectory() {
+		$this->files->ensureDirExists($this->valetHomePath('CA'), user());
+	}
+
+	/**
+	 * Create the directory for SSL/TLS certificates.
+	 *
+	 * @return void
+	 */
+	public function createCertificatesDirectory() {
+		$this->files->ensureDirExists($this->valetHomePath('Certificates'), user());
 	}
 
 	/**
@@ -78,12 +108,12 @@ class Configuration {
 	}
 
 	/**
-	 * Create the Valet sites directory.
+	 * Create the directory for the Emergency Uninstall files.
 	 *
 	 * @return void
 	 */
-	public function createSitesDirectory() {
-		$this->files->ensureDirExists($this->valetHomePath('Sites'), user());
+	public function createEmergencyUninstallDirectory() {
+		$this->files->ensureDirExists($this->valetHomePath('Emergency Uninstall'), user());
 	}
 
 	/**
@@ -107,12 +137,12 @@ class Configuration {
 	}
 
 	/**
-	 * Create the directory for SSL/TLS certificates.
+	 * Create the directory for the site-specific Nginx server config files.
 	 *
 	 * @return void
 	 */
-	public function createCertificatesDirectory() {
-		$this->files->ensureDirExists($this->valetHomePath('Certificates'), user());
+	public function createNginxDirectory() {
+		$this->files->ensureDirExists($this->valetHomePath('Nginx'), user());
 	}
 
 	/**
@@ -122,6 +152,15 @@ class Configuration {
 	 */
 	public function createServicesDirectory() {
 		$this->files->ensureDirExists($this->valetHomePath('Services'), user());
+	}
+
+	/**
+	 * Create the Valet sites directory.
+	 *
+	 * @return void
+	 */
+	public function createSitesDirectory() {
+		$this->files->ensureDirExists($this->valetHomePath('Sites'), user());
 	}
 
 	/**
@@ -234,7 +273,7 @@ class Configuration {
 	 * Determine if the given PHP version is the alias.
 	 *
 	 * @param string $phpVersion
-	 * @return boolean
+	 * @return bool
 	 */
 	public function isPhpAlias($phpVersion) {
 		$php = $this->getPhpByVersion($phpVersion);
