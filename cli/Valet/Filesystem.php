@@ -261,6 +261,7 @@ class Filesystem {
 	 * Resolve the given path.
 	 *
 	 * @param string $path
+	 * @param bool $normalise Whether to normalise the path by replacing backslashes with forward slashes.
 	 * @return string
 	 */
 	public function realpath($path, $normalise = true) {
