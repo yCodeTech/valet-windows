@@ -33,6 +33,9 @@ class Acrylic {
 	 * @return void
 	 */
 	public function install(string $tld = 'test') {
+		// Install the Acrylic package if it is not already installed.
+		resolve(Packages\Acrylic::class)->install();
+		// Install the Acrylic service and hosts file.
 		$this->createHostsFile($tld);
 		$this->installService();
 	}
