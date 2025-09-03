@@ -1,24 +1,21 @@
 <?php
 
-namespace Valet\Drivers\Custom;
+namespace Valet\Drivers\Specific;
 
 use Valet\Drivers\ValetDriver;
 
-class SampleValetDriver extends ValetDriver {
+class ContaoValetDriver extends ValetDriver {
 	/**
 	 * Determine if the driver serves the request.
 	 *
 	 * @param string $sitePath
 	 * @param string $siteName
 	 * @param string $uri
+	 *
 	 * @return bool
 	 */
 	public function serves($sitePath, $siteName, $uri) {
-		// if (file_exists("$sitePath/file-that-identifies-my-framework")) {
-		//     return true;
-		// }
-
-		return false;
+		return is_dir("{$sitePath}/vendor/contao") && file_exists("{$sitePath}/web/app.php");
 	}
 
 	/**
@@ -27,10 +24,11 @@ class SampleValetDriver extends ValetDriver {
 	 * @param string $sitePath
 	 * @param string $siteName
 	 * @param string $uri
+	 *
 	 * @return string|false
 	 */
 	public function isStaticFile($sitePath, $siteName, $uri) {
-		if (file_exists($staticFilePath = "$sitePath/public/$uri")) {
+		if ($this->isActualFile($staticFilePath = "{$sitePath}/web{$uri}")) {
 			return $staticFilePath;
 		}
 
@@ -43,9 +41,21 @@ class SampleValetDriver extends ValetDriver {
 	 * @param string $sitePath
 	 * @param string $siteName
 	 * @param string $uri
+	 *
 	 * @return string
 	 */
 	public function frontControllerPath($sitePath, $siteName, $uri) {
-		return "$sitePath/public/index.php";
+		if ($uri === '/install.php') {
+			return "{$sitePath}/web/install.php";
+		}
+
+		if (strncmp($uri, '/app_dev.php', 12) === 0) {
+			$_SERVER['SCRIPT_NAME'] = '/app_dev.php';
+			$_SERVER['SCRIPT_FILENAME'] = "{$sitePath}/app_dev.php";
+
+			return "{$sitePath}/web/app_dev.php";
+		}
+
+		return "{$sitePath}/web/app.php";
 	}
 }
