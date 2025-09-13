@@ -1655,6 +1655,10 @@ Upon installation, Valet creates the following directories and config files:
 
     If the WMI error does occur, try running the command again. If different WMI errors occur, please submit an issue with all relevant details.
 
+-   If there is a large error and it's file trace output to the terminal, the top of the error may be cut off/overwritten. Apparently Symfony can only write to the terminal that is viewable, if it goes outside of the viewable area (ie. you need to scroll up to view) then the output is overwritten and the most important part of the error, the description at the start is cut off. (See https://github.com/symfony/symfony/issues/35012). If this happens, make the terminal larger in height and try the command again to try and view the full error.
+
+-   When trying to install Valet after updating via Composer, and you receive this error or similiar: `The system cannot find the path specified`; it could be that Ansicon hasn't uninstalled properly and left it's path in the registry. Because it happens unpredictably, there is no way of debugging or fixing it. The only "workaround" is to use the emergency uninstall script (`emergency_uninstall_services.bat`) in the `C:\Users\Stuart\.config\valet\Emergency Uninstall` directory to allow Ansicon another chance to uninstall itself properly. (See [issue 28](https://github.com/yCodeTech/valet-windows/issues/28)).
+
 ## Xdebug Installation
 
 Valet only installs a specific Xdebug PHP CGI service on a separate port to work alongside the PHP service. To install Xdebug itself, follow the [official guide](https://xdebug.org/docs/install).
