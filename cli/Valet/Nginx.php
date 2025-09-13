@@ -38,7 +38,6 @@ class Nginx {
 	 * @param Configuration $configuration
 	 * @param Site $site
 	 * @param WinSwFactory $winsw
-	 * @return void
 	 */
 	public function __construct(CommandLine $cli, Filesystem $files, Configuration $configuration, Site $site, WinSwFactory $winsw) {
 		$this->cli = $cli;
@@ -50,8 +49,6 @@ class Nginx {
 
 	/**
 	 * Install the configuration files for Nginx.
-	 *
-	 * @return void
 	 */
 	public function install() {
 		// Install the Nginx package if it is not already installed.
@@ -65,8 +62,6 @@ class Nginx {
 
 	/**
 	 * Install the Nginx configuration file.
-	 *
-	 * @return void
 	 */
 	public function installConfiguration() {
 		$defaultPhpVersion = $this->configuration->get('default_php');
@@ -84,8 +79,6 @@ class Nginx {
 
 	/**
 	 * Install the Valet Nginx server configuration file.
-	 *
-	 * @return void
 	 */
 	public function installServer() {
 		$defaultPhpVersion = $this->configuration->get('default_php');
@@ -93,7 +86,7 @@ class Nginx {
 
 		$this->files->ensureDirExists($this->path('valet'));
 
-		$valetErrorTemplatePath = $this->files->realpath(valetBinPath(). '../cli/templates');
+		$valetErrorTemplatePath = $this->files->realpath(valetBinPath() . '../cli/templates');
 
 		$this->files->putAsUser(
 			$this->path('valet/valet.conf'),
@@ -112,6 +105,8 @@ class Nginx {
 
 	/**
 	 * Check nginx.conf and all linked site configurations for errors.
+	 *
+	 * @return string
 	 */
 	public function lint($returnOutput = false) {
 		$output = $this->cli->run(
@@ -142,8 +137,6 @@ class Nginx {
 
 	/**
 	 * Generate fresh Nginx servers for existing secure sites.
-	 *
-	 * @return void
 	 */
 	public function rewriteNginxFiles() {
 		$tld = $this->configuration->read()['tld'];
@@ -154,8 +147,6 @@ class Nginx {
 
 	/**
 	 * Install the Windows service.
-	 *
-	 * @return void
 	 */
 	public function installService() {
 		if ($this->winsw->installed()) {
@@ -171,8 +162,6 @@ class Nginx {
 
 	/**
 	 * Restart the Nginx service.
-	 *
-	 * @return void
 	 */
 	public function restart() {
 		$this->killProcess();
@@ -184,8 +173,6 @@ class Nginx {
 
 	/**
 	 * Stop the Nginx service.
-	 *
-	 * @return void
 	 */
 	public function stop() {
 		$this->killProcess();
@@ -195,8 +182,6 @@ class Nginx {
 
 	/**
 	 * Prepare Nginx for uninstallation.
-	 *
-	 * @return void
 	 */
 	public function uninstall() {
 		$this->killProcess();
@@ -215,6 +200,7 @@ class Nginx {
 	 * Get the Nginx path.
 	 *
 	 * @param string $path
+	 *
 	 * @return string
 	 */
 	public function path(string $path = ''): string {

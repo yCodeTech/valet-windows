@@ -14,7 +14,6 @@ class ProcessOutput {
 	 * Create a new test process instance.
 	 *
 	 * @param \Symfony\Component\Process\Process $process
-	 * @return void
 	 */
 	public function __construct(Process $process) {
 		$this->process = $process;
@@ -50,6 +49,7 @@ class ProcessOutput {
 	 *
 	 * @param string $method
 	 * @param array $args
+	 *
 	 * @return mixed
 	 */
 	public function __call($method, $args) {

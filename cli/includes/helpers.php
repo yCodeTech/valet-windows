@@ -29,7 +29,6 @@ define('VALET_STATIC_PREFIX', '41c270e4-5535-4daa-b23e-c269744c2f45');
  * Output the given text to the console.
  *
  * @param string $output
- * @return void
  */
 function info($output) {
 	output('<info>' . $output . '</info>');
@@ -40,7 +39,6 @@ function info($output) {
  * Output the given array to the console using var_dump.
  *
  * @param string $output
- * @return void
  */
 function info_dump($output) {
 	output('<info>' . var_dump($output) . '</info>');
@@ -50,7 +48,6 @@ function info_dump($output) {
  * Output the given text to the console.
  *
  * @param string $output
- * @return void
  */
 function warning($output) {
 	if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'testing') {
@@ -68,8 +65,6 @@ function warning($output) {
  *
  * @throws RuntimeException
  * @throws ValetException
- *
- * @return void
  */
 function error(string $output, $exception = false) {
 	if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'testing') {
@@ -96,7 +91,6 @@ function error(string $output, $exception = false) {
  * Output the given text to the console.
  *
  * @param string $output
- * @return void
  */
 function output($output) {
 	if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'testing') {
@@ -110,7 +104,6 @@ function output($output) {
  *
  * @param array $headers
  * @param array $rows
- * @return void
  */
 function table(array $headers = [], array $rows = [], $setHorizontal = false, $title = null) {
 	$table = new Table(new ConsoleOutput());
@@ -170,6 +163,8 @@ function changeColumnMaxWidth($table, $headers, $columns, $maxWidth) {
  * Add a table separator inbetween all the rows.
  *
  * @param array $rows The array of rows
+ *
+ * @return mixed
  */
 function addTableSeparator($rows) {
 	/**
@@ -191,6 +186,7 @@ if (!function_exists('resolve')) {
 	 * https://laravel.com/docs/12.x/helpers#method-resolve
 	 *
 	 * @param string $class
+	 *
 	 * @return mixed
 	 */
 	function resolve($class) {
@@ -203,7 +199,6 @@ if (!function_exists('resolve')) {
  *
  * @param string $class
  * @param mixed $instance
- * @return void
  */
 function swap($class, $instance) {
 	Container::getInstance()->instance($class, $instance);
@@ -218,6 +213,7 @@ if (!function_exists('retry')) {
 	 * @param int $retries
 	 * @param callable $fn
 	 * @param int $sleep
+	 *
 	 * @return mixed
 	 */
 	function retry($retries, $fn, $sleep = 0) {
@@ -249,6 +245,7 @@ if (!function_exists('tap')) {
 	 *
 	 * @param mixed $value
 	 * @param callable $callback
+	 *
 	 * @return mixed
 	 */
 	function tap($value, callable $callback) {
@@ -273,6 +270,7 @@ function user() {
 
 /**
  * Get the bin path.
+ *
  * @return string `"c:\Users\Username\AppData\Roaming\Composer\vendor\ycodetech\valet-windows\bin\"`
  */
 function valetBinPath() {
@@ -381,6 +379,7 @@ function getTarExecutable() {
  *
  * @param string $haystack
  * @param array $needles
+ *
  * @return bool
  */
 function str_contains_any($haystack, $needles) {

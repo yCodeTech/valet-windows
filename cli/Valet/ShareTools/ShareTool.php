@@ -34,7 +34,6 @@ abstract class ShareTool {
 	 *
 	 * @param CommandLine $cli
 	 * @param Filesystem $files
-	 * @return void
 	 */
 	public function __construct(CommandLine $cli, Filesystem $files) {
 		$this->cli = $cli;
@@ -76,6 +75,7 @@ abstract class ShareTool {
 
 	/**
 	 * Get the current tunnel URL from the API.
+	 *
 	 * @param string $site The site
 	 *
 	 * @return string The current tunnel URL

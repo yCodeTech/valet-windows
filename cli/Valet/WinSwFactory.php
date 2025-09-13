@@ -18,7 +18,6 @@ class WinSwFactory {
 	 *
 	 * @param CommandLine $cli
 	 * @param Filesystem $files
-	 * @return void
 	 */
 	public function __construct(CommandLine $cli, Filesystem $files) {
 		$this->cli = $cli;
@@ -33,6 +32,7 @@ class WinSwFactory {
 	 *
 	 * @param string $service
 	 * @param string $serviceId
+	 *
 	 * @return WinSW
 	 */
 	public function make(string $service, string $serviceId) {

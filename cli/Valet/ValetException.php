@@ -23,6 +23,7 @@ class ValetException extends Exception {
 	 * Eg.: Inputs error code `0`, outputs error name `"FATAL"`
 	 *
 	 * @param mixed $code The numeric error type/code
+	 *
 	 * @return string The error type name
 	 */
 	private function getErrorTypeName($code) {
