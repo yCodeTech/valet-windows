@@ -44,6 +44,7 @@ class Gsudo extends GithubPackage {
 
 	/**
 	 * Run as the Local System account (NT AUTHORITY\SYSTEM).
+	 *
 	 * @return string
 	 */
 	public function runAsSystem() {
@@ -51,6 +52,7 @@ class Gsudo extends GithubPackage {
 	}
 	/**
 	 * Run as the Trusted Installer account (NT SERVICE\TrustedInstaller).
+	 *
 	 * @return string
 	 */
 	public function runAsTrustedInstaller() {

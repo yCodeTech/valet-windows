@@ -27,7 +27,8 @@ class PhpCgi {
 	 */
 	protected $winswFactory;
 
-	/**@var array
+	/**
+	 * @var array
 	 */
 	protected $phpWinSws;
 
@@ -43,7 +44,6 @@ class PhpCgi {
 	 * @param Filesystem $files
 	 * @param WinSwFactory $winsw
 	 * @param Configuration $configuration
-	 * @return void
 	 */
 	public function __construct(CommandLine $cli, Filesystem $files, WinSwFactory $winswFactory, Configuration $configuration) {
 		$this->cli = $cli;
@@ -68,8 +68,6 @@ class PhpCgi {
 
 	/**
 	 * Install and configure PHP CGI service.
-	 *
-	 * @return void
 	 */
 	public function install($phpVersion = null) {
 		if ($phpVersion) {
@@ -95,8 +93,6 @@ class PhpCgi {
 
 	/**
 	 * Install the Windows service.
-	 *
-	 * @return void
 	 */
 	public function installService($phpVersion, $phpCgiServiceConfig = null, $installConfig = null) {
 		$phpWinSw = $this->phpWinSws[$phpVersion];
@@ -124,8 +120,6 @@ class PhpCgi {
 
 	/**
 	 * Uninstall the PHP CGI service.
-	 *
-	 * @return void
 	 */
 	public function uninstall($phpVersion = null) {
 		if ($phpVersion) {
@@ -150,8 +144,6 @@ class PhpCgi {
 
 	/**
 	 * Install the Windows service.
-	 *
-	 * @return void
 	 */
 	public function uninstallService($phpVersion) {
 		$phpWinSw = $this->phpWinSws[$phpVersion];
@@ -163,8 +155,6 @@ class PhpCgi {
 
 	/**
 	 * Restart the PHP CGI service.
-	 *
-	 * @return void
 	 */
 	public function restart() {
 		foreach ($this->phpWinSws as $phpWinSw) {
@@ -176,8 +166,6 @@ class PhpCgi {
 
 	/**
 	 * Stop the PHP CGI service.
-	 *
-	 * @return void
 	 */
 	public function stop() {
 		foreach ($this->phpWinSws as $phpWinSw) {
@@ -207,6 +195,7 @@ class PhpCgi {
 	 *
 	 * @param string $phpPath The path to the PHP executable.
 	 * @param bool $getExecPath Optional. Determines whether to return the executable path. Default: `false`.
+	 *
 	 * @return string|bool The PHP version or the executable path determined by the `$getExecPath` param, returns `false` on error.
 	 */
 	public function findPhpVersion($phpPath, $getExecPath = false) {
@@ -228,6 +217,7 @@ class PhpCgi {
 
 	/**
 	 * Get the PHP path by version.
+	 *
 	 * @param string $phpVersion
 	 *
 	 * @return string|null The path to the PHP executable.
@@ -248,6 +238,7 @@ class PhpCgi {
 	 * Get the CGI name
 	 *
 	 * @param string $phpVersion
+	 *
 	 * @return string
 	 */
 	public function getPhpCgiName($phpVersion) {

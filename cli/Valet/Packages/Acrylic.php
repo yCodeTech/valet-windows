@@ -17,8 +17,6 @@ class Acrylic extends Package {
 
 	/**
 	 * Install the Acrylic DNS proxy.
-	 *
-	 * @return void
 	 */
 	public function install() {
 		if (!$this->isInstalled()) {

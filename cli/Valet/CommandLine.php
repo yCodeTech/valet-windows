@@ -11,7 +11,6 @@ class CommandLine {
 	 * Pass the command to the command line and display the output.
 	 *
 	 * @param string $command
-	 * @return void
 	 */
 	public function passthru($command) {
 		passthru($command);
@@ -21,6 +20,7 @@ class CommandLine {
 	 * Execute command via shell and return the complete output as a string
 	 *
 	 * @param string $command
+	 *
 	 * @return bool|string|null The output.
 	 */
 	public function shellExec($command) {
@@ -54,6 +54,7 @@ class CommandLine {
 	 * @param string $command
 	 * @param callable|null $onError
 	 * @param bool $realTimeOutput Set to `true` to get the output in real time as the command is running. Default: `false`
+	 *
 	 * @return ProcessOutput
 	 */
 	public function run($command, ?callable $onError = null, $realTimeOutput = false) {
@@ -66,6 +67,7 @@ class CommandLine {
 	 * @param string $command
 	 * @param callable|null $onError
 	 * @param bool $realTimeOutput Set to `true` to get the output in real time as the command is running. Default: `false`
+	 *
 	 * @return ProcessOutput
 	 */
 	public function powershell(string $command, ?callable $onError = null, $realTimeOutput = false) {
@@ -78,6 +80,7 @@ class CommandLine {
 	 * @param string $command
 	 * @param callable|null $onError
 	 * @param bool $realTimeOutput Set to `true` to get the output in real time as the command is running. Default: `false`
+	 *
 	 * @return ProcessOutput
 	 */
 	public function runOrExit($command, ?callable $onError = null, $realTimeOutput = false) {
@@ -100,6 +103,7 @@ class CommandLine {
 	 * @param string $command
 	 * @param callable|null $onError
 	 * @param bool $realTimeOutput Set to `true` to get the output in real time as the command is running. Default: `false`
+	 *
 	 * @return ProcessOutput|void Returns a ProcessOutput only if the real time is `false`, otherwise it doesn't return anything (void) as it's echoing out in real time.
 	 */
 	public function runCommand($command, ?callable $onError = null, $realTimeOutput = false) {

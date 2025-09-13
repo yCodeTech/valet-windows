@@ -23,6 +23,7 @@ class Share {
 
 	/**
 	 * The supported share tools.
+	 *
 	 * @var string[]
 	 */
 	protected $share_tools;
@@ -38,6 +39,7 @@ class Share {
 	 *
 	 * @param CommandLine $cli
 	 * @param Configuration $config
+	 *
 	 * @return void
 	 */
 	public function __construct(CommandLine $cli, Configuration $config, Filesystem $files) {
@@ -69,8 +71,6 @@ class Share {
 	/**
 	 * Create the share tool class namespace using the current tool
 	 * and create the child class instance.
-	 *
-	 * @return void
 	 */
 	private function createShareToolInstance() {
 		$tool = $this->getCurrentShareTool();
@@ -85,6 +85,7 @@ class Share {
 
 	/**
 	 * Get the share tool child class instance.
+	 *
 	 * @return object
 	 */
 	private function getShareToolInstance() {
@@ -107,6 +108,7 @@ class Share {
 	 * Check if the specified tool is valid.
 	 *
 	 * @param string $tool
+	 *
 	 * @return bool
 	 */
 	public function isToolValid($tool) {

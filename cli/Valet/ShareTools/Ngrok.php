@@ -19,8 +19,6 @@ class Ngrok extends ShareTool {
 	 * @param string $site The site
 	 * @param int $port The site's port
 	 * @param array $options Options/flags to pass to ngrok
-	 *
-	 * @return void
 	 */
 	public function start(string $site, int $port, array $options = []) {
 		if ($port === 443 && !$this->hasAuthToken()) {
@@ -60,8 +58,6 @@ Then use: <fg=magenta>valet set-ngrok-token [token]</>');
 	 * Run ngrok CLI commands.
 	 *
 	 * @param string $command
-	 *
-	 * @return void
 	 */
 	public function run(string $command) {
 		$ngrok = realpath(valetBinPath() . 'ngrok.exe');

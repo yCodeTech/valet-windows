@@ -14,8 +14,6 @@ class Ansicon extends GithubPackage {
 
 	/**
 	 * Install Ansicon.
-	 *
-	 * @return void
 	 */
 	public function install() {
 		if (!$this->isInstalled()) {
@@ -52,8 +50,6 @@ class Ansicon extends GithubPackage {
 
 	/**
 	 * Uninstall Ansicon.
-	 *
-	 * @return void
 	 */
 	public function uninstall() {
 		$this->cli->runOrExit(

@@ -82,7 +82,6 @@ abstract class Package {
 	/**
 	 * Check if the package is installed.
 	 *
-
 	 * @return bool
 	 */
 	public function isInstalled() {
@@ -193,8 +192,6 @@ abstract class Package {
 	 * If empty, no directories will be removed.
 	 * @param array $searchStrings An array of strings to search for in the filenames.
 	 * If empty, no files will be removed.
-	 *
-	 * @return void
 	 */
 	protected function cleanUpPackageDirectory($requiredDir = "", $searchStrings = []) {
 
@@ -266,7 +263,6 @@ abstract class Package {
 
 	/**
 	 * Remove the zip file after extracting its contents.
-	 *
 	 */
 	protected function removeZip() {
 		$this->files->unlink($this->packageZipFilePath());

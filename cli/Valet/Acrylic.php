@@ -19,6 +19,7 @@ class Acrylic {
 	 * @param CommandLine $cli
 	 * @param Filesystem $files
 	 * @param Site $site
+	 *
 	 * @return void
 	 */
 	public function __construct(CommandLine $cli, Filesystem $files) {
@@ -30,7 +31,6 @@ class Acrylic {
 	 * Install Acrylic DNS.
 	 *
 	 * @param string $tld
-	 * @return void
 	 */
 	public function install(string $tld = 'test') {
 		// Install the Acrylic package if it is not already installed.
@@ -44,7 +44,6 @@ class Acrylic {
 	 * Create the AcrylicHosts file.
 	 *
 	 * @param string $tld
-	 * @return void
 	 */
 	protected function createHostsFile(string $tld) {
 		$contents = $this->files->getStub('AcrylicHosts.txt');
@@ -61,8 +60,6 @@ class Acrylic {
 
 	/**
 	 * Install the Acrylic DNS service.
-	 *
-	 * @return void
 	 */
 	protected function installService() {
 		$this->uninstall();
@@ -81,8 +78,6 @@ class Acrylic {
 
 	/**
 	 * Configure the Network DNS.
-	 *
-	 * @return void
 	 */
 	protected function configureNetworkDNS() {
 		$array = [
@@ -97,7 +92,6 @@ class Acrylic {
 	 * Update the tld used by Acrylic DNS.
 	 *
 	 * @param string $tld
-	 * @return void
 	 */
 	public function updateTld(string $tld) {
 		$this->stop();
@@ -109,8 +103,6 @@ class Acrylic {
 
 	/**
 	 * Uninstall the Acrylic DNS service.
-	 *
-	 * @return void
 	 */
 	public function uninstall() {
 		if (!$this->installed()) {
@@ -142,8 +134,6 @@ class Acrylic {
 
 	/**
 	 * Remove the Network DNS.
-	 *
-	 * @return void
 	 */
 	protected function removeNetworkDNS() {
 		$array = [
@@ -156,8 +146,6 @@ class Acrylic {
 
 	/**
 	 * Start the Acrylic DNS service.
-	 *
-	 * @return void
 	 */
 	public function start() {
 		$this->cli->runOrExit(
@@ -172,8 +160,6 @@ class Acrylic {
 
 	/**
 	 * Stop the Acrylic DNS service.
-	 *
-	 * @return void
 	 */
 	public function stop() {
 		$this->cli->run(
@@ -188,8 +174,6 @@ class Acrylic {
 
 	/**
 	 * Restart the Acrylic DNS service.
-	 *
-	 * @return void
 	 */
 	public function restart() {
 		$this->cli->run(
@@ -204,8 +188,6 @@ class Acrylic {
 
 	/**
 	 * Flush Windows DNS.
-	 *
-	 * @return void
 	 */
 	public function flushdns() {
 		$this->cli->run('cmd "/C ipconfig /flushdns"');
@@ -215,6 +197,7 @@ class Acrylic {
 	 * Get the Acrylic path.
 	 *
 	 * @param string $path
+	 *
 	 * @return string
 	 */
 	public function path(string $path = ''): string {

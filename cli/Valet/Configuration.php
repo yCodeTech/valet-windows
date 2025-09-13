@@ -13,8 +13,7 @@ class Configuration {
 	/**
 	 * Create a new Valet configuration class instance.
 	 *
-	 * @param Filesystem $filesystem
-	 * @return void
+	 * @param Filesystem $files
 	 */
 	public function __construct(Filesystem $files) {
 		$this->files = $files;
@@ -22,8 +21,6 @@ class Configuration {
 
 	/**
 	 * Install the Valet configuration file.
-	 *
-	 * @return void
 	 */
 	public function install() {
 		$this->createDirectories();
@@ -34,8 +31,6 @@ class Configuration {
 
 	/**
 	 * Create the Valet configuration directories.
-	 *
-	 * @return void
 	 */
 	public function createDirectories() {
 		// Create the .config directory and the Valet home directory if they don't exist.
@@ -56,8 +51,6 @@ class Configuration {
 
 	/**
 	 * Create the `~\.config` directory and the Valet configuration directory (`~\.config\valet`).
-	 *
-	 * @return void
 	 */
 	public function createConfigurationDirectory() {
 		// Create the `.config` directory if it doesn't exist.
@@ -71,8 +64,6 @@ class Configuration {
 
 	/**
 	 * Create the directory for the Valet self-signed Certificate Authority (CA) certificates.
-	 *
-	 * @return void
 	 */
 	public function createCaDirectory() {
 		$this->files->ensureDirExists($this->valetHomePath('CA'), user());
@@ -80,8 +71,6 @@ class Configuration {
 
 	/**
 	 * Create the directory for SSL/TLS certificates.
-	 *
-	 * @return void
 	 */
 	public function createCertificatesDirectory() {
 		$this->files->ensureDirExists($this->valetHomePath('Certificates'), user());
@@ -89,8 +78,6 @@ class Configuration {
 
 	/**
 	 * Create the Valet drivers directory.
-	 *
-	 * @return void
 	 */
 	public function createDriversDirectory() {
 		$driversPath = $this->valetHomePath('Drivers');
@@ -109,8 +96,6 @@ class Configuration {
 
 	/**
 	 * Create the directory for the Emergency Uninstall files.
-	 *
-	 * @return void
 	 */
 	public function createEmergencyUninstallDirectory() {
 		$this->files->ensureDirExists($this->valetHomePath('Emergency Uninstall'), user());
@@ -118,8 +103,6 @@ class Configuration {
 
 	/**
 	 * Create the directory for the Valet extensions.
-	 *
-	 * @return void
 	 */
 	public function createExtensionsDirectory() {
 		$this->files->ensureDirExists(Valet::homePath('Extensions'), user());
@@ -127,8 +110,6 @@ class Configuration {
 
 	/**
 	 * Create the directory for logs.
-	 *
-	 * @return void
 	 */
 	public function createLogDirectory() {
 		$this->files->ensureDirExists($path = $this->valetHomePath('Log'), user());
@@ -138,8 +119,6 @@ class Configuration {
 
 	/**
 	 * Create the directory for the site-specific Nginx server config files.
-	 *
-	 * @return void
 	 */
 	public function createNginxDirectory() {
 		$this->files->ensureDirExists($this->valetHomePath('Nginx'), user());
@@ -147,8 +126,6 @@ class Configuration {
 
 	/**
 	 * Create the directory for the Windows services.
-	 *
-	 * @return void
 	 */
 	public function createServicesDirectory() {
 		$this->files->ensureDirExists($this->valetHomePath('Services'), user());
@@ -156,8 +133,6 @@ class Configuration {
 
 	/**
 	 * Create the Valet sites directory.
-	 *
-	 * @return void
 	 */
 	public function createSitesDirectory() {
 		$this->files->ensureDirExists($this->valetHomePath('Sites'), user());
@@ -165,8 +140,6 @@ class Configuration {
 
 	/**
 	 * Create the directory for the Xdebug profiler.
-	 *
-	 * @return void
 	 */
 	public function createXdebugDirectory() {
 		$this->files->ensureDirExists($this->valetHomePath('Xdebug'), user());
@@ -174,8 +147,6 @@ class Configuration {
 
 	/**
 	 * Write the base, initial configuration for Valet.
-	 *
-	 * @return void
 	 */
 	public function writeBaseConfiguration() {
 		if (!$this->files->exists($this->path())) {
@@ -209,8 +180,6 @@ class Configuration {
 
 	/**
 	 * Forcefully delete the Valet home configuration directory and contents.
-	 *
-	 * @return void
 	 */
 	public function uninstall() {
 		$this->files->unlink($this->valetHomePath());
@@ -218,8 +187,6 @@ class Configuration {
 
 	/**
 	 * Add the given php path to the configuration.
-	 *
-	 * @return void
 	 */
 	public function addDefaultPhp() {
 		$phpPath = lcfirst(\PhpCgi::findDefaultPhpPath());
@@ -235,6 +202,7 @@ class Configuration {
 	 * Get the php configuration by path.
 	 *
 	 * @param string $phpPath
+	 *
 	 * @return mixed
 	 */
 	public function getPhp($phpPath) {
@@ -251,6 +219,7 @@ class Configuration {
 	 * Get the php configuration by version.
 	 *
 	 * @param string $phpVersion
+	 *
 	 * @return mixed
 	 */
 	public function getPhpByVersion($phpVersion) {
@@ -273,6 +242,7 @@ class Configuration {
 	 * Determine if the given PHP version is the alias.
 	 *
 	 * @param string $phpVersion
+	 *
 	 * @return bool
 	 */
 	public function isPhpAlias($phpVersion) {
@@ -295,6 +265,7 @@ class Configuration {
 	 * Add the given php path to the configuration.
 	 *
 	 * @param string $phpPath
+	 *
 	 * @return mixed
 	 */
 	public function addPhp($phpPath) {
@@ -353,6 +324,7 @@ class Configuration {
 	 * Remove the given php path from the configuration.
 	 *
 	 * @param string $phpPath
+	 *
 	 * @return mixed
 	 */
 	public function removePhp($phpPath) {
@@ -392,7 +364,6 @@ class Configuration {
 	 *
 	 * @param string $path
 	 * @param bool $prepend
-	 * @return void
 	 */
 	public function addPath(string $path, bool $prepend = false) {
 		$path = str_replace('\\', "/", $path);
@@ -407,7 +378,6 @@ class Configuration {
 	 * Prepend the given path to the configuration.
 	 *
 	 * @param string $path
-	 * @return void
 	 */
 	public function prependPath(string $path) {
 		$this->addPath($path, true);
@@ -418,7 +388,6 @@ class Configuration {
 	 * Used by `valet forget`
 	 *
 	 * @param string $path
-	 * @return void
 	 */
 	public function removePath(string $path) {
 		if ($path == $this->valetHomePath('Sites')) {
@@ -468,6 +437,7 @@ class Configuration {
 	 *
 	 * @param string|int|null $key
 	 * @param mixed $default
+	 *
 	 * @return mixed
 	 */
 	public function get($key, $default = null) {
@@ -479,6 +449,7 @@ class Configuration {
 	 *
 	 * @param string $key
 	 * @param mixed $value
+	 *
 	 * @return array
 	 */
 	public function updateKey(string $key, $value): array {
@@ -493,7 +464,6 @@ class Configuration {
 	 * Write the given configuration to disk.
 	 *
 	 * @param array $config
-	 * @return void
 	 */
 	public function write(array $config) {
 		$this->files->putAsUser($this->path(), json_encode(
@@ -515,6 +485,7 @@ class Configuration {
 	 * Get the Valet home path.
 	 *
 	 * @param string $path
+	 *
 	 * @return string
 	 */
 	protected function valetHomePath(string $path = ''): string {

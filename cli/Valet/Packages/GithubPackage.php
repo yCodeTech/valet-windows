@@ -24,8 +24,6 @@ abstract class GithubPackage extends Package {
 	 * @param string $githubApiUrl The GitHub API URL for the release.
 	 * @param string $filename The name of the file to download.
 	 * @param string $filePath The path where the file will be saved and as what name.
-	 *
-	 * @return void
 	 */
 	protected function download(string $githubApiUrl, string $filename, string $filePath) {
 		// Get the response from the GitHub API OR handle errors.

@@ -28,7 +28,6 @@ class WinSW {
 	 *
 	 * @param CommandLine $cli
 	 * @param Filesystem $files
-	 * @return void
 	 */
 	public function __construct(string $service, string $serviceId, CommandLine $cli, Filesystem $files) {
 		$this->cli = $cli;
@@ -41,7 +40,6 @@ class WinSW {
 	 * Install the service.
 	 *
 	 * @param array $args
-	 * @return void
 	 */
 	public function install(array $args = []) {
 		$this->createConfiguration($args);
@@ -57,7 +55,6 @@ class WinSW {
 	 * Create the .exe and .xml files.
 	 *
 	 * @param array $args
-	 * @return void
 	 */
 	protected function createConfiguration(array $args = []) {
 		$args['VALET_HOME_PATH'] = Valet::homePath();
@@ -77,8 +74,6 @@ class WinSW {
 
 	/**
 	 * Uninstall the service.
-	 *
-	 * @return void
 	 */
 	public function uninstall() {
 		if ($this->isRunning()) {
@@ -104,8 +99,6 @@ class WinSW {
 
 	/**
 	 * Restart the service.
-	 *
-	 * @return void
 	 */
 	public function restart() {
 		$command = 'cmd /C cd "' . $this->servicesPath() . '" && "' . $this->servicesPath($this->service) . '" restart';
@@ -121,8 +114,6 @@ class WinSW {
 
 	/**
 	 * Stop the service.
-	 *
-	 * @return void
 	 */
 	public function stop() {
 		$command = 'cmd /C cd "' . $this->servicesPath() . '" && "' . $this->servicesPath($this->service) . '" stop';
@@ -168,6 +159,7 @@ class WinSW {
 	 * Get the services path.
 	 *
 	 * @param string $path
+	 *
 	 * @return string
 	 */
 	protected function servicesPath(string $path = ''): string {

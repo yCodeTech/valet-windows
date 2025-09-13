@@ -1,5 +1,7 @@
 <?php
 
+// phpcs:disable Generic.Commenting.DocComment.ContentAfterOpen,Generic.Commenting.DocComment.ContentBeforeClose,Generic.Commenting.DocComment.SpacingBeforeShort -- Disable Generic Commenting sniffs to allow single line headers, eg. /** Header **/
+
 namespace Valet;
 
 class Diagnose {
@@ -21,7 +23,6 @@ class Diagnose {
 	 *
 	 * @param CommandLine $cli
 	 * @param Filesystem $files
-	 * @return void
 	 */
 	public function __construct(CommandLine $cli, Filesystem $files) {
 		$this->cli = $cli;
@@ -207,6 +208,7 @@ class Diagnose {
 	 * Determines if Valet should ignore the output of a command.
 	 *
 	 * @param string $command
+	 *
 	 * @return bool
 	 */
 	protected function ignoreOutput($command) {
@@ -219,6 +221,7 @@ class Diagnose {
 	 * a command or task that is run via PHP instead of the CLI.
 	 *
 	 * @param string $command
+	 *
 	 * @return bool
 	 */
 	protected function isNonCliCommand($command) {
@@ -232,6 +235,7 @@ class Diagnose {
 	 *
 	 * @param string $command
 	 * @param string|ProcessOutput $output
+	 *
 	 * @return string $output The edited output.
 	 */
 	protected function editOutput($command, $output) {
@@ -262,8 +266,8 @@ class Diagnose {
 
 		/** Composer Diagnose **/
 		if (str_contains($command, "composer global diagnose")) {
-			$output = $this->cli->powershell('cat '. Valet::homePath() .'/composer.txt');
-			$this->files->unlink(Valet::homePath() .'/composer.txt');
+			$output = $this->cli->powershell('cat ' . Valet::homePath() . '/composer.txt');
+			$this->files->unlink(Valet::homePath() . '/composer.txt');
 		}
 
 		/** Composer Outdated **/
@@ -419,6 +423,7 @@ class Diagnose {
 	 *
 	 * @param \Illuminate\Support\Collection $results A collection of the outputs.
 	 * @param bool $plainText
+	 *
 	 * @return array|string The formatted output as a `string`,
 	 * or if `plainText` is `true`, then an `array` of the formatted plain output
 	 * as a `string` for the terminal
@@ -494,6 +499,8 @@ class Diagnose {
 	 * @param string $command
 	 * @param string $output
 	 * @param string $heading The heading to output before the command name.
+	 *
+	 * @return string The formatted output as HTML.
 	 */
 	protected function formatForCopy($command, $output, $heading) {
 		if (str_contains($command, "composer global outdated")) {
@@ -587,6 +594,7 @@ class Diagnose {
 	 * creating a new collection with the headings as the keys.
 	 *
 	 * @param \Illuminate\Support\Collection $results A collection of the outputs.
+	 *
 	 * @return \Illuminate\Support\Collection The new combined collection
 	 */
 	protected function combineWithHeadings($results) {

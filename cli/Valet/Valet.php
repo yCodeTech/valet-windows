@@ -14,7 +14,6 @@ class Valet {
 	 *
 	 * @param CommandLine $cli
 	 * @param Filesystem $files
-	 * @return void
 	 */
 	public function __construct(CommandLine $cli, Filesystem $files) {
 		$this->cli = $cli;
@@ -104,6 +103,7 @@ class Valet {
 	 * Determine if this is the latest version of Valet.
 	 *
 	 * @param string $currentVersion
+	 *
 	 * @return bool
 	 *
 	 * @throws \GuzzleHttp\Exception\GuzzleException
@@ -133,9 +133,9 @@ class Valet {
 
 	/**
 	 * Get a calculation of the percentage of parity completion against Laravel Valet for macOS
+	 *
 	 * @param string $url The URL to the raw code in Github of `app.php` of Laravel Valet on a released version.
 	 * eg. https://raw.githubusercontent.com/laravel/valet/v4.3.0/cli/app.php
-	 * @return void
 	 */
 	public function parity($url) {
 
@@ -252,6 +252,7 @@ class Valet {
 	 * Get the Valet home path (VALET_HOME_PATH = ~/.config/valet).
 	 *
 	 * @param string $path
+	 *
 	 * @return string
 	 */
 	public static function homePath(string $path = ''): string {

@@ -25,7 +25,8 @@ class PhpCgiXdebug extends PhpCgi {
 	 * Install and configure PHP CGI service.
 	 *
 	 * @param null|string $phpVersion The PHP version
-	 * @return array|void $versionArray
+	 *
+	 * @return array $versionArray
 	 */
 	public function install($phpVersion = null) {
 		if ($phpVersion) {
@@ -57,8 +58,6 @@ class PhpCgiXdebug extends PhpCgi {
 
 	/**
 	 * Install the Windows service.
-	 *
-	 * @return void
 	 */
 	public function installService($phpVersion, $phpCgiServiceConfig = null, $installConfig = null) {
 		$phpWinSw = $this->phpWinSws[$phpVersion];
@@ -77,6 +76,7 @@ class PhpCgiXdebug extends PhpCgi {
 	 * Determine if the Xdebug is installed.
 	 *
 	 * @param string|null $phpVersion
+	 *
 	 * @return bool
 	 */
 	public function installed($phpVersion = null) {

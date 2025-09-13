@@ -60,8 +60,6 @@ class WinSW extends GithubPackage {
 	 * source code on GitHub.
 	 *
 	 * The readme is mainly for dev purposes, to help understand how to use the package.
-	 *
-	 * @return void
 	 */
 	private function changeReadme() {
 		$winswPath = $this->packagePath();
