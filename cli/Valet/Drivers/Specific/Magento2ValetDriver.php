@@ -61,6 +61,6 @@ class Magento2ValetDriver extends ValetDriver {
 		$_SERVER['SERVER_NAME'] = $_SERVER['HTTP_HOST'];
 		$_SERVER['DOCUMENT_ROOT'] = $sitePath;
 
-		return $sitePath.'/pub/index.php';
+		return $sitePath . '/pub/index.php';
 	}
 }

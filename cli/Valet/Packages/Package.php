@@ -1,4 +1,5 @@
 <?php
+// phpcs:disable Generic.Commenting.DocComment.ContentAfterOpen,Generic.Commenting.DocComment.ContentBeforeClose,Generic.Commenting.DocComment.SpacingBeforeShort -- Disable Generic Commenting sniffs to allow single line headers, eg. /** Header **/
 
 namespace Valet\Packages;
 

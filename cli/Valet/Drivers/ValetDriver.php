@@ -159,8 +159,6 @@ abstract class ValetDriver {
 	 * @param string $sitePath
 	 * @param string $siteName
 	 * @param string $uri
-	 *
-	 * @return void
 	 */
 	public function beforeLoading($sitePath, $siteName, $uri) {
 		// Do nothing
@@ -184,8 +182,6 @@ abstract class ValetDriver {
 	 * @param string $sitePath
 	 * @param string $siteName
 	 * @param string $uri
-	 *
-	 * @return void
 	 */
 	public function serveStaticFile($staticFilePath, $sitePath, $siteName, $uri) {
 		/**
@@ -226,8 +222,6 @@ abstract class ValetDriver {
 	 *
 	 * @param string $sitePath
 	 * @param string $siteName
-	 *
-	 * @return void
 	 */
 	public function loadServerEnvironmentVariables($sitePath, $siteName) {
 		$varFilePath = "$sitePath/.valet-env.php";

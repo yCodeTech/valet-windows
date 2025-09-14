@@ -24,7 +24,6 @@ class JoomlaValetDriver extends BasicValetDriver {
 	 * @param string $sitePath
 	 * @param string $siteName
 	 * @param string $uri
-	 * @return void
 	 */
 	public function beforeLoading($sitePath, $siteName, $uri) {
 		$_SERVER['PHP_SELF'] = $uri;

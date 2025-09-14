@@ -9,6 +9,7 @@ class SampleValetDriver extends ValetDriver {
 	 * @param string $sitePath
 	 * @param string $siteName
 	 * @param string $uri
+	 *
 	 * @return bool
 	 */
 	public function serves($sitePath, $siteName, $uri) {
@@ -25,6 +26,7 @@ class SampleValetDriver extends ValetDriver {
 	 * @param string $sitePath
 	 * @param string $siteName
 	 * @param string $uri
+	 *
 	 * @return string|false
 	 */
 	public function isStaticFile($sitePath, $siteName, $uri) {
@@ -41,6 +43,7 @@ class SampleValetDriver extends ValetDriver {
 	 * @param string $sitePath
 	 * @param string $siteName
 	 * @param string $uri
+	 *
 	 * @return string|null
 	 */
 	public function frontControllerPath($sitePath, $siteName, $uri) {
