@@ -22,8 +22,6 @@ class LaravelValetDriver extends ValetDriver {
 	 * @param string $sitePath
 	 * @param string $siteName
 	 * @param string $uri
-	 *
-	 * @return void
 	 */
 	public function beforeLoading($sitePath, $siteName, $uri) {
 		// Shortcut for getting the "local" hostname as the HTTP_HOST, especially when

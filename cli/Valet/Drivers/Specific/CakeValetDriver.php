@@ -24,8 +24,6 @@ class CakeValetDriver extends ValetDriver {
 	 * @param string $sitePath
 	 * @param string $siteName
 	 * @param string $uri
-	 *
-	 * @return void
 	 */
 	public function beforeLoading($sitePath, $siteName, $uri) {
 		$_SERVER['DOCUMENT_ROOT'] = "{$sitePath}/webroot";

@@ -62,7 +62,6 @@ class Typo3ValetDriver extends ValetDriver {
 	 * @param string $sitePath
 	 * @param string $siteName
 	 * @param string $uri
-	 * @return void
 	 */
 	public function beforeLoading($sitePath, $siteName, $uri) {
 		// without modifying the URI, redirect if necessary
@@ -165,8 +164,6 @@ class Typo3ValetDriver extends ValetDriver {
 	 * the generated JavaScript URIs on the login screen would be broken on /typo3.
 	 *
 	 * @param string $uri
-	 *
-	 * @return void
 	 */
 	private function handleRedirectBackendShorthandUris($uri) {
 		if (rtrim($uri, '/') === '/typo3/install') {
