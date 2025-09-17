@@ -19,8 +19,6 @@ class Acrylic {
 	 * @param CommandLine $cli
 	 * @param Filesystem $files
 	 * @param Site $site
-	 *
-	 * @return void
 	 */
 	public function __construct(CommandLine $cli, Filesystem $files) {
 		$this->cli = $cli;

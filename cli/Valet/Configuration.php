@@ -404,8 +404,6 @@ class Configuration {
 
 	/**
 	 * Prune all non-existent paths from the configuration.
-	 *
-	 * @return void
 	 */
 	public function prune() {
 		if (!$this->files->exists($this->path())) {
