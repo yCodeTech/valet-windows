@@ -91,6 +91,23 @@
 			<property name="ignoreNewlines" value="true" />
 		</properties>
 	</rule>
+
+	<!-- Disallow unnecessary string concatenation, eg. `"Hello " . "World"`, `"Hello " . $name` ie. Enforces string interpolation (`"Hello $name"`) -->
+	<rule ref="Generic.Strings.UnnecessaryStringConcat">
+		<properties>
+			<property name="allowMultiline" value="true"/>
+		</properties>
+	</rule>
+
+	<!-- If concatenation is necessary, then it must have correct spacing.
+	1 space after and 1 space before the concatenation operator (.) -->
+	<rule ref="Squiz.Strings.ConcatenationSpacing">
+		<properties>
+			<property name="spacing" value="1" />
+			<property name="ignoreNewlines" value="true" />
+		</properties>
+	</rule>
+
 	<!-- External standard. https://github.com/JParkinson1991/phpcodesniffer-standards/blob/master/docs/Standards/JPSR12/JPSR12.md -->
 	<!-- Exclude certain sniffs. -->
 	<rule ref="JPSR12">
@@ -99,4 +116,9 @@
 		<exclude name="JPSR12.Types.DeclareStrictTypes" />
 		<exclude name="JPSR12.ControlSignatures.MultiKeyword.SingleNewlineRequired" />
 	</rule>
+
+	<!-- My own external standard. https://github.com/yCodeTech/phpcs-standard -->
+	<!-- Add all yCodeTech sniffs. -->
+	<rule ref="yCodeTech" />
+
 </ruleset>
