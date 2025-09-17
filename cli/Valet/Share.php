@@ -39,8 +39,6 @@ class Share {
 	 *
 	 * @param CommandLine $cli
 	 * @param Configuration $config
-	 *
-	 * @return void
 	 */
 	public function __construct(CommandLine $cli, Configuration $config, Filesystem $files) {
 		$this->cli = $cli;
