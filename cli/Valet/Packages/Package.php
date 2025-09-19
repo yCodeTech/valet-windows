@@ -58,8 +58,6 @@ abstract class Package {
 
 	/**
 	 * Install the package.
-	 *
-	 * @return void
 	 */
 	abstract public function install();
 
@@ -69,8 +67,6 @@ abstract class Package {
 	 * @param string $url The URL for the download.
 	 * @param string $filename The name of the file to download.
 	 * @param string $filePath The path where the file will be saved and as what name.
-	 *
-	 * @return void
 	 */
 	abstract protected function download(string $url, string $filename, string $filePath);
 

@@ -46,8 +46,6 @@ abstract class ShareTool {
 	 * @param string $site The site
 	 * @param int $port The site's port
 	 * @param array $options Options/flags to pass to ngrok
-	 *
-	 * @return void
 	 */
 	abstract public function start(string $site, int $port, array $options = []);
 
@@ -55,8 +53,6 @@ abstract class ShareTool {
 	 * Run CLI commands
 	 *
 	 * @param string $command
-	 *
-	 * @return void
 	 */
 	abstract public function run(string $command);
 
