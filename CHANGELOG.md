@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/yCodeTech/valet-windows/tree/master)
 
-## [3.3.0](https://github.com/yCodeTech/valet-windows/tree/v3.3.0) - 2025-10-22
+## [3.3.0](https://github.com/yCodeTech/valet-windows/tree/v3.3.0) - 2025-10-23
 
 This is a large [Release PR](https://github.com/yCodeTech/valet-windows/pull/29) that focuses on code-parity with macOS Valet, enhanced emergency uninstallation, significant code quality improvements and lots of refactoring for improved maintainability. Valet will also no longer ship with the executable for Acrylic, instead the latest version is dynamically downloaded and installed from SourceForge.
 
