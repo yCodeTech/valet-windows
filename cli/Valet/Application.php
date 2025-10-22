@@ -5,7 +5,9 @@ namespace Valet;
 use Silly\Application as SillyApplication;
 
 class Application extends SillyApplication {
-	/** @var string */
+	/**
+	 * @var string
+	 */
 	private static $logo =
 	"     _                               _  __      __   _      _       ____________
     | |                             | | \ \    / /  | |    | |     |            \

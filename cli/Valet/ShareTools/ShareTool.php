@@ -34,7 +34,6 @@ abstract class ShareTool {
 	 *
 	 * @param CommandLine $cli
 	 * @param Filesystem $files
-	 * @return void
 	 */
 	public function __construct(CommandLine $cli, Filesystem $files) {
 		$this->cli = $cli;
@@ -47,8 +46,6 @@ abstract class ShareTool {
 	 * @param string $site The site
 	 * @param int $port The site's port
 	 * @param array $options Options/flags to pass to ngrok
-	 *
-	 * @return void
 	 */
 	abstract public function start(string $site, int $port, array $options = []);
 
@@ -56,8 +53,6 @@ abstract class ShareTool {
 	 * Run CLI commands
 	 *
 	 * @param string $command
-	 *
-	 * @return void
 	 */
 	abstract public function run(string $command);
 
@@ -76,6 +71,7 @@ abstract class ShareTool {
 
 	/**
 	 * Get the current tunnel URL from the API.
+	 *
 	 * @param string $site The site
 	 *
 	 * @return string The current tunnel URL

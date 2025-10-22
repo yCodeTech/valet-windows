@@ -7,6 +7,100 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/yCodeTech/valet-windows/tree/master)
 
+## [3.3.0](https://github.com/yCodeTech/valet-windows/tree/v3.3.0) - 2025-10-22
+
+This is a large [Release PR](https://github.com/yCodeTech/valet-windows/pull/29) that focuses on code-parity with macOS Valet, enhanced emergency uninstallation, significant code quality improvements and lots of refactoring for improved maintainability. Valet will also no longer ship with the executable for Acrylic, instead the latest version is dynamically downloaded and installed from SourceForge.
+
+For the full changelog please view the PR commits.
+
+### Added
+
+-   Added the ability for nginx to display http status 500 error page. This is important because if a PHP error occurs internally while trying to access a site, nginx fails silently, and the browser just displays a generic 500 error page. To help users debug the error, and narrow down the cause of the error, the new valet 500 error page will tell users where to look for the error in the logs.
+
+-   Added a command to the `Diagnose` class to get the `winsw` version via reading it's README.
+
+-   Added the ability to get the structure of both Valet's home directory and the Valet bin directory and output it in the `Diagnose` output as a directory tree diagram. This will help diagnose any issues in the future by making sure the Valet home directory and Valet bin directory has all the required files and named correctly. A new `Filesystem::scanDirRecursive` method has also been added to assist with scanning and retrieving of the directories and files.
+
+-   Added the ability to download the latest version of `Acrylic`.
+
+    -   Added new `Acrylic` class with the namespace `Valet\Packages` that extend the new base `Package` class. This class will download the latest version from SourceForge.
+
+    -   Added new `Acrylic_IPv4_Binding_Address.ini` stub file to add the custom IPv4 binding localhost loopback address as fixed in PR [#15](https://github.com/yCodeTech/valet-windows/pull/15).
+
+    -   Added a `changeLocalIpv4BindingAddress` method to replace the default value of `LocalIPv4BindingAddress` with our custom value from the new stub file.
+
+### Changed
+
+-   Extract much of `GithubPackage` class into a new `Package` class as the new base class, refactor and make the method and variable names generic.
+
+-   Improved the emergency uninstall services creation during Valet installation. The emergency uninstall files are now located in `~/.config/valet/Emergency Uninstall`.
+
+    -   Fixed the script to automatically run with admin privileges if it doesn't already have them.
+
+    -   Added `Ansicon` to the script to handle cases where `Ansicon` fails to uninstall properly.
+
+        In cases where valet has uninstalled for a composer update, there is sometimes a remnants of the Ansicon path in the registry. This will cause installation issues where a system message will appear `"The system cannot find the path specified"` or similar, and installation will fail. This emergency script has a copy of Ansicon in the `~/.config/valet/Emergency Uninstall` directory and will attempt to uninstall it again. This is just a workaround, and not a direct fix for issue [#28](https://github.com/yCodeTech/valet-windows/issues/28).
+
+    -   Fixed the script to remove all the `valet\Services` files after uninstalling them.
+
+-   Code-parity with the Mac version (v4.8.7):
+
+    -   Moved the basic and laravel drivers into a new `Drivers` directory within the `Valet` directory, and namespaced them as `Valet\Drivers`.
+
+        Moved the rest of the drivers into the `Specific` subdirectory of `Drivers`, and namespaced them as `Valet\Drivers\Specific`.
+
+        This is so they can be autoloaded by PSR-4.
+
+    -   Introduced empty legacy driver classes that extend the namespaced drivers so that user custom drivers still work. These legacy drivers are deprecated by default.
+
+    -   Added the requirement for custom drivers to be namespaced as `Valet\Drivers\Custom`.
+
+    -   Added a more robust check for `Bedrock` environments and checking the composer dependencies for the required package.
+
+    -   Fixed Drupal JSON:API support for non-standard urls. More info on the Valet for Mac PR [#1218](https://github.com/laravel/valet/pull/1218).
+
+    -   Added new drivers for `Nette`, `Radicle`, and `Statamic V2`.
+
+    -   Fixed `Craft` driver to prevent sites breaking when applying security patches to Craft. More info on the Valet for Mac PR [#1516](https://github.com/laravel/valet/pull/1516).
+
+    -   Gracefully handle the old `SampleValetDriver.php` and upgrade it to the new namespaced sample via a new `Upgrader::fixOldSampleValetDriver` method.
+
+    -   Added upgrade instructions for custom drivers in [UPGRADE.md](/UPGRADE.md), including namespace and inheritance requirements.
+
+    -   Update logos to support GitHub dark/light theme.
+
+-   Moved the `services` command from being an installed-only command to being available without installation.
+
+-   Various refactoring for better organisation, maintainability, and improved code quality.
+
+### Fixed
+
+-   Fixed the copying of Unicode character in the `Diagnose` output. The Windows clip.exe program doesn't support copying of all Unicode characters, so if there's a character it doesn't know, it will display `????` in the output instead of the character. This is especially true for the box characters (eg. `┣━`) used for directory trees. The `copyToClipboard` method now writes the output to a temp file as UTF-8 with BOM encoding to allow usage of copyable Unicode characters, and uses the Powershell command `Set-Clipboard` to copy to the clipboard.
+
+-   Fixed errors when the Valet home directory (`~/.config/valet`) doesn't exist during the `Upgrader` run. `Upgrader` now only runs if the home path exists.
+
+-   Fixed `Upgrader::upgradeSymbolicLinks` method running when the directory is empty causing redundant console messages. It now only runs when the config key is missing and there are symlinks in the directory.
+
+-   Fixed system compatibility check to PHP 7.4 as a minimum.
+
+-   Fixed `set-ngrok-token` command errors that was caused by a method name change. The `Ngrok::getNgrokConfig` method was changed to the generic `Ngrok::getConfig` in the release PR of v3.2.0 and specifically in commit [db085bd](https://github.com/yCodeTech/valet-windows/commit/db085bd1ddb0be1d58a6b59b33acae5ee1050924), but it's usage in the command was never changed. Changed the method call to the new name.
+
+-   Fixed updating old isolated site conf files on `valet install`. Secured site conf files have always been updated on installing valet via the `Nginx::rewriteSecureNginxFiles` method, but isolated sites were stuck using old configurations. All conf files are now rewritten and updated to prevent old nginx configurations causing issues.
+
+-   Fixed `Site::unisolate` and `Site::isolate` methods to not output info directly to the terminal, as this causes progress bars to mess up in the terminal when using the `Site::reisolateForNewTld` method which calls the `un/isolate` methods. The info output is now moved to the commands that called the methods.
+
+### Removed
+
+-   Removed the `CommandLine::runAsUser` method because it is a duplicate method of `run`. It doesn't do anything different or special. So we can just use `run` instead.
+
+-   Removed the unused `Valet::composerGlobalDiagnose`, `Valet::composerGlobalUpdate`, and `ValetException::githubApiRateLimitExceededError` methods.
+
+-   Removed all bin files for `Acrylic`, in favour of downloading the latest versions from SourceForge.
+
+### Deprecated
+
+-   The new legacy drivers are all deprecated by default and will be removed in v4.0.0.
+
 ## [3.2.1](https://github.com/yCodeTech/valet-windows/tree/v3.2.1) - 2025-08-03
 
 ### Added

@@ -17,28 +17,26 @@ class Nginx extends GithubPackage {
 	public function install() {
 		if (!$this->isInstalled()) {
 			$nginxPath = $this->packagePath();
-			$zipFilePath = "$nginxPath/nginx.zip";
+			$zipFilePath = $this->packageZipFilePath();
 
 			$this->files->ensureDirExists($nginxPath);
 
 			$this->download("https://api.github.com/repos/nginx/nginx/releases/latest", "nginx-VERSION.zip", $zipFilePath);
 
-			$this->files->unzip($zipFilePath, $nginxPath);
+			$this->unzip();
 
-			$this->moveNginxFiles($zipFilePath);
+			$this->moveNginxFiles();
 
-			$this->cleanUpPackageDirectory($zipFilePath);
+			$this->cleanUpPackageDirectory();
 		}
 	}
 
 	/**
 	 * Move the required Nginx files into the package directory.
-	 *
-	 * @param mixed $zipFilePath
 	 */
-	private function moveNginxFiles($zipFilePath) {
+	private function moveNginxFiles() {
 		// Loop through a list of directory names from the zip file path.
-		foreach ($this->files->listTopLevelZipDirs($zipFilePath) as $dir) {
+		foreach ($this->files->listTopLevelZipDirs($this->packageZipFilePath()) as $dir) {
 			// If the directory name contains 'nginx-', set it as the required directory.
 			if (str_contains($dir, 'nginx-')) {
 				$requiredDir = $dir;

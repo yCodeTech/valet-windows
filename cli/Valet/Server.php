@@ -36,7 +36,7 @@ class Server {
 		$siteName = basename(
 			// Filter host to support wildcard dns feature
 			$this->supportWildcardDnsDomains($httpHost),
-			'.'.$this->config['tld']
+			'.' . $this->config['tld']
 		);
 
 		if (strpos($siteName, 'www.') === 0) {

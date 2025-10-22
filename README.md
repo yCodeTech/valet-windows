@@ -1,4 +1,4 @@
-<p align="center"><img src="./laravel_valet_windows_3_logo.svg" style="width:500px; background: none;"></p>
+<p align="center"><img src="./art/laravel_valet_windows_3_logo.svg" style="width:500px; background: none;"></p>
 
 <p align="center">
 <a href="https://packagist.org/packages/ycodetech/valet-windows"><img src="https://poser.pugx.org/ycodetech/valet-windows/downloads" alt="Total Downloads"></a>
@@ -10,7 +10,7 @@
 <p align="center">This is a Windows port of the popular Mac development environment <a href="https://github.com/laravel/valet">Laravel Valet</a>.</p>
 <p align="center">Laravel Valet <i>Windows</i> 3 is a much needed updated fork of <a href="https://github.com/cretueusebiu/valet-windows">cretueusebiu/valet-windows</a>, with lots of improvements and new commands. This version hopes to achieve as much parity as possible with the Mac version. For command parity, please refer to the <a href="#command-parity-checker">parity checker</a>.</p>
 
-<p align="center"><img src="./composer_laravel_valet_windows_3_logo.svg" style="width:400px; background: none;"></p>
+<p align="center"><img src="./art/composer_laravel_valet_windows_3_logo.svg" style="width:400px; background: none;"></p>
 
 ```sh
 composer global require ycodetech/valet-windows
@@ -152,10 +152,9 @@ This is 3.0 of Valet Windows, branded under the name _Laravel Valet Windows 3_, 
 
 Valet ships with and installs these services:
 
-|                                                                       Service | Version |
-| ----------------------------------------------------------------------------: | ------- |
-| [Acrylic DNS Proxy](https://mayakron.altervista.org/support/acrylic/Home.htm) | 2.1.0   |
-|                                                   [ngrok](https://ngrok.com/) | 3.3.1   |
+|                     Service | Version |
+| --------------------------: | ------- |
+| [ngrok](https://ngrok.com/) | 3.3.1   |
 
 > [!IMPORTANT]
 > ngrok may error out that it is "too old" when running it for some accounts. In the upcoming v3.2.0 release, Valet will ship with the latest version of ngrok.
@@ -166,14 +165,15 @@ Valet ships with and installs these services:
 >
 > For both commands, valet automatically appends the config file location as a flag to the command, so ngrok will already know where the config file is.
 
-As of v3.2.0, Valet no longer ships with the executables for the following services, instead they will be downloaded and installed automatically from GitHub's API. This is so that the latest versions with bug fixes and security updates can be installed.
+As of v3.2.0 and v3.3.0, Valet no longer ships with the executables for the following services, instead they will be downloaded and installed automatically from it's online source (GitHub, SourceForge, etc.). This is so that the latest versions with bug fixes and security updates can be installed.
 
-|                                     Service | Latest Version as of 13/05/2025 |
-| ------------------------------------------: | ------------------------------- |
-| [Ansicon](https://github.com/adoxa/ansicon) | 1.89                            |
-|  [gsudo](https://github.com/gerardog/gsudo) | 2.6.0                           |
-|                 [nginx](https://nginx.org/) | 1.28.0                          |
-|     [WinSW](https://github.com/winsw/winsw) | 2.12.0                          |
+|                                                                       Service | Latest Version as of 2025-10-22 |
+| ----------------------------------------------------------------------------: | ------------------------------- |
+|                                   [Ansicon](https://github.com/adoxa/ansicon) | 1.89                            |
+|                                    [gsudo](https://github.com/gerardog/gsudo) | 2.6.1                           |
+|                                                   [nginx](https://nginx.org/) | 1.29.2                          |
+|                                       [WinSW](https://github.com/winsw/winsw) | 2.12.0                          |
+| [Acrylic DNS Proxy](https://mayakron.altervista.org/support/acrylic/Home.htm) | 2.2.1                           |
 
 > [!IMPORTANT]
 >
@@ -205,7 +205,7 @@ Also make sure to open your preferred terminal (Windows Terminal, CMD, Git Bash,
 
 -   Install Valet with Composer via `composer global require ycodetech/valet-windows`.
 
-    <p align="center"><img src="./composer_laravel_valet_windows_3_logo.svg" style="width:400px; background: none;"></p>
+    <p align="center"><img src="./art/composer_laravel_valet_windows_3_logo.svg" style="width:400px; background: none;"></p>
 
     > [!WARNING]
     >
@@ -1537,17 +1537,25 @@ Doesn't affect valet functionality.
 
 ## Emergency Stop and Uninstall Services
 
-As of v3.1.6, Valet has an emergency stop and uninstall services script. This script is copied to the `/.config/valet` directory for safe keeping.
+As of v3.1.6, Valet has an emergency stop and uninstall services script. This script is copied to the `/.config/valet/Emergency Uninstall` directory for safe keeping.
 
 So if `composer global update` is ran before valet is uninstalled, and several running services prevent composer from removing the files and updating valet, then you can run the `emergency_uninstall_services.bat` file to stop and uninstall the services.
 
 To run, open a CMD terminal with Admin privileges and run this:
 
 ```sh
-> %UserProfile%\.config\valet\emergency_uninstall_services.bat
+> "%UserProfile%\.config\valet\Emergency Uninstall\emergency_uninstall_services.bat"
 ```
 
-All services will have been stopped and you can then be able to run `composer global update`.
+Alternatively, find it in the File Explorer and double clicking the file will also run it.
+
+All services will have been stopped and removed and you can then be able to run `composer global update`.
+
+> [!IMPORTANT]
+>
+> If you receive the `The system cannot find the path specified` error or similar while installing valet, then usually it's to do with Ansicon leaving it's path in the registry after uninstalling, which then fails Valet's installation.
+>
+> The emergency uninstall script can help to uninstall Ansicon again and hopefully fully removing it from the registry.
 
 ## Valet Directories
 
@@ -1595,7 +1603,13 @@ Upon installation, Valet creates the following directories and config files:
 -   `~/.config/valet/config.json`
     This is the main Valet config file.
 
--   `~/.config/valet/emergency_uninstall_services.bat`
+-   `~/.config/valet/Emergency Uninstall`
+    Contains the emergency uninstall files.
+
+-   `~/.config/valet/Emergency Uninstall/ansicon`
+    Contains the Ansicon files and executable to help uninstall it.
+
+-   `~/.config/valet/Emergency Uninstall/emergency_uninstall_services.bat`
     This is an batch file to do an emergency stop and uninstall of all services. See the [Emergency Stop and Uninstall Services section](#emergency-stop-and-uninstall-services).
 
 > [!WARNING]
@@ -1654,6 +1668,12 @@ Upon installation, Valet creates the following directories and config files:
     While using `valet use`, the error may have been caused by Valet trying to stop the nginx service twice, of which [this commit](https://github.com/yCodeTech/valet-windows/commit/afcafffbc9e58c00ee54b59c6929f62f2cffa8a3) tries to fix. Though it's difficult to debug an error that only occurs 1% of the time, with it being useless in terms of information when it does.
 
     If the WMI error does occur, try running the command again. If different WMI errors occur, please submit an issue with all relevant details.
+
+-   If there is a large error and it's file trace output to the terminal, the top of the error may be cut off/overwritten. Apparently Symfony can only write to the terminal that is viewable, if it goes outside of the viewable area (ie. you need to scroll up to view) then the output is overwritten and the most important part of the error, the description at the start is cut off. (See https://github.com/symfony/symfony/issues/35012). If this happens, make the terminal larger in height and try the command again to try and view the full error.
+
+-   When trying to install Valet after updating via Composer, and you receive this error or similiar: `The system cannot find the path specified`; it could be that Ansicon hasn't uninstalled properly and left it's path in the registry. Because it happens unpredictably, there is no way of debugging or fixing it.
+
+    The only "workaround" is to use the emergency uninstall script (`emergency_uninstall_services.bat`) in the `~/.config/valet/Emergency Uninstall` directory to allow Ansicon another chance to uninstall itself properly. (See [issue 28](https://github.com/yCodeTech/valet-windows/issues/28)). See the [Emergency Stop and Uninstall Services section](#emergency-stop-and-uninstall-services).
 
 ## Xdebug Installation
 

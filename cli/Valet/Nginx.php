@@ -38,7 +38,6 @@ class Nginx {
 	 * @param Configuration $configuration
 	 * @param Site $site
 	 * @param WinSwFactory $winsw
-	 * @return void
 	 */
 	public function __construct(CommandLine $cli, Filesystem $files, Configuration $configuration, Site $site, WinSwFactory $winsw) {
 		$this->cli = $cli;
@@ -50,8 +49,6 @@ class Nginx {
 
 	/**
 	 * Install the configuration files for Nginx.
-	 *
-	 * @return void
 	 */
 	public function install() {
 		// Install the Nginx package if it is not already installed.
@@ -59,14 +56,12 @@ class Nginx {
 		// Install the Nginx configs, server, and service.
 		$this->installConfiguration();
 		$this->installServer();
-		$this->installNginxDirectory();
+		$this->rewriteNginxFiles();
 		$this->installService();
 	}
 
 	/**
 	 * Install the Nginx configuration file.
-	 *
-	 * @return void
 	 */
 	public function installConfiguration() {
 		$defaultPhpVersion = $this->configuration->get('default_php');
@@ -76,7 +71,7 @@ class Nginx {
 			$this->path('conf/nginx.conf'),
 			str_replace(
 				['VALET_USER', 'VALET_HOME_PATH', '__VALET_PHP_PORT__', '__VALET_PHP_XDEBUG_PORT__'],
-				[user(), VALET_HOME_PATH, $defaultPhp['port'], $defaultPhp['xdebug_port']],
+				[user(), Valet::homePath(), $defaultPhp['port'], $defaultPhp['xdebug_port']],
 				$this->files->getStub('nginx.conf')
 			)
 		);
@@ -84,8 +79,6 @@ class Nginx {
 
 	/**
 	 * Install the Valet Nginx server configuration file.
-	 *
-	 * @return void
 	 */
 	public function installServer() {
 		$defaultPhpVersion = $this->configuration->get('default_php');
@@ -93,11 +86,13 @@ class Nginx {
 
 		$this->files->ensureDirExists($this->path('valet'));
 
+		$valetErrorTemplatePath = $this->files->realpath(valetBinPath() . '../cli/templates');
+
 		$this->files->putAsUser(
 			$this->path('valet/valet.conf'),
 			str_replace(
-				['VALET_HOME_PATH', 'VALET_SERVER_PATH', 'VALET_STATIC_PREFIX', 'HOME_PATH', 'VALET_PHP_PORT'],
-				[VALET_HOME_PATH, VALET_SERVER_PATH, VALET_STATIC_PREFIX, $_SERVER['HOME'], $defaultPhp['port']],
+				['VALET_HOME_PATH', 'VALET_SERVER_PATH', 'VALET_STATIC_PREFIX', 'HOME_PATH', 'VALET_PHP_PORT', 'VALET_ERROR_TEMPLATE_PATH'],
+				[Valet::homePath(), VALET_SERVER_PATH, VALET_STATIC_PREFIX, $_SERVER['HOME'], $defaultPhp['port'], $valetErrorTemplatePath],
 				$this->files->getStub('valet.conf')
 			)
 		);
@@ -109,24 +104,9 @@ class Nginx {
 	}
 
 	/**
-	 * Install the Nginx configuration directory to the ~/.config/valet directory.
-	 *
-	 * This directory contains all site-specific Nginx servers.
-	 *
-	 * @return void
-	 */
-	public function installNginxDirectory() {
-		if (!$this->files->isDir($nginxDirectory = Valet::homePath('Nginx'))) {
-			$this->files->mkdirAsUser($nginxDirectory);
-		}
-
-		$this->files->putAsUser($nginxDirectory . '/.keep', "\n");
-
-		$this->rewriteSecureNginxFiles();
-	}
-
-	/**
 	 * Check nginx.conf and all linked site configurations for errors.
+	 *
+	 * @return string
 	 */
 	public function lint($returnOutput = false) {
 		$output = $this->cli->run(
@@ -157,19 +137,16 @@ class Nginx {
 
 	/**
 	 * Generate fresh Nginx servers for existing secure sites.
-	 *
-	 * @return void
 	 */
-	public function rewriteSecureNginxFiles() {
+	public function rewriteNginxFiles() {
 		$tld = $this->configuration->read()['tld'];
 
 		$this->site->resecureForNewTld($tld, $tld);
+		$this->site->reisolateForNewTld($tld, $tld);
 	}
 
 	/**
 	 * Install the Windows service.
-	 *
-	 * @return void
 	 */
 	public function installService() {
 		if ($this->winsw->installed()) {
@@ -185,8 +162,6 @@ class Nginx {
 
 	/**
 	 * Restart the Nginx service.
-	 *
-	 * @return void
 	 */
 	public function restart() {
 		$this->killProcess();
@@ -198,8 +173,6 @@ class Nginx {
 
 	/**
 	 * Stop the Nginx service.
-	 *
-	 * @return void
 	 */
 	public function stop() {
 		$this->killProcess();
@@ -209,8 +182,6 @@ class Nginx {
 
 	/**
 	 * Prepare Nginx for uninstallation.
-	 *
-	 * @return void
 	 */
 	public function uninstall() {
 		$this->killProcess();
@@ -229,6 +200,7 @@ class Nginx {
 	 * Get the Nginx path.
 	 *
 	 * @param string $path
+	 *
 	 * @return string
 	 */
 	public function path(string $path = ''): string {
@@ -241,7 +213,7 @@ class Nginx {
 	 * For use in valet.php to check if Valet is installed
 	 * to enable most of the commands.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function isInstalled() {
 		return $this->winsw->installed();

@@ -14,7 +14,6 @@ class Valet {
 	 *
 	 * @param CommandLine $cli
 	 * @param Filesystem $files
-	 * @return void
 	 */
 	public function __construct(CommandLine $cli, Filesystem $files) {
 		$this->cli = $cli;
@@ -104,6 +103,7 @@ class Valet {
 	 * Determine if this is the latest version of Valet.
 	 *
 	 * @param string $currentVersion
+	 *
 	 * @return bool
 	 *
 	 * @throws \GuzzleHttp\Exception\GuzzleException
@@ -133,9 +133,9 @@ class Valet {
 
 	/**
 	 * Get a calculation of the percentage of parity completion against Laravel Valet for macOS
+	 *
 	 * @param string $url The URL to the raw code in Github of `app.php` of Laravel Valet on a released version.
 	 * eg. https://raw.githubusercontent.com/laravel/valet/v4.3.0/cli/app.php
-	 * @return void
 	 */
 	public function parity($url) {
 
@@ -234,20 +234,6 @@ class Valet {
 	}
 
 	/**
-	 * Run composer global diagnose.
-	 */
-	public function composerGlobalDiagnose() {
-		$this->cli->runAsUser('composer global diagnose');
-	}
-
-	/**
-	 * Run composer global update.
-	 */
-	public function composerGlobalUpdate() {
-		$this->cli->runAsUser('composer global update');
-	}
-
-	/**
 	 * Get the path to the home directory of composer global.
 	 *
 	 * While the default is "~/AppData/Roaming/Composer",
@@ -259,16 +245,50 @@ class Valet {
 	 * @return string The path to the global composer directory.
 	 */
 	public function getComposerGlobalPath() {
-		return $this->cli->runAsUser('composer -n config --global home');
+		return $this->cli->run('composer -n config --global home');
 	}
 
 	/**
 	 * Get the Valet home path (VALET_HOME_PATH = ~/.config/valet).
 	 *
 	 * @param string $path
+	 *
 	 * @return string
 	 */
 	public static function homePath(string $path = ''): string {
 		return VALET_HOME_PATH . ($path ? "/$path" : $path);
+	}
+
+	/**
+	 * Create the emergency uninstall files.
+	 *
+	 * This is used to emergency uninstall leftover Valet services, if `composer global update`
+	 * was ran before uninstalling Valet.
+	 */
+	public function createEmergencyUninstallFiles() {
+		$emergencyUninstallPath = $this->homePath("Emergency Uninstall");
+
+		// Copy the emergency stop and uninstall services script to the Valet home
+		// directory for safe keeping.
+		$this->files->copy(
+			realpath(__DIR__ . '/../../emergency_uninstall_services.bat'),
+			"$emergencyUninstallPath/emergency_uninstall_services.bat"
+		);
+
+		// Copy the Ansicon bin files into the Valet home directory for emergency uninstall.
+		//
+		// This is because Ansicon uses the Windows Registry to autorun, so we must ensure it's
+		// safely removed from the Registry too by uninstalling Ansicon officially instead of
+		// hacking it out of the system.
+
+		$this->files->ensureDirExists("$emergencyUninstallPath/ansicon", user());
+		$ansiconBinPath = resolve(Packages\Ansicon::class)->packagePath();
+
+		collect($this->files->scandir($ansiconBinPath))->each(function ($file) use ($emergencyUninstallPath, $ansiconBinPath) {
+			$this->files->copy(
+				realpath("$ansiconBinPath/$file"),
+				"$emergencyUninstallPath/ansicon/$file"
+			);
+		});
 	}
 }

@@ -39,7 +39,8 @@ Upgrader::onEveryRun();
 /**
  * Install Valet's services and configs,
  * and auto start Valet.
- * @param boolean $xdebug Optionally, install Xdebug for PHP
+ *
+ * @param bool $xdebug Optionally, install Xdebug for PHP
  */
 $app->command('install [--xdebug]', function ($input, $output, $xdebug) {
 	$helper = $this->getHelperSet()->get('question');
@@ -66,7 +67,7 @@ $app->command('install [--xdebug]', function ($input, $output, $xdebug) {
 		}
 	}
 
-	$maxItems = $xdebug ? 7 : 6;
+	$maxItems = $xdebug ? 8 : 7;
 	$progressBar = progressbar($maxItems, "Installing");
 	sleep(1);
 
@@ -105,6 +106,11 @@ $app->command('install [--xdebug]', function ($input, $output, $xdebug) {
 	$progressBar->setMessage("Ansicon", "placeholder");
 	$progressBar->advance();
 	Ansicon::install();
+	sleep(1);
+
+	$progressBar->setMessage("Emergency Uninstall Files", "placeholder");
+	$progressBar->advance();
+	Valet::createEmergencyUninstallFiles();
 	sleep(1);
 
 	$progressBar->finish();
@@ -154,8 +160,9 @@ $app->command('sudo valetCommand* [-o|--valetOptions=]', function ($valetCommand
 
 /**
  * Output diagnostics to aid in debugging Valet.
- * @param boolean $print Optionally print diagnostics output while running
- * @param boolean $plain Optionally format clipboard output as plain text
+ *
+ * @param bool $print Optionally print diagnostics output while running
+ * @param bool $plain Optionally format clipboard output as plain text
  */
 $app->command('diagnose [-p|--print] [--plain]', function ($print, $plain) {
 	info('Running diagnostics... (this may take a while)');
@@ -170,6 +177,7 @@ $app->command('diagnose [-p|--print] [--plain]', function ($print, $plain) {
 
 /**
  * Add PHP by specifying a path.
+ *
  * @param string $path The path to the PHP
  * @param bool $xdebug Optionally, install Xdebug
  */
@@ -193,6 +201,7 @@ $app->command('php:add path [--xdebug]', function ($path, $xdebug) {
 
 /**
  * Remove PHP by specifying it's version.
+ *
  * @param string $phpVersion The PHP version
  * @param string $path Optionally, specify the path to the PHP, instead of using the `$phpVersion`.
  */
@@ -277,6 +286,7 @@ $app->command('php:list', function () {
 
 /**
  * Determine which PHP version the current working directory is using.
+ *
  * @param null|string $site Optionally, specify a site
  */
 $app->command('php:which [site]', function ($site = null) {
@@ -320,6 +330,7 @@ $app->command('php:proxy phpCommand* [--site=]', function ($phpCommand, $site = 
 
 /**
  * Install Xdebug services for all PHP versions that are specified in `valet php:list`.
+ *
  * @param string $phpVersion Optionally, install a specific PHP version of Xdebug.
  */
 $app->command('xdebug:install [phpVersion]', function ($input, $output, $phpVersion = null) {
@@ -349,6 +360,7 @@ $app->command('xdebug:install [phpVersion]', function ($input, $output, $phpVers
 
 /**
  * Uninstall all Xdebug services.
+ *
  * @param string $phpVersion Optionally, uninstall a specific PHP version of Xdebug.
  */
 $app->command('xdebug:uninstall [phpVersion]', function ($phpVersion = null) {
@@ -380,9 +392,22 @@ $app->command('parity', function () {
 })->descriptions("Get a calculation of the percentage of parity completion.");
 
 /**
+ * List the installed Valet services.
+ */
+$app->command('services', function () {
+	info("Checking the Valet services...");
+
+	$services = Valet::services();
+	output("\n");
+
+	table(['Service', 'Windows Name', 'Status'], $services, true);
+	info('Use <bg=magenta> start </> <bg=magenta> stop </> or <bg=magenta> restart </> commands to change the status, eg. <bg=magenta> valet restart nginx </>');
+})->descriptions('List the installed Valet services.');
+
+/**
  * Most commands are available only if Valet is installed.
  */
-if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
+if (is_dir(Valet::homePath()) && Nginx::isInstalled()) {
 	/**
 	 * Upgrade helper: ensure the tld config exists.
 	 */
@@ -393,6 +418,7 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 	/**
 	 * Registers the current working directory to automatically serve sub-directories as sites
 	 * and adds it to the paths configuration.
+	 *
 	 * @param string $path Optionally, specify a path
 	 */
 	$app->command('park [path]', function ($path = null) {
@@ -418,6 +444,7 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 
 	/**
 	 * Remove the current working directory from Valet's list of paths.
+	 *
 	 * @param string $path Optionally, specify a path
 	 */
 	$app->command('forget [path]', function ($path = null) {
@@ -432,7 +459,7 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 	 * Register the current working directory as a symbolic link.
 	 *
 	 * @param string $name Optionally specify a new name to be linked as.
-	 * @param boolean $secure Optionally secure the site
+	 * @param bool $secure Optionally secure the site
 	 * @param string $isolate Optionally isolate the site to a specified PHP version
 	 */
 	$app->command('link [name] [--secure] [--isolate=]', function ($name, $secure, $isolate = null) {
@@ -446,6 +473,7 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 
 		if ($isolate) {
 			Site::isolate($isolate, $name);
+			info("The site [$name] is now using $isolate.");
 
 			info('Restarting Nginx...');
 			Nginx::restart();
@@ -479,6 +507,7 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 
 	/**
 	 * Unlink the current working directory linked site
+	 *
 	 * @param string $name Optionally specify the linked site name
 	 */
 	$app->command('unlink [name]', function ($name) {
@@ -489,6 +518,7 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 
 		if (Site::isIsolated($name) === true) {
 			Site::unisolate($name);
+			info(sprintf('The site [%s] is now using the default PHP version.', $name));
 		}
 
 		if (Site::isSecured($name) === true) {
@@ -499,7 +529,7 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 		}
 
 		info('Restarting Nginx...');
-			Nginx::restart();
+		Nginx::restart();
 
 		// Unlink the site.
 		Site::unlink($name);
@@ -512,10 +542,11 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 
 	/**
 	 * Proxy a specified site to a specified host
+	 *
 	 * @param string $site The site to be proxied.
 	 * Multiple sites can be proxied at the same time to 1 host. Separated by commas. eg. `site1,site2,site3`
 	 * @param string $host The host to receive the site traffic
-	 * @param boolean $secure Optionally, create a proxy with a trusted TLS certificate
+	 * @param bool $secure Optionally, create a proxy with a trusted TLS certificate
 	 */
 	$app->command('proxy site host [--secure]', function ($site, $host, $secure) {
 		Site::proxyCreate($site, $host, $secure);
@@ -542,6 +573,7 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 
 	/**
 	 * Remove a proxied site.
+	 *
 	 * @param string $site The site
 	 */
 	$app->command('unproxy site', function ($site) {
@@ -606,6 +638,7 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 
 	/**
 	 * Secure the current working directory with a trusted TLS certificate.
+	 *
 	 * @param string $site Optionally specify the site.
 	 */
 	$app->command('secure [site]', function ($site = null) {
@@ -640,8 +673,9 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 
 	/**
 	 * Unsecure the current working directory
+	 *
 	 * @param string $site Optionally specify the site.
-	 * @param boolean $all Optionally unsecure all secured sites
+	 * @param bool $all Optionally unsecure all secured sites
 	 */
 	$app->command('unsecure [site] [--all]', function ($site = null, $all = null) {
 		if ($all) {
@@ -718,6 +752,7 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 		if (!$site) {
 			info("Isolating the current working directory...");
 			Site::isolate($phpVersion, $site);
+			info("The current working directory is now using $phpVersion.");
 
 			info('Restarting Nginx...');
 			Nginx::restart();
@@ -728,6 +763,7 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 		// Loop through the sites array and isolate each one.
 		foreach ($site as $sitename) {
 			Site::isolate($phpVersion, $sitename);
+			info("The site [$sitename] is now using $phpVersion.");
 		}
 		info('Restarting Nginx...');
 		Nginx::restart();
@@ -755,9 +791,9 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 
 	/**
 	 * Remove [unisolate] the current working directory's site
-	 * @param string $site Optionally specify the site
-	 * @param boolean $all Optionally unisolates all isolated sites
 	 *
+	 * @param string $site Optionally specify the site
+	 * @param bool $all Optionally unisolates all isolated sites
 	 */
 	$app->command('unisolate [--site=] [--all]', function ($output, $site = null, $all = null) {
 		if ($all) {
@@ -765,6 +801,7 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 
 			foreach ($isolated as $array) {
 				Site::unisolate($array["site"]);
+				info(sprintf('The site [%s] is now using the default PHP version.', $array["site"]));
 			}
 
 			info('Restarting Nginx...');
@@ -778,6 +815,7 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 		}
 
 		Site::unisolate($site);
+		info(sprintf('The site [%s] is now using the default PHP version.', $site));
 
 		info('Restarting Nginx...');
 		Nginx::restart();
@@ -876,6 +914,7 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 	/**
 	 * Get and copy the public URL of the current working directory site
 	 * that is currently being shared
+	 *
 	 * @param string|null $site Optionally, specify a site
 	 */
 	$app->command('fetch-share-url [site]', function ($site = null) {
@@ -900,6 +939,7 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 
 	/**
 	 * Set the ngrok authtoken.
+	 *
 	 * @param string $token Your personal ngrok authtoken
 	 */
 	$app->command('set-ngrok-token [token]', function ($token = null) {
@@ -912,7 +952,7 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 			return warning("Please provide your ngrok authtoken.");
 		}
 
-		Ngrok::run("authtoken $token " . Ngrok::getNgrokConfig());
+		Ngrok::run("authtoken $token " . Ngrok::getConfig());
 
 	})->setAliases(["auth"])->descriptions('Set the ngrok auth token', [
 		"token" => "Your personal ngrok authtoken"
@@ -954,7 +994,9 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 		"--options" => "Specify ngrok options/flags without the leading <fg=green>--</>. Multiple options must be separated by double slashes <fg=green>//</>."
 	])->addUsage("ngrok config add-authtoken [token] --options config=C:/ngrok.yml")->addUsage("ngrok config add-authtoken [token] -o config=C:/ngrok.yml");
 
-	/**** End Sharing ****/
+	/**
+	 * End Sharing
+	 */
 
 
 	/**
@@ -973,6 +1015,7 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 
 	/**
 	 * Restarts Valet's services
+	 *
 	 * @param string $service Optionally, specify a particular service to start.
 	 * [acrylic, nginx, php, xdebug]
 	 * @param string $devTxt Adds specific text to the output. INTERNAL USE ONLY.
@@ -1046,6 +1089,7 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 
 	/**
 	 * Stops Valet's services
+	 *
 	 * @param string $service Optionally, specify a particular service to stop.
 	 * [acrylic, nginx, php, xdebug]
 	 */
@@ -1111,6 +1155,7 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 
 	/**
 	 * Get the TLD currently being used by Valet.
+	 *
 	 * @param string $tld Optionally, set a new TLD.
 	 */
 	$app->command('tld [tld]', function ($tld = null) {
@@ -1178,6 +1223,7 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 
 	/**
 	 * Open the current working directory site in the browser
+	 *
 	 * @param string $site Optionally, specify a site
 	 */
 	$app->command('open [site]', function ($site = null) {
@@ -1203,19 +1249,20 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 
 	/**
 	 * View and follow a log file.
+	 *
 	 * @param string $key The name of the log
 	 * @param string $lines The number of lines to view
-	 * @param boolean $follow Follow real time streaming output of the changing file
+	 * @param bool $follow Follow real time streaming output of the changing file
 	 */
 	$app->command('log [key] [-l|--lines=] [-f|--follow]', function ($key, $lines, $follow) {
 		$defaultLogs = [
-			'nginx' => VALET_HOME_PATH . '/Log/nginx-error.log',
-			'nginxservice.err' => VALET_HOME_PATH . '/Log/nginxservice.err.log',
-			'nginxservice.out' => VALET_HOME_PATH . '/Log/nginxservice.out.log',
-			'nginxservice.wrapper' => VALET_HOME_PATH . '/Log/nginxservice.wrapper.log',
-			'phpcgiservice.err' => VALET_HOME_PATH . '/Log/phpcgiservice.err.log',
-			'phpcgiservice.out' => VALET_HOME_PATH . '/Log/phpcgiservice.out.log',
-			'phpcgiservice.wrapper' => VALET_HOME_PATH . '/Log/phpcgiservice.wrapper.log'
+			'nginx' => Valet::homePath() . '/Log/nginx-error.log',
+			'nginxservice.err' => Valet::homePath() . '/Log/nginxservice.err.log',
+			'nginxservice.out' => Valet::homePath() . '/Log/nginxservice.out.log',
+			'nginxservice.wrapper' => Valet::homePath() . '/Log/nginxservice.wrapper.log',
+			'phpcgiservice.err' => Valet::homePath() . '/Log/phpcgiservice.err.log',
+			'phpcgiservice.out' => Valet::homePath() . '/Log/phpcgiservice.out.log',
+			'phpcgiservice.wrapper' => Valet::homePath() . '/Log/phpcgiservice.wrapper.log'
 		];
 
 		$configLogs = data_get(Configuration::read(), 'logs');
@@ -1280,20 +1327,8 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 	])->addUsage("log nginx --lines=3 --follow")->addUsage("log nginx -l 3 -f");
 
 	/**
-	 * List the installed Valet services.
-	 */
-	$app->command('services', function () {
-		info("Checking the Valet services...");
-
-		$services = Valet::services();
-		output("\n");
-
-		table(['Service', 'Windows Name', 'Status'], $services, true);
-		info('Use <bg=magenta> start </> <bg=magenta> stop </> or <bg=magenta> restart </> commands to change the status, eg. <bg=magenta> valet restart nginx </>');
-	})->descriptions('List the installed Valet services.');
-
-	/**
 	 * Determine directory-listing behaviour. Default is off, which means a 404 will display.
+	 *
 	 * @param string $status Optionally, switch directory listing [on, off]
 	 */
 	$app->command('directory-listing [status]', function ($status = null) {
@@ -1316,6 +1351,7 @@ if (is_dir(VALET_HOME_PATH) && Nginx::isInstalled()) {
 
 	/**
 	 * Uninstalls Valet's services
+	 *
 	 * @param bool $force Optionally force an uninstall without confirmation.
 	 * @param bool $purgeConfig Optionally purge and remove all Valet configs
 	 */

@@ -28,11 +28,15 @@ class Upgrader {
 	 * Run all the upgrades that should be run every time Valet commands are run.
 	 */
 	public function onEveryRun() {
-		$this->prunePathsFromConfig();
-		$this->pruneSymbolicLinks();
-		$this->upgradeSymbolicLinks();
-		$this->lintNginxConfigs();
-		$this->upgradeNginxSiteConfigs();
+		// Only run if the Valet home path exists.
+		if ($this->files->isDir(Valet::homePath())) {
+			$this->prunePathsFromConfig();
+			$this->pruneSymbolicLinks();
+			$this->upgradeSymbolicLinks();
+			$this->lintNginxConfigs();
+			$this->upgradeNginxSiteConfigs();
+			$this->fixOldSampleValetDriver();
+		}
 	}
 
 	/**
@@ -61,12 +65,11 @@ class Upgrader {
 	 * This is a one-time upgrade that will be run when Valet is first installed.
 	 */
 	private function upgradeSymbolicLinks() {
-		// Check if the symlinks have already been upgraded, by checking if a key exists in
-		// the config. If not, then upgrade them.
-		if ($this->config->get("symlinks_upgraded", false) === false) {
+		if ($this->shouldUpgradeSymbolicLinks()) {
 			info("Upgrading your linked sites from the old junction links to symbolic links...");
-
+			// Convert all junction links to symbolic links.
 			$this->files->convertJunctionsToSymlinks($this->site->sitesPath());
+
 			// Add a new key to the config file to indicate that the symlinks have been upgraded.
 			// This will prevent the upgrade from running again, since it is a one-time upgrade.
 			$this->config->updateKey("symlinks_upgraded", true);
@@ -76,9 +79,31 @@ class Upgrader {
 	}
 
 	/**
+	 * Check if the symbolic links should be upgraded.
+	 *
+	 * @return bool Returns a boolean indicating whether the symlinks should be upgraded.
+	 *
+	 * The symlinks should be upgraded if:
+	 *
+	 * 1. The symlinks have not been upgraded yet (`$symlinksUpgraded` is `false`).
+	 * 2. The sites directory is not empty (`$isDirEmpty` is `false`).
+	 */
+	private function shouldUpgradeSymbolicLinks() {
+		// Get the value of the "symlinks_upgraded" key from the config.
+		// If the key doesn't exist, it will return false.
+		$symlinksUpgraded = $this->config->get("symlinks_upgraded", false);
+
+		// Check if the sites directory is empty.
+		$isDirEmpty = $this->files->isDirEmpty($this->site->sitesPath());
+
+		// Check if the symlinks have not been upgraded yet AND the sites directory is not empty.
+		return !$symlinksUpgraded && !$isDirEmpty;
+	}
+
+	/**
 	 * Lint the Nginx configuration files.
 	 *
-	 * @param boolean $returnOutput
+	 * @param bool $returnOutput
 	 *
 	 * @return string|null
 	 */
@@ -134,6 +159,35 @@ class Upgrader {
 						}
 					}
 				}
+			}
+		}
+	}
+
+	/**
+	 * If the user has the old `SampleValetDriver` without the Valet namespace,
+	 * replace it with the new `SampleValetDriver` that uses the namespace.
+	 */
+	public function fixOldSampleValetDriver(): void {
+		$samplePath = Valet::homePath() . '/Drivers/SampleValetDriver.php';
+
+		if ($this->files->exists($samplePath)) {
+			$contents = $this->files->get($samplePath);
+
+			if (! str_contains($contents, 'namespace')) {
+				if ($contents !== $this->files->getStub('LegacySampleValetDriver.php')) {
+					warning('Existing SampleValetDriver.php has been customized.');
+					warning("Backing up at '$samplePath.bak'");
+
+					$this->files->putAsUser(
+						"$samplePath.bak",
+						$contents
+					);
+				}
+
+				$this->files->putAsUser(
+					$samplePath,
+					$this->files->getStub('SampleValetDriver.php')
+				);
 			}
 		}
 	}
