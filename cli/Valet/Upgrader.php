@@ -36,6 +36,7 @@ class Upgrader {
 			$this->lintNginxConfigs();
 			$this->upgradeNginxSiteConfigs();
 			$this->fixOldSampleValetDriver();
+			$this->addMissingConfigKeys();
 		}
 	}
 
@@ -190,5 +191,12 @@ class Upgrader {
 				);
 			}
 		}
+	}
+
+	/**
+	 * Add any missing necessary default configuration keys.
+	 */
+	public function addMissingConfigKeys() {
+		$this->config->addMissingDefaultConfigKeys();
 	}
 }
