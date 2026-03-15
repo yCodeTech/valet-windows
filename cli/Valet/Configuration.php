@@ -167,6 +167,30 @@ class Configuration {
 	}
 
 	/**
+	 * Add any missing necessary default configuration keys.
+	 *
+	 * It will not overwrite any existing configuration values,
+	 * only add missing keys with default values.
+	 */
+	public function addMissingDefaultConfigKeys() {
+		$config = $this->read();
+
+		// Add default_php if missing or is null.
+		if (!isset($config['default_php']) || $config['default_php'] === null) {
+			$this->addDefaultPhp();
+		}
+
+		// Add tld if missing.
+		$this->updateKey('tld', $config['tld'] ?? 'test');
+		// Add php_port if missing.
+		$this->updateKey('php_port', $config['php_port'] ?? PhpCgi::PORT);
+		// Add the default php_xdebug_port if missing.
+		$this->updateKey('php_xdebug_port', $config['php_xdebug_port'] ?? PhpCgiXdebug::PORT);
+		// Add share-tool if missing.
+		$this->updateKey('share-tool', $config['share-tool'] ?? 'ngrok');
+	}
+
+	/**
 	 * Forcefully delete the Valet home configuration directory and contents.
 	 */
 	public function uninstall() {
@@ -476,29 +500,5 @@ class Configuration {
 	 */
 	protected function valetHomePath(string $path = ''): string {
 		return Valet::homePath($path);
-	}
-
-	/**
-	 * Add any missing necessary default configuration keys.
-	 *
-	 * It will not overwrite any existing configuration values,
-	 * only add missing keys with default values.
-	 */
-	public function addMissingDefaultConfigKeys() {
-		$config = $this->read();
-
-		// Add default_php if missing or is null.
-		if (!isset($config['default_php']) || $config['default_php'] === null) {
-			$this->addDefaultPhp();
-		}
-
-		// Add tld if missing.
-		$this->updateKey('tld', $config['tld'] ?? 'test');
-		// Add php_port if missing.
-		$this->updateKey('php_port', $config['php_port'] ?? PhpCgi::PORT);
-		// Add the default php_xdebug_port if missing.
-		$this->updateKey('php_xdebug_port', $config['php_xdebug_port'] ?? PhpCgiXdebug::PORT);
-		// Add share-tool if missing.
-		$this->updateKey('share-tool', $config['share-tool'] ?? 'ngrok');
 	}
 }
