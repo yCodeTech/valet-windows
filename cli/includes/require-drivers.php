@@ -38,7 +38,7 @@ foreach (scandir($specificDriversDir) as $file) {
 }
 
 // Require legacy drivers.
-$legacyDriversDir = "$includesDir/legacy";
+$legacyDriversDir = "$includesDir/legacy_drivers";
 
 foreach (scandir($legacyDriversDir) as $file) {
 	if (substr($file, 0, 1) !== '.') {
