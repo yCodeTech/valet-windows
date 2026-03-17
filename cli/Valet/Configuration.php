@@ -149,6 +149,7 @@ class Configuration {
 	 * Write the base, initial configuration for Valet.
 	 */
 	public function writeBaseConfiguration() {
+		// If the configuration file doesn't exist, create it with the base configuration.
 		if (!$this->files->exists($this->path())) {
 			$baseConfig = [
 				'tld' => 'test',
@@ -161,6 +162,17 @@ class Configuration {
 			$this->write($baseConfig);
 		}
 
+		// If the configuration file exists, ensure it has all the necessary keys.
+		$this->addMissingDefaultConfigKeys();
+	}
+
+	/**
+	 * Add any missing necessary default configuration keys.
+	 *
+	 * It will not overwrite any existing configuration values,
+	 * only add missing keys with default values.
+	 */
+	public function addMissingDefaultConfigKeys() {
 		$config = $this->read();
 
 		// Add default_php if missing or is null.
