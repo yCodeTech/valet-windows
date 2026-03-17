@@ -980,7 +980,8 @@ class Site {
 	 * @return array|string|null
 	 */
 	public function replacePhpVersionInSiteConf($siteConf, $phpPort, $phpVersion = null) {
-		$siteConf = str_replace('127.0.0.1:$valet_php_port;', "127.0.0.1:{$phpPort};", $siteConf);
+		// Replace both the variable $valet_php_port and any existing specific port numbers
+		$siteConf = preg_replace('/127\.0\.0\.1:(?:\$valet_php_port|\d+);/', "127.0.0.1:{$phpPort};", $siteConf);
 
 		// Remove `Valet isolated PHP version` line from config
 		$siteConf = preg_replace('/# Valet isolated PHP version.*\n/', '', $siteConf);
