@@ -1048,14 +1048,14 @@ class Site {
 		$tld = $this->config->read()['tld'];
 
 		foreach (explode(',', $url) as $proxyUrl) {
-			if (!str_ends_with($url, '.' . $tld)) {
-				$protocol = $this->isSecured($proxyUrl) ? 'https' : 'http';
-
+			if (!str_ends_with($proxyUrl, '.' . $tld)) {
 				$proxyUrl .= '.' . $tld;
 			}
 
 			$this->unsecure($proxyUrl);
 			$this->files->unlink($this->nginxPath($proxyUrl));
+
+			$protocol = $this->isSecured($proxyUrl) ? 'https' : 'http';
 			info("Valet will no longer proxy [$protocol://" . $proxyUrl . "].");
 		}
 	}
@@ -1104,6 +1104,21 @@ class Site {
 			});
 
 		return $proxies;
+	}
+
+	/**
+	 * Determine if a site is a proxy.
+	 *
+	 * @param string $site
+	 *
+	 * @return bool
+	 */
+	public function isProxy($site) {
+		$proxies = $this->proxies()->map(function ($arr, $key) {
+			return ["site" => $arr["site"]];
+		})->flatten()->all();
+
+		return in_array(explode(".", $site)[0], $proxies);
 	}
 
 	/**
