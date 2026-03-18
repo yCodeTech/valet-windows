@@ -1106,6 +1106,21 @@ class Site {
 	}
 
 	/**
+	 * Determine if a site is a proxy.
+	 *
+	 * @param string $site
+	 *
+	 * @return bool
+	 */
+	public function isProxy($site) {
+		$proxies = $this->proxies()->map(function ($arr, $key) {
+			return ["site" => $arr["site"]];
+		})->flatten()->all();
+
+		return in_array(explode(".", $site)[0], $proxies);
+	}
+
+	/**
 	 * Identify whether a site is for a proxy by reading the host name from its config file.
 	 *
 	 * @param string $site Site name without TLD

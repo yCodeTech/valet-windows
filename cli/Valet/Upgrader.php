@@ -150,6 +150,17 @@ class Upgrader {
 							$this->site->unisolate($site);
 							$this->site->isolate($phpVersion, $site);
 						}
+						// If the site is a proxy...
+						elseif ($this->site->isProxy($site)) {
+							// Get the proxy host and whether the site is secured.
+							$host = $this->site->getProxyHostForSite($site);
+							$secured = $this->site->isSecured($site);
+
+							// Delete the proxy and re-create it using the host and
+							// secured values to upgrade the Nginx config file.
+							$this->site->proxyDelete($site);
+							$this->site->proxyCreate($site, $host, $secured);
+						}
 						// If the site is secured...
 						elseif ($this->site->isSecured($site)) {
 							// Unsecure the site and re-secure it to upgrade
