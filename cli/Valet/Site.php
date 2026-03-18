@@ -1047,14 +1047,14 @@ class Site {
 		$tld = $this->config->read()['tld'];
 
 		foreach (explode(',', $url) as $proxyUrl) {
-			if (!str_ends_with($url, '.' . $tld)) {
-				$protocol = $this->isSecured($proxyUrl) ? 'https' : 'http';
-
+			if (!str_ends_with($proxyUrl, '.' . $tld)) {
 				$proxyUrl .= '.' . $tld;
 			}
 
 			$this->unsecure($proxyUrl);
 			$this->files->unlink($this->nginxPath($proxyUrl));
+
+			$protocol = $this->isSecured($proxyUrl) ? 'https' : 'http';
 			info("Valet will no longer proxy [$protocol://" . $proxyUrl . "].");
 		}
 	}
