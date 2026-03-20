@@ -976,15 +976,26 @@ class Site {
 	 *
 	 * @param string $siteConf
 	 * @param string $phpPort
+	 * @param string|null $phpVersion
 	 *
 	 * @return array|string|null
 	 */
 	public function replacePhpVersionInSiteConf($siteConf, $phpPort, $phpVersion = null) {
-		// Replace both the variable $valet_php_port and any existing specific port numbers
-		$siteConf = preg_replace('/127\.0\.0\.1:(?:\$valet_php_port|\d+);/', "127.0.0.1:{$phpPort};", $siteConf);
-
 		// Remove `Valet isolated PHP version` line from config
-		$siteConf = preg_replace('/# Valet isolated PHP version.*\n/', '', $siteConf);
+		$siteConf = preg_replace('/^# Valet isolated PHP version.*\R/m', '', $siteConf);
+
+		// If a specific PHP version is provided, use that port value,
+		// otherwise use the global variable.
+		$phpPortValue = $phpVersion ? $phpPort : '$valet_php_port';
+
+		// Replace existing port number or global variable with the new port value
+		// or global variable, depending on whether the site is isolated or not.
+		$siteConf = preg_replace(
+			'/(^\s*set \$valet_site_php_port\s+)[^;]+(\s*;)/m',
+			"$1{$phpPortValue}$2",
+			$siteConf,
+			1
+		);
 
 		if ($phpVersion) {
 			$siteConf = '# Valet isolated PHP version : ' . $phpVersion . PHP_EOL . $siteConf;
