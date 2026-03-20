@@ -18,6 +18,13 @@ class Upgrader {
 	 */
 	protected $site;
 
+	/**
+	 * Sites that have had their Nginx configs upgraded during this run of Valet.
+	 *
+	 * @var array<string, bool>
+	 */
+	protected $upgradedNginxSites = [];
+
 	public function __construct(Filesystem $files, Configuration $config, Site $site) {
 		$this->files = $files;
 		$this->config = $config;
@@ -33,8 +40,7 @@ class Upgrader {
 			$this->prunePathsFromConfig();
 			$this->pruneSymbolicLinks();
 			$this->upgradeSymbolicLinks();
-			$this->lintNginxConfigs();
-			$this->upgradeNginxSiteConfigs();
+			$this->upgradeDeprecatedNginxConfigDirectives();
 			$this->fixOldSampleValetDriver();
 		}
 	}
@@ -116,17 +122,73 @@ class Upgrader {
 	/**
 	 * Upgrade Nginx site configurations.
 	 *
-	 * This method checks the Nginx configuration files for deprecated `http2` param
-	 * and `http2_push_preload` directive, then upgrades the site configurations accordingly.
+	 * To upgrade the Nginx config files for each site, this method will:
+	 * - Unisolate and reisolate isolated sites
+	 * - Delete and recreate proxy sites
+	 * - Unsecure and resecure secured sites
+	 *
+	 * @param string $site The site to upgrade.
 	 */
-	private function upgradeNginxSiteConfigs() {
+	private function upgradeNginxSiteConfigs($site) {
+		info("Upgrading Nginx config for site '{$site}'...");
+
+		$didUpgrade = false;
+
+		// If the site is isolated...
+		if ($this->site->isIsolated($site)) {
+			// Get the PHP version for the site.
+			$phpVersion = $this->site->customPhpVersion($site);
+
+			// Unisolate the site and re-isolate it using the phpVersion to
+			// upgrade the Nginx config file.
+			$this->site->unisolate($site);
+			$this->site->isolate($phpVersion, $site);
+			$didUpgrade = true;
+		}
+		// If the site is a proxy...
+		elseif ($this->site->isProxy($site)) {
+			// Get the proxy host and whether the site is secured.
+			$host = $this->site->getProxyHostForSite($site);
+			$secured = $this->site->isSecured($site);
+
+			// Delete the proxy and re-create it using the host and
+			// secured values to upgrade the Nginx config file.
+			$this->site->proxyDelete($site);
+			$this->site->proxyCreate($site, $host, $secured);
+			$didUpgrade = true;
+		}
+		// If the site is secured...
+		elseif ($this->site->isSecured($site)) {
+			// Unsecure the site and re-secure it to upgrade
+			// the Nginx config file.
+			$this->site->unsecure($site);
+			$this->site->secure($site);
+			$didUpgrade = true;
+		}
+
+		if ($didUpgrade) {
+			$this->upgradedNginxSites[$site] = true;
+		}
+	}
+
+	/**
+	 * Upgrade deprecated Nginx configuration directives.
+	 *
+	 * This method checks the Nginx configuration files for deprecated `http2` param and `http2_push_preload` directive, then prompts the user to upgrade their Nginx site configurations accordingly.
+	 */
+	private function upgradeDeprecatedNginxConfigDirectives() {
 		$output = $this->lintNginxConfigs(true);
 
 		// If output is not empty...
 		if (!empty($output)) {
-			$stringsToCheck = ['the "listen ... http2" directive is deprecated', '"http2_push_preload" directive is obsolete'];
+			$stringsToCheck = [
+				'the "listen ... http2" directive is deprecated',
+				'"http2_push_preload" directive is obsolete'
+			];
 
 			$outputArray = explode("\r\n", $output);
+
+			$sitesToUpgrade = [];
 
 			// For each line in the output...
 			foreach ($outputArray as $line) {
@@ -139,36 +201,21 @@ class Upgrader {
 						// Get the site name from file path in the matched string,
 						// ie. gets the filename (site.conf) and removes the extension.
 						$site = basename($matches[1], ".conf");
-
-						// If the site is isolated...
-						if ($this->site->isIsolated($site)) {
-							// Get the PHP version for the site.
-							$phpVersion = $this->site->customPhpVersion($site);
-
-							// Unisolate the site and re-isolate it using the phpVersion to
-							// upgrade the Nginx config file.
-							$this->site->unisolate($site);
-							$this->site->isolate($phpVersion, $site);
-						}
-						// If the site is a proxy...
-						elseif ($this->site->isProxy($site)) {
-							// Get the proxy host and whether the site is secured.
-							$host = $this->site->getProxyHostForSite($site);
-							$secured = $this->site->isSecured($site);
-
-							// Delete the proxy and re-create it using the host and
-							// secured values to upgrade the Nginx config file.
-							$this->site->proxyDelete($site);
-							$this->site->proxyCreate($site, $host, $secured);
-						}
-						// If the site is secured...
-						elseif ($this->site->isSecured($site)) {
-							// Unsecure the site and re-secure it to upgrade
-							// the Nginx config file.
-							$this->site->unsecure($site);
-							$this->site->secure($site);
-						}
+						// Add the site to the sitesToUpgrade array.
+						// This ensures that if a site has multiple deprecated directives,
+						// it will only be added to the array once.
+						$sitesToUpgrade[$site] = true;
 					}
+				}
+			}
+
+			// If there are any sites to upgrade...
+			if (!empty($sitesToUpgrade)) {
+				warning('Your Nginx configuration files contain some deprecated directives that need to be updated.');
+
+				// Upgrade the Nginx config files for each site that needs to be upgraded.
+				foreach (array_keys($sitesToUpgrade) as $site) {
+					$this->upgradeNginxSiteConfigs($site);
 				}
 			}
 		}
