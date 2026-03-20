@@ -42,6 +42,7 @@ class Upgrader {
 			$this->upgradeSymbolicLinks();
 			$this->upgradeDeprecatedNginxConfigDirectives();
 			$this->fixOldSampleValetDriver();
+			$this->upgradeNginxSitePhpPortOverrides();
 		}
 	}
 
@@ -248,5 +249,59 @@ class Upgrader {
 				);
 			}
 		}
+	}
+
+	/**
+	 * Upgrade all Nginx site configs to use per-site PHP port overrides.
+	 */
+	private function upgradeNginxSitePhpPortOverrides() {
+		// If the PHP port definitions have already been upgraded, skip.
+		if (!$this->shouldUpgradeNginxSitePhpPortOverrides()) {
+			return;
+		}
+
+		// If the Nginx config directory doesn't exist, skip and mark it as upgraded to prevent
+		// this from running again.
+		if (!$this->files->exists($this->site->nginxPath())) {
+			$this->config->updateKey('php_port_overrides_upgraded', true);
+			return;
+		}
+
+		$upgraded = 0;
+		$tld = $this->config->read()['tld'];
+
+		// Get all the Nginx config files for the sites.
+		foreach ($this->files->scandir($this->site->nginxPath()) as $file) {
+			// If the file doesn't end with ".{tld}.conf", skip it.
+			if (!str_ends_with($file, ".{$tld}.conf")) {
+				continue;
+			}
+
+			// Remove the ".conf" extension from the filename to get the site name.
+			$site = basename($file, '.conf');
+
+			// If the site has already been upgraded during this run, skip it.
+			if (isset($this->upgradedNginxSites[$site])) {
+				continue;
+			}
+
+			$this->upgradeNginxSiteConfigs($site);
+			$upgraded++;
+		}
+
+		if ($upgraded > 0) {
+			info("Upgraded {$upgraded} Nginx site config(s) to the new PHP port override format.");
+		}
+
+		$this->config->updateKey('php_port_overrides_upgraded', true);
+	}
+
+	/**
+	 * Determine whether Nginx site PHP port overrides should be upgraded.
+	 *
+	 * @return bool
+	 */
+	private function shouldUpgradeNginxSitePhpPortOverrides() {
+		return !$this->config->get('php_port_overrides_upgraded', false);
 	}
 }
