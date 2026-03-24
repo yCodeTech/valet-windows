@@ -77,9 +77,8 @@ class Upgrader {
 			// Convert all junction links to symbolic links.
 			$this->files->convertJunctionsToSymlinks($this->site->sitesPath());
 
-			// Add a new key to the config file to indicate that the symlinks have been upgraded.
-			// This will prevent the upgrade from running again, since it is a one-time upgrade.
-			$this->config->updateKey("symlinks_upgraded", true);
+			// Mark this upgrade as complete so it will not run again.
+			$this->markAsUpgraded('symlinks_upgraded');
 
 			info("Successfully upgraded junction links to symbolic links.");
 		}
@@ -261,7 +260,7 @@ class Upgrader {
 		// If the Nginx config directory doesn't exist, skip and mark it as upgraded to prevent
 		// this from running again.
 		if (!$this->files->exists($this->site->nginxPath())) {
-			$this->config->updateKey('php_port_overrides_upgraded', true);
+			$this->markAsUpgraded('php_port_overrides_upgraded');
 			return;
 		}
 
@@ -291,7 +290,7 @@ class Upgrader {
 			info("Upgraded {$upgraded} Nginx site config(s) to the new PHP port override format.");
 		}
 
-		$this->config->updateKey('php_port_overrides_upgraded', true);
+		$this->markAsUpgraded('php_port_overrides_upgraded');
 	}
 
 	/**
@@ -312,5 +311,14 @@ class Upgrader {
 	 */
 	private function isUpgraded(string $upgradeId): bool {
 		return $this->config->get($upgradeId, false);
+	}
+
+	/**
+	 * Mark a named upgrade as completed in the configuration.
+	 *
+	 * @param string $upgradeId
+	 */
+	private function markAsUpgraded(string $upgradeId): void {
+		$this->config->updateKey($upgradeId, true);
 	}
 }
