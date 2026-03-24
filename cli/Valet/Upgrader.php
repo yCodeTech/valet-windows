@@ -96,9 +96,7 @@ class Upgrader {
 	 * 2. The sites directory is not empty (`$isDirEmpty` is `false`).
 	 */
 	private function shouldUpgradeSymbolicLinks() {
-		// Get the value of the "symlinks_upgraded" key from the config.
-		// If the key doesn't exist, it will return false.
-		$symlinksUpgraded = $this->config->get("symlinks_upgraded", false);
+		$symlinksUpgraded = $this->isUpgraded('symlinks_upgraded');
 
 		// Check if the sites directory is empty.
 		$isDirEmpty = $this->files->isDirEmpty($this->site->sitesPath());
@@ -302,6 +300,17 @@ class Upgrader {
 	 * @return bool
 	 */
 	private function shouldUpgradeNginxSitePhpPortOverrides() {
-		return !$this->config->get('php_port_overrides_upgraded', false);
+		return !$this->isUpgraded('php_port_overrides_upgraded');
+	}
+
+	/**
+	 * Determine if a named upgrade has already been completed.
+	 *
+	 * @param string $upgradeId
+	 *
+	 * @return bool
+	 */
+	private function isUpgraded(string $upgradeId): bool {
+		return $this->config->get($upgradeId, false);
 	}
 }
