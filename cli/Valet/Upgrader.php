@@ -78,7 +78,7 @@ class Upgrader {
 			$this->files->convertJunctionsToSymlinks($this->site->sitesPath());
 
 			// Mark this upgrade as complete so it will not run again.
-			$this->markAsUpgraded('symlinks_upgraded');
+			$this->markAsUpgraded('symlinks');
 
 			info("Successfully upgraded junction links to symbolic links.");
 		}
@@ -95,7 +95,7 @@ class Upgrader {
 	 * 2. The sites directory is not empty (`$isDirEmpty` is `false`).
 	 */
 	private function shouldUpgradeSymbolicLinks() {
-		$symlinksUpgraded = $this->isUpgraded('symlinks_upgraded');
+		$symlinksUpgraded = $this->isUpgraded('symlinks');
 
 		// Check if the sites directory is empty.
 		$isDirEmpty = $this->files->isDirEmpty($this->site->sitesPath());
@@ -260,7 +260,7 @@ class Upgrader {
 		// If the Nginx config directory doesn't exist, skip and mark it as upgraded to prevent
 		// this from running again.
 		if (!$this->files->exists($this->site->nginxPath())) {
-			$this->markAsUpgraded('php_port_overrides_upgraded');
+			$this->markAsUpgraded('nginx_site_php_port_overrides');
 			return;
 		}
 
@@ -290,7 +290,7 @@ class Upgrader {
 			info("Upgraded {$upgraded} Nginx site config(s) to the new PHP port override format.");
 		}
 
-		$this->markAsUpgraded('php_port_overrides_upgraded');
+		$this->markAsUpgraded('nginx_site_php_port_overrides');
 	}
 
 	/**
@@ -301,7 +301,7 @@ class Upgrader {
 	 * @return bool
 	 */
 	private function isUpgraded(string $upgradeId): bool {
-		return $this->config->get($upgradeId, false);
+		return $this->config->get("upgrades.{$upgradeId}", false);
 	}
 
 	/**
@@ -310,6 +310,6 @@ class Upgrader {
 	 * @param string $upgradeId
 	 */
 	private function markAsUpgraded(string $upgradeId): void {
-		$this->config->updateKey($upgradeId, true);
+		$this->config->updateKey("upgrades.{$upgradeId}", true);
 	}
 }
