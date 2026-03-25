@@ -465,6 +465,24 @@ class Configuration {
 	}
 
 	/**
+	 * Remove a specific key from the configuration file.
+	 *
+	 * @uses Arr:forget Removes a value within a nested array using "dot" notation.
+	 * @link https://laravel.com/docs/13.x/helpers#method-array-forget
+	 *
+	 * @param string $key
+	 *
+	 * @return array
+	 */
+	public function removeKey(string $key): array {
+		return tap($this->read(), function (&$config) use ($key) {
+			Arr::forget($config, $key);
+
+			$this->write($config);
+		});
+	}
+
+	/**
 	 * Write the given configuration to disk.
 	 *
 	 * @param array $config

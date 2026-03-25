@@ -72,6 +72,9 @@ class Upgrader {
 	 * This is a one-time upgrade that will be run when Valet is first installed.
 	 */
 	private function upgradeSymbolicLinks() {
+		// Migrate legacy symlinks upgrade key to the new format.
+		$this->migrateSymlinksUpgradeKey();
+
 		if ($this->shouldUpgradeSymbolicLinks()) {
 			info("Upgrading your linked sites from the old junction links to symbolic links...");
 			// Convert all junction links to symbolic links.
@@ -311,5 +314,29 @@ class Upgrader {
 	 */
 	private function markAsUpgraded(string $upgradeId): void {
 		$this->config->updateKey("upgrades.{$upgradeId}", true);
+	}
+
+	/**
+	 * Migrate legacy `symlinks_upgraded` upgrade key to the new `symlinks` key under
+	 * the `upgrades` array in the configuration (`upgrades.symlinks`).
+	 *
+	 * If the legacy key exists but the new key doesn't, it marks the upgrade as completed,
+	 * and removes legacy key from configuration.
+	 */
+	private function migrateSymlinksUpgradeKey(): void {
+		$legacyUpgradeKey = 'symlinks_upgraded';
+		$newUpgradeKey = 'symlinks';
+
+		$hasNewKey = $this->config->get("upgrades.{$newUpgradeKey}", false);
+		$hasLegacyKey = $this->config->get($legacyUpgradeKey, false);
+
+		// If the legacy key exists AND the new key doesn't,
+		// mark the new upgrade key as upgraded.
+		if ($hasLegacyKey && !$hasNewKey) {
+			$this->markAsUpgraded($newUpgradeKey);
+		}
+
+		// Remove the legacy upgrade key to clean up the config.
+		$this->config->removeKey($legacyUpgradeKey);
 	}
 }
