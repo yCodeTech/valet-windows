@@ -253,7 +253,7 @@ class Upgrader {
 	 */
 	private function upgradeNginxSitePhpPortOverrides() {
 		// If the PHP port definitions have already been upgraded, skip.
-		if (!$this->shouldUpgradeNginxSitePhpPortOverrides()) {
+		if ($this->isUpgraded('nginx_site_php_port_overrides')) {
 			return;
 		}
 
@@ -291,15 +291,6 @@ class Upgrader {
 		}
 
 		$this->markAsUpgraded('php_port_overrides_upgraded');
-	}
-
-	/**
-	 * Determine whether Nginx site PHP port overrides should be upgraded.
-	 *
-	 * @return bool
-	 */
-	private function shouldUpgradeNginxSitePhpPortOverrides() {
-		return !$this->isUpgraded('php_port_overrides_upgraded');
 	}
 
 	/**
