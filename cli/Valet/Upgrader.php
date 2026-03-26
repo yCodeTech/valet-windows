@@ -207,7 +207,7 @@ class Upgrader {
 	 * If the user has the old `SampleValetDriver` without the Valet namespace,
 	 * replace it with the new `SampleValetDriver` that uses the namespace.
 	 */
-	public function fixOldSampleValetDriver(): void {
+	public function fixOldSampleValetDriver() {
 		$samplePath = Valet::homePath() . '/Drivers/SampleValetDriver.php';
 
 		if ($this->files->exists($samplePath)) {
@@ -293,7 +293,7 @@ class Upgrader {
 	 *
 	 * @param string $upgradeId
 	 */
-	private function markAsUpgraded(string $upgradeId): void {
+	private function markAsUpgraded(string $upgradeId) {
 		$this->config->updateKey("upgrades.{$upgradeId}", true);
 	}
 
@@ -304,7 +304,7 @@ class Upgrader {
 	 * If the legacy key exists but the new key doesn't, it marks the upgrade as completed,
 	 * and removes legacy key from configuration.
 	 */
-	private function migrateSymlinksUpgradeKey(): void {
+	private function migrateSymlinksUpgradeKey() {
 		$legacyUpgradeKey = 'symlinks_upgraded';
 		$newUpgradeKey = 'symlinks';
 
