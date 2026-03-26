@@ -75,7 +75,8 @@ class Upgrader {
 		// Migrate legacy symlinks upgrade key to the new format.
 		$this->migrateSymlinksUpgradeKey();
 
-		if ($this->shouldUpgradeSymbolicLinks()) {
+		// Check if the symlinks have NOT been upgraded yet AND the sites directory is NOT empty.
+		if (!$this->isUpgraded('symlinks') && !$this->files->isDirEmpty($this->site->sitesPath())) {
 			info("Upgrading your linked sites from the old junction links to symbolic links...");
 			// Convert all junction links to symbolic links.
 			$this->files->convertJunctionsToSymlinks($this->site->sitesPath());
@@ -85,26 +86,6 @@ class Upgrader {
 
 			info("Successfully upgraded junction links to symbolic links.");
 		}
-	}
-
-	/**
-	 * Check if the symbolic links should be upgraded.
-	 *
-	 * @return bool Returns a boolean indicating whether the symlinks should be upgraded.
-	 *
-	 * The symlinks should be upgraded if:
-	 *
-	 * 1. The symlinks have not been upgraded yet (`$symlinksUpgraded` is `false`).
-	 * 2. The sites directory is not empty (`$isDirEmpty` is `false`).
-	 */
-	private function shouldUpgradeSymbolicLinks() {
-		$symlinksUpgraded = $this->isUpgraded('symlinks');
-
-		// Check if the sites directory is empty.
-		$isDirEmpty = $this->files->isDirEmpty($this->site->sitesPath());
-
-		// Check if the symlinks have not been upgraded yet AND the sites directory is not empty.
-		return !$symlinksUpgraded && !$isDirEmpty;
 	}
 
 	/**
