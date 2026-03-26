@@ -327,7 +327,7 @@ class Upgrader {
 		$legacyUpgradeKey = 'symlinks_upgraded';
 		$newUpgradeKey = 'symlinks';
 
-		$hasNewKey = $this->config->get("upgrades.{$newUpgradeKey}", false);
+		$hasNewKey = $this->isUpgraded($newUpgradeKey);
 		$hasLegacyKey = $this->config->get($legacyUpgradeKey, false);
 
 		// If the legacy key exists AND the new key doesn't,
