@@ -72,39 +72,20 @@ class Upgrader {
 	 * This is a one-time upgrade that will be run when Valet is first installed.
 	 */
 	private function upgradeSymbolicLinks() {
-		if ($this->shouldUpgradeSymbolicLinks()) {
+		// Migrate legacy symlinks upgrade key to the new format.
+		$this->migrateSymlinksUpgradeKey();
+
+		// Check if the symlinks have NOT been upgraded yet AND the sites directory is NOT empty.
+		if (!$this->isUpgraded('symlinks') && !$this->files->isDirEmpty($this->site->sitesPath())) {
 			info("Upgrading your linked sites from the old junction links to symbolic links...");
 			// Convert all junction links to symbolic links.
 			$this->files->convertJunctionsToSymlinks($this->site->sitesPath());
 
-			// Add a new key to the config file to indicate that the symlinks have been upgraded.
-			// This will prevent the upgrade from running again, since it is a one-time upgrade.
-			$this->config->updateKey("symlinks_upgraded", true);
+			// Mark this upgrade as complete so it will not run again.
+			$this->markAsUpgraded('symlinks');
 
 			info("Successfully upgraded junction links to symbolic links.");
 		}
-	}
-
-	/**
-	 * Check if the symbolic links should be upgraded.
-	 *
-	 * @return bool Returns a boolean indicating whether the symlinks should be upgraded.
-	 *
-	 * The symlinks should be upgraded if:
-	 *
-	 * 1. The symlinks have not been upgraded yet (`$symlinksUpgraded` is `false`).
-	 * 2. The sites directory is not empty (`$isDirEmpty` is `false`).
-	 */
-	private function shouldUpgradeSymbolicLinks() {
-		// Get the value of the "symlinks_upgraded" key from the config.
-		// If the key doesn't exist, it will return false.
-		$symlinksUpgraded = $this->config->get("symlinks_upgraded", false);
-
-		// Check if the sites directory is empty.
-		$isDirEmpty = $this->files->isDirEmpty($this->site->sitesPath());
-
-		// Check if the symlinks have not been upgraded yet AND the sites directory is not empty.
-		return !$symlinksUpgraded && !$isDirEmpty;
 	}
 
 	/**
@@ -226,7 +207,7 @@ class Upgrader {
 	 * If the user has the old `SampleValetDriver` without the Valet namespace,
 	 * replace it with the new `SampleValetDriver` that uses the namespace.
 	 */
-	public function fixOldSampleValetDriver(): void {
+	public function fixOldSampleValetDriver() {
 		$samplePath = Valet::homePath() . '/Drivers/SampleValetDriver.php';
 
 		if ($this->files->exists($samplePath)) {
@@ -256,14 +237,14 @@ class Upgrader {
 	 */
 	private function upgradeNginxSitePhpPortOverrides() {
 		// If the PHP port definitions have already been upgraded, skip.
-		if (!$this->shouldUpgradeNginxSitePhpPortOverrides()) {
+		if ($this->isUpgraded('nginx_site_php_port_overrides')) {
 			return;
 		}
 
 		// If the Nginx config directory doesn't exist, skip and mark it as upgraded to prevent
 		// this from running again.
 		if (!$this->files->exists($this->site->nginxPath())) {
-			$this->config->updateKey('php_port_overrides_upgraded', true);
+			$this->markAsUpgraded('nginx_site_php_port_overrides');
 			return;
 		}
 
@@ -293,15 +274,50 @@ class Upgrader {
 			info("Upgraded {$upgraded} Nginx site config(s) to the new PHP port override format.");
 		}
 
-		$this->config->updateKey('php_port_overrides_upgraded', true);
+		$this->markAsUpgraded('nginx_site_php_port_overrides');
 	}
 
 	/**
-	 * Determine whether Nginx site PHP port overrides should be upgraded.
+	 * Determine if a named upgrade has already been completed.
+	 *
+	 * @param string $upgradeId
 	 *
 	 * @return bool
 	 */
-	private function shouldUpgradeNginxSitePhpPortOverrides() {
-		return !$this->config->get('php_port_overrides_upgraded', false);
+	private function isUpgraded(string $upgradeId): bool {
+		return $this->config->get("upgrades.{$upgradeId}", false);
+	}
+
+	/**
+	 * Mark a named upgrade as completed in the configuration.
+	 *
+	 * @param string $upgradeId
+	 */
+	private function markAsUpgraded(string $upgradeId) {
+		$this->config->updateKey("upgrades.{$upgradeId}", true);
+	}
+
+	/**
+	 * Migrate legacy `symlinks_upgraded` upgrade key to the new `symlinks` key under
+	 * the `upgrades` array in the configuration (`upgrades.symlinks`).
+	 *
+	 * If the legacy key exists but the new key doesn't, it marks the upgrade as completed,
+	 * and removes legacy key from configuration.
+	 */
+	private function migrateSymlinksUpgradeKey() {
+		$legacyUpgradeKey = 'symlinks_upgraded';
+		$newUpgradeKey = 'symlinks';
+
+		$hasNewKey = $this->isUpgraded($newUpgradeKey);
+		$hasLegacyKey = $this->config->get($legacyUpgradeKey, false);
+
+		// If the legacy key exists AND the new key doesn't,
+		// mark the new upgrade key as upgraded.
+		if ($hasLegacyKey && !$hasNewKey) {
+			$this->markAsUpgraded($newUpgradeKey);
+		}
+
+		// Remove the legacy upgrade key to clean up the config.
+		$this->config->removeKey($legacyUpgradeKey);
 	}
 }

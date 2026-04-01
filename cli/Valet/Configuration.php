@@ -431,7 +431,10 @@ class Configuration {
 	}
 
 	/**
-	 * Get an item from the configuration file using "dot" notation.
+	 * Get an item from the configuration file.
+	 *
+	 * @uses Arr:get Gets a value from a nested array using "dot" notation.
+	 * @link https://laravel.com/docs/13.x/helpers#method-array-get
 	 *
 	 * @param string|int|null $key
 	 * @param mixed $default
@@ -445,6 +448,9 @@ class Configuration {
 	/**
 	 * Update a specific key in the configuration file.
 	 *
+	 * @uses Arr:set Sets a value within a nested array using "dot" notation.
+	 * @link https://laravel.com/docs/13.x/helpers#method-array-set
+	 *
 	 * @param string $key
 	 * @param mixed $value
 	 *
@@ -452,7 +458,25 @@ class Configuration {
 	 */
 	public function updateKey(string $key, $value): array {
 		return tap($this->read(), function (&$config) use ($key, $value) {
-			$config[$key] = $value;
+			Arr::set($config, $key, $value);
+
+			$this->write($config);
+		});
+	}
+
+	/**
+	 * Remove a specific key from the configuration file.
+	 *
+	 * @uses Arr:forget Removes a value within a nested array using "dot" notation.
+	 * @link https://laravel.com/docs/13.x/helpers#method-array-forget
+	 *
+	 * @param string $key
+	 *
+	 * @return array
+	 */
+	public function removeKey(string $key): array {
+		return tap($this->read(), function (&$config) use ($key) {
+			Arr::forget($config, $key);
 
 			$this->write($config);
 		});
