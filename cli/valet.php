@@ -405,6 +405,52 @@ $app->command('services', function () {
 })->descriptions('List the installed Valet services.');
 
 /**
+ * Display the current visibility of the nginx error page, or optionally
+ * update its visibility to enable or disable it.
+ *
+ * Valet's nginx error page is shown when a site has internal server or PHP errors.
+ * It is enabled by default, but can be disabled to allow any 3rd party error
+ * reporting tools to show instead.
+ *
+ * @param string $visibility Optionally, set to `on` to enable Valet's nginx 500 error page, or `off` to disable it. Default is `on`.
+ */
+$app->command('nginx-error-page [visibility]', function ($visibility = null) {
+	$key = 'nginx_error_page';
+	$current = Configuration::get($key);
+
+	// If no visibility argument was passed, output the current status of the nginx error page.
+	if ($visibility == null) {
+		return info("Valet's nginx 500 error page is $current.");
+	}
+
+	// If the visibility argument is valid...
+	if (in_array($visibility, ['on', 'off'])) {
+		// If the visibility is the same as the current value, output a message and return early.
+		// This avoids unnecessary nginx config rewrites when the user tries to set the visibility
+		// to its current value.
+		if ($visibility === $current) {
+			return info("Valet's nginx 500 error page is already $visibility.");
+		}
+
+		// Update the configuration value for the nginx error page visibility.
+		Configuration::updateKey($key, $visibility);
+
+		// Re-install nginx server config and restart nginx to apply the change.
+		Nginx::installServer();
+		Nginx::restart();
+
+		return info("Valet's nginx 500 error page is now $visibility.");
+	}
+	// If the visibility argument is invalid, output an error message.
+	else {
+		return warning("Invalid visibility. Please set to either 'on' or 'off'.");
+	}
+
+})->descriptions("Display the current visibility of Valet's nginx 500 error page, or optionally update its visibility to enable or disable it.", [
+	'visibility' => "<fg=green>[on = default]</> will show Valet's 500 error page \n <fg=green>[off]</> will disable it."
+]);
+
+/**
  * Most commands are available only if Valet is installed.
  */
 if (is_dir(Valet::homePath()) && Nginx::isInstalled()) {

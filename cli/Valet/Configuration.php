@@ -156,7 +156,8 @@ class Configuration {
 				'paths' => [$this->valetHomePath('Sites')],
 				'php_port' => PhpCgi::PORT,
 				'php_xdebug_port' => PhpCgiXdebug::PORT,
-				'share-tool' => 'ngrok'
+				'share-tool' => 'ngrok',
+				'nginx_error_page' => 'on'
 			];
 
 			$this->write($baseConfig);
@@ -188,6 +189,8 @@ class Configuration {
 		$this->updateKey('php_xdebug_port', $config['php_xdebug_port'] ?? PhpCgiXdebug::PORT);
 		// Add share-tool if missing.
 		$this->updateKey('share-tool', $config['share-tool'] ?? 'ngrok');
+		// Add nginx_error_page if missing.
+		$this->updateKey('nginx_error_page', $config['nginx_error_page'] ?? 'on');
 	}
 
 	/**
