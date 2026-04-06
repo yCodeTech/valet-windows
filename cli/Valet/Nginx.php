@@ -88,11 +88,14 @@ class Nginx {
 
 		$valetErrorTemplatePath = $this->files->realpath(valetBinPath() . '../cli/templates');
 
+		// Check if nginx error pages are disabled
+		$interceptErrors = $this->configuration->get('nginx_error_page');
+
 		$this->files->putAsUser(
 			$this->path('valet/valet.conf'),
 			str_replace(
-				['VALET_HOME_PATH', 'VALET_SERVER_PATH', 'VALET_STATIC_PREFIX', 'HOME_PATH', 'VALET_PHP_PORT', 'VALET_ERROR_TEMPLATE_PATH'],
-				[Valet::homePath(), VALET_SERVER_PATH, VALET_STATIC_PREFIX, $_SERVER['HOME'], $defaultPhp['port'], $valetErrorTemplatePath],
+				['VALET_HOME_PATH', 'VALET_SERVER_PATH', 'VALET_STATIC_PREFIX', 'HOME_PATH', 'VALET_PHP_PORT', 'VALET_ERROR_TEMPLATE_PATH', 'VALET_INTERCEPT_ERRORS'],
+				[Valet::homePath(), VALET_SERVER_PATH, VALET_STATIC_PREFIX, $_SERVER['HOME'], $defaultPhp['port'], $valetErrorTemplatePath, $interceptErrors],
 				$this->files->getStub('valet.conf')
 			)
 		);

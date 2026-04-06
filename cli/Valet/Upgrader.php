@@ -43,6 +43,7 @@ class Upgrader {
 			$this->upgradeDeprecatedNginxConfigDirectives();
 			$this->fixOldSampleValetDriver();
 			$this->upgradeNginxSitePhpPortOverrides();
+			$this->addMissingConfigKeys();
 		}
 	}
 
@@ -319,5 +320,12 @@ class Upgrader {
 
 		// Remove the legacy upgrade key to clean up the config.
 		$this->config->removeKey($legacyUpgradeKey);
+	}
+
+	/**
+	 * Add any missing necessary default configuration keys.
+	 */
+	public function addMissingConfigKeys() {
+		$this->config->addMissingDefaultConfigKeys();
 	}
 }

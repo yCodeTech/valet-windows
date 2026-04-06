@@ -138,6 +138,16 @@ composer global require ycodetech/valet-windows
     <td></td>
 		<td align="center"><a href="#parity">parity</a></td>
   </tr>
+  
+  <tr>
+  <th></th>
+    <td></td>
+    <td></td>
+    <td></td>
+		<td></td>
+    <td></td>
+		<td align="center"><a href="#nginx-error-page">nginx-error-page</a></td>
+  </tr>
 </table>
 
 ## Introduction
@@ -1420,6 +1430,23 @@ Parity at 87% out of a total 92% possible parity with the Laravel Valet (macOS) 
 ```
 
 This command is a way to determine how much parity has been achieved.
+
+##### nginx-error-page
+
+```
+nginx-error-page               Display the current visibility of the nginx error page.
+                 [visibility]  Optionally, set to "on" to enable Valet's nginx error page, or "off" to disable it.
+```
+
+```console
+$ valet nginx-error-page
+Valet's nginx error pages are on.
+
+$ valet nginx-error-page off
+Valet's nginx error pages are now off.
+```
+
+The nginx error pages are `on` (enabled) by default, which means that Valet's custom nginx 404/500 error pages will be shown when an error is encountered. However, for those who prefer to use a framework's error reporting exception pages like that of Symfony or Laravel, Valet's nginx error pages can be turned `off` (disabled).
 
 ---
 

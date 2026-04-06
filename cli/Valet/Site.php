@@ -309,7 +309,7 @@ class Site {
 	}
 
 	/**
-	 * Extract PHP version of exising nginx config.
+	 * Extract PHP version of existing nginx config.
 	 *
 	 * @param string $url
 	 *
