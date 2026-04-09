@@ -42,7 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-- Removed redundant `fastcgi_intercept_errors`/`proxy_intercept_errors` and `error_page` directives from site configs, since they are not used by nginx as it's only the main `valet.conf` that nginx uses these directives from.
+- Removed redundant `fastcgi_intercept_errors`/`proxy_intercept_errors` and `error_page` directives from site configs, since they are not used by nginx as it's only the main `valet.conf` that nginx uses these directives from. In PR [#39](https://github.com/yCodeTech/valet-windows/pull/39)
 
 ### Changed
 
