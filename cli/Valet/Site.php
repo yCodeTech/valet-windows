@@ -992,7 +992,7 @@ class Site {
 		// or global variable, depending on whether the site is isolated or not.
 		$siteConf = preg_replace(
 			'/(^\s*set \$valet_site_php_port\s+)[^;]+(\s*;)/m',
-			"$1{$phpPortValue}$2",
+			'${1}' . $phpPortValue . '$2',
 			$siteConf,
 			1
 		);
