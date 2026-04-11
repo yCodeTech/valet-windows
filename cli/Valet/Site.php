@@ -993,8 +993,7 @@ class Site {
 		$siteConf = preg_replace(
 			'/(^\s*set \$valet_site_php_port\s+)[^;]+(\s*;)/m',
 			'${1}' . $phpPortValue . '$2',
-			$siteConf,
-			1
+			$siteConf
 		);
 
 		if ($phpVersion) {
