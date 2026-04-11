@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/yCodeTech/valet-windows/tree/master)
 
+## [3.4.1](https://github.com/yCodeTech/valet-windows/tree/v3.4.1) - 2026-04-11
+
+### Fixed
+
+- Fixed [#42](https://github.com/yCodeTech/valet-windows/issues/42): replacing PHP ports in site configs removes the entire `set $valet_site_php_port` line and malforms the config; in [#43](https://github.com/yCodeTech/valet-windows/pull/43).
+
+### Removed
+
+- Removed the limit of max replacements the PHP port replacement can do, ensuring all PHP port lines in multiple location blocks in the site configs are replaced; in [#43](https://github.com/yCodeTech/valet-windows/pull/43).
+
 ## [3.4.0](https://github.com/yCodeTech/valet-windows/tree/v3.4.0) - 2026-04-09
 
 ### Added
