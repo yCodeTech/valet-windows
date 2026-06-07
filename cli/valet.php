@@ -16,6 +16,7 @@ require_once __DIR__ . '/version.php';
 use Illuminate\Container\Container;
 use Valet\Application;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Valet\Drivers\ValetDriver;
 use function Valet\info;
 use function Valet\info_dump;
 use function Valet\output;
@@ -1236,7 +1237,8 @@ if (is_dir(Valet::homePath()) && Nginx::isInstalled()) {
 	 * Determine which Valet driver the current working directory is using
 	 */
 	$app->command('which', function () {
-		require __DIR__ . '/drivers/require.php';
+		// DEPRECATED: Remove this require with the rest of the legacy drivers code.
+		require __DIR__ . '/includes/require-drivers.php';
 
 		$driver = ValetDriver::assign(getcwd(), basename(getcwd()), '/');
 
