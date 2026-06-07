@@ -5,5 +5,14 @@
 	"printWidth": 150,
 	"bracketSameLine": true,
 	"bracketSpacing": false,
-	"endOfLine": "crlf"
+	"endOfLine": "crlf",
+	"overrides": [
+		{
+			"files": "*.md",
+			"options": {
+				"useTabs": false,
+				"tabWidth": 4
+			}
+		}
+	]
 }
