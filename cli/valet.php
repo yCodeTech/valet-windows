@@ -947,7 +947,11 @@ if (is_dir(Valet::homePath()) && Nginx::isInstalled()) {
 			return error("Option shortcuts cannot have a <bg=magenta> = </> immediately after them.\nPlease use a space to separate it from the value: <bg=magenta> valet share $site -o " . preg_replace("/=/", "", $options, 1) . " </>");
 		}
 
-		$url = ($site ?: strtolower(Site::host(getcwd()))) . '.' . Configuration::read()['tld'];
+		$tld = Configuration::read()['tld'];
+		// Remove the tld from the site if it's included, because it'll get added back in the URL variable and this can cause issues if it's included twice.
+		$site = str_replace(".$tld", "", $site);
+
+		$url = ($site ?: strtolower(Site::host(getcwd()))) . '.' . $tld;
 
 		$options = $options != null ? explode("//", $options) : [];
 
