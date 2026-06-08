@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/yCodeTech/valet-windows/tree/master)
 
+## [3.4.3](https://github.com/yCodeTech/valet-windows/tree/v3.4.3) - 2026-06-08
+
+### Fixed
+
+- Fixed [#47](https://github.com/yCodeTech/valet-windows/issues/47): `fetch-share-url` command bug that spat out a PHP fatal error when `Valet\retry` helper was undefined; in [#48](https://github.com/yCodeTech/valet-windows/pull/48).
+
+- Fixed bug in `share` command that added the tld on to the specified site even if the site already included the tld. To prevent issues, the command will now remove the tld from the specified site before adding it back in the URL variable.
+
+- Fixed Valet's version, which was still at `3.4.1` in the previous release. Changed it to `3.4.3` to reflect this version.
+
+### Changed
+
+- Improved error messages in the `fetch-share-url` command to be more informative on the site it's trying to fetch the share URL for. This will help debugging.
+
 ## [3.4.2](https://github.com/yCodeTech/valet-windows/tree/v3.4.2) - 2026-06-07
 
 ### Fixed
