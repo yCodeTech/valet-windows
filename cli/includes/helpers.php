@@ -179,20 +179,19 @@ function addTableSeparator($rows) {
 	return $separatedRows;
 }
 
-if (!function_exists('resolve')) {
-	/**
-	 * Resolve the given class from the container.
-	 *
-	 * https://laravel.com/docs/12.x/helpers#method-resolve
-	 *
-	 * @param string $class
-	 *
-	 * @return mixed
-	 */
-	function resolve($class) {
-		return Container::getInstance()->make($class);
-	}
+/**
+ * Resolve the given class from the container.
+ *
+ * https://laravel.com/docs/12.x/helpers#method-resolve
+ *
+ * @param string $class
+ *
+ * @return mixed
+ */
+function resolve($class) {
+	return Container::getInstance()->make($class);
 }
+
 
 /**
  * Swap the given class implementation in the container.
@@ -204,56 +203,53 @@ function swap($class, $instance) {
 	Container::getInstance()->instance($class, $instance);
 }
 
-if (!function_exists('retry')) {
-	/**
-	 * Retry the given function N times.
-	 *
-	 * https://laravel.com/docs/12.x/helpers#method-retry
-	 *
-	 * @param int $retries
-	 * @param callable $fn
-	 * @param int $sleep
-	 *
-	 * @return mixed
-	 */
-	function retry($retries, $fn, $sleep = 0) {
-		beginning:
-		try {
-			return $fn();
+/**
+ * Retry the given function N times.
+ *
+ * https://laravel.com/docs/12.x/helpers#method-retry
+ *
+ * @param int $retries
+ * @param callable $fn
+ * @param int $sleep
+ *
+ * @return mixed
+ */
+function retry($retries, $fn, $sleep = 0) {
+	beginning:
+	try {
+		return $fn();
+	}
+	catch (Exception $e) {
+		if (!$retries) {
+			throw $e;
 		}
-		catch (Exception $e) {
-			if (!$retries) {
-				throw $e;
-			}
 
-			$retries--;
+		$retries--;
 
-			if ($sleep > 0) {
-				usleep($sleep * 1000);
-			}
-
-			goto beginning;
+		if ($sleep > 0) {
+			usleep($sleep * 1000);
 		}
+
+		goto beginning;
 	}
 }
 
-if (!function_exists('tap')) {
-	/**
-	 * Tap the given value.
-	 *
-	 * https://laravel.com/docs/12.x/helpers#method-tap
-	 *
-	 * @param mixed $value
-	 * @param callable $callback
-	 *
-	 * @return mixed
-	 */
-	function tap($value, callable $callback) {
-		$callback($value);
+/**
+ * Tap the given value.
+ *
+ * https://laravel.com/docs/12.x/helpers#method-tap
+ *
+ * @param mixed $value
+ * @param callable $callback
+ *
+ * @return mixed
+ */
+function tap($value, callable $callback) {
+	$callback($value);
 
-		return $value;
-	}
+	return $value;
 }
+
 
 /**
  * Get the user.
