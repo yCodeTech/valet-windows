@@ -16,6 +16,7 @@ require_once __DIR__ . '/version.php';
 use Illuminate\Container\Container;
 use Valet\Application;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Valet\Drivers\ValetDriver;
 use function Valet\info;
 use function Valet\info_dump;
 use function Valet\output;
@@ -946,7 +947,11 @@ if (is_dir(Valet::homePath()) && Nginx::isInstalled()) {
 			return error("Option shortcuts cannot have a <bg=magenta> = </> immediately after them.\nPlease use a space to separate it from the value: <bg=magenta> valet share $site -o " . preg_replace("/=/", "", $options, 1) . " </>");
 		}
 
-		$url = ($site ?: strtolower(Site::host(getcwd()))) . '.' . Configuration::read()['tld'];
+		$tld = Configuration::read()['tld'];
+		// Remove the tld from the site if it's included, because it'll get added back in the URL variable and this can cause issues if it's included twice.
+		$site = str_replace(".$tld", "", $site);
+
+		$url = ($site ?: strtolower(Site::host(getcwd()))) . '.' . $tld;
 
 		$options = $options != null ? explode("//", $options) : [];
 
@@ -1236,7 +1241,8 @@ if (is_dir(Valet::homePath()) && Nginx::isInstalled()) {
 	 * Determine which Valet driver the current working directory is using
 	 */
 	$app->command('which', function () {
-		require __DIR__ . '/drivers/require.php';
+		// DEPRECATED: Remove this require with the rest of the legacy drivers code.
+		require __DIR__ . '/includes/require-drivers.php';
 
 		$driver = ValetDriver::assign(getcwd(), basename(getcwd()), '/');
 

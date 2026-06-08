@@ -72,12 +72,12 @@ abstract class ShareTool {
 	/**
 	 * Get the current tunnel URL from the API.
 	 *
-	 * @param string $site The site
+	 * @param string $site The site that is being shared.
 	 *
 	 * @return string The current tunnel URL
 	 */
 	public function currentTunnelUrl(string $site) {
-		info("Trying to retrieve tunnel URL...");
+		info("Trying to retrieve tunnel URL for '$site'...");
 
 		foreach ($this->tunnelsEndpoints as $endpoint) {
 			try {
@@ -97,7 +97,7 @@ abstract class ShareTool {
 						}
 					}
 
-					throw new DomainException('Failed to retrieve tunnel URL.');
+					throw new DomainException("Failed to retrieve tunnel URL for '$site'.");
 				}, 250);
 
 				// If response is NOT empty, return the response.
@@ -110,13 +110,14 @@ abstract class ShareTool {
 			}
 		}
 
-		throw new DomainException('Tunnel not established.');
+		throw new DomainException("Tunnel not established for '$site'.");
 	}
 
 	/**
 	 * Find the HTTP tunnel URL from the list of tunnels.
 	 *
-	 * @param array $tunnels
+	 * @param array $tunnels The list of tunnels.
+	 * @param string|null $site The site that is being shared.
 	 *
 	 * @return string|null
 	 */
