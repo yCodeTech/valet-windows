@@ -1,0 +1,12 @@
+[
+	{
+		"name": "skip-changelog",
+		"color": "ededed",
+		"description": "Exclude this PR from the automated changelog update."
+	},
+	{
+		"name": "auto version bump",
+		"color": "bfd4f2",
+		"description": "Automated version bump PRs created by the release workflow."
+	}
+]
