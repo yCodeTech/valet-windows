@@ -38,19 +38,26 @@ Then use: <fg=magenta>valet set-ngrok-token [token]</>');
 
 		$ngrok = realpath(valetBinPath() . 'ngrok.exe');
 
-		$ngrokCommand = "\"$ngrok\" http $site:$port " . $this->getConfig() . " $options";
+		// Log to stdout, log level info, and log format term for real-time output.
+		$logging = "--log=stdout --log-level=info --log-format=term";
+
+		$ngrokCommand = "\"$ngrok\" http $site:$port " . $this->getConfig() . " $options $logging";
 
 		info("Sharing $site...\n");
 		info("To output the public URL, please open a new terminal and run `valet fetch-share-url $site`");
 
-		$output = $this->cli->shellExec("$ngrokCommand 2>&1");
+		// Stream ngrok output in real time and collect error lines for post-run analysis.
+		// Shared matcher: use the same rule for live error styling and for post-run capture.
+		$isErrorLine = function ($line) {
+			return strpos($line, 'ERROR:') !== false;
+		};
 
-		if ($errors = strstr($output, "ERROR")) {
-			error($errors . PHP_EOL);
+		// Pass the same matcher once; CommandLine reuses it for error styling when no separate
+		// error callback is supplied.
+		$errorLines = $this->cli->streamCommandOutput($ngrokCommand, $isErrorLine);
 
-			if (strpos($errors, 'ERR_NGROK_121') !== false) {
-				info("To update ngrok yourself, please run `valet ngrok update` and then upgrade the config file by running `valet ngrok config upgrade`\n");
-			}
+		if (!empty($errorLines) && strpos(implode("\n", $errorLines), 'ERR_NGROK_121') !== false) {
+			info("\nTo update ngrok yourself, please run `valet ngrok update` and then upgrade the config file by running `valet ngrok config upgrade`\n");
 		}
 	}
 

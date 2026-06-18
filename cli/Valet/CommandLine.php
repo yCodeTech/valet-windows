@@ -28,6 +28,52 @@ class CommandLine {
 	}
 
 	/**
+	 * Stream command output in real time and optionally collect matching lines.
+	 *
+	 * @param string $command
+	 * @param callable|null $lineMatches Callback to check matching lines; must return `true`
+	 * to collect the line for post-run analysis.
+	 * @param callable|null $lineIsError Callback to check whether a line should be
+	 * rendered as an error in real time. If omitted, the capture matcher is reused.
+	 *
+	 * @return array The collected output lines or an empty array if no lines were collected.
+	 */
+	public function streamCommandOutput($command, ?callable $lineMatches = null, ?callable $lineIsError = null): array {
+		$capturedLines = [];
+		$lineIsError = $lineIsError ?: $lineMatches;
+
+		// Open a process to execute the command and read its output.
+		$handle = popen("$command 2>&1", 'r');
+		while ($handle && !feof($handle)) {
+			$line = fgets($handle);
+			if ($line === false) {
+				break;
+			}
+
+			// Keep raw command output unless caller explicitly marks this line as an error.
+			if ($lineIsError && $lineIsError($line)) {
+				error($line, false, false, true);
+			}
+			else {
+				echo $line;
+			}
+
+			// If a callback is provided and the line matches the condition,
+			// then collect the line for post-run analysis.
+			if ($lineMatches && $lineMatches($line)) {
+				$capturedLines[] = trim($line);
+			}
+		}
+
+		// Close the process.
+		if ($handle) {
+			pclose($handle);
+		}
+
+		return $capturedLines;
+	}
+
+	/**
 	 * Pass the given Valet command to the command line with elevated privileges using gsudo.
 	 *
 	 * gsudo is a sudo equivalent of the Mac `sudo` utility. It allows the user to run commands as the root user with elevated privileges with minimal amount of UAC popups, ie. only 1 UAC popup.

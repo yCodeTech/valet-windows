@@ -11,6 +11,7 @@ use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 
 if (!isset($_SERVER['HOME'])) {
 	$_SERVER['HOME'] = $_SERVER['USERPROFILE'];
@@ -62,11 +63,16 @@ function warning($output) {
  *
  * @param string $output
  * @param bool $exception Optionally pass a boolean to indicate whether to throw an exception. If `true`, the error will be thrown as a `ValetException`. [default: `false`]
+ * @param bool $newline Whether to append a newline after the error output. [default: `true`]
+ * @param bool $escapeOutput Whether to escape the output to prevent formatting issues. [default: `false`]
  *
  * @throws RuntimeException
  * @throws ValetException
  */
-function error(string $output, $exception = false) {
+function error(string $output, bool $exception = false, bool $newline = true, bool $escapeOutput = false) {
+
+	$errorOutput = (new ConsoleOutput())->getErrorOutput();
+
 	if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'testing') {
 		throw new RuntimeException($output);
 	}
@@ -78,12 +84,17 @@ function error(string $output, $exception = false) {
 		usleep(1);
 
 		// Print the error message to the console.
-		(new ConsoleOutput())->getErrorOutput()->writeln("\n\n<error>$errors</error>");
+		$errorOutput->write("\n\n<error>$errors</error>", $newline);
 
 		exit();
 	}
 	else {
-		(new ConsoleOutput())->getErrorOutput()->writeln("<error>$output</error>");
+		// If escapeOutput is true, then escape the output to prevent any formatting issues.
+		if ($escapeOutput) {
+			$output = OutputFormatter::escape($output);
+		}
+
+		$errorOutput->write("<error>$output</error>", $newline);
 	}
 }
 
