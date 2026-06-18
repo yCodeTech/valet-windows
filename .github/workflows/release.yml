@@ -106,7 +106,7 @@ jobs:
 
           # Replace the entire [Unreleased] heading line (including any trailing URL) with
           # a versioned release heading that links to the tree at the tag.
-          RELEASE_URL="https://github.com/${REPO}/tree/${TAG_NAME}"
+          RELEASE_URL="${{ github.server_url }}/${REPO}/tree/${TAG_NAME}"
           NEW_HEADING="## [${VERSION}](${RELEASE_URL}) - ${CURRENT_DATE}"
 
           sed -i "s|^## \[Unreleased\].*|${NEW_HEADING}|" CHANGELOG.md
