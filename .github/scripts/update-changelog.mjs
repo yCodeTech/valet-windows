@@ -35,6 +35,21 @@ const TYPE_TO_PREFIX = {
 };
 
 /**
+ * Words that would be redundant as the leading word of a changelog entry given
+ * the section prefix already prefixes the entry.
+ * Keyed by the prefix string resolved from TYPE_TO_PREFIX or TYPE_TO_SECTION.
+ */
+const PREFIX_REDUNDANT_WORDS = {
+	Added: ["add", "adds", "added", "adding"],
+	Fixed: ["fix", "fixes", "fixed", "fixing"],
+	Changed: ["change", "changes", "changed", "changing"],
+	Removed: ["remove", "removes", "removed", "removing"],
+	Deprecated: ["deprecate", "deprecates", "deprecated", "deprecating"],
+	Reverted: ["revert", "reverts", "reverted", "reverting"],
+	Refactored: ["refactor", "refactors", "refactored", "refactoring"],
+};
+
+/**
  * Indentation used for PR description lines nested under a changelog list item — 2 spaces.
  */
 const DESCRIPTION_INDENT = "  ";
@@ -248,6 +263,32 @@ function addEntryToSection(lines, unreleasedIndex, section, entry) {
 }
 
 /**
+ * Strips a redundant leading verb from the cleaned title when it duplicates
+ * the prefix already applied to the changelog entry.
+ * e.g. prefix="Added", cleanedTitle="add support for X" → "support for X"
+ *      prefix="Fixed", cleanedTitle="fixed a bug"       → "a bug"
+ * @param {string} prefix - Changelog entry prefix (e.g. "Added", "Fixed")
+ * @param {string} cleanedTitle - PR title with commit-type prefix already stripped
+ * @returns {string} - Title with the redundant leading word removed if applicable
+ */
+function stripRedundantLeadingWord(prefix, cleanedTitle) {
+	const redundant = PREFIX_REDUNDANT_WORDS[prefix];
+	if (!redundant) return cleanedTitle;
+
+	const firstWordMatch = cleanedTitle.match(/^(\S+)(?:\s+([\s\S]*))?/i);
+	if (!firstWordMatch) return cleanedTitle;
+
+	const [, firstWord, rest] = firstWordMatch;
+	if (redundant.includes(firstWord.toLowerCase())) {
+		// If stripping the word leaves nothing meaningful, keep the original
+		if (!rest || rest.trim() === "") return cleanedTitle;
+		return rest;
+	}
+
+	return cleanedTitle;
+}
+
+/**
  * Formats the PR description with indentation for nesting under a list item
  * @param {string|null} prBody - PR description/body text
  * @returns {string} - Formatted description string (empty if no body)
@@ -295,7 +336,8 @@ function buildEntry(
 	prBody,
 ) {
 	const prefix = TYPE_TO_PREFIX[type] ?? section;
-	return `- ${prefix} ${cleanedTitle} ([#${prNumber}](${prUrl})) by @${prAuthor}${formatPRDescription(prBody)}\n<!-- end -->`;
+	const dedupedTitle = stripRedundantLeadingWord(prefix, cleanedTitle);
+	return `- ${prefix} ${dedupedTitle} ([#${prNumber}](${prUrl})) by @${prAuthor}${formatPRDescription(prBody)}\n<!-- end -->`;
 }
 
 /**
