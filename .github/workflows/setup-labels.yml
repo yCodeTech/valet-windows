@@ -1,0 +1,33 @@
+name: Setup Labels
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/setup-labels.yml"
+      - ".github/config/labels.json"
+permissions:
+  pull-requests: write
+jobs:
+  sync-labels:
+    runs-on: ubuntu-latest
+    steps:
+      # Setup (and sync) global labels from the shared profile config
+      - name: Setup global labels
+        uses: julbme/gh-action-manage-label@v1
+        with:
+          from: https://raw.githubusercontent.com/yCodeTech/yCodeTech/refs/heads/master/.github/config/labels.json
+          skip_delete: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Setup (and sync) repository-specific labels from the local config
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup local labels
+        uses: julbme/gh-action-manage-label@v1
+        with:
+          from: .github/config/labels.json
+          skip_delete: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
