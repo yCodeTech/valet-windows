@@ -275,13 +275,13 @@ function stripRedundantLeadingWord(prefix, cleanedTitle) {
 	const redundant = PREFIX_REDUNDANT_WORDS[prefix];
 	if (!redundant) return cleanedTitle;
 
-	const firstWordMatch = cleanedTitle.match(/^(\S+)(?:\s+([\s\S]*))?/i);
+	const firstWordMatch = cleanedTitle.match(/^(\S+)(?:\s+(.*))?/i);
 	if (!firstWordMatch) return cleanedTitle;
 
 	const [, firstWord, rest] = firstWordMatch;
 	if (redundant.includes(firstWord.toLowerCase())) {
 		// If stripping the word leaves nothing meaningful, keep the original
-		if (!rest || rest.trim() === "") return cleanedTitle;
+		if (!rest?.trim()) return cleanedTitle;
 		return rest;
 	}
 
