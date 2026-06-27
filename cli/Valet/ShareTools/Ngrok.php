@@ -22,9 +22,7 @@ class Ngrok extends ShareTool {
 	 */
 	public function start(string $site, int $port, array $options = []) {
 		if ($port === 443 && !$this->hasAuthToken()) {
-			output('Forwarding to local port 443 or a local https:// URL is only available after you sign up.
-Sign up at: <fg=blue>https://ngrok.com/signup</>
-Then use: <fg=magenta>valet set-ngrok-token [token]</>');
+			output("Forwarding to local port 443 or a local https:// URL is only available after you sign up.\nSign up at: <fg=blue>https://ngrok.com/signup</>\nThen use: <fg=magenta>valet set-ngrok-token [token]</>");
 			exit(1);
 		}
 
