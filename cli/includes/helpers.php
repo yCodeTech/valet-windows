@@ -102,12 +102,13 @@ function error(string $output, bool $exception = false, bool $newline = true, bo
  * Output the given text to the console.
  *
  * @param string $output
+ * @param bool $newline Whether to append a newline after the output. [default: `true`]
  */
-function output($output) {
+function output($output, bool $newline = true) {
 	if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'testing') {
 		return;
 	}
-	(new ConsoleOutput())->writeln($output);
+	(new ConsoleOutput())->write($output, $newline);
 }
 
 /**
