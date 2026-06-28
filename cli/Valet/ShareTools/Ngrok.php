@@ -34,6 +34,9 @@ class Ngrok extends ShareTool {
 			// Logging options are undocumented for the http command, but is defined as
 			// API flags but still works for the http command. See ngrok docs for more details:
 			// https://ngrok.com/docs/agent/cli-api#flags-2
+			//
+			// (Note: Both `stdout` and `stderr` values capture the same output since
+			// `CommandLine::streamCommandOutput` method uses `2>&1` to redirect stderr to stdout.)
 			'log'         => 'stdout',
 			'log-level'   => 'info',
 			'log-format'  => 'term'
@@ -53,7 +56,12 @@ class Ngrok extends ShareTool {
 		$ngrokCommand = "\"$ngrok\" http $site:$port " . $this->getConfig() . " $options";
 
 		info("Sharing $site...\n");
-		info("To output the public URL, please open a new terminal and run `valet fetch-share-url $site`");
+
+		// If the options string doesn't contain the `--log` option with values of either `stdout`
+		// or `stderr`,then inform the user that they can fetch the public URL in a new terminal.
+		if (strpos($options, '--log=stdout') === false && strpos($options, '--log=stderr') === false) {
+			info("To output the public URL, please open a new terminal and run `valet fetch-share-url $site`");
+		}
 
 		// Stream ngrok output in real time and collect error lines for post-run analysis.
 		// Shared matcher: use the same rule for live error styling and for post-run capture.
@@ -61,8 +69,28 @@ class Ngrok extends ShareTool {
 			return strpos($line, 'ERROR:') !== false;
 		};
 
+		$didOutputShareUrl = false;
+
+		// Line handler: check each line for the "started tunnel" log line to find and
+		// extract the public URL.
+		$lineHandler = function ($line) use ($site, &$didOutputShareUrl) {
+			// If the share URL has already been output, skip further processing.
+			if ($didOutputShareUrl) {
+				return;
+			}
+
+			// If the line contains the 'msg="started tunnel"' message AND has a 'url=' key...
+			if (strpos($line, 'msg="started tunnel"') !== false && preg_match('/\burl=(\S+)/', $line, $matches)) {
+				// Set the flag to true to avoid further processing of lines.
+				$didOutputShareUrl = true;
+				// Output an info message with extracted public URL.
+				info("The public URL for $site is: <fg=blue>$matches[1]</>");
+			}
+		};
+
 		// Stream ngrok output in real time and collect error lines for post-run analysis.
 		$errorLines = $this->cli->streamCommandOutput($ngrokCommand, [
+			'onLine' => $lineHandler,
 			'matches' => $isErrorLine
 		]);
 

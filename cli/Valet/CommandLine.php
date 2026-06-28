@@ -32,18 +32,21 @@ class CommandLine {
 	 *
 	 * @param string $command
 	 * @param array $callbacks Optional callbacks:
+	 * - onLine (callable): receives every raw line after it is written.
 	 * - matches (callable): return true to collect line for post-run analysis.
 	 * - isError (callable): return true to render line as an error. Defaults to matches.
 	 *
 	 * @return array The collected output lines or an empty array if no lines were collected.
 	 */
 	public function streamCommandOutput($command, array $callbacks = []): array {
+		$lineHandler = $callbacks['onLine'] ?? null;
 		$lineMatches = $callbacks['matches'] ?? null;
 		$lineIsError = $callbacks['isError'] ?? $lineMatches;
 
 		$capturedLines = [];
 
 		// Open a process to execute the command and read its output.
+		// 2>&1 redirects stderr to stdout so we can capture both.
 		$handle = popen("$command 2>&1", 'r');
 		while ($handle && !feof($handle)) {
 			$line = fgets($handle);
@@ -57,6 +60,12 @@ class CommandLine {
 			}
 			else {
 				echo $line;
+			}
+
+			// Invoke the optional line handler after writing output so callers can append
+			// follow-up messages in display order.
+			if ($lineHandler) {
+				$lineHandler($line);
 			}
 
 			// If a callback is provided and the line matches the condition,
