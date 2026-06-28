@@ -54,12 +54,13 @@ class CommandLine {
 				break;
 			}
 
-			// Keep raw command output unless caller explicitly marks this line as an error.
+			// If the line is an error, output it as an error.
 			if ($lineIsError && $lineIsError($line)) {
 				error($line, false, false, true);
 			}
+			// Otherwise, output it normally.
 			else {
-				echo $line;
+				output($line, false);
 			}
 
 			// Invoke the optional line handler after writing output so callers can append
