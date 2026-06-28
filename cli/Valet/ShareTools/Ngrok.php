@@ -26,20 +26,31 @@ class Ngrok extends ShareTool {
 			exit(1);
 		}
 
-		// If host-header is not specified,
-		// then set it into the array with a default value of rewrite.
-		if (!stripos(json_encode($options), 'host-header')) {
-			array_push($options, "host-header=rewrite");
+		// Apply defaults for various options the user has not already specified.
+		$defaults = [
+			'host-header' => 'rewrite',
+			// Logging options: log to stdout at info level, enables real-time output
+			// and post-run error analysis.
+			// Logging options are undocumented for the http command, but is defined as
+			// API flags but still works for the http command. See ngrok docs for more details:
+			// https://ngrok.com/docs/agent/cli-api#flags-2
+			'log'         => 'stdout',
+			'log-level'   => 'info',
+			'log-format'  => 'term'
+		];
+
+		// Merge defaults with user-specified options, giving precedence to user-specified options.
+		foreach ($defaults as $key => $value) {
+			if (!array_filter($options, fn($opt) => strpos($opt, "$key=") === 0)) {
+				$options[] = "$key=$value";
+			}
 		}
 
 		$options = prefixOptions($options);
 
 		$ngrok = realpath(valetBinPath() . 'ngrok.exe');
 
-		// Log to stdout, log level info, and log format term for real-time output.
-		$logging = "--log=stdout --log-level=info --log-format=term";
-
-		$ngrokCommand = "\"$ngrok\" http $site:$port " . $this->getConfig() . " $options $logging";
+		$ngrokCommand = "\"$ngrok\" http $site:$port " . $this->getConfig() . " $options";
 
 		info("Sharing $site...\n");
 		info("To output the public URL, please open a new terminal and run `valet fetch-share-url $site`");
