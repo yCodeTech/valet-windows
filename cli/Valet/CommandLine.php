@@ -31,16 +31,17 @@ class CommandLine {
 	 * Stream command output in real time and optionally collect matching lines.
 	 *
 	 * @param string $command
-	 * @param callable|null $lineMatches Callback to check matching lines; must return `true`
-	 * to collect the line for post-run analysis.
-	 * @param callable|null $lineIsError Callback to check whether a line should be
-	 * rendered as an error in real time. If omitted, the capture matcher is reused.
+	 * @param array $callbacks Optional callbacks:
+	 * - matches (callable): return true to collect line for post-run analysis.
+	 * - isError (callable): return true to render line as an error. Defaults to matches.
 	 *
 	 * @return array The collected output lines or an empty array if no lines were collected.
 	 */
-	public function streamCommandOutput($command, ?callable $lineMatches = null, ?callable $lineIsError = null): array {
+	public function streamCommandOutput($command, array $callbacks = []): array {
+		$lineMatches = $callbacks['matches'] ?? null;
+		$lineIsError = $callbacks['isError'] ?? $lineMatches;
+
 		$capturedLines = [];
-		$lineIsError = $lineIsError ?: $lineMatches;
 
 		// Open a process to execute the command and read its output.
 		$handle = popen("$command 2>&1", 'r');

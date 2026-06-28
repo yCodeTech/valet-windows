@@ -50,9 +50,10 @@ class Ngrok extends ShareTool {
 			return strpos($line, 'ERROR:') !== false;
 		};
 
-		// Pass the same matcher once; CommandLine reuses it for error styling when no separate
-		// error callback is supplied.
-		$errorLines = $this->cli->streamCommandOutput($ngrokCommand, $isErrorLine);
+		// Stream ngrok output in real time and collect error lines for post-run analysis.
+		$errorLines = $this->cli->streamCommandOutput($ngrokCommand, [
+			'matches' => $isErrorLine
+		]);
 
 		if (!empty($errorLines) && strpos(implode("\n", $errorLines), 'ERR_NGROK_121') !== false) {
 			info("\nTo update ngrok yourself, please run `valet ngrok update` and then upgrade the config file by running `valet ngrok config upgrade`\n");
