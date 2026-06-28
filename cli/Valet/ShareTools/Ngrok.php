@@ -85,6 +85,9 @@ class Ngrok extends ShareTool {
 				$didOutputShareUrl = true;
 				// Output an info message with extracted public URL.
 				info("The public URL for $site is: <fg=blue>$matches[1]</>");
+
+				// Copy the public URL to the clipboard for ease.
+				$this->copyUrlToClipboard($matches[1]);
 			}
 		};
 

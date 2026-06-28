@@ -90,8 +90,7 @@ abstract class ShareTool {
 					if (isset($body->tunnels) && count($body->tunnels) > 0) {
 						// If the tunnel URL is NOT null, return the URL.
 						if ($tunnelUrl = $this->findHttpTunnelUrl($body->tunnels, $site)) {
-							// Use | clip to copy the URL to the clipboard.
-							$this->cli->passthru("echo $tunnelUrl | clip");
+							$this->copyUrlToClipboard($tunnelUrl);
 
 							return $tunnelUrl;
 						}
@@ -131,5 +130,15 @@ abstract class ShareTool {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Copy the public URL to the clipboard.
+	 *
+	 * @param string $url The public URL to copy.
+	 */
+	public function copyUrlToClipboard(string $url) {
+		$this->cli->passthru("echo $url | clip");
+		info("It has been copied to your clipboard.");
 	}
 }
