@@ -138,7 +138,12 @@ abstract class ShareTool {
 	 * @param string $url The public URL to copy.
 	 */
 	public function copyUrlToClipboard(string $url) {
-		$this->cli->passthru("echo $url | clip");
+		// Escape single quotes in the URL for PowerShell.
+		$escapedUrl = str_replace("'", "''", $url);
+		// The single quotes around the URL are necessary to ensure that PowerShell treats it as
+		// a literal string, even if it contains spaces or special shell characters and prevents
+		// command injection.
+		$this->cli->powershell("'{$escapedUrl}' | Set-Clipboard");
 		info("It has been copied to your clipboard.");
 	}
 }
