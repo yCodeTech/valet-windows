@@ -48,6 +48,9 @@ class CommandLine {
 		// Open a process to execute the command and read its output.
 		// 2>&1 redirects stderr to stdout so we can capture both.
 		$handle = popen("$command 2>&1", 'r');
+		if ($handle === false) {
+			error('Failed to start command for streaming output.', true);
+		}
 		while ($handle && !feof($handle)) {
 			$line = fgets($handle);
 			if ($line === false) {
