@@ -66,7 +66,7 @@ class Ngrok extends ShareTool {
 		// Stream ngrok output in real time and collect error lines for post-run analysis.
 		// Shared matcher: use the same rule for live error styling and for post-run capture.
 		$isErrorLine = function ($line) {
-			return strpos($line, 'ERROR:') !== false;
+			return strpos($line, 'ERROR:') !== false || strpos($line, 'ERR_NGROK_') !== false;
 		};
 
 		$didOutputShareUrl = false;
