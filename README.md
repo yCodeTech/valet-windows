@@ -1108,7 +1108,15 @@ Before sharing a site with ngrok, you must first set the authtoken using Valet's
 
 > [!NOTE]
 >
-> The public URL won't be displayed, however, in a separate terminal, you can use the [`fetch-share-url` command](#fetch-share-url) to get the url and copy it to the clipboard.
+> Prior to v3.4.4, the public URL wasn't displayed and the [`fetch-share-url` command](#fetch-share-url) had to be used instead to get the URL and copy it to the clipboard.
+>
+> As of v3.4.4, the public URL **will** be displayed and automatically copied to your clipboard (requires ngrok's real-time logging). You can still use the `fetch-share-url` command in a separate terminal though.
+
+> [!IMPORTANT]
+>
+> ngrok will now output logging information directly to the terminal in real-time by default using the `--log=stdout` option. Valet redirects stderr to stdout, so all logging information will be outputted to the terminal. This is useful for debugging and seeing what ngrok is doing in real-time. For this reason the `--log=stderr` is exactly the same output as `--log=stdout`.
+>
+> If you wish to disable real-time logging, you can use the valet's `--options` argument to pass ngrok's `log=false` option; this will disable all logging output to the terminal, including the public URL.
 
 ###### share --options
 
