@@ -203,7 +203,7 @@ Also make sure to open your preferred terminal (Windows Terminal, CMD, Git Bash,
 
 ---
 
--   If you don't have PHP installed, make sure to [install](https://windows.php.net/download) it.
+- If you don't have PHP installed, make sure to [install](https://windows.php.net/download) it.
 
     Download the Zip file and unzip into a directory of your choosing. The recommended directory is: `C:/php/`.
 
@@ -211,9 +211,9 @@ Also make sure to open your preferred terminal (Windows Terminal, CMD, Git Bash,
 
     > For NTS binaries the widespread use case is interaction with a web server through the FastCGI protocol, utilizing no multithreading (but also for example CLI).
 
--   If you don't have Composer installed, make sure to [install](https://getcomposer.org/doc/00-intro.md#installation-windows) it.
+- If you don't have Composer installed, make sure to [install](https://getcomposer.org/doc/00-intro.md#installation-windows) it.
 
--   Install Valet with Composer via `composer global require ycodetech/valet-windows`.
+- Install Valet with Composer via `composer global require ycodetech/valet-windows`.
 
     <p align="center"><img src="./art/composer_laravel_valet_windows_3_logo.svg" style="width:400px; background: none;"></p>
 
@@ -221,9 +221,9 @@ Also make sure to open your preferred terminal (Windows Terminal, CMD, Git Bash,
     >
     > **If you're coming from <a href="https://github.com/cretueusebiu/valet-windows">cretueusebiu/valet-windows</a>, then you need to make sure to fully uninstall it from your computer, deleting all configs, and removing from composer with `composer global remove cretueusebiu/valet-windows`, before installing this 3.0 version.**
 
--   Install Valet by running the `valet install` command, or alternatively `valet sudo install` with administrator elevation. This will configure and install Valet and register Valet's daemon to launch when your system starts. Once installed, Valet will automatically start it's services.
+- Install Valet by running the `valet install` command, or alternatively `valet sudo install` with administrator elevation. This will configure and install Valet and register Valet's daemon to launch when your system starts. Once installed, Valet will automatically start it's services.
 
--   If you're installing on Windows 10/11, you may need to [manually configure](https://mayakron.altervista.org/support/acrylic/Windows10Configuration.htm) Windows to use the [Acrylic DNS Proxy](https://mayakron.altervista.org/support/acrylic/Home.htm).
+- If you're installing on Windows 10/11, you may need to [manually configure](https://mayakron.altervista.org/support/acrylic/Windows10Configuration.htm) Windows to use the [Acrylic DNS Proxy](https://mayakron.altervista.org/support/acrylic/Home.htm).
 
 Valet will automatically start its daemon each time your machine boots. There is no need to run `valet start` or `valet install` ever again once the initial Valet installation is complete.
 
@@ -248,11 +248,11 @@ Valet installed and started successfully!
 
 This installs all Valet services:
 
--   Nginx
--   PHP CGI
--   PHP Xdebug CGI [optional]
--   Acrylic DNS
--   Ansicon
+- Nginx
+- PHP CGI
+- PHP Xdebug CGI [optional]
+- Acrylic DNS
+- Ansicon
 
 And it's configs in `C:/Users/Username/.config/valet`.
 
@@ -1462,13 +1462,13 @@ The nginx error pages are `on` (enabled) by default, which means that Valet's cu
 
 These are **important notes** for the commands that have the `--options` or `--valetOptions`.
 
--   The `--options`, `--valetOptions` (shortcut `-o`) options can be used to pass options/flags to the service related to that command.
+- The `--options`, `--valetOptions` (shortcut `-o`) options can be used to pass options/flags to the service related to that command.
 
     Just pass the option name without the `--` prefix eg. `--options=config=C:/path/ngrok.yml` (example for the `ngrok` command). This is so that Valet doesn't get confused with it's own options.
 
     All options/flags that are passed will be prefixed with `--` after Valet has processed the command, unless it's a shortcut of a single character, then it will be prefixed with `-`. The example above will run as `--config=C:/path/ngrok.yml`.
 
--   The `=` immediately after the command option is optional, if it's omitted, you must use a space instead.
+- The `=` immediately after the command option is optional, if it's omitted, you must use a space instead.
 
     ```
     --options=option1
@@ -1477,7 +1477,7 @@ These are **important notes** for the commands that have the `--options` or `--v
     --valetOptions option1
     ```
 
--   The options also have `-o` shortcuts and it cannot have the `=` character, it must use a space for separation.
+- The options also have `-o` shortcuts and it cannot have the `=` character, it must use a space for separation.
 
     ```console
     -o option1
@@ -1489,7 +1489,7 @@ These are **important notes** for the commands that have the `--options` or `--v
 
     > ###### Note that to comply with the docopt standard, long options can specify their values after a whitespace or an `=` sign (e.g. `--iterations 5` or `--iterations=5`), but short options can only use whitespaces or no separation at all (e.g. `-i 5` or `-i5`).
 
--   The options also allows multiple options to be passed, they just need to be separated with double slashes `//`.
+- The options also allows multiple options to be passed, they just need to be separated with double slashes `//`.
 
     ```console
     --valetOptions=option1//option2//option3
@@ -1501,46 +1501,46 @@ These are **important notes** for the commands that have the `--options` or `--v
 
 Commands that have been tested and made parity:
 
--   [ ] composer - not applicable
--   [x] diagnose
--   [x] directory-listing
--   [x] fetch-share-url
--   [x] forget
--   [x] install
--   [x] isolate
--   [x] isolated
--   [x] link
--   [x] links
--   [x] log
--   [ ] loopback (the localhost IP) - not applicable
--   [x] on-latest-version
--   [x] open
--   [x] park
--   [x] parked
--   [x] paths
--   [x] php (proxying commands to PHP CLI) - renamed to `php:proxy` with alias of `php`
--   [x] proxies
--   [x] proxy
--   [ ] renew (Renews all domains with a trusted TLS certificate) - TBD
--   [x] restart
--   [x] secure
--   [x] secured
--   [x] set-ngrok-token
--   [x] share
--   [x] share-tool
--   [x] start
--   [x] status - renamed to `services`
--   [x] stop
--   [x] tld
--   [ ] trust - not applicable
--   [x] uninstall
--   [x] unisolate
--   [x] unlink
--   [x] unproxy
--   [x] unsecure
--   [x] use
--   [x] which
--   [x] which-php - renamed to `php:which`
+- [ ] composer - not applicable
+- [x] diagnose
+- [x] directory-listing
+- [x] fetch-share-url
+- [x] forget
+- [x] install
+- [x] isolate
+- [x] isolated
+- [x] link
+- [x] links
+- [x] log
+- [ ] loopback (the localhost IP) - not applicable
+- [x] on-latest-version
+- [x] open
+- [x] park
+- [x] parked
+- [x] paths
+- [x] php (proxying commands to PHP CLI) - renamed to `php:proxy` with alias of `php`
+- [x] proxies
+- [x] proxy
+- [ ] renew (Renews all domains with a trusted TLS certificate) - TBD
+- [x] restart
+- [x] secure
+- [x] secured
+- [x] set-ngrok-token
+- [x] share
+- [x] share-tool
+- [x] start
+- [x] status - renamed to `services`
+- [x] stop
+- [x] tld
+- [ ] trust - not applicable
+- [x] uninstall
+- [x] unisolate
+- [x] unlink
+- [x] unproxy
+- [x] unsecure
+- [x] use
+- [x] which
+- [x] which-php - renamed to `php:which`
 
 To see a calculation of how much parity has been achieved, see the [parity command](#parity).
 
@@ -1596,56 +1596,56 @@ All services will have been stopped and removed and you can then be able to run 
 
 Upon installation, Valet creates the following directories and config files:
 
--   `~/.config/valet`
-    Contains all of Valet's config files. This resides in the home directory (`C:/Users/Username/`) indicated by `~`.
+- `~/.config/valet`
+  Contains all of Valet's config files. This resides in the home directory (`C:/Users/Username/`) indicated by `~`.
 
--   `~/.config/valet/CA`
-    Contains Valet's generated self-signed Root CA certificate, of which all site TLS certificates are signed with.
+- `~/.config/valet/CA`
+  Contains Valet's generated self-signed Root CA certificate, of which all site TLS certificates are signed with.
 
--   `~/.config/valet/Certificates`
-    Contains all the TLS certificates for the secured sites. These files are rebuilt when running the `install` and `secure` commands.
+- `~/.config/valet/Certificates`
+  Contains all the TLS certificates for the secured sites. These files are rebuilt when running the `install` and `secure` commands.
 
--   `~/.config/valet/Drivers`
-    Contains any user-defined custom Valet drivers. Drivers determine how a particular framework / CMS is served. See the [Valet Docs](https://laravel.com/docs/12.x/valet#custom-valet-drivers) for information on how to create a custom driver.
+- `~/.config/valet/Drivers`
+  Contains any user-defined custom Valet drivers. Drivers determine how a particular framework / CMS is served. See the [Valet Docs](https://laravel.com/docs/12.x/valet#custom-valet-drivers) for information on how to create a custom driver.
 
--   `~/.config/valet/Drivers/SampleValetDriver.php`
-    A sample custom driver.
+- `~/.config/valet/Drivers/SampleValetDriver.php`
+  A sample custom driver.
 
--   `~/.config/valet/Extensions`
-    Contains custom Valet extensions/commands. You can extend Valet and add your own commands or change existing ones. See [this comment](https://github.com/laravel/valet/issues/804#issuecomment-569731561) for more info and links to examples.
+- `~/.config/valet/Extensions`
+  Contains custom Valet extensions/commands. You can extend Valet and add your own commands or change existing ones. See [this comment](https://github.com/laravel/valet/issues/804#issuecomment-569731561) for more info and links to examples.
 
--   `~/.config/valet/Log`
-    Contains all error logs.
+- `~/.config/valet/Log`
+  Contains all error logs.
 
--   `~/.config/valet/Nginx`
-    Contains site-specific Nginx configs for any site that is isolated or secured. These files are rebuilt when running the `install`, `tld`, and `secure` commands.
+- `~/.config/valet/Nginx`
+  Contains site-specific Nginx configs for any site that is isolated or secured. These files are rebuilt when running the `install`, `tld`, and `secure` commands.
 
--   `~/.config/valet/Ngrok`
-    Contains the `ngrok.yml` config file for the ngrok executable to be able to `share` sites. This directory and file will only be created when the `set-ngrok-token` command is run.
+- `~/.config/valet/Ngrok`
+  Contains the `ngrok.yml` config file for the ngrok executable to be able to `share` sites. This directory and file will only be created when the `set-ngrok-token` command is run.
 
--   `~/.config/valet/Services`
-    Contains the Nginx and PHP config and executable files to be able to run them as Windows services. These files are rebuilt when running the `install` command.
+- `~/.config/valet/Services`
+  Contains the Nginx and PHP config and executable files to be able to run them as Windows services. These files are rebuilt when running the `install` command.
 
--   `~/.config/valet/Sites`
-    Contains all of the symbolic links for any `link`ed sites.
+- `~/.config/valet/Sites`
+  Contains all of the symbolic links for any `link`ed sites.
 
--   `~/.config/valet/stubs`
-    A user-created directory to contain custom stubs. Only used in Valet if it exists, and overrides Valet's internal stubs.
+- `~/.config/valet/stubs`
+  A user-created directory to contain custom stubs. Only used in Valet if it exists, and overrides Valet's internal stubs.
 
--   `~/.config/valet/Xdebug`
-    Contains the output files of Xdebug profiling.
+- `~/.config/valet/Xdebug`
+  Contains the output files of Xdebug profiling.
 
--   `~/.config/valet/config.json`
-    This is the main Valet config file.
+- `~/.config/valet/config.json`
+  This is the main Valet config file.
 
--   `~/.config/valet/Emergency Uninstall`
-    Contains the emergency uninstall files.
+- `~/.config/valet/Emergency Uninstall`
+  Contains the emergency uninstall files.
 
--   `~/.config/valet/Emergency Uninstall/ansicon`
-    Contains the Ansicon files and executable to help uninstall it.
+- `~/.config/valet/Emergency Uninstall/ansicon`
+  Contains the Ansicon files and executable to help uninstall it.
 
--   `~/.config/valet/Emergency Uninstall/emergency_uninstall_services.bat`
-    This is an batch file to do an emergency stop and uninstall of all services. See the [Emergency Stop and Uninstall Services section](#emergency-stop-and-uninstall-services).
+- `~/.config/valet/Emergency Uninstall/emergency_uninstall_services.bat`
+  This is an batch file to do an emergency stop and uninstall of all services. See the [Emergency Stop and Uninstall Services section](#emergency-stop-and-uninstall-services).
 
 > [!WARNING]
 >
@@ -1657,12 +1657,12 @@ Upon installation, Valet creates the following directories and config files:
 
 ## Known Issues
 
--   WSL2 distros fail because of Acrylic DNS Proxy ([microsoft/wsl#4929](https://github.com/microsoft/WSL/issues/4929)). Use `valet stop`, start WSL2 then `valet start`.
--   The PHP-CGI process uses port 9001. If it's already used change it in `~/.config/valet/config.json` and run `valet install` again.
--   When sharing sites the url will not be copied to the clipboard.
--   ~~You must run the `valet` commands from the drive where Valet is installed, except for park and link. See [#12](https://github.com/cretueusebiu/valet-windows/issues/12#issuecomment-283111834).~~ All commands seem to work fine on all drives.
--   If your machine is not connected to the internet you'll have to manually add the domains in your `hosts` file or you can install the [Microsoft Loopback Adapter](https://docs.microsoft.com/en-us/troubleshoot/windows-server/networking/install-microsoft-loopback-adapter) as this simulates an active local network interface that Valet can bind too.
--   When trying to run Valet on PHP 7.4 and you get this error:
+- WSL2 distros fail because of Acrylic DNS Proxy ([microsoft/wsl#4929](https://github.com/microsoft/WSL/issues/4929)). Use `valet stop`, start WSL2 then `valet start`.
+- The PHP-CGI process uses port 9001. If it's already used change it in `~/.config/valet/config.json` and run `valet install` again.
+- When sharing sites the url will not be copied to the clipboard.
+- ~~You must run the `valet` commands from the drive where Valet is installed, except for park and link. See [#12](https://github.com/cretueusebiu/valet-windows/issues/12#issuecomment-283111834).~~ All commands seem to work fine on all drives.
+- If your machine is not connected to the internet you'll have to manually add the domains in your `hosts` file or you can install the [Microsoft Loopback Adapter](https://docs.microsoft.com/en-us/troubleshoot/windows-server/networking/install-microsoft-loopback-adapter) as this simulates an active local network interface that Valet can bind too.
+- When trying to run Valet on PHP 7.4 and you get this error:
 
     > Composer detected issues in your platform:
     >
@@ -1684,13 +1684,13 @@ Upon installation, Valet creates the following directories and config files:
     >
     > Make sure you uninstall Valet before `composer global update`, to make sure all services have been stopped and uninstalled before composer removes and updates them. Otherwise errors occur and composer can't update in-use files. If this does happen please refer to the [Emergency Stop and Uninstall Services](#emergency-stop-and-uninstall-services) section.
 
--   If you're using a framework that uses a .env file and sets the domain name, such as `WP_HOME` for Laravel Bedrock, then make sure the TLD is the same as the one set for Valet. Otherwise, when trying to reach a site, the site will auto redirect to use the TLD in set in the .env.
+- If you're using a framework that uses a .env file and sets the domain name, such as `WP_HOME` for Laravel Bedrock, then make sure the TLD is the same as the one set for Valet. Otherwise, when trying to reach a site, the site will auto redirect to use the TLD in set in the .env.
 
     Example: `WP_HOME='http://mySite.test'`, Valet gets a request to `http://mySite.dev`, the site will auto redirect to `http://mySite.test`.
 
     If this still happens after changing the TLD, then it has been cached by the browser, despite NGINX specifying headers not to cache. To rectify try `"Empty cache and hard reload"` option of the page reload button.
 
--   On rare occasions, you may encounter a WMI error:
+- On rare occasions, you may encounter a WMI error:
 
     > FATAL - WMI Operation failure: InvalidServiceControl
     > <br>WMI.WmiException: InvalidServiceControl
@@ -1704,9 +1704,9 @@ Upon installation, Valet creates the following directories and config files:
 
     If the WMI error does occur, try running the command again. If different WMI errors occur, please submit an issue with all relevant details.
 
--   If there is a large error and it's file trace output to the terminal, the top of the error may be cut off/overwritten. Apparently Symfony can only write to the terminal that is viewable, if it goes outside of the viewable area (ie. you need to scroll up to view) then the output is overwritten and the most important part of the error, the description at the start is cut off. (See https://github.com/symfony/symfony/issues/35012). If this happens, make the terminal larger in height and try the command again to try and view the full error.
+- If there is a large error and it's file trace output to the terminal, the top of the error may be cut off/overwritten. Apparently Symfony can only write to the terminal that is viewable, if it goes outside of the viewable area (ie. you need to scroll up to view) then the output is overwritten and the most important part of the error, the description at the start is cut off. (See https://github.com/symfony/symfony/issues/35012). If this happens, make the terminal larger in height and try the command again to try and view the full error.
 
--   When trying to install Valet after updating via Composer, and you receive this error or similiar: `The system cannot find the path specified`; it could be that Ansicon hasn't uninstalled properly and left it's path in the registry. Because it happens unpredictably, there is no way of debugging or fixing it.
+- When trying to install Valet after updating via Composer, and you receive this error or similiar: `The system cannot find the path specified`; it could be that Ansicon hasn't uninstalled properly and left it's path in the registry. Because it happens unpredictably, there is no way of debugging or fixing it.
 
     The only "workaround" is to use the emergency uninstall script (`emergency_uninstall_services.bat`) in the `~/.config/valet/Emergency Uninstall` directory to allow Ansicon another chance to uninstall itself properly. (See [issue 28](https://github.com/yCodeTech/valet-windows/issues/28)). See the [Emergency Stop and Uninstall Services section](#emergency-stop-and-uninstall-services).
 
