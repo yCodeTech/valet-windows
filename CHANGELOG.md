@@ -7,6 +7,73 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/yCodeTech/valet-windows/tree/master)
 
+### Fixed
+
+- Fixed ngrok error logging by adding real-time output ([#51](https://github.com/yCodeTech/valet-windows/pull/51)) by @yCodeTech
+
+    Technically a follow-up to issue #48 that prompted me to double check ngrok was running properly; and also a follow-up and enhancement of commit 2724314
+
+    It was really hard to figure out if there was something wrong with ngrok without proper logging. Ngrok does actually have an undocumented `--log` option for the `http` command (but documented as [API flags](https://ngrok.com/docs/agent/cli-api#flags-2)), so we can use this to stream live logging output directly to the terminal.
+
+    **Summary**
+
+    This pull request introduces significant improvements to the ngrok sharing experience in Valet, including real-time logging, automatic copying of the public URL to the clipboard, and a more robust streaming of ngrok output. It also updates documentation to reflect these changes and includes some minor codebase improvements.
+
+    **Enhancements to ngrok sharing and output handling:**
+
+    - Added a new `streamCommandOutput` method in `CommandLine.php` to stream command output in real-time, with support for error detection, line handling, and formatting errors as valet errors.
+    - Updated `Ngrok.php` to:
+        - Set default ngrok options for real-time logging (`log=stdout`, `log-level=info`, `log-format=term`), with ability for users to override these settings or completely disable the real-time logging.
+        - Stream ngrok output in real-time, detect and display the public URL when available (formatted as an information output), and copy it to the clipboard automatically.
+        - Inform the user how to fetch the public URL if real-time logging is disabled.
+
+    **Clipboard improvements:**
+
+    - Refactored URL copying logic into a reusable `copyUrlToClipboard` method in `ShareTool.php`, ensuring consistent and secure clipboard operations.
+    - Removed redundant clipboard message in `valet.php` since the new method handles user notification.
+
+    **Error and output handling:**
+
+    - Enhanced the `error` and `output` helper functions to improve formatting and robustness.
+        - Changing the usage of Symfony's `writeln` to `write` to support optional writing of newlines at the end of the output.
+        - Included the Symfony `OutputFormatter` for output escaping in the `error` helper function.
+
+<!-- end -->
+
+### Changed
+
+- Refactored update error pages ([#49](https://github.com/yCodeTech/valet-windows/pull/49)) by @yCodeTech
+
+    This pull request updates the `404.html` and `500.html` error page templates to improve their appearance, responsiveness, and maintainability. The changes focus on improving layout, using modern CSS, enhancing mobile support, and unify the branding and SVG usage across both pages.
+
+    **HTML Structure, UX, and Responsiveness Improvements:**
+
+    - Consolidated SVG styles into the main `<style>` block for consistency.
+    - Refined CSS to make for a better UX.
+    - Refactored HTML structure to use containers with classes (`.container`, `.content`) for improved structure and better CSS selectors.
+
+    **Content and Readability Enhancements:**
+
+    - Enhanced the help text on the 500 error page by styling the command with a dedicated class and improving line wrapping for better readability.
+
+    ***
+
+    **Summary from #41 **
+
+    **Styling and Layout Improvements:**
+
+    - Added a responsive `<meta name="viewport">` tag and reworked the CSS to use flexbox for centering, improved font scaling with `clamp()`, and better color handling for both light and dark modes. This ensures the error pages look good on all devices and respect user preferences.
+
+    - Moved inline styles into a `<style>` block for maintainability and consistency, and removed redundant or outdated inline style attributes from HTML elements.
+
+    **SVG and Branding Consistency:**
+
+    - Updated the SVG logo markup in `500.html` to match the more modern and maintainable structure from `404.html`, using consistent class names and gradient definitions. This unifies the branding and reduces code duplication.
+
+    These updates collectively provide a more polished, user-friendly, and maintainable error page experience.-update dark scheme rendering
+
+<!-- end -->
+
 ## [3.4.3](https://github.com/yCodeTech/valet-windows/tree/v3.4.3) - 2026-06-08
 
 ### Fixed
