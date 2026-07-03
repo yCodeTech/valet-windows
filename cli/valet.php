@@ -978,7 +978,6 @@ if (is_dir(Valet::homePath()) && Nginx::isInstalled()) {
 
 		$url = Share::shareTool()->currentTunnelUrl($site);
 		info("The public URL for $site is: <fg=blue>$url</>");
-		info("It has been copied to your clipboard.");
 
 	})->setAliases(["url"])->descriptions('Get and copy the public URL of the current working directory site that is currently being shared', [
 		"site" => "Optionally, specify a site"

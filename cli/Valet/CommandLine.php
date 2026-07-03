@@ -28,6 +28,69 @@ class CommandLine {
 	}
 
 	/**
+	 * Stream command output in real time and optionally collect matching lines.
+	 *
+	 * @param string $command
+	 * @param array $callbacks Optional callbacks:
+	 * - onLine (callable): receives every raw line after it is written.
+	 * - matches (callable): return true to collect line for post-run analysis.
+	 * - isError (callable): return true to render line as an error. Defaults to matches.
+	 *
+	 * @return array The collected output lines or an empty array if no lines were collected.
+	 */
+	public function streamCommandOutput($command, array $callbacks = []): array {
+		$lineHandler = $callbacks['onLine'] ?? null;
+		$lineMatches = $callbacks['matches'] ?? null;
+		$lineIsError = $callbacks['isError'] ?? $lineMatches;
+
+		$capturedLines = [];
+
+		// Open a process to execute the command and read its output.
+		// 2>&1 redirects stderr to stdout so we can capture both.
+		$handle = popen("$command 2>&1", 'r');
+
+		// If the process failed to start, throw an error.
+		if ($handle === false) {
+			error('Failed to start command for streaming output.', true);
+		}
+
+		while ($handle && !feof($handle)) {
+			$line = fgets($handle);
+			if ($line === false) {
+				break;
+			}
+
+			// If the line is an error, output it as an error.
+			if ($lineIsError && $lineIsError($line)) {
+				error($line, false, false, true);
+			}
+			// Otherwise, output it normally.
+			else {
+				output($line, false);
+			}
+
+			// Invoke the optional line handler after writing output so callers can append
+			// follow-up messages in display order.
+			if ($lineHandler) {
+				$lineHandler($line);
+			}
+
+			// If a callback is provided and the line matches the condition,
+			// then collect the line for post-run analysis.
+			if ($lineMatches && $lineMatches($line)) {
+				$capturedLines[] = trim($line);
+			}
+		}
+
+		// Close the process.
+		if ($handle) {
+			pclose($handle);
+		}
+
+		return $capturedLines;
+	}
+
+	/**
 	 * Pass the given Valet command to the command line with elevated privileges using gsudo.
 	 *
 	 * gsudo is a sudo equivalent of the Mac `sudo` utility. It allows the user to run commands as the root user with elevated privileges with minimal amount of UAC popups, ie. only 1 UAC popup.
