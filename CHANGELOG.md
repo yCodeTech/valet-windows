@@ -40,6 +40,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- end -->
 
+### Changed
+
+- Refactored update error pages ([#49](https://github.com/yCodeTech/valet-windows/pull/49)) by @yCodeTech
+
+    This pull request updates the `404.html` and `500.html` error page templates to improve their appearance, responsiveness, and maintainability. The changes focus on improving layout, using modern CSS, enhancing mobile support, and unify the branding and SVG usage across both pages.
+
+    **HTML Structure, UX, and Responsiveness Improvements:**
+
+    - Consolidated SVG styles into the main `<style>` block for consistency.
+    - Refined CSS to make for a better UX.
+    - Refactored HTML structure to use containers with classes (`.container`, `.content`) for improved structure and better CSS selectors.
+
+    **Content and Readability Enhancements:**
+
+    - Enhanced the help text on the 500 error page by styling the command with a dedicated class and improving line wrapping for better readability.
+
+    ***
+
+    **Summary from #41 **
+
+    **Styling and Layout Improvements:**
+
+    - Added a responsive `<meta name="viewport">` tag and reworked the CSS to use flexbox for centering, improved font scaling with `clamp()`, and better color handling for both light and dark modes. This ensures the error pages look good on all devices and respect user preferences.
+
+    - Moved inline styles into a `<style>` block for maintainability and consistency, and removed redundant or outdated inline style attributes from HTML elements.
+
+    **SVG and Branding Consistency:**
+
+    - Updated the SVG logo markup in `500.html` to match the more modern and maintainable structure from `404.html`, using consistent class names and gradient definitions. This unifies the branding and reduces code duplication.
+
+    These updates collectively provide a more polished, user-friendly, and maintainable error page experience.-update dark scheme rendering
+
+<!-- end -->
+
 ## [3.4.3](https://github.com/yCodeTech/valet-windows/tree/v3.4.3) - 2026-06-08
 
 ### Fixed
