@@ -58,7 +58,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
     ***
 
-    **Summary from #41 **
+    **Summary from [#41](https://github.com/yCodeTech/valet-windows/pull/41)**
 
     **Styling and Layout Improvements:**
 
