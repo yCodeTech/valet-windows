@@ -15,6 +15,7 @@ indent_size = 4
 
 [*.yml]
 indent_size = 2
+indent_style = space
 
 [*.conf]
 indent_style = space
