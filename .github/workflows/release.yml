@@ -551,13 +551,20 @@ jobs:
           set -euo pipefail
 
           RELEASE_ARGS=()
+          RELEASE_TITLE="Laravel Valet Windows 3 [${{ needs.validate-release-tag.outputs.version }}]"
+
           if [[ "${{ inputs.prerelease }}" == "true" ]]; then
             RELEASE_ARGS+=(--prerelease)
           fi
 
+          # Create the GitHub release with auto-generated release notes
+          # The --generate-notes flag will automatically generate release notes and title.
+          # The title can be overridden with the --title flag if desired.
+
           gh release create "${{ env.RELEASE_TAG }}" \
             --target "${{ env.RELEASE_SHA }}" \
             --generate-notes \
+            --title "$RELEASE_TITLE" \
             "${RELEASE_ARGS[@]}"
 
           if [[ "${{ inputs.prerelease }}" == "true" ]]; then
