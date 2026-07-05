@@ -3,7 +3,7 @@ name: Prepare And Publish Release
 on:
   workflow_dispatch:
     inputs:
-      tag_name:
+      release_tag:
         description: "Release tag (e.g. v3.4.5)"
         required: true
         type: string
@@ -39,7 +39,7 @@ jobs:
     outputs:
       version: ${{ steps.parse_version.outputs.version }}
     env:
-      TAG_NAME: ${{ inputs.tag_name }}
+      RELEASE_TAG: ${{ inputs.release_tag }}
       TARGET_BRANCH: ${{ inputs.target_branch }}
     steps:
       - name: Checkout target branch
@@ -54,15 +54,15 @@ jobs:
         run: |
           set -euo pipefail
 
-          TAG_NAME="${{ env.TAG_NAME }}"
+          RELEASE_TAG="${{ env.RELEASE_TAG }}"
 
           # Validate semver format and require the release tag to start with 'v'.
-          if [[ "$TAG_NAME" =~ ^v([0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9\.-]+)?(\+[a-zA-Z0-9\.-]+)?)$ ]]; then
+          if [[ "$RELEASE_TAG" =~ ^v([0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9\.-]+)?(\+[a-zA-Z0-9\.-]+)?)$ ]]; then
             VERSION="${BASH_REMATCH[1]}"
             echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-            echo "✅ Valid semver tag: $TAG_NAME"
+            echo "✅ Valid semver tag: $RELEASE_TAG"
           else
-            echo "❌ Invalid version format: $TAG_NAME"
+            echo "❌ Invalid version format: $RELEASE_TAG"
             echo "ℹ️ Version must start with 'v' and follow semver (e.g., v1.0.0, v1.0.0-beta.1)"
             exit 1
           fi
@@ -72,8 +72,8 @@ jobs:
         run: |
           set -euo pipefail
 
-          if git rev-parse -q --verify "refs/tags/${{ env.TAG_NAME }}" >/dev/null; then
-            echo "⚠️ Tag ${{ env.TAG_NAME }} already exists locally."
+          if git rev-parse -q --verify "refs/tags/${{ env.RELEASE_TAG }}" >/dev/null; then
+            echo "⚠️ Tag ${{ env.RELEASE_TAG }} already exists locally."
             exit 1
           fi
 
@@ -82,8 +82,8 @@ jobs:
         run: |
           set -euo pipefail
 
-          if git ls-remote --exit-code --tags origin "refs/tags/${{ env.TAG_NAME }}" >/dev/null 2>&1; then
-            echo "⚠️ Tag ${{ env.TAG_NAME }} already exists on origin."
+          if git ls-remote --exit-code --tags origin "refs/tags/${{ env.RELEASE_TAG }}" >/dev/null 2>&1; then
+            echo "⚠️ Tag ${{ env.RELEASE_TAG }} already exists on origin."
             echo "Published tags are immutable. Choose a new tag."
             exit 1
           fi
@@ -96,7 +96,7 @@ jobs:
     outputs:
       release_sha: ${{ steps.resolve_release_sha.outputs.release_sha }}
     env:
-      TAG_NAME: ${{ inputs.tag_name }}
+      RELEASE_TAG: ${{ inputs.release_tag }}
       TARGET_BRANCH: ${{ inputs.target_branch }}
     steps:
       - name: Checkout target branch
@@ -164,7 +164,7 @@ jobs:
 
           # Replace the entire [Unreleased] heading line (including any trailing URL)
           # with a versioned release heading that links to the tree at the tag.
-          RELEASE_URL="${{ github.server_url }}/${REPO}/tree/${{ env.TAG_NAME }}"
+          RELEASE_URL="${{ github.server_url }}/${REPO}/tree/${{ env.RELEASE_TAG }}"
           NEW_HEADING="## [${VERSION}](${RELEASE_URL}) - ${CURRENT_DATE}"
 
           sed -i "s|^## \[Unreleased\].*|${NEW_HEADING}|" CHANGELOG.md
@@ -233,7 +233,7 @@ jobs:
           set -euo pipefail
 
           # Create a release branch name based on the tag name
-          BRANCH_NAME="release/${{ env.TAG_NAME }}"
+          BRANCH_NAME="release/${{ env.RELEASE_TAG }}"
           echo "branch_name=$BRANCH_NAME" >> "$GITHUB_OUTPUT"
 
       - name: Check release branch doesn't already exist remotely
@@ -276,7 +276,7 @@ jobs:
             exit 1
           }
 
-          git commit -m "chore: version bump and update changelog for ${{ env.TAG_NAME }}" || {
+          git commit -m "chore: version bump and update changelog for ${{ env.RELEASE_TAG }}" || {
             echo "❌ Failed to commit changes"
             exit 1
           }
@@ -313,8 +313,8 @@ jobs:
 
           # Define PR details
           # ^ capitalizes the first letter
-          PR_TITLE="${RELEASE_TYPE^} ${{ env.TAG_NAME }}"
-          PR_BODY="Automated version bump and changelog update for $RELEASE_TYPE ${{ env.TAG_NAME }}."
+          PR_TITLE="${RELEASE_TYPE^} ${{ env.RELEASE_TAG }}"
+          PR_BODY="Automated version bump and changelog update for $RELEASE_TYPE ${{ env.RELEASE_TAG }}."
           PR_LABELS="auto version bump,release"
 
           # Create pull request and get the returned URL
@@ -467,7 +467,7 @@ jobs:
       - prepare-release
       - resolve-release-sha-publish-only
     env:
-      TAG_NAME: ${{ inputs.tag_name }}
+      RELEASE_TAG: ${{ inputs.release_tag }}
       TARGET_BRANCH: ${{ inputs.target_branch }}
       RELEASE_SHA: ${{ inputs.publish_only && needs.resolve-release-sha-publish-only.outputs.release_sha || needs.prepare-release.outputs.release_sha }}
     steps:
@@ -494,17 +494,17 @@ jobs:
         run: |
           set -euo pipefail
 
-          TAG_SHA=$(git ls-remote --tags origin "refs/tags/${{ env.TAG_NAME }}" | awk '{print $1}')
+          TAG_SHA=$(git ls-remote --tags origin "refs/tags/${{ env.RELEASE_TAG }}" | awk '{print $1}')
 
           # Check if the tag exists remotely and output the result
           if [[ -n "$TAG_SHA" ]]; then
             echo "exists=true" >> "$GITHUB_OUTPUT"
             echo "tag_sha=$TAG_SHA" >> "$GITHUB_OUTPUT"
-            echo "ℹ️ Remote tag already exists: ${{ env.TAG_NAME }} ($TAG_SHA)"
+            echo "ℹ️ Remote tag already exists: ${{ env.RELEASE_TAG }} ($TAG_SHA)"
           else
             echo "exists=false" >> "$GITHUB_OUTPUT"
             echo "tag_sha=" >> "$GITHUB_OUTPUT"
-            echo "ℹ️ Remote tag does not exist yet: ${{ env.TAG_NAME }}"
+            echo "ℹ️ Remote tag does not exist yet: ${{ env.RELEASE_TAG }}"
           fi
 
       - name: Validate remote tag state for normal mode
@@ -512,7 +512,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          echo "❌ Tag ${{ env.TAG_NAME }} already exists on origin."
+          echo "❌ Tag ${{ env.RELEASE_TAG }} already exists on origin."
           echo "Published tags are immutable. Choose a new tag."
           exit 1
 
@@ -523,7 +523,7 @@ jobs:
 
           # Check if the existing tag points to the expected release commit
           if [[ "${{ steps.remote_tag.outputs.tag_sha }}" != "${{ env.RELEASE_SHA }}" ]]; then
-            echo "❌ Existing tag ${{ env.TAG_NAME }} points to ${{ steps.remote_tag.outputs.tag_sha }}, expected ${{ env.RELEASE_SHA }}"
+            echo "❌ Existing tag ${{ env.RELEASE_TAG }} points to ${{ steps.remote_tag.outputs.tag_sha }}, expected ${{ env.RELEASE_SHA }}"
             echo "ℹ️ Refusing to continue to avoid publishing from a mismatched immutable tag."
             exit 1
           fi
@@ -534,15 +534,15 @@ jobs:
         if: steps.remote_tag.outputs.exists != 'true'
         run: |
           set -euo pipefail
-          git tag "${{ env.TAG_NAME }}" "${{ env.RELEASE_SHA }}"
-          echo "✅ Created immutable tag locally: ${{ env.TAG_NAME }}"
+          git tag "${{ env.RELEASE_TAG }}" "${{ env.RELEASE_SHA }}"
+          echo "✅ Created immutable tag locally: ${{ env.RELEASE_TAG }}"
 
       - name: Push immutable tag
         if: steps.remote_tag.outputs.exists != 'true'
         run: |
           set -euo pipefail
-          git push origin "${{ env.TAG_NAME }}"
-          echo "✅ Pushed immutable tag: ${{ env.TAG_NAME }}"
+          git push origin "${{ env.RELEASE_TAG }}"
+          echo "✅ Pushed immutable tag: ${{ env.RELEASE_TAG }}"
 
       - name: Publish GitHub release
         env:
@@ -555,13 +555,13 @@ jobs:
             RELEASE_ARGS+=(--prerelease)
           fi
 
-          gh release create "${{ env.TAG_NAME }}" \
+          gh release create "${{ env.RELEASE_TAG }}" \
             --target "${{ env.RELEASE_SHA }}" \
             --generate-notes \
             "${RELEASE_ARGS[@]}"
 
           if [[ "${{ inputs.prerelease }}" == "true" ]]; then
-            echo "✅ Published prerelease: ${{ env.TAG_NAME }}"
+            echo "✅ Published prerelease: ${{ env.RELEASE_TAG }}"
           else
-            echo "✅ Published release: ${{ env.TAG_NAME }}"
+            echo "✅ Published release: ${{ env.RELEASE_TAG }}"
           fi
