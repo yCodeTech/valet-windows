@@ -328,7 +328,7 @@ jobs:
           echo "✅ Pull request created successfully: $PR_URL"
 
           # Extract PR number from URL and store as output
-          PR_NUMBER=$(echo "$PR_URL" | grep -oP '\\d+$')
+          PR_NUMBER=$(echo "$PR_URL" | grep -oP '\d+$')
           echo "pr_number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
           echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
 
