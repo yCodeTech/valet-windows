@@ -68,6 +68,7 @@ jobs:
           fi
 
       - name: Check local tag availability
+        if: inputs.publish_only != true
         run: |
           set -euo pipefail
 
@@ -77,6 +78,7 @@ jobs:
           fi
 
       - name: Check remote tag availability
+        if: inputs.publish_only != true
         run: |
           set -euo pipefail
 
@@ -487,13 +489,56 @@ jobs:
           git cat-file -e "${{ env.RELEASE_SHA }}^{commit}"
           echo "✅ Release commit exists locally: ${{ env.RELEASE_SHA }}"
 
+      - name: Detect remote tag state
+        id: remote_tag
+        run: |
+          set -euo pipefail
+
+          TAG_SHA=$(git ls-remote --tags origin "refs/tags/${{ env.TAG_NAME }}" | awk '{print $1}')
+
+          # Check if the tag exists remotely and output the result
+          if [[ -n "$TAG_SHA" ]]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "tag_sha=$TAG_SHA" >> "$GITHUB_OUTPUT"
+            echo "ℹ️ Remote tag already exists: ${{ env.TAG_NAME }} ($TAG_SHA)"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "tag_sha=" >> "$GITHUB_OUTPUT"
+            echo "ℹ️ Remote tag does not exist yet: ${{ env.TAG_NAME }}"
+          fi
+
+      - name: Validate remote tag state for normal mode
+        if: inputs.publish_only != true && steps.remote_tag.outputs.exists == 'true'
+        run: |
+          set -euo pipefail
+
+          echo "❌ Tag ${{ env.TAG_NAME }} already exists on origin."
+          echo "Published tags are immutable. Choose a new tag."
+          exit 1
+
+      - name: Validate existing tag for publish-only mode
+        if: inputs.publish_only == true && steps.remote_tag.outputs.exists == 'true'
+        run: |
+          set -euo pipefail
+
+          # Check if the existing tag points to the expected release commit
+          if [[ "${{ steps.remote_tag.outputs.tag_sha }}" != "${{ env.RELEASE_SHA }}" ]]; then
+            echo "❌ Existing tag ${{ env.TAG_NAME }} points to ${{ steps.remote_tag.outputs.tag_sha }}, expected ${{ env.RELEASE_SHA }}"
+            echo "ℹ️ Refusing to continue to avoid publishing from a mismatched immutable tag."
+            exit 1
+          fi
+
+          echo "✅ Existing immutable tag already points to the expected commit"
+
       - name: Create immutable tag
+        if: steps.remote_tag.outputs.exists != 'true'
         run: |
           set -euo pipefail
           git tag "${{ env.TAG_NAME }}" "${{ env.RELEASE_SHA }}"
           echo "✅ Created immutable tag locally: ${{ env.TAG_NAME }}"
 
       - name: Push immutable tag
+        if: steps.remote_tag.outputs.exists != 'true'
         run: |
           set -euo pipefail
           git push origin "${{ env.TAG_NAME }}"
