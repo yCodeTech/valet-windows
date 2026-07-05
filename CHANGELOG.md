@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- Fixed release workflow and immutable release tags for Packagist ([#55](https://github.com/yCodeTech/valet-windows/pull/55)) by @yCodeTech
+
+    Fixes https://github.com/yCodeTech/valet-windows/issues/54 where Packagist complains the release tag has been modified after the release. To fix we need to completely change how we do releases and auto version bump. We now manually trigger the workflow, input the version tag, run the auto version bump and changelog update jobs, and then create the release and tag pragmatically after committing.
+
+    - Refactor release pipeline to completely change how we do releases and auto version bump. Allowing the workflow to be triggered manually (instead of on-release) with inputs to set the release tag version and publish the release.
+
+        - Introduced `release_tag`, `target_branch` with default as master, and `prerelease` boolean inputs.
+
+        - Introduced `publish_only` and `release_sha` inputs to enable the skipping of a version and changelog updates and jump directly to publishing the release.
+
+        - Fixed the release tag behaviour and removed the updating of tag commits.
+
+        - Added a proper publish release job with the creation of immutable tags and releases.
+
+        - Publish releases from resolved release commit SHA to keep tag/release contents aligned both on GitHub and Packagist.
+
+    - Updated versioning validation and enforce semver release tags prefixed with a v.
+
+    - Require both version.php and CHANGELOG.md updates for every release and validate them before creating a PR.
+
+<!-- end -->
+
 ## [3.4.4](https://github.com/yCodeTech/valet-windows/tree/v3.4.4) - 2026-07-03
 
 ### Fixed
