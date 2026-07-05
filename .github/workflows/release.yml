@@ -43,363 +43,362 @@ jobs:
       TAG_NAME: ${{ inputs.tag_name }}
       TARGET_BRANCH: ${{ inputs.target_branch }}
     steps:
-    - name: Checkout target branch
-      uses: actions/checkout@v4
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        ref: ${{ inputs.target_branch }}
-        fetch-depth: 0
+      - name: Checkout target branch
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ inputs.target_branch }}
+          fetch-depth: 0
 
-    - name: Parse and validate version
-      id: parse_version
-      run: |
-        set -euo pipefail
+      - name: Parse and validate version
+        id: parse_version
+        run: |
+          set -euo pipefail
 
-        TAG_NAME="${{ env.TAG_NAME }}"
+          TAG_NAME="${{ env.TAG_NAME }}"
 
-        # Validate semver format and require the release tag to start with 'v'.
-        if [[ "$TAG_NAME" =~ ^v([0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9\.-]+)?(\+[a-zA-Z0-9\.-]+)?)$ ]]; then
-          VERSION="${BASH_REMATCH[1]}"
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "✅ Valid semver tag: $TAG_NAME"
-        else
-          echo "❌ Invalid version format: $TAG_NAME"
-          echo "ℹ️ Version must start with 'v' and follow semver (e.g., v1.0.0, v1.0.0-beta.1)"
-          exit 1
-        fi
-
-    - name: Check local tag availability
-      run: |
-        set -euo pipefail
-
-        if git rev-parse -q --verify "refs/tags/${{ env.TAG_NAME }}" >/dev/null; then
-          echo "⚠️ Tag ${{ env.TAG_NAME }} already exists locally."
-          exit 1
-        fi
-
-    - name: Check remote tag availability
-      run: |
-        set -euo pipefail
-
-        if git ls-remote --exit-code --tags origin "refs/tags/${{ env.TAG_NAME }}" >/dev/null 2>&1; then
-          echo "⚠️ Tag ${{ env.TAG_NAME }} already exists on origin."
-          echo "Published tags are immutable. Choose a new tag."
-          exit 1
-        fi
-
-    - name: Setup git identity
-      run: |
-        git config user.name "github-actions[bot]"
-        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-    - name: Update version file
-      run: |
-        set -euo pipefail
-
-        VERSION="${{ steps.parse_version.outputs.version }}"
-        CURRENT_VERSION=$(grep -oP "(?<=\\\$version = ')[^']+" cli/version.php)
-
-        if [[ "$VERSION" == "$CURRENT_VERSION" ]]; then
-          echo "ℹ️ version.php already set to $VERSION"
-        else
-          sed -i "s/\$version = '[^']*';/\$version = '$VERSION';/" cli/version.php
-          echo "✅ Updated version.php: $CURRENT_VERSION -> $VERSION"
-        fi
-
-    - name: Detect changelog file
-      id: changelog_file
-      run: |
-        set -euo pipefail
-
-        # Check if CHANGELOG.md exists
-        if [[ -f "CHANGELOG.md" ]]; then
-          echo "exists=true" >> "$GITHUB_OUTPUT"
-        else
-          echo "❌ CHANGELOG.md not found. Release requires changelog updates."
-          exit 1
-        fi
-
-    - name: Detect unreleased changelog heading
-      id: changelog_unreleased
-      if: steps.changelog_file.outputs.exists == 'true'
-      run: |
-        set -euo pipefail
-
-        # Check if Unreleased section exists (with or without a trailing URL)
-        if grep -qP "^## \[Unreleased\]" CHANGELOG.md; then
-          echo "exists=true" >> "$GITHUB_OUTPUT"
-        else
-          echo "❌ No [Unreleased] section found in CHANGELOG.md."
-          echo "Release requires converting [Unreleased] into the release heading."
-          exit 1
-        fi
-
-    - name: Update changelog release heading
-      if: steps.changelog_unreleased.outputs.exists == 'true'
-      run: |
-        set -euo pipefail
-
-        VERSION="${{ steps.parse_version.outputs.version }}"
-        REPO="${{ github.repository }}"
-        CURRENT_DATE=$(date +%Y-%m-%d)
-
-        # Replace the entire [Unreleased] heading line (including any trailing URL)
-        # with a versioned release heading that links to the tree at the tag.
-        RELEASE_URL="${{ github.server_url }}/${REPO}/tree/${{ env.TAG_NAME }}"
-        NEW_HEADING="## [${VERSION}](${RELEASE_URL}) - ${CURRENT_DATE}"
-
-        sed -i "s|^## \[Unreleased\].*|${NEW_HEADING}|" CHANGELOG.md
-        echo "✅ Updated CHANGELOG.md [Unreleased] heading to [$VERSION]"
-
-    - name: Verify version metadata
-      run: |
-        set -euo pipefail
-
-        VERSION="${{ steps.parse_version.outputs.version }}"
-        FILE_VERSION=$(grep -oP "(?<=\\\$version = ')[^']+" cli/version.php)
-
-        if [[ "$FILE_VERSION" != "$VERSION" ]]; then
-          echo "❌ version.php mismatch: expected $VERSION, found $FILE_VERSION"
-          exit 1
-        fi
-
-    - name: Verify changelog metadata
-      run: |
-        set -euo pipefail
-
-        VERSION="${{ steps.parse_version.outputs.version }}"
-
-        if ! grep -qE "^## \[$VERSION\]" CHANGELOG.md; then
-          echo "❌ CHANGELOG.md does not contain a release heading for [$VERSION]"
-          echo "❌ Refusing to release because changelog metadata is incomplete."
-          exit 1
-        fi
-
-    - name: Verify required release file changes
-      id: git_check
-      run: |
-        set -euo pipefail
-
-        VERSION_CHANGED=true
-        CHANGELOG_CHANGED=true
-
-        if git diff --quiet -- cli/version.php; then
-          VERSION_CHANGED=false
-        fi
-
-        if git diff --quiet -- CHANGELOG.md; then
-          CHANGELOG_CHANGED=false
-        fi
-
-        if [[ "$VERSION_CHANGED" != "true" ]]; then
-          echo "❌ version.php was not changed."
-          echo "❌ A release requires a version bump."
-          exit 1
-        fi
-
-        if [[ "$CHANGELOG_CHANGED" != "true" ]]; then
-          echo "❌ CHANGELOG.md was not changed."
-          echo "❌ A release requires a changelog update."
-          exit 1
-        fi
-
-        echo "changes=true" >> "$GITHUB_OUTPUT"
-        echo "📝 Required release changes detected:"
-        git status --porcelain -- cli/version.php CHANGELOG.md
-
-    - name: Prepare release branch name
-      if: steps.git_check.outputs.changes == 'true'
-      id: release_branch
-      run: |
-        set -euo pipefail
-
-        # Create a release branch name based on the tag name
-        BRANCH_NAME="release/${{ env.TAG_NAME }}"
-        echo "branch_name=$BRANCH_NAME" >> "$GITHUB_OUTPUT"
-
-    - name: Check release branch doesn't already exist remotely
-      if: steps.git_check.outputs.changes == 'true'
-      run: |
-        set -euo pipefail
-
-        BRANCH_NAME="${{ steps.release_branch.outputs.branch_name }}"
-
-        if git ls-remote --exit-code --heads origin "$BRANCH_NAME" >/dev/null 2>&1; then
-          echo "❌ Branch $BRANCH_NAME already exists on origin"
-          echo "Delete the existing branch or use a new tag name."
-          exit 1
-        fi
-
-        echo "✅ Release branch name ($BRANCH_NAME) is available"
-
-    - name: Create release branch
-      if: steps.git_check.outputs.changes == 'true'
-      run: |
-        set -euo pipefail
-
-        BRANCH_NAME="${{ steps.release_branch.outputs.branch_name }}"
-
-        # Create and checkout new branch
-        git checkout -b "$BRANCH_NAME" || {
-          echo "❌ Failed to create release branch: $BRANCH_NAME"
-          exit 1
-        }
-        echo "✅ Created release branch: $BRANCH_NAME"
-
-    - name: Commit release update changes
-      if: steps.git_check.outputs.changes == 'true'
-      run: |
-        set -euo pipefail
-
-        # Stage and commit changes
-        git add cli/version.php CHANGELOG.md || {
-          echo "❌ Failed to stage files"
-          exit 1
-        }
-
-        git commit -m "chore: version bump and update changelog for ${{ env.TAG_NAME }}" || {
-          echo "❌ Failed to commit changes"
-          exit 1
-        }
-        echo "✅ Committed changes"
-
-    - name: Push to remote
-      if: steps.git_check.outputs.changes == 'true'
-      run: |
-        set -euo pipefail
-        # Push to remote
-        git push -u origin "${{ steps.release_branch.outputs.branch_name }}" || {
-          echo "❌ Failed to push release branch to remote: ${{ steps.release_branch.outputs.branch_name }}"
-          exit 1
-        }
-        echo "✅ Pushed release branch to remote"
-
-    - name: Create pull request
-      if: steps.git_check.outputs.changes == 'true'
-      id: create_pr
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        set -euo pipefail
-
-        BRANCH_NAME="${{ steps.release_branch.outputs.branch_name }}"
-
-        echo "Creating pull request on $BRANCH_NAME branch into ${{ env.TARGET_BRANCH }}"
-
-        # Determine release type for PR title and body
-        RELEASE_TYPE="release"
-        if [[ "${{ inputs.prerelease }}" == "true" ]]; then
-          RELEASE_TYPE="pre-release"
-        fi
-
-        # Define PR details
-        # ^ capitalizes the first letter
-        PR_TITLE="${RELEASE_TYPE^} ${{ env.TAG_NAME }}"
-        PR_BODY="Automated version bump and changelog update for $RELEASE_TYPE ${{ env.TAG_NAME }}."
-        PR_LABELS="auto version bump,release"
-
-        # Create pull request and get the returned URL
-        PR_URL=$(gh pr create \
-          --base "${{ env.TARGET_BRANCH }}" \
-          --head "$BRANCH_NAME" \
-          --title "$PR_TITLE" \
-          --body "$PR_BODY" \
-          --label "$PR_LABELS") || {
-          echo "❌ Failed to create pull request"
-          exit 1
-        }
-        echo "✅ Pull request created successfully: $PR_URL"
-
-        # Extract PR number from URL and store as output
-        PR_NUMBER=$(echo "$PR_URL" | grep -oP '\\d+$')
-        echo "pr_number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
-        echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
-        
-
-    - name: Verify repository auto-merge is enabled
-      if: steps.git_check.outputs.changes == 'true'
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        set -euo pipefail
-
-        # Check if auto-merge is allowed for the repository using GitHub GraphQL API
-        AUTO_MERGE_ALLOWED=$(gh api graphql \
-          -f query='query($owner:String!, $repo:String!){ repository(owner:$owner, name:$repo){ autoMergeAllowed } }' \
-          -f owner='${{ github.repository_owner }}' \
-          -f repo='${{ github.event.repository.name }}' \
-          --jq '.data.repository.autoMergeAllowed')
-
-        if [[ "$AUTO_MERGE_ALLOWED" != "true" ]]; then
-          echo "❌ Repository auto-merge is disabled."
-          echo "ℹ️ Enable auto-merge in repository settings, or manually merge the release PR and rerun with publish_only=true."
-          exit 1
-        fi
-
-    - name: Queue pull request for auto-merge
-      if: steps.git_check.outputs.changes == 'true'
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        set -euo pipefail
-        # Merge PR using auto-merge
-        gh pr merge "${{ steps.create_pr.outputs.pr_url }}" --auto --squash || {
-          echo "❌ Failed to queue pull request for auto-merge"
-          exit 1
-        }
-        echo "✅ Pull request queued for auto-merge"
-
-    - name: Wait for PR merge
-      if: steps.git_check.outputs.changes == 'true'
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        set -euo pipefail
-
-        PR_NUMBER="${{ steps.create_pr.outputs.pr_number }}"
-
-        echo "⏳ Waiting for pull request #$PR_NUMBER to be merged..."
-
-        # Wait for PR to be merged (timeout after 10 minutes)
-        TIMEOUT=600
-        ELAPSED=0
-        INTERVAL=5
-
-        while [[ $ELAPSED -lt $TIMEOUT ]]; do
-          # Get PR state and merge status in one call
-          PR_DATA=$(gh pr view "$PR_NUMBER" --json state,mergedAt)
-          PR_STATE=$(echo "$PR_DATA" | jq -r '.state')
-          PR_MERGED_AT=$(echo "$PR_DATA" | jq -r '.mergedAt')
-
-          if [[ "$PR_STATE" == "MERGED" || "$PR_MERGED_AT" != "null" ]]; then
-            echo "✅ Pull request successfully merged"
-            exit 0
+          # Validate semver format and require the release tag to start with 'v'.
+          if [[ "$TAG_NAME" =~ ^v([0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9\.-]+)?(\+[a-zA-Z0-9\.-]+)?)$ ]]; then
+            VERSION="${BASH_REMATCH[1]}"
+            echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+            echo "✅ Valid semver tag: $TAG_NAME"
+          else
+            echo "❌ Invalid version format: $TAG_NAME"
+            echo "ℹ️ Version must start with 'v' and follow semver (e.g., v1.0.0, v1.0.0-beta.1)"
+            exit 1
           fi
 
-          echo "⏳ Still waiting... (${ELAPSED}s elapsed)"
-          sleep "$INTERVAL"
-          ELAPSED=$((ELAPSED + INTERVAL))
-        done
+      - name: Check local tag availability
+        run: |
+          set -euo pipefail
 
-        echo "❌ Timeout waiting for pull request to merge"
-        exit 1
+          if git rev-parse -q --verify "refs/tags/${{ env.TAG_NAME }}" >/dev/null; then
+            echo "⚠️ Tag ${{ env.TAG_NAME }} already exists locally."
+            exit 1
+          fi
 
-    - name: Resolve release commit SHA
-      id: resolve_release_sha
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        set -euo pipefail
+      - name: Check remote tag availability
+        run: |
+          set -euo pipefail
 
-        if [[ "${{ steps.git_check.outputs.changes }}" == "true" ]]; then
-          RELEASE_SHA=$(gh pr view "${{ steps.create_pr.outputs.pr_number }}" --json mergeCommit --jq '.mergeCommit.oid')
-        else
-          git fetch origin "${{ env.TARGET_BRANCH }}"
-          RELEASE_SHA=$(git rev-parse "origin/${{ env.TARGET_BRANCH }}")
-        fi
+          if git ls-remote --exit-code --tags origin "refs/tags/${{ env.TAG_NAME }}" >/dev/null 2>&1; then
+            echo "⚠️ Tag ${{ env.TAG_NAME }} already exists on origin."
+            echo "Published tags are immutable. Choose a new tag."
+            exit 1
+          fi
 
-        echo "release_sha=$RELEASE_SHA" >> "$GITHUB_OUTPUT"
-        echo "✅ Resolved release commit SHA: $RELEASE_SHA"
+      - name: Setup git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Update version file
+        run: |
+          set -euo pipefail
+
+          VERSION="${{ steps.parse_version.outputs.version }}"
+          CURRENT_VERSION=$(grep -oP "(?<=\\\$version = ')[^']+" cli/version.php)
+
+          if [[ "$VERSION" == "$CURRENT_VERSION" ]]; then
+            echo "ℹ️ version.php already set to $VERSION"
+          else
+            sed -i "s/\$version = '[^']*';/\$version = '$VERSION';/" cli/version.php
+            echo "✅ Updated version.php: $CURRENT_VERSION -> $VERSION"
+          fi
+
+      - name: Detect changelog file
+        id: changelog_file
+        run: |
+          set -euo pipefail
+
+          # Check if CHANGELOG.md exists
+          if [[ -f "CHANGELOG.md" ]]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "❌ CHANGELOG.md not found. Release requires changelog updates."
+            exit 1
+          fi
+
+      - name: Detect unreleased changelog heading
+        id: changelog_unreleased
+        if: steps.changelog_file.outputs.exists == 'true'
+        run: |
+          set -euo pipefail
+
+          # Check if Unreleased section exists (with or without a trailing URL)
+          if grep -qP "^## \[Unreleased\]" CHANGELOG.md; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "❌ No [Unreleased] section found in CHANGELOG.md."
+            echo "Release requires converting [Unreleased] into the release heading."
+            exit 1
+          fi
+
+      - name: Update changelog release heading
+        if: steps.changelog_unreleased.outputs.exists == 'true'
+        run: |
+          set -euo pipefail
+
+          VERSION="${{ steps.parse_version.outputs.version }}"
+          REPO="${{ github.repository }}"
+          CURRENT_DATE=$(date +%Y-%m-%d)
+
+          # Replace the entire [Unreleased] heading line (including any trailing URL)
+          # with a versioned release heading that links to the tree at the tag.
+          RELEASE_URL="${{ github.server_url }}/${REPO}/tree/${{ env.TAG_NAME }}"
+          NEW_HEADING="## [${VERSION}](${RELEASE_URL}) - ${CURRENT_DATE}"
+
+          sed -i "s|^## \[Unreleased\].*|${NEW_HEADING}|" CHANGELOG.md
+          echo "✅ Updated CHANGELOG.md [Unreleased] heading to [$VERSION]"
+
+      - name: Verify version metadata
+        run: |
+          set -euo pipefail
+
+          VERSION="${{ steps.parse_version.outputs.version }}"
+          FILE_VERSION=$(grep -oP "(?<=\\\$version = ')[^']+" cli/version.php)
+
+          if [[ "$FILE_VERSION" != "$VERSION" ]]; then
+            echo "❌ version.php mismatch: expected $VERSION, found $FILE_VERSION"
+            exit 1
+          fi
+
+      - name: Verify changelog metadata
+        run: |
+          set -euo pipefail
+
+          VERSION="${{ steps.parse_version.outputs.version }}"
+
+          if ! grep -qE "^## \[$VERSION\]" CHANGELOG.md; then
+            echo "❌ CHANGELOG.md does not contain a release heading for [$VERSION]"
+            echo "❌ Refusing to release because changelog metadata is incomplete."
+            exit 1
+          fi
+
+      - name: Verify required release file changes
+        id: git_check
+        run: |
+          set -euo pipefail
+
+          VERSION_CHANGED=true
+          CHANGELOG_CHANGED=true
+
+          if git diff --quiet -- cli/version.php; then
+            VERSION_CHANGED=false
+          fi
+
+          if git diff --quiet -- CHANGELOG.md; then
+            CHANGELOG_CHANGED=false
+          fi
+
+          if [[ "$VERSION_CHANGED" != "true" ]]; then
+            echo "❌ version.php was not changed."
+            echo "❌ A release requires a version bump."
+            exit 1
+          fi
+
+          if [[ "$CHANGELOG_CHANGED" != "true" ]]; then
+            echo "❌ CHANGELOG.md was not changed."
+            echo "❌ A release requires a changelog update."
+            exit 1
+          fi
+
+          echo "changes=true" >> "$GITHUB_OUTPUT"
+          echo "📝 Required release changes detected:"
+          git status --porcelain -- cli/version.php CHANGELOG.md
+
+      - name: Prepare release branch name
+        if: steps.git_check.outputs.changes == 'true'
+        id: release_branch
+        run: |
+          set -euo pipefail
+
+          # Create a release branch name based on the tag name
+          BRANCH_NAME="release/${{ env.TAG_NAME }}"
+          echo "branch_name=$BRANCH_NAME" >> "$GITHUB_OUTPUT"
+
+      - name: Check release branch doesn't already exist remotely
+        if: steps.git_check.outputs.changes == 'true'
+        run: |
+          set -euo pipefail
+
+          BRANCH_NAME="${{ steps.release_branch.outputs.branch_name }}"
+
+          if git ls-remote --exit-code --heads origin "$BRANCH_NAME" >/dev/null 2>&1; then
+            echo "❌ Branch $BRANCH_NAME already exists on origin"
+            echo "Delete the existing branch or use a new tag name."
+            exit 1
+          fi
+
+          echo "✅ Release branch name ($BRANCH_NAME) is available"
+
+      - name: Create release branch
+        if: steps.git_check.outputs.changes == 'true'
+        run: |
+          set -euo pipefail
+
+          BRANCH_NAME="${{ steps.release_branch.outputs.branch_name }}"
+
+          # Create and checkout new branch
+          git checkout -b "$BRANCH_NAME" || {
+            echo "❌ Failed to create release branch: $BRANCH_NAME"
+            exit 1
+          }
+          echo "✅ Created release branch: $BRANCH_NAME"
+
+      - name: Commit release update changes
+        if: steps.git_check.outputs.changes == 'true'
+        run: |
+          set -euo pipefail
+
+          # Stage and commit changes
+          git add cli/version.php CHANGELOG.md || {
+            echo "❌ Failed to stage files"
+            exit 1
+          }
+
+          git commit -m "chore: version bump and update changelog for ${{ env.TAG_NAME }}" || {
+            echo "❌ Failed to commit changes"
+            exit 1
+          }
+          echo "✅ Committed changes"
+
+      - name: Push to remote
+        if: steps.git_check.outputs.changes == 'true'
+        run: |
+          set -euo pipefail
+          # Push to remote
+          git push -u origin "${{ steps.release_branch.outputs.branch_name }}" || {
+            echo "❌ Failed to push release branch to remote: ${{ steps.release_branch.outputs.branch_name }}"
+            exit 1
+          }
+          echo "✅ Pushed release branch to remote"
+
+      - name: Create pull request
+        if: steps.git_check.outputs.changes == 'true'
+        id: create_pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          BRANCH_NAME="${{ steps.release_branch.outputs.branch_name }}"
+
+          echo "Creating pull request on $BRANCH_NAME branch into ${{ env.TARGET_BRANCH }}"
+
+          # Determine release type for PR title and body
+          RELEASE_TYPE="release"
+          if [[ "${{ inputs.prerelease }}" == "true" ]]; then
+            RELEASE_TYPE="pre-release"
+          fi
+
+          # Define PR details
+          # ^ capitalizes the first letter
+          PR_TITLE="${RELEASE_TYPE^} ${{ env.TAG_NAME }}"
+          PR_BODY="Automated version bump and changelog update for $RELEASE_TYPE ${{ env.TAG_NAME }}."
+          PR_LABELS="auto version bump,release"
+
+          # Create pull request and get the returned URL
+          PR_URL=$(gh pr create \
+            --base "${{ env.TARGET_BRANCH }}" \
+            --head "$BRANCH_NAME" \
+            --title "$PR_TITLE" \
+            --body "$PR_BODY" \
+            --label "$PR_LABELS") || {
+            echo "❌ Failed to create pull request"
+            exit 1
+          }
+          echo "✅ Pull request created successfully: $PR_URL"
+
+          # Extract PR number from URL and store as output
+          PR_NUMBER=$(echo "$PR_URL" | grep -oP '\\d+$')
+          echo "pr_number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+          echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Verify repository auto-merge is enabled
+        if: steps.git_check.outputs.changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          # Check if auto-merge is allowed for the repository using GitHub GraphQL API
+          AUTO_MERGE_ALLOWED=$(gh api graphql \
+            -f query='query($owner:String!, $repo:String!){ repository(owner:$owner, name:$repo){ autoMergeAllowed } }' \
+            -f owner='${{ github.repository_owner }}' \
+            -f repo='${{ github.event.repository.name }}' \
+            --jq '.data.repository.autoMergeAllowed')
+
+          if [[ "$AUTO_MERGE_ALLOWED" != "true" ]]; then
+            echo "❌ Repository auto-merge is disabled."
+            echo "ℹ️ Enable auto-merge in repository settings, or manually merge the release PR and rerun with publish_only=true."
+            exit 1
+          fi
+
+      - name: Queue pull request for auto-merge
+        if: steps.git_check.outputs.changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          # Merge PR using auto-merge
+          gh pr merge "${{ steps.create_pr.outputs.pr_url }}" --auto --squash || {
+            echo "❌ Failed to queue pull request for auto-merge"
+            exit 1
+          }
+          echo "✅ Pull request queued for auto-merge"
+
+      - name: Wait for PR merge
+        if: steps.git_check.outputs.changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          PR_NUMBER="${{ steps.create_pr.outputs.pr_number }}"
+
+          echo "⏳ Waiting for pull request #$PR_NUMBER to be merged..."
+
+          # Wait for PR to be merged (timeout after 10 minutes)
+          TIMEOUT=600
+          ELAPSED=0
+          INTERVAL=5
+
+          while [[ $ELAPSED -lt $TIMEOUT ]]; do
+            # Get PR state and merge status in one call
+            PR_DATA=$(gh pr view "$PR_NUMBER" --json state,mergedAt)
+            PR_STATE=$(echo "$PR_DATA" | jq -r '.state')
+            PR_MERGED_AT=$(echo "$PR_DATA" | jq -r '.mergedAt')
+
+            if [[ "$PR_STATE" == "MERGED" || "$PR_MERGED_AT" != "null" ]]; then
+              echo "✅ Pull request successfully merged"
+              exit 0
+            fi
+
+            echo "⏳ Still waiting... (${ELAPSED}s elapsed)"
+            sleep "$INTERVAL"
+            ELAPSED=$((ELAPSED + INTERVAL))
+          done
+
+          echo "❌ Timeout waiting for pull request to merge"
+          exit 1
+
+      - name: Resolve release commit SHA
+        id: resolve_release_sha
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          if [[ "${{ steps.git_check.outputs.changes }}" == "true" ]]; then
+            RELEASE_SHA=$(gh pr view "${{ steps.create_pr.outputs.pr_number }}" --json mergeCommit --jq '.mergeCommit.oid')
+          else
+            git fetch origin "${{ env.TARGET_BRANCH }}"
+            RELEASE_SHA=$(git rev-parse "origin/${{ env.TARGET_BRANCH }}")
+          fi
+
+          echo "release_sha=$RELEASE_SHA" >> "$GITHUB_OUTPUT"
+          echo "✅ Resolved release commit SHA: $RELEASE_SHA"
 
   resolve-release-sha-publish-only:
     if: inputs.publish_only == true
@@ -410,34 +409,34 @@ jobs:
     env:
       TARGET_BRANCH: ${{ inputs.target_branch }}
     steps:
-    - name: Checkout target branch
-      uses: actions/checkout@v4
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        ref: ${{ inputs.target_branch }}
-        fetch-depth: 0
+      - name: Checkout target branch
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ inputs.target_branch }}
+          fetch-depth: 0
 
-    - name: Resolve release commit SHA
-      id: resolve_publish_only_sha
-      run: |
-        set -euo pipefail
+      - name: Resolve release commit SHA
+        id: resolve_publish_only_sha
+        run: |
+          set -euo pipefail
 
-        INPUT_SHA="${{ inputs.release_sha }}"
+          INPUT_SHA="${{ inputs.release_sha }}"
 
-        if [[ -n "$INPUT_SHA" ]]; then
-          RELEASE_SHA="$INPUT_SHA"
-        else
-          git fetch origin "${{ env.TARGET_BRANCH }}"
-          RELEASE_SHA=$(git rev-parse "origin/${{ env.TARGET_BRANCH }}")
-        fi
+          if [[ -n "$INPUT_SHA" ]]; then
+            RELEASE_SHA="$INPUT_SHA"
+          else
+            git fetch origin "${{ env.TARGET_BRANCH }}"
+            RELEASE_SHA=$(git rev-parse "origin/${{ env.TARGET_BRANCH }}")
+          fi
 
-        git cat-file -e "$RELEASE_SHA^{commit}" || {
-          echo "❌ Could not resolve a valid commit SHA for publish-only mode"
-          exit 1
-        }
+          git cat-file -e "$RELEASE_SHA^{commit}" || {
+            echo "❌ Could not resolve a valid commit SHA for publish-only mode"
+            exit 1
+          }
 
-        echo "release_sha=$RELEASE_SHA" >> "$GITHUB_OUTPUT"
-        echo "✅ Publish-only release SHA resolved: $RELEASE_SHA"
+          echo "release_sha=$RELEASE_SHA" >> "$GITHUB_OUTPUT"
+          echo "✅ Publish-only release SHA resolved: $RELEASE_SHA"
 
   publish-release:
     name: Publish Release
@@ -451,54 +450,54 @@ jobs:
       TARGET_BRANCH: ${{ inputs.target_branch }}
       RELEASE_SHA: ${{ inputs.publish_only && needs.resolve-release-sha-publish-only.outputs.release_sha || needs.prepare-release.outputs.release_sha }}
     steps:
-    - name: Checkout target branch
-      uses: actions/checkout@v4
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        ref: ${{ inputs.target_branch }}
-        fetch-depth: 0
+      - name: Checkout target branch
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ inputs.target_branch }}
+          fetch-depth: 0
 
-    - name: Fetch target branch
-      run: |
-        set -euo pipefail
-        git fetch origin "${{ env.TARGET_BRANCH }}"
+      - name: Fetch target branch
+        run: |
+          set -euo pipefail
+          git fetch origin "${{ env.TARGET_BRANCH }}"
 
-    - name: Verify release commit exists locally
-      run: |
-        set -euo pipefail
-        git cat-file -e "${{ env.RELEASE_SHA }}^{commit}"
-        echo "✅ Release commit exists locally: ${{ env.RELEASE_SHA }}"
+      - name: Verify release commit exists locally
+        run: |
+          set -euo pipefail
+          git cat-file -e "${{ env.RELEASE_SHA }}^{commit}"
+          echo "✅ Release commit exists locally: ${{ env.RELEASE_SHA }}"
 
-    - name: Create immutable tag
-      run: |
-        set -euo pipefail
-        git tag "${{ env.TAG_NAME }}" "${{ env.RELEASE_SHA }}"
-        echo "✅ Created immutable tag locally: ${{ env.TAG_NAME }}"
+      - name: Create immutable tag
+        run: |
+          set -euo pipefail
+          git tag "${{ env.TAG_NAME }}" "${{ env.RELEASE_SHA }}"
+          echo "✅ Created immutable tag locally: ${{ env.TAG_NAME }}"
 
-    - name: Push immutable tag
-      run: |
-        set -euo pipefail
-        git push origin "${{ env.TAG_NAME }}"
-        echo "✅ Pushed immutable tag: ${{ env.TAG_NAME }}"
+      - name: Push immutable tag
+        run: |
+          set -euo pipefail
+          git push origin "${{ env.TAG_NAME }}"
+          echo "✅ Pushed immutable tag: ${{ env.TAG_NAME }}"
 
-    - name: Publish GitHub release
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        set -euo pipefail
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
 
-        RELEASE_ARGS=()
-        if [[ "${{ inputs.prerelease }}" == "true" ]]; then
-          RELEASE_ARGS+=(--prerelease)
-        fi
+          RELEASE_ARGS=()
+          if [[ "${{ inputs.prerelease }}" == "true" ]]; then
+            RELEASE_ARGS+=(--prerelease)
+          fi
 
-        gh release create "${{ env.TAG_NAME }}" \
-          --target "${{ env.RELEASE_SHA }}" \
-          --generate-notes \
-          "${RELEASE_ARGS[@]}"
+          gh release create "${{ env.TAG_NAME }}" \
+            --target "${{ env.RELEASE_SHA }}" \
+            --generate-notes \
+            "${RELEASE_ARGS[@]}"
 
-        if [[ "${{ inputs.prerelease }}" == "true" ]]; then
-          echo "✅ Published prerelease: ${{ env.TAG_NAME }}"
-        else
-          echo "✅ Published release: ${{ env.TAG_NAME }}"
-        fi
+          if [[ "${{ inputs.prerelease }}" == "true" ]]; then
+            echo "✅ Published prerelease: ${{ env.TAG_NAME }}"
+          else
+            echo "✅ Published release: ${{ env.TAG_NAME }}"
+          fi
