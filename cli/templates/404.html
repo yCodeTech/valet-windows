@@ -3,9 +3,21 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Valet - Not Found</title>
 		<style>
+			:root {
+				--color-default-dark: #2e2e2e;
+
+				--background-color: #fff;
+				--text-color: #000;
+
+				@media (prefers-color-scheme: dark) {
+					--background-color: var(--color-default-dark);
+					--text-color: #fff;
+				}
+			}
 			body {
 				margin: 0;
-				color: #000;
+				color: var(--text-color);
+				background-color: var(--background-color);
 				font-family: monospace;
 				text-align: center;
 			}
@@ -27,7 +39,7 @@
 				min-width: 200px;
 
 				.valet {
-					fill: #2e2e2e;
+					fill: var(--color-default-dark);
 					fill-rule: evenodd;
 
 					@media (prefers-color-scheme: dark) {

@@ -4,9 +4,23 @@
 		<title>Valet - Internal Server Error</title>
 
 		<style>
+			:root {
+				--color-default-dark: #2e2e2e;
+				--color-accent: #4b40c8;
+
+				--background-color: #fff;
+				--text-color: #000;
+
+				@media (prefers-color-scheme: dark) {
+					--color-accent: #bd74e6;
+					--background-color: var(--color-default-dark);
+					--text-color: #fff;
+				}
+			}
 			body {
 				margin: 0;
-				color: #000;
+				color: var(--text-color);
+				background-color: var(--background-color);
 				font-family: monospace;
 				text-align: center;
 			}
@@ -27,7 +41,7 @@
 				min-width: 200px;
 
 				.valet {
-					fill: #2e2e2e;
+					fill: var(--color-default-dark);
 					fill-rule: evenodd;
 
 					@media (prefers-color-scheme: dark) {
@@ -56,11 +70,7 @@
 				word-wrap: break-word;
 
 				em {
-					color: #4b40c8;
-
-					@media (prefers-color-scheme: dark) {
-						color: #bd74e6;
-					}
+					color: var(--color-accent);
 
 					&.command {
 						white-space: nowrap;
